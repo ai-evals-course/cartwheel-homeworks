@@ -27,18 +27,46 @@ What each test isolates:
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sqlite3
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from agents import Agent, Runner
+from agents.tool_context import ToolContext
 
-from agent.agent import TOOLS_BY_ROLE, render_system_prompt
+from agent.agent import TOOLS_BY_ROLE, render_system_prompt, search_products
 from agent.auth import AuthContext
 from tests.eval.fake_model import FakeModel, text_message, tool_call
 
 SHOPPER_1 = AuthContext(user_id=1, role="shopper")
+
+
+@pytest.mark.parametrize("implemented", [False, True])
+def test_integration_search_products_wrapper(implemented: bool) -> None:
+    arguments = json.dumps({"query": "mug", "store": "Ceramics", "max_price_usd": 25, "limit": 2})
+    context = ToolContext(
+        context=SHOPPER_1, tool_name="search_products",
+        tool_call_id="search", tool_arguments=arguments,
+    )
+    expected = (
+        {"ok": True, "products": []} if implemented else
+        {"ok": False, "error": "not_implemented", "reason": "homework hole"}
+    )
+    with (
+        patch(
+            "agent.agent.hw_tools.search_products", return_value=expected,
+            side_effect=None if implemented else NotImplementedError("homework hole"),
+        ) as search,
+        patch("agent.agent.record_tool_result") as record,
+    ):
+        result = asyncio.run(search_products.on_invoke_tool(context, arguments))
+
+    assert result == expected
+    search.assert_called_once_with(SHOPPER_1, "mug", store="Ceramics", max_price_usd=25, limit=2)
+    record.assert_called_once_with(SHOPPER_1, expected)
 
 
 def _build_fake_agent(ctx: AuthContext, fake: FakeModel) -> Agent[AuthContext]:
