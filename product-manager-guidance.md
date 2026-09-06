@@ -37,9 +37,9 @@ Create .env from the supplied template if needed. Show me how to enter my key lo
 
 Run the supplied baseline checks and explain expected failures from unfinished homework functions. An expected failure does not mean the function is complete.
 
-Help me start a real conversation as shopper user 1 using the provided CLI. Begin with a supported order lookup for order 4127. Inspect the implementation if anything blocks the conversation. Clearly distinguish a technical failure from a behavior we want to evaluate.
+Help me start a real conversation as shopper user 1 using the provided CLI. Begin with a supported order lookup for order 4127. Before running the request, ask what I expect the agent to do and wait for my answer. Inspect the implementation if anything blocks the conversation. Clearly distinguish a technical failure from a behavior we want to evaluate.
 
-Checkpoint: show the actual response and ask what I expected the agent to do. Do not count a simulated response as a real run.
+Checkpoint: show the actual response and ask whether it met my expectation. Do not count a simulated response as a real run.
 
 ## 3. Complete the tools with me
 
@@ -47,7 +47,7 @@ Follow HW1 Part A for get_policy, search_products, list_my_orders, cancel_order,
 
 Use the existing database and authorization helpers. Preserve permission checks. If a docstring and helper disagree, inspect the implementation and tests, explain the mismatch, and resolve it without weakening the requirements or changing a test merely to make it pass.
 
-Run the focused HW1 tests with --runxfail so unfinished functions cannot be hidden as expected failures. Also run the regression checks named in the handout. Help me consider an additional tool when our conversations reveal a missing capability, following the current assignment's guidance.
+Run the focused HW1 tests with --runxfail so unfinished functions cannot be hidden as expected failures. Also run the regression checks named in the handout. When a conversation reveals a missing capability, help me define an appropriate tool, implement it, and register it for the correct roles, following the current assignment's guidance.
 
 Checkpoint: show what now works and which checks passed. Ask whether I want any part explained before we examine more conversations.
 
@@ -55,13 +55,15 @@ Checkpoint: show what now works and which checks passed. Ask whether I want any 
 
 Walk me through Part B one conversation at a time. Cover all required cases and all three roles, then help me design the remaining cases to reach at least ten. Ask what I expect before we run each case, then ask whether the observed behavior met that expectation.
 
+Start each separate conversation in a fresh CLI session so earlier requests and tool results do not influence it. Quit and relaunch the CLI between conversations, keeping follow-up turns within the same conversation together. Resetting the order database does not clear conversation history.
+
 Handle the technical work of capturing the actual request, tool calls and results, and final response in hw1-session.jsonl. Inspect how the CLI exposes those details and arrange reliable capture if needed. Do not invent missing tool calls or results. Use my assessment for the judgment fields and help me distinguish a prompt failure, a tool failure, and an unclear requirement.
 
 Explain when a refund or cancellation changes the local data. Reset between conversations when needed, preserving the records we have already saved and keeping state consistent within each conversation.
 
 ## 5. Investigate a prompt improvement and finish
 
-Guide me through Part C. Help me identify a missing or vague model instruction, predict a failure, and test it. Change the prompt only when the observed behavior supports the change, then rerun the same case. If no tested omission causes a prompt failure, help me explain why no edit was justified.
+Guide me through Part C. Help me identify a missing or vague model instruction, predict a failure, and test it. If the agent already satisfies the first requirement, test another possible omission before concluding the investigation. Change the prompt only when the observed behavior supports the change, then rerun the same case in a fresh session with the same starting data. If none of the tested omissions causes a prompt failure, help me explain which omissions we tested and why no edit was justified.
 
 Check every deliverable against the current handout. Verify the conversation records and run the required checks. Prepare the relevant local commits, excluding .env and unrelated files. Leave publishing or pushing to me.
 
