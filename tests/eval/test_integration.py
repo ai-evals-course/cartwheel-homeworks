@@ -8,6 +8,10 @@ the REAL tool plumbing. They run on every push, with zero API calls.
 
 What each test isolates:
 
+  - Wrapper delegation: search_products forwards arguments, records its
+    result, and converts NotImplementedError into a structured tool error.
+    This checks the SDK tool boundary without a model call.
+
   - Grounding: fix the retrieved-docs set (mock the retrieval tool) and
     assert the model's next-turn context contains exactly those docs. With
     a live model, the follow-on assertion is that the answer cites the store

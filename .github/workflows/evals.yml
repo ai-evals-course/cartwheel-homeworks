@@ -29,7 +29,7 @@ jobs:
         run: uv run pytest tests/eval -k "unit or integration" -q
       - name: Homework structural checks
         run: uv run pytest tests/test_hw_holes.py -q
-      - name: CLI and database lifecycle checks, with no model keys
+      - name: CLI, replay, and database checks, with no model keys
         run: uv run pytest tests/test_cli.py tests/test_run_items.py tests/test_db.py -q
 
   complete-evaluations:
