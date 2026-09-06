@@ -48,7 +48,17 @@ def load_env(path: Path | None = None) -> None:
 
     A tiny loader so the repo does not need python-dotenv. Lines starting
     with '#' and blank lines are ignored. Values are never logged.
+
+    Also disables the Agents SDK's default trace export to the OpenAI
+    backend. That path is separate from `setup_tracing()` (Langfuse) and
+    fails on organizations with zero data retention enabled, since the
+    backend rejects trace ingestion outright. `setup_tracing()` re-enables
+    tracing once `instrument_genai()` has replaced that backend export with
+    the Langfuse one, so spans still ship when `--trace` is used.
     """
+    from agents import set_tracing_disabled
+
+    set_tracing_disabled(True)
     path = path or REPO_ROOT / ".env"
     if not path.exists():
         return
@@ -72,10 +82,15 @@ def setup_tracing() -> None:
             "copy .env.example to .env."
         )
         return
+    from agents import set_tracing_disabled
     from langfuse import get_client
 
     get_client()  # registers the OTel tracer provider from LANGFUSE_* env vars
     instrument_genai(trace.get_tracer_provider())
+    # instrument_genai() replaced the SDK's default trace processors (the
+    # ones that export to the OpenAI backend) with the Langfuse OTel bridge,
+    # so re-enabling tracing here only ships spans to Langfuse, never OpenAI.
+    set_tracing_disabled(False)
     log.info("tracing enabled; spans go to %s", os.environ.get("LANGFUSE_HOST"))
 
 
