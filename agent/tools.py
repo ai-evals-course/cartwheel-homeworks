@@ -3,7 +3,7 @@
 The three lecture tools (`search_help_center`, `get_order`, `issue_refund`)
 are implemented in agent/agent.py and are worked examples of the pattern:
 check permissions first, go through agent/db.py for data, and return a
-structured dict, never a prose error. Your four tools follow the same
+structured dict, never a prose error. The homework tools follow the same
 pattern. agent/agent.py already wraps each function below as an SDK tool, so
 once a function works here it works in chat with no further wiring.
 
@@ -93,7 +93,7 @@ def search_products(
 
     Implementation notes:
         agent.db.list_products(conn, store_id) gives the candidate set.
-        Open the database with agent.db.connect() and close it when done.
+        Use `with db.connection() as conn:` to close the database automatically.
     """
     ### YOUR CODE HERE (HW1)
     raise NotImplementedError("HW1: implement search_products")

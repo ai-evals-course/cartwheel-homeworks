@@ -8,6 +8,7 @@ separable and testable. The schema itself is created by seed/generate.py.
 from __future__ import annotations
 
 import sqlite3
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -17,7 +18,7 @@ from agent.config import db_path
 
 
 def connect(path: Path | None = None) -> sqlite3.Connection:
-    """Open the world database. Caller closes it (or uses a context manager)."""
+    """Open the world database. Caller must close it; prefer connection()."""
     target = path or db_path()
     if not target.exists():
         raise FileNotFoundError(
@@ -26,6 +27,11 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     conn = sqlite3.connect(target)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def connection(path: Path | None = None) -> closing[sqlite3.Connection]:
+    """Open a connection that closes on block exit, without committing on exit."""
+    return closing(connect(path))
 
 
 def _parse_date(value: str | None) -> date | None:

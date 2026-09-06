@@ -58,6 +58,19 @@ The supplied data access layer in `agent/db.py` provides the database operations
 - `get_policy` reads the generated policy files with `load_policy_docs` from `agent/helpcenter.py`.
 - `find_order` searches the authenticated user's orders by product name. Use `list_orders_for_user` and filter by matching the query against product names.
 
+Use `with db.connection() as conn:` for database access. It closes the connection
+automatically, including on early returns and errors:
+
+```python
+with db.connection() as conn:
+    order = db.get_order(conn, order_id)
+```
+
+The supplied write helpers commit their changes. The `with` block only handles
+closing; it does not commit pending writes. Existing code that uses `db.connect()`
+and closes it explicitly still works. A bare `with db.connect()` does not close
+a SQLite connection.
+
 Use the supplied functions rather than writing a second database layer. Each tool docstring states the required inputs, return value, and error behavior.
 
 `SPEC.md` is a design document; the running application does not load it. The starter translates the specification into three kinds of implementation:

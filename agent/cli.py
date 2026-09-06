@@ -80,11 +80,8 @@ def _print_tool_calls(new_items: list[RunItem]) -> None:
 
 def resolve_auth(role: str, user_id: int | None) -> AuthContext:
     """Build the auth context from the users table (the injected block)."""
-    conn = db.connect()
-    try:
+    with db.connection() as conn:
         user = db.get_user(conn, user_id if user_id is not None else DEFAULT_USERS[role])
-    finally:
-        conn.close()
     if user is None:
         raise SystemExit(f"no such user id: {user_id}")
     if user.role != role:
