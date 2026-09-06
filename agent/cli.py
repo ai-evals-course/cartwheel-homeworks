@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import time
 
 from agents import RunConfig, Runner, SQLiteSession
@@ -40,6 +39,7 @@ from agent import db
 from agent.agent import build_agent, prompt_version, render_system_prompt
 from agent.auth import AuthContext
 from agent.config import REPO_ROOT
+from agent.run_items import tool_calls_from_items
 from observability.instrument import load_env, setup_tracing
 
 DEFAULT_USERS = {"shopper": 1, "merchant": 9001, "support": 9501}
@@ -55,27 +55,10 @@ def _print_tool_calls(new_items: list[RunItem]) -> None:
     `result.new_items`, independent of whether tracing is configured, so
     this is accurate with or without --trace.
     """
-    outputs = {
-        item.call_id: item.output
-        for item in new_items
-        if item.type == "tool_call_output_item" and item.call_id is not None
-    }
-    for item in new_items:
-        if item.type == "tool_call_item":
-            raw = item.raw_item
-            args = (
-                raw.get("arguments")
-                if isinstance(raw, dict)
-                else getattr(raw, "arguments", None)
-            )
-            if isinstance(args, str):
-                try:
-                    args = json.loads(args)
-                except json.JSONDecodeError:
-                    pass
-            print(f"  [tool] {item.tool_name}({args})")
-            if item.call_id in outputs:
-                print(f"    -> {outputs[item.call_id]}")
+    for call in tool_calls_from_items(new_items):
+        print(f"  [tool] {call['name']}({call['args']})")
+        if "result" in call:
+            print(f"    -> {call['result']}")
 
 
 def resolve_auth(role: str, user_id: int | None) -> AuthContext:

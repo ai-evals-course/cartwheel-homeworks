@@ -132,38 +132,23 @@ def _auth_context(case_input: dict[str, Any]) -> Any:
 
 def _extract_turn(new_items: list[Any]) -> dict[str, Any]:
     """Collapse one Runner turn's items into {reply, tool_calls, steps}."""
-    from agents.items import MessageOutputItem, ToolCallItem, ToolCallOutputItem
+    from agents.items import MessageOutputItem
 
-    calls: dict[str, dict[str, Any]] = {}
-    ordered: list[dict[str, Any]] = []
+    from agent.run_items import tool_calls_from_items
+
     reply_parts: list[str] = []
     for item in new_items:
-        if isinstance(item, ToolCallItem):
-            raw = item.raw_item
-            record = {
-                "name": getattr(raw, "name", None),
-                "args": json.loads(getattr(raw, "arguments", None) or "{}"),
-                "result": None,
-            }
-            calls[getattr(raw, "call_id", None)] = record
-            ordered.append(record)
-        elif isinstance(item, ToolCallOutputItem):
-            call_id = None
-            raw = item.raw_item
-            if isinstance(raw, dict):
-                call_id = raw.get("call_id")
-            else:
-                call_id = getattr(raw, "call_id", None)
-            if call_id in calls:
-                calls[call_id]["result"] = item.output
-        elif isinstance(item, MessageOutputItem):
+        if isinstance(item, MessageOutputItem):
             for part in getattr(item.raw_item, "content", []) or []:
                 text = getattr(part, "text", None)
                 if text:
                     reply_parts.append(text)
     return {
         "reply": "\n".join(reply_parts),
-        "tool_calls": ordered,
+        "tool_calls": [
+            {**call, "result": call.get("result")}
+            for call in tool_calls_from_items(new_items)
+        ],
         "steps": len(new_items),
     }
 

@@ -310,10 +310,10 @@ def escalate_to_human_logic(
 
 
 def _call(
-    wrapper: RunContextWrapper[AuthContext], fn: Any, /, *args: Any
+    wrapper: RunContextWrapper[AuthContext], fn: Any, /, *args: Any, **kwargs: Any
 ) -> dict[str, Any]:
     try:
-        result = fn(wrapper.context, *args)
+        result = fn(wrapper.context, *args, **kwargs)
     except NotImplementedError as exc:
         result = {"ok": False, "error": "not_implemented", "reason": str(exc)}
     record_tool_result(wrapper.context, result)
@@ -374,15 +374,10 @@ def search_products(
     limit: int = 5,
 ) -> dict[str, Any]:
     """Search the product catalog, optionally within one store or under a price."""
-    ctx = wrapper.context
-    try:
-        result = hw_tools.search_products(
-            ctx, query, store=store, max_price_usd=max_price_usd, limit=limit
-        )
-    except NotImplementedError as exc:
-        result = {"ok": False, "error": "not_implemented", "reason": str(exc)}
-    record_tool_result(ctx, result)
-    return result
+    return _call(
+        wrapper, hw_tools.search_products, query,
+        store=store, max_price_usd=max_price_usd, limit=limit,
+    )
 
 
 @function_tool
