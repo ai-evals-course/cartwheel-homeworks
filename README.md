@@ -7,6 +7,22 @@ The repository contains the Cartwheel support agent and starter code for all fiv
 
 Begin with the [homework index](homework/README.md). Each assignment names the code and records required for the corresponding module.
 
+## Guidance for product managers
+
+If you are a product manager or are unfamiliar with Python setup, use the [interactive Homework 1 tutorial](product-manager-guidance.md). Your coding agent handles setup and implementation while you decide what behavior to expect and review the results. The tutorial starts with your local copy of the existing repository and walks through the full assignment one step at a time.
+
+Open this repository in Claude Code, Codex, or your preferred coding agent and paste:
+
+```text
+Read product-manager-guidance.md and use it to walk me through Homework 1 as an interactive tutorial. Start by checking the current folder and helping me get oriented. Give me one step at a time and pause at the checkpoints so I can ask questions and make decisions.
+```
+
+If you have not downloaded the repository yet, give your coding agent this instead:
+
+```text
+Help me clone https://github.com/ai-evals-course/cartwheel-homeworks onto my computer and open the local repository. Then read product-manager-guidance.md and follow it as an interactive Homework 1 tutorial, one step at a time.
+```
+
 ## Setup
 
 You need Python 3.12 and [uv](https://docs.astral.sh/uv/). Run the commands from the repository root.
