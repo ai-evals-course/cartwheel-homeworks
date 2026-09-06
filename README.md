@@ -43,6 +43,8 @@ The starter contains unfinished homework functions. Tests for unfinished functio
 uv run python -m agent.cli --role shopper --user 1
 ```
 
+CLI tracing is off by default. Add `--debug` to print tool calls and results locally. To send traces to OpenAI, add `--trace-openai` and set `OPENAI_API_KEY`; OpenAI hosted tracing is unavailable for zero-data-retention organizations. For the course's Langfuse setup, use `--trace` instead. The two tracing flags cannot be combined. `OPENAI_AGENTS_DISABLE_TRACING=1` disables SDK tracing for either destination.
+
 The default development seed is the executable course world: 20 stores, 800
 products, 525 users, 10,000 orders, and 18 policy documents. The seed script
 is deterministic. Two runs produce identical data, and the

@@ -37,9 +37,10 @@ def instrument_genai(tracer_provider: Any) -> None:
 
     os.environ.setdefault("TRACELOOP_TRACE_CONTENT", "false")
     # Export only through Langfuse, not the SDK's separate hosted tracing path.
-    OpenAIAgentsInstrumentor(replace_existing_processors=True).instrument(
-        tracer_provider=tracer_provider
-    )
+    instrumentor = OpenAIAgentsInstrumentor(replace_existing_processors=True)
+    instrumentor.instrument(tracer_provider=tracer_provider)
+    if not instrumentor.is_instrumented_by_opentelemetry:
+        raise RuntimeError("OpenAI Agents tracing instrumentation failed to install")
     _genai_instrumented = True
 
 
@@ -65,23 +66,22 @@ def load_env(path: Path | None = None) -> None:
 def setup_tracing() -> bool:
     """Install Langfuse tracing; return False when credentials are missing."""
     load_env()
-    missing = [
-        key
-        for key in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY")
-        if not os.environ.get(key)
-    ]
-    if missing:
+    if not os.environ.get("LANGFUSE_PUBLIC_KEY"):
         log.warning(
-            "Missing %s; tracing is off. Start the stack "
+            "LANGFUSE_PUBLIC_KEY is not set; tracing is off. Start the stack "
             "(docker compose -f observability/docker-compose.yml up -d) and "
-            "copy .env.example to .env.",
-            ", ".join(missing),
+            "copy .env.example to .env."
         )
         return False
     from langfuse import get_client
 
     get_client()  # registers the OTel tracer provider from LANGFUSE_* env vars
     instrument_genai(trace.get_tracer_provider())
+    # Preserve processor replacement for callers such as the server, which
+    # ignore our return value. A missing secret makes Langfuse a no-op client;
+    # returning before replacement would leave hosted OpenAI export active.
+    if not os.environ.get("LANGFUSE_SECRET_KEY"):
+        return False
     log.info("tracing enabled; spans go to %s", os.environ.get("LANGFUSE_HOST"))
     return True
 
