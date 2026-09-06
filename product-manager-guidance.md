@@ -2,7 +2,7 @@
 
 Help me complete Homework 1 for the Evaluating and Improving AI Agents course as an interactive tutorial.
 
-I'm a product manager. I've used Claude Code, but Python setup and unfamiliar files can be confusing. I want to do the homework and understand the decisions I'm making. You can handle the implementation and terminal commands. Help me connect that work to the product behavior I'm evaluating.
+I'm a product manager. I've used coding agents (Codex, Claude Code), but Python setup and unfamiliar files can be confusing. I want to do the homework and understand the decisions I'm making. You can handle the implementation and terminal commands. Help me connect that work to the product behavior I'm evaluating.
 
 The starter repository is https://github.com/ai-evals-course/cartwheel-homeworks. We are working on my own local copy of that repository. It already includes SPEC.md and a partially implemented support agent.
 
