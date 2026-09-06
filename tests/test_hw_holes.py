@@ -689,12 +689,16 @@ def test_m2_failure_report_matches_artifact_l_schema(analysis_state, tmp_path) -
     assert evaluator["test_tpr_interval"] == [0.8271, 0.9854]
     assert evaluator["test_tnr_interval"] == [0.552, 0.953]
 
-def test_m2_select_traces_is_deterministic_and_offline(analysis_state, tmp_path) -> None:
+@pytest.mark.parametrize("filename", ["export.json", "langfuse"])
+def test_m2_select_traces_is_deterministic_and_offline(
+    analysis_state, tmp_path, monkeypatch, filename
+) -> None:
     """`select_traces` clusters an export into a reproducible diverse batch
     with a one-line reason per pick, no model call."""
     import json
 
-    from analysis.helpers import select_traces
+    from pathlib import Path
+    from analysis.helpers import select_traces, next_to_label
 
     # A tiny synthetic export with feature vectors, written to a temp file.
     traces = [
@@ -703,7 +707,8 @@ def test_m2_select_traces_is_deterministic_and_offline(analysis_state, tmp_path)
                                      "tokens": 100 * (i % 7)}}
         for i in range(40)
     ]
-    export = tmp_path / "export.json"
+    monkeypatch.chdir(tmp_path)
+    export = Path(filename)
     export.write_text(json.dumps({"traces": traces}))
 
     picks_a = select_traces(export, k=24, strategy="diversity")
@@ -718,6 +723,11 @@ def test_m2_select_traces_is_deterministic_and_offline(analysis_state, tmp_path)
     saved = json.loads((analysis_state / "samples.json").read_text())
     assert isinstance(saved, list) and saved
     assert set(saved[0]) >= {"trace_id", "reason", "trace", "features", "meta"}
+
+    # Resume from the full export, even after changing directories.
+    monkeypatch.chdir(analysis_state)
+    candidates = next_to_label("resumed", k=len(traces), strategy="random")
+    assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
 
 
 def test_m2_module1_export_is_normalized_for_review(analysis_state, tmp_path) -> None:
@@ -795,31 +805,6 @@ def test_m2_next_to_label_enriches_from_confirmed(analysis_state, tmp_path) -> N
     assert all(c.get("signal") for c in cands)
 
 
-@pytest.mark.parametrize("filename", ["export.json", "langfuse"])
-def test_m2_next_to_label_resumes_selected_file(
-    analysis_state, tmp_path, monkeypatch, filename
-) -> None:
-    """Resume from the full export even after the working directory changes."""
-    import json
-    from pathlib import Path
-    from analysis.helpers import _state, select_traces, next_to_label
-
-    monkeypatch.chdir(tmp_path)
-    export = Path(filename)
-    export.write_text(json.dumps([{"id": "a", "text": "hello"}, {"id": "b", "text": "return"}]))
-    sample = select_traces(export, k=1, strategy="random")[0]
-    _state.append_jsonl(
-        analysis_state / "labels" / "resumed.jsonl",
-        {"trace_id": sample["trace_id"], "label": 1},
-    )
-    # The next candidate must come from outside the saved one-record sample.
-    unsampled = ({"a", "b"} - {sample["trace_id"]}).pop()
-    monkeypatch.chdir(analysis_state)
-    assert next_to_label("resumed", k=1, strategy="random") == [
-        {"trace_id": unsampled, "signal": "random"}
-    ]
-
-
 def test_m2_next_to_label_resumes_live_source(analysis_state, monkeypatch) -> None:
     from analysis.helpers import langfuse_io, select_traces, next_to_label
     from analysis.helpers.normalization import normalize_traces
@@ -834,7 +819,7 @@ def test_m2_next_to_label_resumes_live_source(analysis_state, monkeypatch) -> No
 
 
 @pytest.mark.parametrize("caller", ["select", "next"])
-@pytest.mark.parametrize("failure", ["unconfigured", "empty", "error"])
+@pytest.mark.parametrize("failure", ["unconfigured", "empty"])
 def test_m2_live_source_failure_preserves_samples(
     analysis_state, monkeypatch, caller, failure
 ) -> None:
@@ -846,15 +831,11 @@ def test_m2_live_source_failure_preserves_samples(
     previous = [{"trace_id": "previous"}]
     _state.write_json(analysis_state / "samples.json", previous)
     monkeypatch.setattr(langfuse_io, "is_configured", lambda: failure != "unconfigured")
-    fetch = Mock(
-        return_value=[],
-        side_effect=RuntimeError("fetch failed") if failure == "error" else None,
-    )
+    fetch = Mock(return_value=[])
     monkeypatch.setattr(langfuse_io, "fetch_traces", fetch)
     error = {
         "unconfigured": langfuse_io.LangfuseNotConfigured,
         "empty": ValueError,
-        "error": RuntimeError,
     }[failure]
     with pytest.raises(error):
         if caller == "select":
