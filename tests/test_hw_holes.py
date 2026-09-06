@@ -795,6 +795,77 @@ def test_m2_next_to_label_enriches_from_confirmed(analysis_state, tmp_path) -> N
     assert all(c.get("signal") for c in cands)
 
 
+@pytest.mark.parametrize("filename", ["export.json", "langfuse"])
+def test_m2_next_to_label_resumes_selected_file(
+    analysis_state, tmp_path, monkeypatch, filename
+) -> None:
+    """Resume from the full export even after the working directory changes."""
+    import json
+    from pathlib import Path
+    from analysis.helpers import _state, select_traces, next_to_label
+
+    monkeypatch.chdir(tmp_path)
+    export = Path(filename)
+    export.write_text(json.dumps([{"id": "a", "text": "hello"}, {"id": "b", "text": "return"}]))
+    sample = select_traces(export, k=1, strategy="random")[0]
+    _state.append_jsonl(
+        analysis_state / "labels" / "resumed.jsonl",
+        {"trace_id": sample["trace_id"], "label": 1},
+    )
+    # The next candidate must come from outside the saved one-record sample.
+    unsampled = ({"a", "b"} - {sample["trace_id"]}).pop()
+    monkeypatch.chdir(analysis_state)
+    assert next_to_label("resumed", k=1, strategy="random") == [
+        {"trace_id": unsampled, "signal": "random"}
+    ]
+
+
+def test_m2_next_to_label_resumes_live_source(analysis_state, monkeypatch) -> None:
+    from analysis.helpers import langfuse_io, select_traces, next_to_label
+    from analysis.helpers.normalization import normalize_traces
+
+    traces = normalize_traces([{"id": "live", "text": "hello"}])
+    monkeypatch.setattr(langfuse_io, "is_configured", lambda: True)
+    monkeypatch.setattr(langfuse_io, "fetch_traces", lambda: traces)
+    select_traces("langfuse", k=1)
+    assert next_to_label("resumed", k=1, strategy="random") == [
+        {"trace_id": "live", "signal": "random"}
+    ]
+
+
+@pytest.mark.parametrize("caller", ["select", "next"])
+@pytest.mark.parametrize("failure", ["unconfigured", "empty", "error"])
+def test_m2_live_source_failure_preserves_samples(
+    analysis_state, monkeypatch, caller, failure
+) -> None:
+    """A failed live request must not replace the saved sample with demo data."""
+    from unittest.mock import Mock
+    from analysis.helpers import _state, langfuse_io, select_traces, next_to_label
+
+    _state.write_json(analysis_state / "sample_manifest.json", {"source": "langfuse"})
+    previous = [{"trace_id": "previous"}]
+    _state.write_json(analysis_state / "samples.json", previous)
+    monkeypatch.setattr(langfuse_io, "is_configured", lambda: failure != "unconfigured")
+    fetch = Mock(
+        return_value=[],
+        side_effect=RuntimeError("fetch failed") if failure == "error" else None,
+    )
+    monkeypatch.setattr(langfuse_io, "fetch_traces", fetch)
+    error = {
+        "unconfigured": langfuse_io.LangfuseNotConfigured,
+        "empty": ValueError,
+        "error": RuntimeError,
+    }[failure]
+    with pytest.raises(error):
+        if caller == "select":
+            select_traces("langfuse", k=1)
+        else:
+            next_to_label("resumed", k=1)
+    assert _state.read_json(analysis_state / "samples.json") == previous
+    if failure == "unconfigured":
+        fetch.assert_not_called()
+
+
 # --------------------------------------------------------------------------
 # Grading a student's OWN submission (mode-agnostic; opt-in).
 #
