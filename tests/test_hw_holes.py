@@ -685,6 +685,57 @@ def test_m2_failure_report_matches_artifact_l_schema(analysis_state, tmp_path) -
     assert lead["name"] == DEMO_MODE
     assert round(lead["prevalence"]["corrected"], 3) == 0.163
 
+@pytest.mark.parametrize(
+    "labels,preds,rates,intervals",
+    [
+        pytest.param(
+            [0] * 90 + [1] * 10, [0] * 60 + [1] * 30 + [0] + [1] * 9,
+            (0.6667, 0.9), ([0.5642, 0.7555], [0.5958, 0.9821]), id="asymmetric",
+        ),
+        pytest.param(
+            [0, 0, 0], [0, 0, 1], (0.6667, 0.0),
+            ([0.2077, 0.9385], [None, None]), id="no-failures",
+        ),
+        pytest.param(
+            [1, 1, 1], [1, 1, 0], (0.0, 0.6667),
+            ([None, None], [0.2077, 0.9385]), id="no-passes",
+        ),
+        pytest.param([], [], (None, None), ([None, None], [None, None]), id="empty"),
+    ],
+)
+def test_m2_failure_report_intervals_match_pass_positive_rates(
+    analysis_state, tmp_path, labels, preds, rates, intervals,
+) -> None:
+    """Report intervals use the same class as their Pass TPR and Fail TNR."""
+    import json
+
+    from analysis.helpers import failure_report, judge_alignment, tools
+
+    ids = [f"metric-{i}" for i in range(len(labels))]
+    tools._state.write_jsonl(tools._labels_path(DEMO_MODE), [
+        {"trace_id": tid, "label": label} for tid, label in zip(ids, labels)
+    ])
+    tools._state.write_json(analysis_state / "splits.json", {DEMO_MODE: {"test": ids}})
+    judge = tools._load_judge(DEMO_JUDGE)
+    judge["predictions"] = {judge["prompt_hash"]: dict(zip(ids, preds))}
+    judge.pop("store_predictions", None)  # Exercise report metrics without bootstrapping.
+    tools._state.write_json(tools._judge_path(DEMO_JUDGE), judge)
+
+    output = tmp_path / "report.json"
+    report = failure_report(output)
+    assert json.loads(output.read_text()) == report
+    evaluator = next(m for m in report["modes"] if m["name"] == DEMO_MODE)["evaluator"]
+    assert (evaluator["test_tpr"], evaluator["test_tnr"]) == rates
+    assert (evaluator["test_tpr_interval"], evaluator["test_tnr_interval"]) == intervals
+    assert evaluator["test_class_counts"] == {
+        "failure": labels.count(1), "nonfailure": labels.count(0),
+    }
+    if labels:
+        alignment = judge_alignment(DEMO_JUDGE, "test")
+        assert evaluator["test_tpr_interval"] == alignment["tpr_interval"]
+        assert evaluator["test_tnr_interval"] == alignment["tnr_interval"]
+
+
 def test_m2_select_traces_is_deterministic_and_offline(analysis_state, tmp_path) -> None:
     """`select_traces` clusters an export into a reproducible diverse batch
     with a one-line reason per pick, no model call."""

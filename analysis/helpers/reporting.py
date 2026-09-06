@@ -256,13 +256,14 @@ def failure_report(output_path: str | Path) -> dict[str, Any]:
                 "prompt_hash": judge.get("prompt_hash"),
                 "test_tpr": round(tpr, 4) if tpr is not None else None,
                 "test_tnr": round(tnr, 4) if tnr is not None else None,
+                # Stored 0 means Pass: match each interval to its Pass-positive rate.
                 "test_tpr_interval": tools._wilson_interval(
-                    sum(1 for label, pred in zip(test_labels, test_preds) if label == pred == 1),
-                    sum(1 for label in test_labels if label == 1),
-                ),
-                "test_tnr_interval": tools._wilson_interval(
                     sum(1 for label, pred in zip(test_labels, test_preds) if label == pred == 0),
                     sum(1 for label in test_labels if label == 0),
+                ),
+                "test_tnr_interval": tools._wilson_interval(
+                    sum(1 for label, pred in zip(test_labels, test_preds) if label == pred == 1),
+                    sum(1 for label in test_labels if label == 1),
                 ),
                 "test_class_counts": {
                     "failure": sum(1 for label in test_labels if label == 1),
