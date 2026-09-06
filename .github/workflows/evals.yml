@@ -29,6 +29,8 @@ jobs:
         run: uv run pytest tests/eval -k "unit or integration" -q
       - name: Homework structural checks
         run: uv run pytest tests/test_hw_holes.py -q
+      - name: CLI debug output, with no model keys
+        run: uv run pytest tests/test_cli.py -q
 
   complete-evaluations:
     name: complete evaluations and leakage check
