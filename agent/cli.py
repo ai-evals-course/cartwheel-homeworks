@@ -112,6 +112,7 @@ def _record_conversation(path: Path | None, ctx: AuthContext) -> Iterator[dict[s
                     execution_complete=complete,
                 )
                 output.write(separator + json.dumps(record, ensure_ascii=False).encode("utf-8") + b"\n")
+                output.flush()
                 if complete:
                     print(f"Conversation saved to {path}. Add your assessment to complete the record.")
                 else:
