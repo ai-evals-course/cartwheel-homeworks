@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import time
 
 from agents import RunConfig, Runner, SQLiteSession
@@ -56,7 +57,13 @@ def _print_tool_calls(new_items: list[RunItem]) -> None:
     this is accurate with or without --trace.
     """
     for call in tool_calls_from_items(new_items):
-        print(f"  [tool] {call['name']}({call['args']})")
+        args = call["arguments"]
+        if isinstance(args, str):
+            try:
+                args = json.loads(args)
+            except json.JSONDecodeError:
+                pass
+        print(f"  [tool] {call['name']}({args})")
         if "result" in call:
             print(f"    -> {call['result']}")
 

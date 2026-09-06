@@ -1,5 +1,8 @@
 """Keep CLI debug output and replay transcripts consistent with SDK items."""
 
+import json
+
+import pytest
 from agents import Agent
 from agents.items import MessageOutputItem, ToolCallItem, ToolCallOutputItem
 
@@ -39,10 +42,9 @@ def test_cli_and_replay_pair_repeated_calls_by_id(capsys) -> None:
     }
 
 
-def test_missing_output_differs_from_none_and_keeps_malformed_arguments(capsys) -> None:
+def test_missing_output_differs_from_none(capsys) -> None:
     agent = Agent(name="offline")
     missing = tool_call("lookup", {})
-    missing.arguments = "{unfinished"
     completed = tool_call("lookup", {})
     items = [
         ToolCallItem(agent=agent, raw_item=missing),
@@ -52,15 +54,41 @@ def test_missing_output_differs_from_none_and_keeps_malformed_arguments(capsys) 
 
     _print_tool_calls(items)
     assert capsys.readouterr().out == (
-        "  [tool] lookup({unfinished)\n"
+        "  [tool] lookup({})\n"
         "  [tool] lookup({})\n    -> None\n"
     )
     # Replay keeps its existing schema, with a result key even when output is absent.
     assert _extract_turn(items) == {
         "reply": "",
         "tool_calls": [
-            {"name": "lookup", "args": "{unfinished", "result": None},
+            {"name": "lookup", "args": {}, "result": None},
             {"name": "lookup", "args": {}, "result": None},
         ],
         "steps": 3,
     }
+
+
+@pytest.mark.parametrize(
+    "arguments,cli_args,replay_args", [("", "", {}), ("null", "None", None)]
+)
+def test_empty_arguments_and_json_null_keep_consumer_formats(
+    arguments, cli_args, replay_args, capsys
+) -> None:
+    raw = tool_call("lookup", {})
+    raw.arguments = arguments
+    items = [ToolCallItem(agent=Agent(name="offline"), raw_item=raw)]
+
+    _print_tool_calls(items)
+    assert capsys.readouterr().out == f"  [tool] lookup({cli_args})\n"
+    assert _extract_turn(items)["tool_calls"][0]["args"] == replay_args
+
+
+def test_malformed_arguments_print_in_cli_and_raise_in_replay(capsys) -> None:
+    raw = tool_call("lookup", {})
+    raw.arguments = "{unfinished"
+    items = [ToolCallItem(agent=Agent(name="offline"), raw_item=raw)]
+
+    _print_tool_calls(items)
+    assert capsys.readouterr().out == "  [tool] lookup({unfinished)\n"
+    with pytest.raises(json.JSONDecodeError):
+        _extract_turn(items)

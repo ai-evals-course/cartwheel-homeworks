@@ -146,7 +146,11 @@ def _extract_turn(new_items: list[Any]) -> dict[str, Any]:
     return {
         "reply": "\n".join(reply_parts),
         "tool_calls": [
-            {**call, "result": call.get("result")}
+            {
+                "name": call["name"],
+                "args": json.loads(call["arguments"] or "{}"),
+                "result": call.get("result"),
+            }
             for call in tool_calls_from_items(new_items)
         ],
         "steps": len(new_items),

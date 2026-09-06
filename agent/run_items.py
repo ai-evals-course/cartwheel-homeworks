@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any, NotRequired, TypedDict
 
 from agents.items import RunItem
@@ -10,15 +9,15 @@ from agents.items import RunItem
 
 class ToolCallRecord(TypedDict):
     name: str | None
-    args: Any
+    arguments: Any
     result: NotRequired[Any]
 
 
 def tool_calls_from_items(items: list[RunItem]) -> list[ToolCallRecord]:
-    """Return calls in order, matching results by call ID.
+    """Return calls with raw SDK arguments, matching results by call ID.
 
     A missing result key means no output arrived; an output can itself be
-    None. Keep malformed argument strings available for inspection.
+    None. Each consumer decides how to decode the arguments.
     """
     outputs = {
         item.call_id: item.output
@@ -30,13 +29,10 @@ def tool_calls_from_items(items: list[RunItem]) -> list[ToolCallRecord]:
         if item.type != "tool_call_item":
             continue
         raw = item.raw_item
-        args = raw.get("arguments") if isinstance(raw, dict) else getattr(raw, "arguments", None)
-        if isinstance(args, str):
-            try:
-                args = json.loads(args)
-            except json.JSONDecodeError:
-                pass
-        call: ToolCallRecord = {"name": item.tool_name, "args": args}
+        arguments = (
+            raw.get("arguments") if isinstance(raw, dict) else getattr(raw, "arguments", None)
+        )
+        call: ToolCallRecord = {"name": item.tool_name, "arguments": arguments}
         if item.call_id in outputs:
             call["result"] = outputs[item.call_id]
         calls.append(call)
