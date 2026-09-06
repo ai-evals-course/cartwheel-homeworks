@@ -62,21 +62,28 @@ def load_env(path: Path | None = None) -> None:
             os.environ.setdefault(key, value)
 
 
-def setup_tracing() -> None:
-    """Instrument the Agents SDK and ship spans to self-hosted Langfuse."""
+def setup_tracing() -> bool:
+    """Install Langfuse tracing; return False when credentials are missing."""
     load_env()
-    if not os.environ.get("LANGFUSE_PUBLIC_KEY"):
+    missing = [
+        key
+        for key in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY")
+        if not os.environ.get(key)
+    ]
+    if missing:
         log.warning(
-            "LANGFUSE_PUBLIC_KEY is not set; tracing is off. Start the stack "
+            "%s is not set; tracing is off. Start the stack "
             "(docker compose -f observability/docker-compose.yml up -d) and "
-            "copy .env.example to .env."
+            "copy .env.example to .env.",
+            ", ".join(missing),
         )
-        return
+        return False
     from langfuse import get_client
 
     get_client()  # registers the OTel tracer provider from LANGFUSE_* env vars
     instrument_genai(trace.get_tracer_provider())
     log.info("tracing enabled; spans go to %s", os.environ.get("LANGFUSE_HOST"))
+    return True
 
 
 def record_tool_result(ctx: "AuthContext", result: dict[str, Any]) -> None:

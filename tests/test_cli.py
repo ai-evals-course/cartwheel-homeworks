@@ -5,11 +5,14 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import httpx
+import langfuse
 import pytest
 from agents import Agent, function_tool
 from agents.items import ModelResponse
 from agents.models.interface import Model
-from agents.tracing import get_trace_provider, set_trace_provider
+from agents.tracing import get_trace_provider, set_trace_provider, trace
+from agents.tracing.processors import BackendSpanExporter, BatchTraceProcessor
 from agents.tracing.provider import DefaultTraceProvider
 from agents.usage import Usage
 from openai.types.responses import (
@@ -18,8 +21,14 @@ from openai.types.responses import (
     ResponseOutputText,
 )
 
+from opentelemetry.instrumentation.openai_agents import OpenAIAgentsInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+
 from agent import cli
 from agent.auth import AuthContext
+from observability import instrument
 
 
 class ScriptedModel(Model):
@@ -58,7 +67,8 @@ class ScriptedModel(Model):
 
 
 @pytest.mark.parametrize("debug", [False, True])
-def test_cli_tool_results(debug, tmp_path, monkeypatch, capsys) -> None:
+@pytest.mark.parametrize("tracing", ["plain", "missing_public", "missing_secret", "configured"])
+def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog) -> None:
     executed = []
 
     @function_tool
@@ -70,17 +80,47 @@ def test_cli_tool_results(debug, tmp_path, monkeypatch, capsys) -> None:
     agent = Agent(name="offline-cli", model=model, tools=[lookup])
     ctx = AuthContext(user_id=1, role="shopper")
     messages = iter(["Check both orders", "quit"])
-    monkeypatch.setattr("sys.argv", ["agent.cli"] + (["--debug"] if debug else []))
+    argv = ["agent.cli"] + (["--debug"] if debug else [])
+    if tracing != "plain":
+        argv.append("--trace")
+    monkeypatch.setattr("sys.argv", argv)
     monkeypatch.setattr("builtins.input", lambda _: next(messages))
     monkeypatch.setattr(cli, "build_agent", lambda *args, **kwargs: agent)
     monkeypatch.setattr(cli, "resolve_auth", lambda *args: ctx)
     monkeypatch.setattr(cli, "load_env", lambda: None)
     monkeypatch.setattr(cli, "SESSIONS_DB", tmp_path / "sessions.db")
 
-    # Disable export only in this test; production tracing behavior is unchanged.
+    # Use the real setup and processor replacement with a local OTel sink.
+    monkeypatch.setattr(instrument, "load_env", lambda: None)
+    monkeypatch.setattr(instrument, "_genai_instrumented", False)
+    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "offline-public")
+    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "offline-secret")
+    if tracing == "missing_public":
+        monkeypatch.delenv("LANGFUSE_PUBLIC_KEY")
+    elif tracing == "missing_secret":
+        monkeypatch.delenv("LANGFUSE_SECRET_KEY")
+    otel_provider = TracerProvider()
+    otel_exporter = InMemorySpanExporter()
+    otel_provider.add_span_processor(SimpleSpanProcessor(otel_exporter))
+    setup_calls = []
+    monkeypatch.setattr(langfuse, "get_client", lambda: setup_calls.append(True))
+    monkeypatch.setattr(instrument.trace, "get_tracer_provider", lambda: otel_provider)
+
+    # A hosted export would fail for ZDR. Capture it without contacting OpenAI.
+    requests = []
+
+    def reject_export(request):
+        requests.append(request)
+        return httpx.Response(403, text="simulated ZDR tracing rejection")
+
+    exporter = BackendSpanExporter(api_key="offline-placeholder")
+    exporter._client.close()
+    exporter._client = httpx.Client(transport=httpx.MockTransport(reject_export))
+    hosted_processor = BatchTraceProcessor(exporter)
     previous_provider = get_trace_provider()
     provider = DefaultTraceProvider()
-    provider.set_disabled(True)
+    provider.set_disabled(False)
+    provider.register_processor(hosted_processor)
     set_trace_provider(provider)
     try:
         cli.main()
@@ -97,6 +137,27 @@ def test_cli_tool_results(debug, tmp_path, monkeypatch, capsys) -> None:
         else:
             assert "[tool]" not in output
         assert "agent> Done." in output
+        hosted_processor.force_flush()
+        assert requests == []
+        spans = otel_exporter.get_finished_spans()
+        if tracing == "configured":
+            assert setup_calls == [True]
+            assert sum(span.name == "lookup.tool" for span in spans) == 2
+        else:
+            assert setup_calls == []
+            assert spans == ()
+        if tracing.startswith("missing_"):
+            assert "tracing is off" in caplog.text
+        # Disabling tracing for CLI runs must not disable unrelated SDK traces.
+        with trace("unrelated") as unrelated:
+            assert unrelated.export() is not None
+        hosted_processor.force_flush()
+        assert len(requests) == (0 if tracing == "configured" else 1)
     finally:
+        if tracing == "configured":
+            OpenAIAgentsInstrumentor().uninstrument()
         set_trace_provider(previous_provider)
         provider.shutdown()
+        hosted_processor.shutdown()
+        exporter._client.close()
+        otel_provider.shutdown()

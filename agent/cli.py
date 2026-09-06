@@ -27,7 +27,7 @@ import asyncio
 import json
 import time
 
-from agents import Runner, SQLiteSession
+from agents import RunConfig, Runner, SQLiteSession
 from agents.items import RunItem
 from opentelemetry import trace
 
@@ -90,9 +90,15 @@ def resolve_auth(role: str, user_id: int | None) -> AuthContext:
 
 
 async def chat(
-    ctx: AuthContext, model: str | None, defenses: bool = False, debug: bool = False
+    ctx: AuthContext,
+    model: str | None,
+    defenses: bool = False,
+    debug: bool = False,
+    tracing: bool = False,
 ) -> None:
     agent = build_agent(ctx, model=model, defenses=defenses)
+    # Enable SDK callbacks only after main() installs the Langfuse processor.
+    run_config = RunConfig(tracing_disabled=not tracing)
     session = SQLiteSession(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
     )
@@ -118,7 +124,12 @@ async def chat(
                 span.set_attribute("cartwheel.user_id", str(ctx.user_id))
                 span.set_attribute("cartwheel.prompt_version", version)
             result = await Runner.run(
-                agent, line, session=session, context=ctx, max_turns=MAX_TURNS
+                agent,
+                line,
+                session=session,
+                context=ctx,
+                max_turns=MAX_TURNS,
+                run_config=run_config,
             )
 
         # ------------------------------------------------------------------
@@ -140,7 +151,7 @@ async def chat(
         #       # pending call, including its JSON arguments.
         #       state.approve(item)                  # or state.reject(item)
         #   result = await Runner.run(agent, state, context=ctx,
-        #                             max_turns=MAX_TURNS)
+        #                             max_turns=MAX_TURNS, run_config=run_config)
         #
         # Loop until result.interruptions is empty (a resumed run can pause
         # again). Then fall through to printing final_output. Approving here
@@ -186,10 +197,11 @@ def main() -> None:
     args = parser.parse_args()
 
     load_env()
-    if args.trace:
-        setup_tracing()
+    tracing = setup_tracing() if args.trace else False
     ctx = resolve_auth(args.role, args.user)
-    asyncio.run(chat(ctx, args.model, defenses=args.defenses, debug=args.debug))
+    asyncio.run(
+        chat(ctx, args.model, defenses=args.defenses, debug=args.debug, tracing=tracing)
+    )
 
 
 if __name__ == "__main__":
