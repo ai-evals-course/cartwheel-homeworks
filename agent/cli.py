@@ -19,8 +19,8 @@ default, so the plain chat is the Module 1 agent. With it on, an
 above-threshold refund pauses before the tool runs. The pause seam in ``chat``
 shows the pending tool call and asks whether the tool may run.
 
-``--debug`` prints each tool call's name, arguments, and result as it
-happens. This reads ``result.new_items`` from the SDK directly, so it works
+``--debug`` prints each tool call's name, arguments, and result after each
+turn finishes. This reads ``result.new_items`` from the SDK directly, so it works
 with or without ``--trace`` and needs no tracing setup -- handy for filling
 in the ``tool_calls`` field of hw1-session.jsonl.
 """
@@ -32,7 +32,7 @@ import asyncio
 import json
 import time
 
-from agents import Runner, SQLiteSession
+from agents import RunConfig, Runner, SQLiteSession
 from agents.items import RunItem
 from opentelemetry import trace
 
@@ -55,17 +55,27 @@ def _print_tool_calls(new_items: list[RunItem]) -> None:
     `result.new_items`, independent of whether tracing is configured, so
     this is accurate with or without --trace.
     """
+    outputs = {
+        item.call_id: item.output
+        for item in new_items
+        if item.type == "tool_call_output_item" and item.call_id is not None
+    }
     for item in new_items:
         if item.type == "tool_call_item":
-            args = getattr(item.raw_item, "arguments", None)
+            raw = item.raw_item
+            args = (
+                raw.get("arguments")
+                if isinstance(raw, dict)
+                else getattr(raw, "arguments", None)
+            )
             if isinstance(args, str):
                 try:
                     args = json.loads(args)
                 except json.JSONDecodeError:
                     pass
             print(f"  [tool] {item.tool_name}({args})")
-        elif item.type == "tool_call_output_item":
-            print(f"    -> {item.output}")
+            if item.call_id in outputs:
+                print(f"    -> {outputs[item.call_id]}")
 
 
 def resolve_auth(role: str, user_id: int | None) -> AuthContext:
@@ -85,9 +95,16 @@ def resolve_auth(role: str, user_id: int | None) -> AuthContext:
 
 
 async def chat(
-    ctx: AuthContext, model: str | None, defenses: bool = False, debug: bool = False
+    ctx: AuthContext,
+    model: str | None,
+    defenses: bool = False,
+    debug: bool = False,
+    tracing: bool = False,
 ) -> None:
     agent = build_agent(ctx, model=model, defenses=defenses)
+    # Plain CLI runs skip hosted SDK tracing, including for ZDR accounts.
+    # With --trace, main() installs the Langfuse processor before this run.
+    run_config = RunConfig(tracing_disabled=not tracing)
     session = SQLiteSession(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
     )
@@ -113,7 +130,12 @@ async def chat(
                 span.set_attribute("cartwheel.user_id", str(ctx.user_id))
                 span.set_attribute("cartwheel.prompt_version", version)
             result = await Runner.run(
-                agent, line, session=session, context=ctx, max_turns=MAX_TURNS
+                agent,
+                line,
+                session=session,
+                context=ctx,
+                max_turns=MAX_TURNS,
+                run_config=run_config,
             )
 
         # ------------------------------------------------------------------
@@ -135,7 +157,7 @@ async def chat(
         #       # pending call, including its JSON arguments.
         #       state.approve(item)                  # or state.reject(item)
         #   result = await Runner.run(agent, state, context=ctx,
-        #                             max_turns=MAX_TURNS)
+        #                             max_turns=MAX_TURNS, run_config=run_config)
         #
         # Loop until result.interruptions is empty (a resumed run can pause
         # again). Then fall through to printing final_output. Approving here
@@ -184,7 +206,9 @@ def main() -> None:
     if args.trace:
         setup_tracing()
     ctx = resolve_auth(args.role, args.user)
-    asyncio.run(chat(ctx, args.model, defenses=args.defenses, debug=args.debug))
+    asyncio.run(
+        chat(ctx, args.model, defenses=args.defenses, debug=args.debug, tracing=args.trace)
+    )
 
 
 if __name__ == "__main__":

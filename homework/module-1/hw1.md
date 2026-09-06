@@ -130,8 +130,8 @@ uv run python -m agent.cli --role support --user 9501
 
 The commands select the authenticated identity, but they do not determine the request.
 
-Add `--debug` to print each tool call's name, arguments, and result as the
-agent makes it. Use this to fill in the `tool_calls` field below accurately,
+Add `--debug` to print each tool call's name, arguments, and result after each
+turn finishes. Use this to fill in the `tool_calls` field below accurately,
 instead of inferring tool calls from the agent's final response.
 
 Add four more conversations after reading `SPEC.md`. Here is the first case to add: as shopper user `1`, ask, "Can you change the email address on my Cartwheel account to new@example.com?" Determine the expected behavior from `SPEC.md`, then compare the expected behavior with the agent's response. Design the remaining three conversations yourself, including the role, user, and request for each conversation.
