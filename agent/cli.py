@@ -24,9 +24,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import time
 
 from agents import Runner, SQLiteSession
+from agents.items import RunItem
 from opentelemetry import trace
 
 from agent import db
@@ -39,6 +41,36 @@ DEFAULT_USERS = {"shopper": 1, "merchant": 9001, "support": 9501}
 MAX_TURNS = 12  # cap runaway loops; keeps conversations bounded
 SESSIONS_DB = REPO_ROOT / ".sessions.db"
 _tracer = trace.get_tracer("cartwheel.cli")
+
+
+def _print_tool_calls(new_items: list[RunItem]) -> None:
+    """Print each tool call and its result from one run's new items.
+
+    `Runner.run` always returns the tool calls and their outputs on
+    `result.new_items`, independent of whether tracing is configured, so
+    this is accurate with or without --trace.
+    """
+    outputs = {
+        item.call_id: item.output
+        for item in new_items
+        if item.type == "tool_call_output_item" and item.call_id is not None
+    }
+    for item in new_items:
+        if item.type == "tool_call_item":
+            raw = item.raw_item
+            args = (
+                raw.get("arguments")
+                if isinstance(raw, dict)
+                else getattr(raw, "arguments", None)
+            )
+            if isinstance(args, str):
+                try:
+                    args = json.loads(args)
+                except json.JSONDecodeError:
+                    pass
+            print(f"  [tool] {item.tool_name}({args})")
+            if item.call_id in outputs:
+                print(f"    -> {outputs[item.call_id]}")
 
 
 def resolve_auth(role: str, user_id: int | None) -> AuthContext:
@@ -57,7 +89,9 @@ def resolve_auth(role: str, user_id: int | None) -> AuthContext:
     return AuthContext(user_id=user.id, role=user.role, store_id=user.store_id)
 
 
-async def chat(ctx: AuthContext, model: str | None, defenses: bool = False) -> None:
+async def chat(
+    ctx: AuthContext, model: str | None, defenses: bool = False, debug: bool = False
+) -> None:
     agent = build_agent(ctx, model=model, defenses=defenses)
     session = SQLiteSession(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
@@ -122,6 +156,8 @@ async def chat(ctx: AuthContext, model: str | None, defenses: bool = False) -> N
                 "See the seam comment above."
             )
 
+        if debug:
+            _print_tool_calls(result.new_items)
         print(f"\nagent> {result.final_output}\n")
 
 
@@ -142,13 +178,18 @@ def main() -> None:
         action="store_true",
         help="turn on the Module 4 guards and the refund approval pause (Homework 8)",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="print each tool call's name, arguments, and result",
+    )
     args = parser.parse_args()
 
     load_env()
     if args.trace:
         setup_tracing()
     ctx = resolve_auth(args.role, args.user)
-    asyncio.run(chat(ctx, args.model, defenses=args.defenses))
+    asyncio.run(chat(ctx, args.model, defenses=args.defenses, debug=args.debug))
 
 
 if __name__ == "__main__":

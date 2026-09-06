@@ -147,7 +147,7 @@ def test_hw1_find_order(world: dict) -> None:
     result = tools.find_order(SHOPPER_1, product_name)
     assert result["ok"] is True
     assert isinstance(result["orders"], list)
-    assert any(o["id"] == 4127 for o in result["orders"])
+    assert any(o["order_id"] == 4127 for o in result["orders"])
 
     # No match returns an empty list, not an error.
     empty = tools.find_order(SHOPPER_1, "zzzznonexistent9999")

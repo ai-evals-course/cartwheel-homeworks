@@ -130,6 +130,14 @@ uv run python -m agent.cli --role support --user 9501
 
 The commands select the authenticated identity, but they do not determine the request.
 
+Add `--debug` to print each tool call's name, arguments, and result after each
+turn finishes. Use this output to fill in `tool_calls` in `hw1-session.jsonl`.
+This works without Langfuse or the Homework 2 tracing setup. For example:
+
+```bash
+uv run python -m agent.cli --role shopper --user 1 --debug
+```
+
 Add four more conversations after reading `SPEC.md`. Here is the first case to add: as shopper user `1`, ask, "Can you change the email address on my Cartwheel account to new@example.com?" Determine the expected behavior from `SPEC.md`, then compare the expected behavior with the agent's response. Design the remaining three conversations yourself, including the role, user, and request for each conversation.
 
 A refund or cancellation changes the local database. If you want to test another conversation against the original order state, run `uv run python -m seed.generate` before starting the next conversation. Keep the same database state throughout a conversation you are recording.
