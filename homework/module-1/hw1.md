@@ -1,6 +1,6 @@
 # Homework 1, implementing and examining the support agent
 
-Homework 1 asks you to complete four tools for the Cartwheel support agent and examine the resulting behavior through manual conversations.
+Homework 1 asks you to complete five tools for the Cartwheel support agent and examine the resulting behavior through manual conversations.
 
 ## Expected work
 
