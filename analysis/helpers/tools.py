@@ -36,7 +36,6 @@ from pathlib import Path
 from typing import Any
 
 from . import _state, guards, scale, selection
-from .trace_source import load_trace_source
 
 # ---------------------------------------------------------------------------
 # small shared utilities
@@ -191,8 +190,26 @@ def _cached_preds(judge: dict[str, Any]) -> dict[str, int]:
 
 
 def _load_trace_source(trace_source: str | Path | None) -> list[dict[str, Any]]:
-    """Load normalized traces from an explicit live source or export path."""
-    return load_trace_source(trace_source)
+    """Load normalized traces from an export path or explicit live source.
+
+    The "langfuse" source requires configured Langfuse and nonempty results.
+    For offline analysis, pass an export path, including the demo export.
+    Each reader normalizes its records before returning them.
+    """
+    if isinstance(trace_source, str) and trace_source.lower() == "langfuse":
+        from . import langfuse_io
+
+        if not langfuse_io.is_configured():
+            raise langfuse_io.LangfuseNotConfigured(
+                "Langfuse is not configured. Configure LANGFUSE_PUBLIC_KEY, "
+                "LANGFUSE_SECRET_KEY, and LANGFUSE_HOST, or pass a trace "
+                "export path for offline analysis."
+            )
+        traces = langfuse_io.fetch_traces()
+        if not traces:
+            raise ValueError("Langfuse returned no traces for the Module 2 slice")
+        return traces
+    return selection.load_traces(trace_source)
 
 
 # ---------------------------------------------------------------------------

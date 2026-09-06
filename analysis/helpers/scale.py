@@ -19,7 +19,6 @@ from pathlib import Path
 from typing import Any, Callable
 
 from . import _state
-from .trace_source import load_trace_source
 
 # Course model name -> LiteLLM model id for evaluator execution.
 # The aliases allow a registered judge to use a short course-facing name.
@@ -46,7 +45,10 @@ def load_store_traces() -> list[dict[str, Any]]:
     from . import langfuse_io
 
     if langfuse_io.is_configured():
-        return load_trace_source("langfuse")
+        traces = langfuse_io.fetch_traces()
+        if not traces:
+            raise ValueError("Langfuse returned no traces for the Module 2 slice")
+        return traces
     from .normalization import normalize_traces
 
     records = _state.read_json(_state.state_path("store_traces.json"), default=[])

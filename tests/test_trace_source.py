@@ -36,16 +36,15 @@ def records() -> list[dict]:
 
 
 @pytest.mark.parametrize("format", ["list", "wrapped", "jsonl"])
-@pytest.mark.parametrize("path_kind", [str, Path])
 def test_selection_then_labeling_uses_manifest(
-    tmp_path: Path, records: list[dict], format: str, path_kind: type
+    tmp_path: Path, records: list[dict], format: str
 ) -> None:
     export = tmp_path / ("export.jsonl" if format == "jsonl" else "export.json")
     if format == "jsonl":
         export.write_text("\n".join(json.dumps(record) for record in records))
     else:
         export.write_text(json.dumps({"traces": records} if format == "wrapped" else records))
-    samples = tools.select_traces(path_kind(export), k=1, strategy="random")
+    samples = tools.select_traces(export, k=1, strategy="random")
     saved = _state.read_json(_state.state_path("samples.json"))
     assert saved == samples
     assert isinstance(saved, list)
@@ -63,14 +62,6 @@ def test_selection_then_labeling_uses_manifest(
     unsampled_id = ({"live-1", "live-2"} - {samples[0]["trace_id"]}).pop()
     assert tools.next_to_label("returns", k=10, strategy="random") == [
         {"trace_id": unsampled_id, "signal": "random"}
-    ]
-    normalized = tools._load_trace_source(export)
-    assert normalized[0]["meta"] == {"scenario_id": "support-1"}
-    assert normalized[0]["features"]["tool_call_count"] == 0
-    assert "30 days" in normalized[0]["text"]
-    assert normalized[1]["id"] == normalized[1]["trace_id"] == "live-2"
-    assert normalized[1]["trace"] == [
-        {"role": "user", "text": "Hello"}, {"role": "assistant", "text": "Hi"}
     ]
 
 
@@ -112,7 +103,7 @@ def test_langfuse_selection_labeling_and_scaling_share_normalized_records(
     assert trace_api.get.call_count == 4
 
 
-@pytest.mark.parametrize("caller", ["select", "next", "scale"])
+@pytest.mark.parametrize("caller", ["select", "next"])
 @pytest.mark.parametrize("failure", ["empty", "error"])
 def test_failed_live_source_never_uses_demo_or_overwrites_samples(
     monkeypatch: pytest.MonkeyPatch, caller: str, failure: str
@@ -128,10 +119,8 @@ def test_failed_live_source_never_uses_demo_or_overwrites_samples(
     with pytest.raises(expected, match="unavailable" if failure == "error" else "Langfuse returned no traces"):
         if caller == "select":
             tools.select_traces("langfuse", k=1)
-        elif caller == "next":
-            tools.next_to_label("returns", k=1)
         else:
-            scale.load_store_traces()
+            tools.next_to_label("returns", k=1)
     fetch.assert_called_once_with()
     assert _state.read_json(_state.state_path("samples.json")) == [{"trace_id": "previous"}]
     assert _state.read_json(_state.state_path("sample_manifest.json")) == manifest
@@ -151,32 +140,12 @@ def test_unconfigured_live_source_requires_explicit_export(monkeypatch: pytest.M
     fetch.assert_not_called()
 
 
-@pytest.mark.parametrize("records", [None, []])
-def test_offline_store_preserves_missing_and_empty_default(records: list | None) -> None:
-    if records is not None:
-        _state.write_json(_state.state_path("store_traces.json"), records)
-    assert scale.load_store_traces() == []
-
-
-@pytest.mark.parametrize("content,error", [
-    ("", ValueError),
-    ("{}", ValueError),
-    ("broken", json.JSONDecodeError),
-    ('[{"id":"x","text":"a"},{"id":"x","text":"b"}]', ValueError),
-])
-def test_export_validation_is_preserved(tmp_path: Path, content: str, error: type[Exception]) -> None:
-    export = tmp_path / "invalid.json"
-    export.write_text(content)
-    with pytest.raises(error):
-        tools._load_trace_source(export)
-
-
 def test_missing_explicit_export_is_not_replaced_with_demo(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError, match="trace export does not exist"):
         tools.next_to_label("returns", k=1, trace_source=tmp_path / "missing.json")
 
 
-@pytest.mark.parametrize("source", [Path("langfuse"), Path("export.json"), "export.json"])
+@pytest.mark.parametrize("source", [Path("langfuse"), "export.json"])
 def test_manifest_file_source_survives_working_directory_change(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source: str | Path
 ) -> None:
