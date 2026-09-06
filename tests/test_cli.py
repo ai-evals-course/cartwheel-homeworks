@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-from unittest.mock import create_autospec
 from typing import Any
 
 import httpx
@@ -13,7 +12,7 @@ import pytest
 from agents import Agent, function_tool
 from agents.items import ModelResponse
 from agents.models.interface import Model
-from agents.tracing import TracingProcessor, get_trace_provider, set_trace_provider, trace
+from agents.tracing import get_trace_provider, set_trace_provider, trace
 from agents.tracing.processors import BackendSpanExporter, BatchTraceProcessor
 from agents.tracing.provider import DefaultTraceProvider
 from agents.usage import Usage
@@ -22,7 +21,6 @@ from openai.types.responses import (
     ResponseOutputMessage,
     ResponseOutputText,
 )
-
 from opentelemetry.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 from opentelemetry.trace import NoOpTracerProvider
 from opentelemetry.sdk.trace import TracerProvider
@@ -69,9 +67,41 @@ class ScriptedModel(Model):
         yield
 
 
+@pytest.fixture
+def hosted_exports(monkeypatch):
+    """Isolate SDK tracing and capture hosted exports without network calls."""
+    monkeypatch.setattr(instrument, "load_env", lambda: None)
+    monkeypatch.setattr(instrument, "_genai_instrumented", False)
+    requests = []
+
+    def reject_export(request):
+        requests.append(request)
+        return httpx.Response(403, text="simulated ZDR tracing rejection")
+
+    exporter = BackendSpanExporter(api_key="offline-placeholder")
+    exporter._client.close()
+    exporter._client = httpx.Client(transport=httpx.MockTransport(reject_export))
+    hosted_processor = BatchTraceProcessor(exporter)
+    previous_provider = get_trace_provider()
+    provider = DefaultTraceProvider()
+    provider.set_disabled(False)
+    provider.register_processor(hosted_processor)
+    set_trace_provider(provider)
+    try:
+        yield hosted_processor, requests
+    finally:
+        instrumentor = OpenAIAgentsInstrumentor()
+        if instrumentor.is_instrumented_by_opentelemetry:
+            instrumentor.uninstrument()
+        set_trace_provider(previous_provider)
+        provider.shutdown()
+        hosted_processor.shutdown()
+        exporter._client.close()
+
+
 @pytest.mark.parametrize("debug", [False, True])
 @pytest.mark.parametrize("tracing", ["plain", "missing_public", "missing_secret", "configured", "openai"])
-def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog) -> None:
+def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog, hosted_exports) -> None:
     executed = []
 
     @function_tool
@@ -96,8 +126,6 @@ def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog)
     monkeypatch.setattr(cli, "SESSIONS_DB", tmp_path / "sessions.db")
 
     # Use the real setup and processor replacement with a local OTel sink.
-    monkeypatch.setattr(instrument, "load_env", lambda: None)
-    monkeypatch.setattr(instrument, "_genai_instrumented", False)
     monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "offline-public")
     monkeypatch.setenv("LANGFUSE_SECRET_KEY", "offline-secret")
     if tracing == "missing_public":
@@ -112,22 +140,7 @@ def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog)
     selected_provider = NoOpTracerProvider() if tracing == "missing_secret" else otel_provider
     monkeypatch.setattr(instrument.trace, "get_tracer_provider", lambda: selected_provider)
 
-    # A hosted export would fail for ZDR. Capture it without contacting OpenAI.
-    requests = []
-
-    def reject_export(request):
-        requests.append(request)
-        return httpx.Response(403, text="simulated ZDR tracing rejection")
-
-    exporter = BackendSpanExporter(api_key="offline-placeholder")
-    exporter._client.close()
-    exporter._client = httpx.Client(transport=httpx.MockTransport(reject_export))
-    hosted_processor = BatchTraceProcessor(exporter)
-    previous_provider = get_trace_provider()
-    provider = DefaultTraceProvider()
-    provider.set_disabled(False)
-    provider.register_processor(hosted_processor)
-    set_trace_provider(provider)
+    hosted_processor, requests = hosted_exports
     try:
         cli.main()
         assert sorted(executed) == [3980, 4127]
@@ -146,11 +159,10 @@ def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog)
         hosted_processor.force_flush()
         assert len(requests) == int(tracing == "openai")
         spans = otel_exporter.get_finished_spans()
+        assert setup_calls == ([True] if tracing in {"configured", "missing_secret"} else [])
         if tracing == "configured":
-            assert setup_calls == [True]
             assert sum(span.name == "lookup.tool" for span in spans) == 2
         else:
-            assert setup_calls == ([True] if tracing == "missing_secret" else [])
             assert spans == ()
         if tracing == "missing_public":
             assert "tracing is off" in caplog.text
@@ -161,12 +173,6 @@ def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog)
         expected = 0 if tracing in {"configured", "missing_secret"} else 1
         assert len(requests) == expected + int(tracing == "openai")
     finally:
-        if tracing in {"configured", "missing_secret"}:
-            OpenAIAgentsInstrumentor().uninstrument()
-        set_trace_provider(previous_provider)
-        provider.shutdown()
-        hosted_processor.shutdown()
-        exporter._client.close()
         otel_provider.shutdown()
 
 
@@ -177,35 +183,23 @@ def test_trace_destinations_are_mutually_exclusive(monkeypatch) -> None:
     assert exc.value.code == 2
 
 
-def test_server_missing_secret_still_replaces_hosted_exporter(monkeypatch) -> None:
+def test_server_missing_secret_still_replaces_hosted_exporter(monkeypatch, hosted_exports) -> None:
     from server import app as server
 
     monkeypatch.setattr(server, "load_env", lambda: None)
-    monkeypatch.setattr(instrument, "load_env", lambda: None)
-    monkeypatch.setattr(instrument, "_genai_instrumented", False)
     monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "offline-public-server")
     monkeypatch.delenv("LANGFUSE_SECRET_KEY", raising=False)
     # Use real Langfuse initialization: absent secret creates a no-op client.
-    previous_provider = get_trace_provider()
-    provider = DefaultTraceProvider()
-    provider.set_disabled(False)
-    hosted = create_autospec(TracingProcessor, instance=True)
-    provider.register_processor(hosted)
-    set_trace_provider(provider)
+    hosted_processor, requests = hosted_exports
 
     async def run() -> None:
         async with server.lifespan(server.app):
             with trace("student-completed-server-run"):
                 pass
 
-    try:
-        asyncio.run(run())
-        hosted.on_trace_start.assert_not_called()
-        hosted.on_trace_end.assert_not_called()
-    finally:
-        OpenAIAgentsInstrumentor().uninstrument()
-        set_trace_provider(previous_provider)
-        provider.shutdown()
+    asyncio.run(run())
+    hosted_processor.force_flush()
+    assert requests == []
 
 
 def test_instrumentation_failure_does_not_report_success(monkeypatch) -> None:
