@@ -57,11 +57,12 @@ def test_selection_then_labeling_uses_manifest(
     assert set(manifest) == {"source", "k", "strategy", "selected_at", "picks"}
     _state.append_jsonl(
         _state.state_path("labels", "returns.jsonl"),
-        {"trace_id": "live-1", "label": 1},
+        {"trace_id": samples[0]["trace_id"], "label": 1},
     )
     # Labeling uses the complete source, including records outside the sample.
+    unsampled_id = ({"live-1", "live-2"} - {samples[0]["trace_id"]}).pop()
     assert tools.next_to_label("returns", k=10, strategy="random") == [
-        {"trace_id": "live-2", "signal": "random"}
+        {"trace_id": unsampled_id, "signal": "random"}
     ]
     normalized = tools._load_trace_source(export)
     assert normalized[0]["meta"] == {"scenario_id": "support-1"}
@@ -173,3 +174,20 @@ def test_export_validation_is_preserved(tmp_path: Path, content: str, error: typ
 def test_missing_explicit_export_is_not_replaced_with_demo(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError, match="trace export does not exist"):
         tools.next_to_label("returns", k=1, trace_source=tmp_path / "missing.json")
+
+
+@pytest.mark.parametrize("source", [Path("langfuse"), Path("export.json"), "export.json"])
+def test_manifest_file_source_survives_working_directory_change(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, source: str | Path
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    Path(source).write_text(json.dumps([{"id": "file-trace", "text": "hello"}]))
+    tools.select_traces(source, k=1)
+    manifest = _state.read_json(_state.state_path("sample_manifest.json"))
+    assert manifest["source"] == str(Path(source).resolve())
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    monkeypatch.chdir(elsewhere)
+    assert tools.next_to_label("returns", k=1, strategy="random") == [
+        {"trace_id": "file-trace", "signal": "random"}
+    ]

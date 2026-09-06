@@ -248,8 +248,13 @@ def select_traces(
                 "flags": [],
             }
         )
+    # File paths must survive a later working-directory change and stay
+    # distinct from the live sentinel (including a file named "langfuse").
+    source = str(trace_source)
+    if not (isinstance(trace_source, str) and trace_source.lower() == "langfuse"):
+        source = str(Path(trace_source).resolve())
     manifest = {
-        "source": str(trace_source),
+        "source": source,
         "k": k,
         "strategy": strategy,
         "selected_at": _utcnow(),
