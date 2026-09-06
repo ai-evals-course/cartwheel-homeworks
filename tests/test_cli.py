@@ -211,3 +211,101 @@ def test_instrumentation_failure_does_not_report_success(monkeypatch) -> None:
     with pytest.raises(RuntimeError, match="failed to install"):
         instrument.instrument_genai(NoOpTracerProvider())
     assert instrument._genai_instrumented is False
+
+
+@pytest.fixture
+def recording_cli(tmp_path, monkeypatch, hosted_exports):
+    @function_tool
+    def lookup(order_id: int) -> dict:
+        return {"order_id": order_id, "eligible": order_id == 4127}
+
+    destination = tmp_path / "hw1-session.jsonl"
+    monkeypatch.setattr("sys.argv", ["agent.cli", "--save", str(destination)])
+    monkeypatch.setattr(cli, "load_env", lambda: None)
+    monkeypatch.setattr(cli, "resolve_auth", lambda *a: AuthContext(user_id=9002, role="merchant", store_id=2))
+    monkeypatch.setattr(cli, "SESSIONS_DB", tmp_path / "sessions.db")
+    monkeypatch.setattr(cli, "build_agent", lambda *a, **k: Agent(name="recording", model=ScriptedModel(), tools=[lookup]))
+    return destination
+
+
+@pytest.mark.parametrize("ending", ["quit", EOFError(), KeyboardInterrupt()])
+def test_save_groups_turns_appends_and_leaves_judgments_pending(recording_cli, monkeypatch, ending):
+    from unittest.mock import Mock
+
+    # A hand-edited existing JSONL file may lack its trailing newline.
+    recording_cli.write_text('{"existing": true}', encoding="utf-8")
+    ids = []
+    original_session = cli.SQLiteSession
+    monkeypatch.setattr(cli, "SQLiteSession", lambda sid, path: (ids.append(sid), original_session(sid, path))[1])
+    for _ in range(2):
+        monkeypatch.setattr("builtins.input", Mock(side_effect=['Check "both" café orders', "Follow up", ending]))
+        cli.main()
+    records = [json.loads(line) for line in recording_cli.read_text().splitlines()]
+    assert records[0] == {"existing": True}
+    assert len(records) == 3  # two conversations, not four turns
+    assert ids[0] != ids[1]
+    for record in records[1:]:
+        assert (record["role"], record["user_id"], record["store_id"]) == ("merchant", 9002, 2)
+        assert record["request"] == 'Check "both" café orders'
+        assert record["response"] == "Done."
+        assert len(record["turns"]) == 2
+        assert record["turns"][1]["tool_calls"] == []
+        assert [call["arguments"]["order_id"] for call in record["tool_calls"]] == [4127, 3980]
+        assert [call["result"]["eligible"] for call in record["tool_calls"]] == [True, False]
+        assert all(record[key] is None for key in ("expected", "requirement", "met_requirement", "problem_source"))
+        assert record["execution_complete"] is True
+        assert record["pending_request"] is None
+
+
+def test_empty_conversation_saves_no_record(recording_cli, monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _: "quit")
+    cli.main()
+    assert recording_cli.read_text() == ""
+
+
+def test_invalid_save_path_fails_before_input(recording_cli, monkeypatch):
+    monkeypatch.setattr("sys.argv", ["agent.cli", "--save", str(recording_cli / "missing.jsonl")])
+    monkeypatch.setattr("builtins.input", lambda _: pytest.fail("should fail before input"))
+    with pytest.raises(OSError):
+        cli.main()
+
+
+@pytest.mark.parametrize("after_completed_turn", [False, True])
+def test_failed_run_saves_incomplete_draft(recording_cli, monkeypatch, after_completed_turn):
+    from unittest.mock import Mock
+
+    original_run = cli.Runner.run
+    calls = 0
+
+    async def fail(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1 and after_completed_turn:
+            return await original_run(*args, **kwargs)
+        raise RuntimeError("model failed after possible tool activity")
+
+    monkeypatch.setattr(cli.Runner, "run", fail)
+    monkeypatch.setattr("builtins.input", Mock(side_effect=["Check both", "Pending request"]))
+    with pytest.raises(RuntimeError, match="model failed"):
+        cli.main()
+    record = json.loads(recording_cli.read_text())
+    assert record["execution_complete"] is False
+    assert len(record["turns"]) == int(after_completed_turn)
+    assert record["pending_request"] == ("Pending request" if after_completed_turn else "Check both")
+    assert record["met_requirement"] is None
+
+
+def test_approval_interruption_is_not_a_completed_conversation(recording_cli, monkeypatch):
+    from types import SimpleNamespace
+
+    async def pause(*args, **kwargs):
+        return SimpleNamespace(interruptions=[object()])
+
+    monkeypatch.setattr(cli.Runner, "run", pause)
+    monkeypatch.setattr("builtins.input", lambda _: "Refund")
+    with pytest.raises(NotImplementedError, match="m4"):
+        cli.main()
+    record = json.loads(recording_cli.read_text())
+    assert record["execution_complete"] is False
+    assert record["turns"] == []
+    assert record["pending_request"] == "Refund"

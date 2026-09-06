@@ -123,37 +123,59 @@ The required order cases depend on permissions stored in the local database. Use
 Use the command that matches the identity you want to test:
 
 ```bash
-uv run python -m agent.cli --role shopper --user 1
-uv run python -m agent.cli --role merchant --user 9002
-uv run python -m agent.cli --role support --user 9501
+uv run python -m agent.cli --role shopper --user 1 --save hw1-session.jsonl
+uv run python -m agent.cli --role merchant --user 9002 --save hw1-session.jsonl
+uv run python -m agent.cli --role support --user 9501 --save hw1-session.jsonl
 ```
 
 The commands select the authenticated identity, but they do not determine the request.
 
-Add `--debug` to print each tool call's name, arguments, and result after each
-turn finishes. Use this output to fill in `tool_calls` in `hw1-session.jsonl`.
-This works without Langfuse or the Homework 2 tracing setup. For example:
+`--save` appends one conversation draft to `hw1-session.jsonl` when you quit,
+press Ctrl-C at the input prompt, or reach the end of input. Keep follow-up
+turns in the same CLI session; quit and restart for a separate conversation.
+Existing records are preserved. Without `--save`, the CLI does not write this file.
+
+The draft contains your authenticated identity, requests, tool calls and results,
+and responses. Add your own `expected`, `requirement`, `met_requirement`, and
+`problem_source` values afterward. These start as `null`; an unreviewed draft
+does not count as a completed homework record.
+
+Add `--debug` if you also want to see the tool calls in the terminal. Both
+options work without Langfuse or the Homework 2 tracing setup. For example:
 
 ```bash
-uv run python -m agent.cli --role shopper --user 1 --debug
+uv run python -m agent.cli --role shopper --user 1 --save hw1-session.jsonl --debug
 ```
 
 Add four more conversations after reading `SPEC.md`. Here is the first case to add: as shopper user `1`, ask, "Can you change the email address on my Cartwheel account to new@example.com?" Determine the expected behavior from `SPEC.md`, then compare the expected behavior with the agent's response. Design the remaining three conversations yourself, including the role, user, and request for each conversation.
 
 A refund or cancellation changes the local database. If you want to test another conversation against the original order state, run `uv run python -m seed.generate` before starting the next conversation. Keep the same database state throughout a conversation you are recording.
 
-Write each conversation as one line of `hw1-session.jsonl`. Each record must contain:
+Review each saved conversation in `hw1-session.jsonl`. Each completed record must contain:
 
 - `role`, the authenticated role.
 - `user_id`, the authenticated user's identifier.
 - `store_id`, the authenticated merchant's store, or `null` for other roles.
-- `request`, the user's request.
+- `request`, the initial user request.
 - `tool_calls`, a list containing each tool name, its arguments, and its result. Use an empty list when the agent called no tools.
-- `response`, the agent's final response.
+- `response`, the agent's final response to the last turn.
 - `expected`, the behavior implied by the current specification.
 - `requirement`, the identifier of the relevant requirement in `SPEC.md`, or `null` when no single requirement applies.
 - `met_requirement`, `true` when the observed behavior met the requirement, and `false` when it did not.
 - `problem_source`, either `prompt`, `tool`, `specification`, or `null`. Use `null` when the agent met the requirement.
+
+The recorder also saves `turns`, an ordered list of requests, tool calls, and
+responses. For a multi-turn conversation, use this full sequence when reviewing
+behavior or repeating the case; the top-level `request` is only its first request
+and `tool_calls` combines the completed turns. One saved conversation counts as
+one record, regardless of the number of turns.
+
+`execution_complete: true` means the CLI exited normally, not that your assessment
+is complete. If a run fails or is interrupted, the recorder saves any completed
+turns with `execution_complete: false` and the `pending_request`. Tool activity
+for that pending request may be missing. Keep the partial draft for diagnosis,
+but exclude it from the required ten completed conversations. Saving happens
+on exit; a forced process kill or write failure can prevent it.
 
 Use `prompt` when the tools returned the right information but the model made a poor decision. Use `tool` when a function returned the wrong information or changed the wrong state. Use `specification` when `SPEC.md` does not say what correct behavior would be.
 
@@ -186,6 +208,6 @@ Record one continuous screen video of no more than 5 minutes. In the recording:
 - Show how the agent handles the refund request for order `4455`, including whether it calls the refund tool or opens an escalation.
 - Explain the requirement you examined and how you tested it. If you revised the prompt, show the failure and the exact edit. If you did not revise the prompt, explain why the recorded evidence did not justify an edit.
 - Run at least one test.
-- Regenerate the number of records in `hw1-session.jsonl`.
+- Count the completed, reviewed conversations in `hw1-session.jsonl`; exclude incomplete runs and drafts whose `met_requirement` is still `null`.
 
 The purpose of the recording is to connect your explanation to the committed artifacts. It is not a polished presentation.

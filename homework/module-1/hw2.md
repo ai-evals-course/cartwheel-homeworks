@@ -156,7 +156,7 @@ curl -s -X POST http://localhost:8010/sessions/SESSION_ID/messages \
   -d '{"message":"Show my recent orders."}'
 ```
 
-Submit at least five requests drawn from `hw1-session.jsonl`. For each request, use a session for the corresponding authenticated user and inspect the resulting trace in Langfuse.
+Submit at least five cases drawn from the completed, reviewed conversations in `hw1-session.jsonl`. For a multi-turn case, submit the requests from `turns` in order within the same session; the top-level `request` contains only the first turn. For each request, use a session for the corresponding authenticated user and inspect the resulting trace in Langfuse.
 
 In Langfuse, open the root span and tool spans and check the attributes listed in Parts A and C. Confirm that the response contains the session identifier, final reply, and prompt version. For an allowed tool call, confirm `cartwheel.permission_denied = false` with no denial reason. If a tool call returns a permission denial, confirm `cartwheel.permission_denied = true` and the recorded reason. You do not need to produce a permission denial or use a prescribed request.
 

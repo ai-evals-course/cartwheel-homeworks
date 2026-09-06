@@ -58,7 +58,7 @@ Walk me through Part B one conversation at a time. Cover all required cases and 
 
 Start each separate conversation in a fresh CLI session so earlier requests and tool results do not influence it. Quit and relaunch the CLI between conversations, keeping follow-up turns within the same conversation together. Resetting the order database does not clear conversation history.
 
-Handle the technical work of capturing the actual request, tool calls and results, and final response in hw1-session.jsonl. Inspect how the CLI exposes those details and arrange reliable capture if needed. Do not invent missing tool calls or results. Use my assessment for the judgment fields and help me distinguish a prompt failure, a tool failure, and an unclear requirement.
+Run the CLI with --save hw1-session.jsonl to capture the actual requests, tool calls and results, and responses. Quit after each conversation so its draft is saved. Review all saved turns with me, fill the judgment fields from my assessment, and exclude incomplete or unreviewed drafts from the required ten conversations. Do not invent missing tool calls or results. Use my assessment for the judgment fields and help me distinguish a prompt failure, a tool failure, and an unclear requirement.
 
 Explain when a refund or cancellation changes the local data. Reset between conversations when needed, preserving the records we have already saved and keeping state consistent within each conversation.
 
