@@ -72,7 +72,7 @@ def setup_tracing() -> bool:
     ]
     if missing:
         log.warning(
-            "%s is not set; tracing is off. Start the stack "
+            "Missing %s; tracing is off. Start the stack "
             "(docker compose -f observability/docker-compose.yml up -d) and "
             "copy .env.example to .env.",
             ", ".join(missing),
