@@ -42,6 +42,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import tempfile
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -49,7 +51,8 @@ from pathlib import Path
 from typing import Any
 
 HERE = Path(__file__).resolve().parent
-STATE_DIR = HERE / "state"
+# Resolve once at startup; API saves and replay use the same state directory.
+STATE_DIR = Path(os.environ.get("CARTWHEEL_ANALYSIS_STATE") or HERE / "state")
 UI_DIR = HERE / "ui"
 
 # API path -> the state file that backs it. GET reads the file, POST overwrites
@@ -92,9 +95,15 @@ def _read_json(path: Path, default: Any) -> Any:
 def _write_json(path: Path, data: Any) -> None:
     """Write ``data`` to ``path`` atomically (write temp, then replace)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(json.dumps(data, indent=2))
-    tmp.replace(path)
+    # Each request needs its own temp file: the HTTP server handles saves in threads.
+    fd, tmp = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as handle:
+            handle.write(json.dumps(data, indent=2))
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
 
 
 class ReviewHandler(BaseHTTPRequestHandler):
