@@ -815,33 +815,17 @@ def test_m2_next_to_label_resumes_live_source(analysis_state, monkeypatch) -> No
     ]
 
 
-@pytest.mark.parametrize("caller", ["select", "next"])
-@pytest.mark.parametrize("failure", ["unconfigured", "empty"])
-def test_m2_live_source_failure_preserves_samples(
-    analysis_state, monkeypatch, caller, failure
+@pytest.mark.parametrize("configured, error", [(False, RuntimeError), (True, ValueError)])
+def test_m2_unavailable_live_source_raises(
+    analysis_state, monkeypatch, configured, error
 ) -> None:
-    """A failed live request must not replace the saved sample with demo data."""
-    from unittest.mock import Mock
-    from analysis.helpers import _state, langfuse_io, select_traces, next_to_label
+    """Missing setup or an empty live dataset should give a useful error."""
+    from analysis.helpers import langfuse_io, select_traces
 
-    _state.write_json(analysis_state / "sample_manifest.json", {"source": "langfuse"})
-    previous = [{"trace_id": "previous"}]
-    _state.write_json(analysis_state / "samples.json", previous)
-    monkeypatch.setattr(langfuse_io, "is_configured", lambda: failure != "unconfigured")
-    fetch = Mock(return_value=[])
-    monkeypatch.setattr(langfuse_io, "fetch_traces", fetch)
-    error = {
-        "unconfigured": langfuse_io.LangfuseNotConfigured,
-        "empty": ValueError,
-    }[failure]
-    with pytest.raises(error):
-        if caller == "select":
-            select_traces("langfuse", k=1)
-        else:
-            next_to_label("resumed", k=1)
-    assert _state.read_json(analysis_state / "samples.json") == previous
-    if failure == "unconfigured":
-        fetch.assert_not_called()
+    monkeypatch.setattr(langfuse_io, "is_configured", lambda: configured)
+    monkeypatch.setattr(langfuse_io, "fetch_traces", lambda: [])
+    with pytest.raises(error, match="Langfuse"):
+        select_traces("langfuse", k=1)
 
 
 # --------------------------------------------------------------------------

@@ -32,7 +32,6 @@ from __future__ import annotations
 import datetime as _dt
 import hashlib
 import math
-import os
 from pathlib import Path
 from typing import Any
 
@@ -275,13 +274,9 @@ def select_traces(
         "selected_at": _utcnow(),
         "picks": picks,
     }
-    # File sources are relative to state so the export and state can move
-    # together. The marker distinguishes them from older manifest paths.
+    # Remember the file even if the next call runs from another directory.
     if not (isinstance(trace_source, str) and trace_source.lower() == "langfuse"):
-        manifest["source"] = os.path.relpath(
-            Path(trace_source).resolve(), _state.state_root().resolve()
-        )
-        manifest["source_relative_to"] = "state"
+        manifest["source"] = str(Path(trace_source).resolve())
     _state.write_json(_state.state_path("samples.json"), samples)
     _state.write_json(_state.state_path("sample_manifest.json"), manifest)
     return samples
@@ -324,15 +319,10 @@ def next_to_label(
     """
     labeled = {r["trace_id"] for r in _load_labels(mode)}
     confirmed_failures = [r["trace_id"] for r in _load_labels(mode) if r["label"] == 1]
-    source = trace_source
-    if source is None:
-        manifest = _state.read_json(
-            _state.state_path("sample_manifest.json"), default={}
-        )
-        source = manifest.get("source")
-        if source is not None and manifest.get("source_relative_to") == "state":
-            source = _state.state_path(source)
-    traces = _load_trace_source(source) if source is not None else []
+    source = trace_source or _state.read_json(
+        _state.state_path("sample_manifest.json"), default={}
+    ).get("source")
+    traces = _load_trace_source(source) if source else []
     return selection.next_candidates(
         traces,
         mode=mode,
