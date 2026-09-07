@@ -158,12 +158,27 @@ def search_products(
         products = db.list_products(conn, store_item.id if store is not None else None)
 
         ## Step 6: Format returned products to match desired output
-        filtered_products = []
-        ## Step 7: Add products to final returned object, return product
+        filtered_products = [next((x for x in products if query in x.title or query in x.description), None)]
+        print(filtered_products)
+
+        ## Step 7: Format products to match desired output
+        formatted_prodcuts = []
+        for product in filtered_products:
+            formatted_product = {
+                "product_id": product.id, 
+                "store_id": product.store_id, 
+                "title": product.title,
+                "price_usd": product.price_cents / 100
+            }
+
+            formatted_prodcuts.append(formatted_product)
+        
+
+        ## Step 8: Add products to final returned object, return product
         return {
             "ok": True, 
-            "products": filtered_products, 
-            "count": len(filtered_products)
+            "products": formatted_prodcuts, 
+            "count": len(formatted_prodcuts)
         }
 
 
