@@ -729,6 +729,14 @@ def test_m2_select_traces_is_deterministic_and_offline(
     candidates = next_to_label("resumed", k=len(traces), strategy="random")
     assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
 
+    # Move the containing directory, keeping the export beside its state.
+    monkeypatch.chdir(tmp_path.parent)
+    relocated = tmp_path.with_name(f"{tmp_path.name}-{filename}-moved")
+    tmp_path.rename(relocated)
+    monkeypatch.setenv("CARTWHEEL_ANALYSIS_STATE", str(relocated / "state"))
+    candidates = next_to_label("resumed", k=len(traces), strategy="random")
+    assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
+
 
 def test_m2_module1_export_is_normalized_for_review(analysis_state, tmp_path) -> None:
     """A raw Module 1 Langfuse export becomes a renderable review record."""
