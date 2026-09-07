@@ -162,7 +162,7 @@ def search_products(
         print(filtered_products)
 
         ## Step 7: Format products to match desired output
-        formatted_prodcuts = []
+        formatted_products = []
         for product in filtered_products:
             formatted_product = {
                 "product_id": product.id, 
@@ -171,14 +171,20 @@ def search_products(
                 "price_usd": product.price_cents / 100
             }
 
-            formatted_prodcuts.append(formatted_product)
-        
+            formatted_products.append(formatted_product)
 
-        ## Step 8: Add products to final returned object, return product
+        ## Step 8: Sort products by price, then title, then add limit
+        formatted_products.sort(key=lambda x: x["price_usd"])
+        formatted_products.sort(key=lambda x: x["title"])
+
+        if limit: 
+            formatted_products = formatted_products[:limit]
+
+        ## Step 9: Add products to final returned object, return product
         return {
             "ok": True, 
-            "products": formatted_prodcuts, 
-            "count": len(formatted_prodcuts)
+            "products": formatted_products, 
+            "count": len(formatted_products)
         }
 
 
