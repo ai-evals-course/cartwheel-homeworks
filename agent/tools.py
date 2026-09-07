@@ -129,8 +129,8 @@ def search_products(
     with db.connection() as conn:    
         ## Step 2: Exit if store filter given and NOT found
         if store is not None:
-            store_name = db.get_store_by_name(conn, store)
-            if store_name is None:
+            store_item = db.get_store_by_name(conn, store)
+            if store_item is None:
                 return {
                     "ok": False, 
                     "error": "not_found", 
@@ -147,13 +147,23 @@ def search_products(
             }
         
         ## Step 4: Exit if max_price <= 0
+        if max_price_usd is not None and max_price_usd <= 0:
+            return {
+                "ok": False, 
+                "error": "invalid_argument",
+                "reason": "Max Price must be greater than 0 when declared"
+            }
+
         ## Step 5: Grab all Products that match whitespace cleaned query
+        products = db.list_products(conn, store_item.id if store is not None else None)
+
         ## Step 6: Format returned products to match desired output
+        filtered_products = []
         ## Step 7: Add products to final returned object, return product
         return {
             "ok": True, 
-            "products": [], 
-            "count": len([])
+            "products": filtered_products, 
+            "count": len(filtered_products)
         }
 
 
