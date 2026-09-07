@@ -138,6 +138,14 @@ def search_products(
                 }
 
         ## Step 3: Exit if query is empty
+        trimmed_query = str.strip(query)
+        if len(trimmed_query) == 0:
+            return {
+                "ok": False, 
+                "error": "invalid_argument",
+                "reason": "Query length must be greater than 0"
+            }
+        
         ## Step 4: Exit if max_price <= 0
         ## Step 5: Grab all Products that match whitespace cleaned query
         ## Step 6: Format returned products to match desired output
