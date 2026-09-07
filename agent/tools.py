@@ -118,7 +118,21 @@ def search_products(
         Use `with db.connection() as conn:` to close the database automatically.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement search_products")
+
+    ## Step 0: Early fix for MAX_SEARCH_LIMIT range
+    if limit < 1:
+        limit = 1
+    elif limit > MAX_SEARCH_LIMIT:
+        limit = MAX_SEARCH_LIMIT
+
+    ## Step 1: Open connection with DB
+    with db.connection() as conn:    
+        ## Step 2: Exit if store filter given and NOT found
+        ## Step 3: Exit if query is empty
+        ## Step 4: Exit if max_price <= 0
+        ## Step 5: Grab all Products that match whitespace cleaned query
+        ## Step 6: Format returned products to match desired output
+        ## Step 7: Add products to final returned object, return product
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
