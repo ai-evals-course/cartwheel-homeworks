@@ -1,5 +1,7 @@
 # Homework 1 tutorial
 
+The course instructors prepared this walkthrough for students who want guided help. Your coding agent should follow the steps and checkpoints below when you choose the tutorial.
+
 Help me complete Homework 1 for the Evaluating and Improving AI Agents course as an interactive tutorial.
 
 I want to do the homework and understand the decisions I'm making. You can handle the implementation and terminal commands. Adapt your explanations to what I already know, and help me connect the technical work to the product behavior I'm evaluating.

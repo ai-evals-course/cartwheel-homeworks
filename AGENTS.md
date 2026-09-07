@@ -12,7 +12,7 @@ Cartwheel is the support agent used throughout "Evaluating and Improving AI Agen
 ## Shared rules
 
 - Read [SPEC.md](SPEC.md) and the relevant function contracts before changing agent behavior. Policy numbers come from `facts.yaml`. Editing the specification alone does not change the running application.
-- Reuse the supplied database and authorization helpers. Keep tool results structured and functions small and typed.
+- Reuse the supplied database and authorization helpers and return structured tool results.
 - Preserve permission checks, refund thresholds, human approval, and kill-switch protections. Keep evaluation cases as regression tests and keep evaluation inputs out of prompts.
 - Preserve existing student work and settings. Before regenerating data, check whether it would erase work the student wants to keep. Generate demo data through the seed tools and preserve the pinned demo orders. Confine adversarial fixtures to temporary database copies and keep their generated data out of commits.
 - Handle API keys locally through `.env`. Never request keys in chat, print their values, or commit them. Refer to credentials by environment variable name.

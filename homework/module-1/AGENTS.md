@@ -8,7 +8,7 @@ Read [Homework 1](hw1.md) and inspect existing work before starting. Use a help 
 
 If the student asks for general HW1 help without choosing a style, ask one question before implementation: "How would you like to work through Homework 1?"
 
-1. **Guided tutorial (recommended if you want explanations):** The agent handles the technical work, explains each step, and pauses for your predictions and observations.
+1. **Instructor-prepared tutorial (recommended if you want explanations):** Follow the course instructors' walkthrough. The agent handles the technical work and pauses for your predictions and observations.
 2. **Direct implementation help:** The agent works through the requested task with brief updates, asking when it needs your input.
 3. **Help with a blocker:** Focus on the step or error that is holding you up.
 

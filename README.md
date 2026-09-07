@@ -11,18 +11,18 @@ Begin with the [homework index](homework/README.md). Each assignment names the c
 
 Ask your coding agent for help with Homework 1. If you haven't chosen an approach, the repository instructions tell it to offer a guided tutorial, direct implementation help, or help with a specific blocker. Tell it your preference, and change approaches whenever you need to.
 
-The [interactive HW1 tutorial](homework/module-1/hw1-tutorial.md) is for anyone who wants explanations and checkpoints, including product managers and people unfamiliar with Python setup. Your coding agent handles setup and implementation while you decide what behavior to expect and review the results.
+The course instructors prepared the [HW1 tutorial](homework/module-1/hw1-tutorial.md) for anyone who wants explanations and checkpoints, including product managers and people unfamiliar with Python setup. Your coding agent follows that walkthrough, handling setup and implementation while you decide what behavior to expect and review the results.
 
 Open this repository in Claude Code, Codex, or your preferred coding agent and paste:
 
 ```text
-Read homework/module-1/hw1-tutorial.md and walk me through Homework 1.
+Read AGENTS.md and help me get started with Homework 1.
 ```
 
 If you have not downloaded the repository yet, give your coding agent this instead:
 
 ```text
-Help me clone https://github.com/ai-evals-course/cartwheel-homeworks onto my computer and open the local repository. Then read homework/module-1/hw1-tutorial.md and walk me through Homework 1.
+Help me get started with Homework 1 in https://github.com/ai-evals-course/cartwheel-homeworks. Use my existing local copy if I have one, or help me clone it. Then read AGENTS.md and help me choose how to proceed.
 ```
 
 ## Setup
