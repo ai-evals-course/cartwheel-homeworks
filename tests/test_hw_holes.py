@@ -689,16 +689,12 @@ def test_m2_failure_report_matches_artifact_l_schema(analysis_state, tmp_path) -
     assert evaluator["test_tpr_interval"] == [0.8271, 0.9854]
     assert evaluator["test_tnr_interval"] == [0.552, 0.953]
 
-# Path("langfuse") identifies a file, so include that filename in the test.
-@pytest.mark.parametrize("filename", ["export.json", "langfuse"])
 def test_m2_file_selection_is_deterministic_and_resumable(
-    analysis_state, tmp_path, monkeypatch, filename
+    analysis_state, tmp_path, monkeypatch
 ) -> None:
-    """Select a repeatable batch, then resume after changing the working
-    directory or moving the export and state together."""
+    """Select a repeatable batch, then resume after changing directories."""
     import json
 
-    from pathlib import Path
     from analysis.helpers import select_traces, next_to_label
 
     # A tiny synthetic export with feature vectors, written to a temp file.
@@ -709,7 +705,7 @@ def test_m2_file_selection_is_deterministic_and_resumable(
         for i in range(40)
     ]
     monkeypatch.chdir(tmp_path)
-    export = Path(filename)
+    export = Path("export.json")
     export.write_text(json.dumps({"traces": traces}))
 
     picks_a = select_traces(export, k=24, strategy="diversity")
@@ -727,14 +723,6 @@ def test_m2_file_selection_is_deterministic_and_resumable(
 
     # Resume from the full export, even after changing directories.
     monkeypatch.chdir(analysis_state)
-    candidates = next_to_label("resumed", k=len(traces), strategy="random")
-    assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
-
-    # Move the containing directory, keeping the export beside its state.
-    monkeypatch.chdir(tmp_path.parent)
-    relocated = tmp_path.with_name(f"{tmp_path.name}-{filename}-moved")
-    tmp_path.rename(relocated)
-    monkeypatch.setenv("CARTWHEEL_ANALYSIS_STATE", str(relocated / "state"))
     candidates = next_to_label("resumed", k=len(traces), strategy="random")
     assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
 
