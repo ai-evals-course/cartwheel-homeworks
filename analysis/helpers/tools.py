@@ -190,13 +190,7 @@ def _cached_preds(judge: dict[str, Any]) -> dict[str, int]:
 
 
 def _load_trace_source(trace_source: str | Path | None) -> list[dict[str, Any]]:
-    """Load normalized traces from an export path or explicit live source.
-
-    The "langfuse" source requires configured Langfuse and nonempty results.
-    For offline analysis, pass a Module 1 export such as
-    ``traces/support_traces.json`` from ``scenarios.export_langfuse``.
-    Each reader normalizes its records before returning them.
-    """
+    """Load normalized traces from a file or Langfuse."""
     if isinstance(trace_source, str) and trace_source.lower() == "langfuse":
         from . import langfuse_io
 
