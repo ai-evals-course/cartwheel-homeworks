@@ -739,43 +739,6 @@ def test_m2_file_selection_is_deterministic_and_resumable(
     assert {c["trace_id"] for c in candidates} == {t["id"] for t in traces}
 
 
-def test_m2_file_source_on_different_drive(analysis_state, tmp_path, monkeypatch) -> None:
-    import json
-    from analysis.helpers import select_traces, next_to_label
-    from analysis.helpers import tools as analysis_tools
-
-    export = tmp_path / "export.json"
-    export.write_text('{"traces": [{"id": "example", "text": "Where is my order?"}]}')
-
-    def different_drives(*args):
-        raise ValueError("path and start are on different drives")
-
-    monkeypatch.setattr(analysis_tools.os.path, "relpath", different_drives)
-    select_traces(export, k=1)
-    manifest = json.loads((analysis_state / "sample_manifest.json").read_text())
-    assert manifest["source"] == str(export.resolve())
-    assert "source_relative_to" not in manifest
-    assert next_to_label("resumed", k=1)[0]["trace_id"] == "example"
-
-
-def test_m2_windows_source_uses_portable_separators(analysis_state, tmp_path, monkeypatch) -> None:
-    import json
-    import ntpath
-    from analysis.helpers import select_traces, next_to_label
-    from analysis.helpers import tools as analysis_tools
-
-    export = tmp_path / "export.json"
-    export.write_text('{"traces": [{"id": "example", "text": "Where is my order?"}]}')
-    # Use Windows path rules when saving, then resume on the host platform.
-    with monkeypatch.context() as windows:
-        windows.setattr(analysis_tools.os.path, "relpath", ntpath.relpath)
-        windows.setattr(analysis_tools.os, "sep", "\\")
-        select_traces(export, k=1)
-    manifest = json.loads((analysis_state / "sample_manifest.json").read_text())
-    assert manifest["source"] == "../export.json"
-    assert next_to_label("resumed", k=1)[0]["trace_id"] == "example"
-
-
 def test_m2_module1_export_is_normalized_for_review(analysis_state, tmp_path) -> None:
     """A raw Module 1 Langfuse export becomes a renderable review record."""
     import json

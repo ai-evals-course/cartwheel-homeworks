@@ -278,14 +278,10 @@ def select_traces(
     # File sources are relative to state so the export and state can move
     # together. The marker distinguishes them from older manifest paths.
     if not (isinstance(trace_source, str) and trace_source.lower() == "langfuse"):
-        source_path = Path(trace_source).resolve()
-        try:
-            relative_source = os.path.relpath(source_path, _state.state_root().resolve())
-        except ValueError:  # Windows cannot make relative paths across drives.
-            manifest["source"] = str(source_path)
-        else:
-            manifest["source"] = relative_source.replace(os.sep, "/")
-            manifest["source_relative_to"] = "state"
+        manifest["source"] = os.path.relpath(
+            Path(trace_source).resolve(), _state.state_root().resolve()
+        )
+        manifest["source_relative_to"] = "state"
     _state.write_json(_state.state_path("samples.json"), samples)
     _state.write_json(_state.state_path("sample_manifest.json"), manifest)
     return samples
