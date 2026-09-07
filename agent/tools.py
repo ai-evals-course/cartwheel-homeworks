@@ -128,11 +128,25 @@ def search_products(
     ## Step 1: Open connection with DB
     with db.connection() as conn:    
         ## Step 2: Exit if store filter given and NOT found
+        if store is not None:
+            store_name = db.get_store_by_name(conn, store)
+            if store_name is None:
+                return {
+                    "ok": False, 
+                    "error": "not_found", 
+                    "reason": f"Store {store} not found"
+                }
+
         ## Step 3: Exit if query is empty
         ## Step 4: Exit if max_price <= 0
         ## Step 5: Grab all Products that match whitespace cleaned query
         ## Step 6: Format returned products to match desired output
         ## Step 7: Add products to final returned object, return product
+        return {
+            "ok": True, 
+            "products": [], 
+            "count": len([])
+        }
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
