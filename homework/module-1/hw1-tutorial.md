@@ -1,8 +1,8 @@
-# Product manager guidance for Homework 1
+# Homework 1 tutorial
 
 Help me complete Homework 1 for the Evaluating and Improving AI Agents course as an interactive tutorial.
 
-I'm a product manager. I've used coding agents (Codex, Claude Code), but Python setup and unfamiliar files can be confusing. I want to do the homework and understand the decisions I'm making. You can handle the implementation and terminal commands. Help me connect that work to the product behavior I'm evaluating.
+I want to do the homework and understand the decisions I'm making. You can handle the implementation and terminal commands. Adapt your explanations to what I already know, and help me connect the technical work to the product behavior I'm evaluating.
 
 The starter repository is https://github.com/ai-evals-course/cartwheel-homeworks. We are working on my own local copy of that repository. It already includes SPEC.md and a partially implemented support agent.
 
@@ -20,7 +20,7 @@ The starter repository is https://github.com/ai-evals-course/cartwheel-homeworks
 
 Check whether this session is already in the Cartwheel homework repository. If it is, use the existing files and preserve any work. If it isn't, help me find my copy or clone the repository into a suitable folder. Explain where it will live. If you need me to select or open a folder in the app, give me one concrete action and wait.
 
-Read the repository instructions, README.md, homework/README.md, homework/module-1/hw1.md, and SPEC.md. Inspect relevant code as needed. Use the current HW1 handout as the checklist. The opening sentence may say four tools, but the task list names five; check the actual list and code.
+Read the [repository instructions](../../AGENTS.md), [Module 1 instructions](AGENTS.md), and [HW1 handout](hw1.md), along with README.md and SPEC.md at the repository root. Inspect relevant code as needed. Use the current handout as the checklist. The student has chosen the tutorial, so begin orientation without asking them to choose a help style again.
 
 Explain what Cartwheel does and why we'll use it for later evals. Show me where SPEC.md lives and summarize what it already defines. Explain how an intended behavior gets implemented in the system prompt or tool code. Editing SPEC.md alone does not change the running application.
 
@@ -34,7 +34,7 @@ Check the Python and uv setup, install the project dependencies, and generate th
 
 Explain that .env is a settings file. The Cartwheel agent needs an API key to call a model when we chat with it. Help me choose one supported provider I can access. Check the project's current configuration rather than guessing a model name. Explain any account setup or API billing I need to handle myself.
 
-Create .env from the supplied template if needed. Show me how to enter my key locally. Do not ask me to paste the key into this conversation, display its value, or include it in git commits. The tests and data generation should work without a model key; if I cannot obtain one yet, we can continue that work and clearly mark live conversations as pending.
+Create .env from the supplied template if needed and show me how to enter my key locally, following the shared credential rules. The tests and data generation should work without a model key; if I cannot obtain one yet, we can continue that work and clearly mark live conversations as pending.
 
 Run the supplied baseline checks and explain expected failures from unfinished homework functions. An expected failure does not mean the function is complete.
 
@@ -46,7 +46,7 @@ Checkpoint: show the actual response and ask whether it met my expectation. Do n
 
 Follow HW1 Part A for get_policy, search_products, list_my_orders, cancel_order, and find_order. Use the supplied specification and function contracts. For each tool, briefly explain its purpose and ask about one relevant success or failure case. Implement it based on the supplied requirements and our discussion.
 
-Use the existing database and authorization helpers. Preserve permission checks. If a docstring and helper disagree, inspect the implementation and tests, explain the mismatch, and resolve it without weakening the requirements or changing a test merely to make it pass.
+If a docstring and helper disagree, inspect the implementation and tests. Explain the mismatch and apply the shared implementation rules.
 
 Run the focused HW1 tests with --runxfail so unfinished functions cannot be hidden as expected failures. Also run the regression checks named in the handout. When a conversation reveals a missing capability, help me define an appropriate tool, implement it, and register it for the correct roles, following the current assignment's guidance.
 
