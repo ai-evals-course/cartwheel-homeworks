@@ -689,12 +689,13 @@ def test_m2_failure_report_matches_artifact_l_schema(analysis_state, tmp_path) -
     assert evaluator["test_tpr_interval"] == [0.8271, 0.9854]
     assert evaluator["test_tnr_interval"] == [0.552, 0.953]
 
+# Path("langfuse") identifies a file, so include that filename in the test.
 @pytest.mark.parametrize("filename", ["export.json", "langfuse"])
-def test_m2_select_traces_is_deterministic_and_offline(
+def test_m2_file_selection_is_deterministic_and_resumable(
     analysis_state, tmp_path, monkeypatch, filename
 ) -> None:
-    """`select_traces` clusters an export into a reproducible diverse batch
-    with a one-line reason per pick, no model call."""
+    """Select a repeatable batch, then resume after changing the working
+    directory or moving the export and state together."""
     import json
 
     from pathlib import Path

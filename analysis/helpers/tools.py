@@ -31,8 +31,8 @@ from __future__ import annotations
 
 import datetime as _dt
 import hashlib
-import os
 import math
+import os
 from pathlib import Path
 from typing import Any
 
@@ -194,7 +194,8 @@ def _load_trace_source(trace_source: str | Path | None) -> list[dict[str, Any]]:
     """Load normalized traces from an export path or explicit live source.
 
     The "langfuse" source requires configured Langfuse and nonempty results.
-    For offline analysis, pass an export path, including the demo export.
+    For offline analysis, pass a Module 1 export such as
+    ``traces/support_traces.json`` from ``scenarios.export_langfuse``.
     Each reader normalizes its records before returning them.
     """
     if isinstance(trace_source, str) and trace_source.lower() == "langfuse":
@@ -235,7 +236,8 @@ def select_traces(
         trace_source: a Langfuse export path (JSON/JSONL of trace records), or
             the literal ``"langfuse"`` to pull the
             error-analysis slice live from configured Langfuse. Empty live
-            results raise. For offline use, pass the demo export path.
+            results raise. For offline use, pass a Module 1 export such as
+            ``traces/support_traces.json``.
         k: batch size (the demo default is 24).
         strategy: ``"diversity"`` (default), ``"random"``, or ``"outlier"``
             (interquartile-range flags on a numeric feature).
