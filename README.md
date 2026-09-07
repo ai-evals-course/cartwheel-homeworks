@@ -7,19 +7,19 @@ The repository contains the Cartwheel support agent and starter code for all fiv
 
 Begin with the [homework index](homework/README.md). Each assignment names the code and records required for the corresponding module.
 
-## Choose how to work through Homework 1
+## Get started with Homework 1
 
-Ask your coding agent for help with Homework 1. If you haven't chosen an approach, the repository instructions tell it to offer a guided tutorial, direct implementation help, or help with a specific blocker. Tell it your preference, and change approaches whenever you need to.
+The course instructors put together this [HW1 walkthrough](homework/module-1/hw1-tutorial.md) for anyone who wants a hand, including PMs. Your coding agent handles setup and coding while you decide what to expect and check the results.
 
-The course instructors prepared the [HW1 tutorial](homework/module-1/hw1-tutorial.md) for anyone who wants explanations and checkpoints, including product managers and people unfamiliar with Python setup. Your coding agent follows that walkthrough, handling setup and implementation while you decide what behavior to expect and review the results.
+Choose the walkthrough for step-by-step help, or ask your agent to jump into a task. You can ask for help whenever you get stuck and switch approaches at any time.
 
-Open this repository in Claude Code, Codex, or your preferred coding agent and paste:
+Open this repo in Codex, Claude Code, or your preferred coding agent and paste:
 
 ```text
 Read AGENTS.md and help me get started with Homework 1.
 ```
 
-If you have not downloaded the repository yet, give your coding agent this instead:
+If you haven't downloaded the repo yet, paste this instead:
 
 ```text
 Help me get started with Homework 1 in https://github.com/ai-evals-course/cartwheel-homeworks. Use my existing local copy if I have one, or help me clone it. Then read AGENTS.md and help me choose how to proceed.
@@ -64,7 +64,7 @@ Homework 2 also requires Docker with Compose. Follow the assignment for starting
 ## Repo map
 
 ```
-AGENTS.md                 shared instructions and homework guidance for coding agents
+AGENTS.md                 instructions for your coding agent
 CLAUDE.md                 symlink to AGENTS.md
 SPEC.md                   support specification: scope, access matrix, criteria table
 facts.yaml                the facts sheet; every policy number lives here
