@@ -301,23 +301,23 @@ def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]
     ## Step 1: Check user role
     role = ctx.role
 
-    ## Step 2: Check that user has access to cancel order
-    if not can_cancel_order(ctx, ctx.user_id, ctx.store_id):
-        ## Step 3: Return error on access denied
-        return permission_denied(f"Role {role} does not have access to cancel order {order_id}")
-
-    ## Step 4: Start connection to DB
+    ## Step 2: Start connection to DB
     with db.connection() as conn:
-        ## Step 5: Get order
+        ## Step 3: Get order
         order = db.get_order(conn, order_id)
 
-        ## Step 6: Return error if order not found
+        ## Step 4: Return error if order not found
         if order is None:
             return {
                 "ok": False, 
                 "error": "not_found",
                 "reason": f"Order {order_id} not found"
             }
+
+        ## Step 5: Check that user has access to cancel order)
+        if not can_cancel_order(ctx, order.user_id, order.store_id):
+            ## Step 6: Return error on access denied
+            return permission_denied(f"Role {role} does not have access to cancel order {order_id}")
 
         ## Step 7: Check that order is in allowed status
         if order.status != 'placed':
