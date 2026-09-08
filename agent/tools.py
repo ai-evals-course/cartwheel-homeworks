@@ -19,14 +19,22 @@ They are marked xfail and flip to passing as you implement each function.
 from __future__ import annotations
 
 import sqlite3
+from datetime import timedelta
 from typing import Any
 
 from rapidfuzz import fuzz
 
 from agent import db
-from agent.auth import AuthContext, can_cancel_order, permission_denied
+from agent.auth import (
+    AuthContext,
+    can_cancel_order,
+    can_view_order,
+    permission_denied,
+)
+from agent.config import load_facts
 from agent.helpcenter import load_policy_docs
 from agent.killswitch import kill_switch
+from seed.eligibility import effective_return_window_days, is_refund_eligible
 
 MAX_SEARCH_LIMIT = 25
 DEFAULT_ORDER_LIMIT = 20
@@ -344,4 +352,157 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
     return {
         "ok": True,
         "orders": [order.to_public_dict() for _, order in matches[:MAX_FIND_RESULTS]],
+    }
+
+
+# ---------------------------------------------------------------------------
+# Additional tools (Homework 1, Part A). Both were added after Part B
+# conversations showed the agent could not answer a reasonable question with
+# the tools it had. Each is registered in TOOLS_BY_ROLE in agent/agent.py.
+# ---------------------------------------------------------------------------
+
+
+def get_product(ctx: AuthContext, product_id: int) -> dict[str, Any]:
+    """Fetch one product by its id. Risk tier: read.
+
+    The catalog is public, so every role may read any product and this tool
+    needs no permission check, exactly like search_products.
+
+    Pairs with get_order, which returns a product_id but not the product's
+    name: without this tool the agent cannot answer "what was the item I
+    ordered?" for an order it can otherwise see.
+
+    Args:
+        ctx: The caller's auth context. Unused here, but every tool takes it.
+        product_id: The product to look up.
+
+    Returns:
+        On success: {"ok": True, "product": {"product_id": int,
+        "store_id": int, "store_name": str | None, "title": str,
+        "description": str, "category": str, "price_usd": float}}.
+        If no product has this id: {"ok": False, "error": "not_found",
+        "reason": ...}.
+
+    Note that price_usd is the current listing price, which is not
+    necessarily what an older order paid; compare with the order's total_usd
+    rather than assuming they agree.
+    """
+    with db.connection() as conn:
+        product = db.get_product(conn, product_id)
+        if product is None:
+            return {
+                "ok": False,
+                "error": "not_found",
+                "reason": f"no product #{product_id}",
+            }
+        store = db.get_store(conn, product.store_id)
+        return {
+            "ok": True,
+            "product": {
+                "product_id": product.id,
+                "store_id": product.store_id,
+                "store_name": store.name if store else None,
+                "title": product.title,
+                "description": product.description,
+                "category": product.category,
+                "price_usd": product.price_usd,
+            },
+        }
+
+
+def check_return_eligibility(ctx: AuthContext, order_id: int) -> dict[str, Any]:
+    """Explain whether an order can still be returned, and why. Risk tier: read.
+
+    Scoped by the access matrix through agent.auth.can_view_order, on the same
+    terms as get_order: shoppers see their own orders, merchants their store's,
+    support any.
+
+    The eligibility decision reuses the oracle in seed/eligibility.py, the same
+    pure functions the seed script uses to stamp refund_eligible on every
+    order, so this tool cannot drift from the flag issue_refund honors.
+
+    Args:
+        ctx: The caller's auth context.
+        order_id: The order to check.
+
+    Returns:
+        On success, {"ok": True, ...} with the fields below. If no order has
+        this id: {"ok": False, "error": "not_found", ...}. If the order is
+        outside the caller's scope: agent.auth.permission_denied(...).
+
+        - status, delivered_at: the order's own values.
+        - as_of: the world's current date (agent.db.world_asof), which is what
+          every date calculation here counts against. It is not today's real
+          date; do not substitute one.
+        - days_since_delivery: negative if the delivery date is in the future.
+        - return_window_days, window_source, policy_id: the window that
+          applies, whether it came from the store override or the platform
+          default, and the policy id to cite for it (RESP-1).
+        - return_deadline: the last day a return may be started.
+        - refund_eligible: the flag stored on the order. This is the
+          authoritative answer, because issue_refund honors this flag.
+        - computed_eligible, consistent: the recomputation from the oracle and
+          whether it agrees with the stored flag. The seed plants at least one
+          order whose stored flag disagrees with its own dates, so a False
+          here means the record is internally inconsistent and the caller
+          should say so rather than pick a side (RESP-3).
+
+    This tool answers the return window only. It does not account for
+    restocking fees, which some stores charge on opened items, nor for the
+    refund auto-approval threshold, which issue_refund applies separately.
+    """
+    facts = load_facts()
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {
+                "ok": False,
+                "error": "not_found",
+                "reason": f"no order #{order_id}",
+            }
+        if not can_view_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"role '{ctx.role}' (user {ctx.user_id}) may not view order #{order_id}"
+            )
+        store = db.get_store(conn, order.store_id)
+        as_of = db.world_asof(conn)
+
+    override = store.return_window_days_override if store else None
+    window = effective_return_window_days(facts["return_window_days"], override)
+    computed = is_refund_eligible(
+        status=order.status,
+        delivered_at=order.delivered_at,
+        as_of=as_of,
+        return_window_days=window,
+    )
+
+    # An override is valid only if the store's own policy page states it
+    # (cw-store-overrides), so cite that page when one applies. Fall back to
+    # the platform policy if the store has no doc under the usual id.
+    policy_id = "cw-returns"
+    if override is not None and store is not None:
+        candidate = f"store-{store.slug}-policy"
+        if any(doc.policy_id == candidate for doc in load_policy_docs()):
+            policy_id = candidate
+
+    return {
+        "ok": True,
+        "order_id": order_id,
+        "status": order.status,
+        "as_of": as_of.isoformat(),
+        "delivered_at": order.delivered_at.isoformat() if order.delivered_at else None,
+        "days_since_delivery": (
+            (as_of - order.delivered_at).days if order.delivered_at else None
+        ),
+        "return_window_days": window,
+        "window_source": "store_override" if override is not None else "platform_default",
+        "policy_id": policy_id,
+        "return_deadline": (
+            (order.delivered_at + timedelta(days=window)).isoformat()
+            if order.delivered_at
+            else None
+        ),
+        "refund_eligible": order.refund_eligible,
+        "computed_eligible": computed,
+        "consistent": computed == order.refund_eligible,
     }

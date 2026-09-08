@@ -186,6 +186,23 @@ def list_all_orders(conn: sqlite3.Connection, limit: int = 20) -> list[Order]:
     return [_order_from_row(row) for row in rows]
 
 
+def _product_from_row(row: sqlite3.Row) -> Product:
+    return Product(
+        id=row["id"],
+        store_id=row["store_id"],
+        title=row["title"],
+        description=row["description"],
+        category=row["category"],
+        price_cents=row["price_cents"],
+    )
+
+
+def get_product(conn: sqlite3.Connection, product_id: int) -> Product | None:
+    """One product by id. Orders carry a product_id but not the product."""
+    row = conn.execute("SELECT * FROM products WHERE id = ?", (product_id,)).fetchone()
+    return _product_from_row(row) if row else None
+
+
 def list_products(
     conn: sqlite3.Connection, store_id: int | None = None
 ) -> list[Product]:
@@ -195,17 +212,7 @@ def list_products(
         rows = conn.execute(
             "SELECT * FROM products WHERE store_id = ? ORDER BY id", (store_id,)
         ).fetchall()
-    return [
-        Product(
-            id=row["id"],
-            store_id=row["store_id"],
-            title=row["title"],
-            description=row["description"],
-            category=row["category"],
-            price_cents=row["price_cents"],
-        )
-        for row in rows
-    ]
+    return [_product_from_row(row) for row in rows]
 
 
 def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> None:
