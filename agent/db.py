@@ -177,6 +177,15 @@ def list_orders_for_store(
     return [_order_from_row(row) for row in rows]
 
 
+def list_all_orders(conn: sqlite3.Connection, limit: int = 20) -> list[Order]:
+    """Every order, newest first. Support staff search across all orders."""
+    rows = conn.execute(
+        "SELECT * FROM orders ORDER BY ordered_at DESC, id DESC LIMIT ?",
+        (limit,),
+    ).fetchall()
+    return [_order_from_row(row) for row in rows]
+
+
 def list_products(
     conn: sqlite3.Connection, store_id: int | None = None
 ) -> list[Product]:
