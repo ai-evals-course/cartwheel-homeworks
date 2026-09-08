@@ -211,7 +211,47 @@ def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
         tool: the model cannot ask for someone else's orders through it.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement list_my_orders")
+
+    ## Step 1: Determine user type from context
+    role = ctx.role
+
+    ## Step 2: Connect to DB
+    with db.connection() as conn:
+        ## Step 3: Determine logic for shopper
+        if role == 'shopper':
+            orders = db.list_orders_for_user(conn, ctx.user_id, DEFAULT_ORDER_LIMIT)
+            fmt_orders = []
+            for order in orders:
+                fmt_order = order.to_public_dict()
+                fmt_orders.append(fmt_order)
+
+            return {
+                "ok": True,
+                "orders": fmt_orders,
+                "count": len(fmt_orders)
+            }
+
+        ## Step 4: Use helper for merchant
+        elif role == 'merchant':
+            orders = db.list_orders_for_store(conn, ctx.store_id, DEFAULT_ORDER_LIMIT)
+            fmt_orders = []
+            for order in orders:
+                fmt_order = order.to_public_dict()
+                fmt_orders.append(fmt_order)
+
+            return {
+                "ok": True,
+                "orders": fmt_orders,
+                "count": len(fmt_orders)
+            }
+
+        ## Step 5: Return order for support        
+        else:
+            return {
+                "ok": False,
+                "error": "invalid_argument", 
+                "reason": "This user does not have access to view orders"
+            }
 
 
 def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]:
