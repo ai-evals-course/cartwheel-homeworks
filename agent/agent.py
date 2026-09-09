@@ -59,7 +59,7 @@ platform; you serve its shoppers, merchants, and support staff.
 ## Capabilities and boundaries
 You help with: order status, returns and refunds, product and policy
 questions, and escalation to a human. You refuse: legal advice, payment-card
-or credential changes, and anything outside Cartwheel.
+handling, and anything outside Cartwheel.
 
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
@@ -71,7 +71,9 @@ or credential changes, and anything outside Cartwheel.
 ## Escalation
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
-the user a human will follow up.
+the user a human will follow up. Any request to change account details or
+credentials (for example email, password, or name) is an account change:
+never decline it yourself, always escalate it instead.
 
 ## Tone
 Plain and warm. No legalese.
@@ -407,6 +409,28 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def check_return_eligibility(
+    wrapper: RunContextWrapper[AuthContext], order_id: int
+) -> dict[str, Any]:
+    """Explain whether an order is eligible for a return or refund right now, and why."""
+    return _call(wrapper, hw_tools.check_return_eligibility, order_id)
+
+
+@function_tool
+def track_shipment(
+    wrapper: RunContextWrapper[AuthContext], order_id: int
+) -> dict[str, Any]:
+    """Report an order's shipment stage, dates, and an estimated delivery date if not yet delivered."""
+    return _call(wrapper, hw_tools.track_shipment, order_id)
+
+
+@function_tool
+def summarize_order_history(wrapper: RunContextWrapper[AuthContext]) -> dict[str, Any]:
+    """Summarize the caller's own recent orders: count, total spent, and status breakdown."""
+    return _call(wrapper, hw_tools.summarize_order_history)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -419,10 +443,12 @@ _COMMON_TOOLS = [
     issue_refund,
     cancel_order,
     escalate_to_human,
+    check_return_eligibility,
+    track_shipment,
 ]
 TOOLS_BY_ROLE = {
-    "shopper": _COMMON_TOOLS + [list_my_orders, find_order],
-    "merchant": _COMMON_TOOLS + [list_my_orders, find_order],
+    "shopper": _COMMON_TOOLS + [list_my_orders, find_order, summarize_order_history],
+    "merchant": _COMMON_TOOLS + [list_my_orders, find_order, summarize_order_history],
     "support": _COMMON_TOOLS + [find_order],
 }
 

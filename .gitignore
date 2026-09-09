@@ -4,6 +4,9 @@
 # Secrets. Never commit keys.
 .env
 
+# Local tutorial progress note, not a submission file.
+hw1-progress-notes.md
+
 # Generated world data. Recreate with: uv run python -m seed.generate
 data/cartwheel.db
 
