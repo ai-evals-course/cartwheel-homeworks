@@ -1,3 +1,11 @@
+# Workflow
+Your workflow from here, after you switch to a `main` branch:
+```bash
+git pull                      # from your fork
+git pull upstream main        # pull course updates explicitly
+```
+
+
 # HW1 Part B — conversation log
 
 Student notes for Homework 1, Part B. Not a deliverable; the graded
