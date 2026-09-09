@@ -365,4 +365,28 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
         match, return {"ok": True, "orders": []}.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement find_order")
+    ## Step 1: Get the role
+    role = ctx.role
+    
+    ## Step 2: Open DB connection
+    with db.connection() as conn:
+        orders = []
+        if role == 'shopper':
+            ## Step 3a: Get list of orders (shopper)
+            orders = db.list_orders_for_user(conn, ctx.user_id, DEFAULT_ORDER_LIMIT)
+            True
+        elif role == 'merchant':
+            ## Step 3b: Get list of orders (merchant)
+            orders = db.list_orders_for_store(conn, ctx.store_id, DEFAULT_ORDER_LIMIT)
+            True
+        elif role == 'support':
+            ## Step 3c: Get list of orders (support)
+            orders = db.list_orders_for_user(conn, "*", DEFAULT_ORDER_LIMIT)
+            True
+        else:
+            raise NotImplementedError("HW1: implement find_order")
+            
+            
+        ## Step 4: Filter orders based on search
+        ## Step 5: Return order
+        
