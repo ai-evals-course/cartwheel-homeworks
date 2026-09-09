@@ -1,8 +1,9 @@
 # HW1 Part B — conversation log
 
-Scratch tracking aid. Not a deliverable; the graded artifact is
-`homework/hw1-session.jsonl`. The same table is appended to
-`homework/module-1/hw1.md` as Appendix A.
+Student notes for Homework 1, Part B. Not a deliverable; the graded
+artifact is `homework/hw1-session.jsonl`. Kept in its own file rather than
+appended to `homework/module-1/hw1.md`, so pulls from upstream never
+conflict with these notes.
 ## Appendix A — Part B conversation log (student notes)
 
 Added by the student. Not part of the original handout.
