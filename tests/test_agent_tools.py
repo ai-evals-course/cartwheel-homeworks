@@ -93,3 +93,21 @@ def test_refund_respects_scope(world_copy: Path) -> None:
     result = issue_refund_logic(SHOPPER_2, 4127, 84.0, "not my order")
     assert result["ok"] is False
     assert result["error"] == "permission_denied"
+
+
+def test_get_store_info_reports_override_and_default(world: dict) -> None:
+    from agent.tools import get_store_info
+
+    juniper = get_store_info(SHOPPER_1, "Juniper Home Goods")
+    assert juniper["ok"] is True
+    assert juniper["effective_return_window_days"] == 14
+    assert juniper["return_window_days_override"] == 14
+    assert juniper["platform_return_window_days"] == 30
+
+    heron = get_store_info(SHOPPER_1, "blue-heron-ceramics")
+    assert heron["ok"] is True
+    assert heron["return_window_days_override"] is None
+    assert heron["effective_return_window_days"] == 30
+
+    assert get_store_info(SHOPPER_1, "")["error"] == "invalid_argument"
+    assert get_store_info(SHOPPER_1, "No Such Store")["error"] == "not_found"

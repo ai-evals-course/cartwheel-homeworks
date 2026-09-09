@@ -59,7 +59,7 @@ platform; you serve its shoppers, merchants, and support staff.
 ## Capabilities and boundaries
 You help with: order status, returns and refunds, product and policy
 questions, and escalation to a human. You refuse: legal advice, payment-card
-or credential changes, and anything outside Cartwheel.
+or payment-credential handling, and anything outside Cartwheel.
 
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
@@ -71,7 +71,8 @@ or credential changes, and anything outside Cartwheel.
 ## Escalation
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
-the user a human will follow up.
+the user a human will follow up. Account changes of any kind, including
+email, always require escalate_to_human; do not complete them yourself.
 
 ## Tone
 Plain and warm. No legalese.
@@ -407,6 +408,14 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def get_store_info(
+    wrapper: RunContextWrapper[AuthContext], store: str
+) -> dict[str, Any]:
+    """Look up a store's public profile, including any return-window override."""
+    return _call(wrapper, hw_tools.get_store_info, store)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -415,6 +424,7 @@ _COMMON_TOOLS = [
     search_help_center,
     get_policy,
     search_products,
+    get_store_info,
     get_order,
     issue_refund,
     cancel_order,
