@@ -45,6 +45,16 @@ from seed.eligibility import refund_needs_approval
 # RESP-2 and RESP-3 are only partly represented in the starter prompt. Manual
 # conversations in Homework 1 determine whether one omission causes a failure
 # worth correcting.
+#
+# Homework 1 Part C revisions. Evidence: homework/hw1-session.jsonl.
+#   Record 6  (RESP-1): the agent stated the cancellation rule from memory and
+#     cited nothing. Records 7 and 8 show it cites correctly whenever it
+#     retrieves, so the gap was the missing lookup, not the missing citation.
+#     Tool guidance now requires a lookup before stating a rule.
+#   Record 10 (ESC-2): the agent refused an account email change without
+#     escalating. escalate_to_human was available and unused, and nothing in
+#     the prompt linked account changes to escalation. The escalation section
+#     now names them.
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT_TEMPLATE = """\
@@ -65,6 +75,9 @@ or credential changes, and anything outside Cartwheel.
 - Prefer a tool lookup over memory. Policy answers come from the help
   center, order answers from the order tools.
 - Cite the policy id (for example cw-returns) for every policy claim.
+- A rule you already know is still a policy claim. Before stating any rule
+  about returns, refunds, cancellations, shipping, or fees, look it up with
+  search_help_center or get_policy and cite the id.
 - Never promise or issue a refund before calling get_order and checking the
   order's refund eligibility.
 
@@ -72,6 +85,9 @@ or credential changes, and anything outside Cartwheel.
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
 the user a human will follow up.
+Account changes of any kind, including email, password, and payment details,
+always go to a human: do not make the change yourself, call escalate_to_human,
+and tell the user a human will follow up.
 
 ## Tone
 Plain and warm. No legalese.
