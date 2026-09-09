@@ -49,9 +49,9 @@ Implement `record_tool_result` and `_set_permission_denied_attributes` in `obser
 
 Use the active tool span returned by `trace.get_current_span()`. Add the following application attributes:
 
-- `cartwheel.user_role`, as a string
-- `cartwheel.user_id`, as the decimal user identifier stored in a string
-- `cartwheel.store_id`, as an integer when the caller is a merchant
+- `cartwheel.user_role`, as a string (same for every tool call in the request)
+- `cartwheel.user_id`, as the decimal user identifier stored in a string (same for every tool call in the request)
+- `cartwheel.store_id`, as an integer when the caller is a merchant (same for every tool call in the request)
 - `cartwheel.permission_denied`, as a Boolean value
 - `cartwheel.permission_denied.reason`, when permission was denied
 
@@ -83,7 +83,7 @@ uv run pytest --runxfail -vv tests/test_hw_holes.py -k "create_session_binds"
 
 ## Part C, implement the traced message endpoint
 
-With sessions in place, you can now accept user messages over HTTP. The message endpoint ties together authentication, the agent loop, and tracing so that every request produces a fully attributed trace.
+The supplied OTel GenAI instrumentation already records model spans and tool spans automatically. Part A added application attributes to the tool spans. In this part you create the root span that wraps the full request and carries the remaining application attributes.
 
 Implement `post_message` in `server/app.py`. The endpoint must authorize the bearer token before it runs the agent. The authorization checks are already provided in `_authorize`: a missing or invalid token returns HTTP 401, a token issued for a different session returns HTTP 403, and an unknown session returns HTTP 404. The endpoint must then recover the session stored by the server and compute the version of the rendered system prompt.
 
@@ -93,12 +93,12 @@ Run the agent inside a root span named `cartwheel.session_message`. Record the f
 - `cartwheel.user_id`, as the decimal user identifier stored in a string
 - `cartwheel.prompt_version`
 - `cartwheel.scenario_id`, when the request supplies a nonempty value
-- `gen_ai.input.messages`, containing the incoming user message when content capture is enabled
-- `gen_ai.output.messages`, containing the final assistant reply after the run completes, when content capture is enabled
+- `gen_ai.input.messages`, containing the incoming user message
+- `gen_ai.output.messages`, containing the final assistant reply after the run completes
 
 Use the OTel GenAI message format, serialized with `json.dumps`, for both message attributes. For example, the input is `[{"role": "user", "parts": [{"type": "text", "content": body.message}]}]`. The output uses the same structure with role `assistant` and the final reply as its text. The automatic model spans contain the full input for each model call, including conversation history and tool results.
 
-Return the session identifier, final reply, and prompt version. The supplied OTel GenAI instrumentation records model and tool spans within the request span.
+Return the session identifier, final reply, and prompt version.
 
 Verify the root span and its attributes in Langfuse in Part E.
 
