@@ -247,6 +247,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "rank-bm25" },
+    { name = "rapidfuzz" },
     { name = "uvicorn" },
 ]
 
@@ -274,6 +275,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.7" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
+    { name = "rapidfuzz", specifier = ">=3.14.5" },
     { name = "uvicorn", specifier = ">=0.30" },
 ]
 provides-extras = ["optimization"]

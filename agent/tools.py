@@ -25,6 +25,8 @@ from agent.auth import AuthContext, can_cancel_order, permission_denied
 from agent.helpcenter import load_policy_docs
 from agent.killswitch import kill_switch
 
+from rapidfuzz import fuzz
+
 MAX_SEARCH_LIMIT = 25
 DEFAULT_ORDER_LIMIT = 20
 
@@ -370,23 +372,42 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
     
     ## Step 2: Open DB connection
     with db.connection() as conn:
-        orders = []
+        fmt_orders = []
         if role == 'shopper':
             ## Step 3a: Get list of orders (shopper)
             orders = db.list_orders_for_user(conn, ctx.user_id, DEFAULT_ORDER_LIMIT)
-            True
+            for order in orders:
+                fmt_order = order.to_public_dict()
+                fmt_orders.append(fmt_order)
         elif role == 'merchant':
             ## Step 3b: Get list of orders (merchant)
             orders = db.list_orders_for_store(conn, ctx.store_id, DEFAULT_ORDER_LIMIT)
-            True
+            for order in orders:
+                fmt_order = order.to_public_dict()
+                fmt_orders.append(fmt_order)
         elif role == 'support':
             ## Step 3c: Get list of orders (support)
             orders = db.list_orders_for_user(conn, "*", DEFAULT_ORDER_LIMIT)
-            True
+            for order in orders:
+                fmt_order = order.to_public_dict()
+                fmt_orders.append(fmt_order)
         else:
             raise NotImplementedError("HW1: implement find_order")
             
-            
         ## Step 4: Filter orders based on search
+        orders_with_product = []
+        all_products = db.list_products(conn, None)
+        for order in fmt_orders:
+            product = next((p for p in all_products if fuzz.ratio(p.title, query) > 90), None)
+
+            if product is not None and len(orders_with_product) < 5:
+                orders_with_product.append(order)
+                
+    
         ## Step 5: Return order
+        print(orders_with_product)
+        return {
+            "ok": True, 
+            "orders": orders_with_product
+        }
         
