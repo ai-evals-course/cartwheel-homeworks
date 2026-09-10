@@ -28,13 +28,23 @@ application's database, policies, or expected outcomes.
 
 ## Procedure
 
-1. Read the spec, propose 5 to 8 dimensions with values, and show them to
-   the human before generating anything. The dimensions are: user
-   role, intent, order state, policy relevance (including store-override
-   cases), difficulty, turn count (1 to 3), language register.
-2. Create a coverage pool in which every dimension value appears repeatedly.
-   Create a separate challenge pool from difficult but valid combinations.
-   Do not select a challenge merely because a model failed on the exact case.
+1. Read the spec, propose the six required dimensions with their values,
+   and show them to the human before generating anything. Add another
+   dimension only with a stated reason. The six required dimensions are:
+   the authenticated role; the intent; the record involved (an order and
+   its state, a product, a store policy page, or none); the applicable
+   policy (platform rule, store override, or none); the number of tool
+   calls needed (none, one lookup, or several); and the difficulty. Each
+   scenario also records its turn count (1 to 3), which equals one plus
+   the number of followups.
+2. Generate tuples from the approved dimensions, using a few tuples the
+   human wrote as examples. Do not enumerate the full Cartesian product;
+   some combinations are invalid and the product grows quickly. Count how
+   often each value appears, and sample the rare and risky combinations on
+   purpose. Keep a coverage pool in which every dimension value appears
+   repeatedly and a separate challenge pool of difficult but valid
+   combinations. Do not select a challenge merely because a model failed
+   on the exact case.
 3. Draft one natural opening message per tuple. For a multi-turn scenario,
    put one or two exact user utterances in `followups`; the runner sends every
    string verbatim, so do not place persona notes or generation instructions
@@ -68,7 +78,7 @@ application's database, policies, or expected outcomes.
   "id": "support-0042",
   "scenario_group": "challenge",
   "data_quality_case_id": "dq-order-missing-delivery-date",
-  "tuple": {"role": "shopper", "intent": "return_deadline", "order_id": 8002},
+  "tuple": {"role": "shopper", "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002},
   "opening_message": "When does the return period end for order 8002?",
   "followups": [],
   "expected": {

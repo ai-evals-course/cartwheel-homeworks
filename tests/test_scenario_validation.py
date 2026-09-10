@@ -15,7 +15,8 @@ def valid_scenario() -> dict:
         "tuple": {
             "role": "shopper",
             "intent": "order_status",
-            "order_state": "delivered",
+            "record_state": "delivered",
+            "tools_needed": "one_lookup",
             "applicable_policy": None,
             "turn_count": 1,
             "difficulty": "ordinary",

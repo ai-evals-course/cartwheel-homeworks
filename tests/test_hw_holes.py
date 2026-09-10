@@ -895,3 +895,15 @@ def test_m2_submission_has_a_frozen_judge_per_split_mode() -> None:
             frozen_modes.add(j.get("mode"))
     for mode in splits:
         assert mode in frozen_modes, f"{mode}: no frozen judge (freeze before reporting)"
+
+
+@hw(1, "find_order")
+@pytest.mark.parametrize("ctx,scope", [(SHOPPER_1, "shopper"), (AuthContext(user_id=9002, role="merchant", store_id=2), "merchant"), (SUPPORT, "support")])
+def test_hw1_find_order_roles_and_old_matches(order_search_cases, ctx, scope):
+    title, expected = order_search_cases
+    result = tools.find_order(ctx, title)
+    assert result["ok"] is True
+    with db.connection() as conn:
+        wanted = [db.get_order(conn, order_id).to_public_dict() for order_id in expected[scope][:5]]
+    assert result["orders"] == wanted
+    assert tools.find_order(ctx, "zzzznonexistent9999") == {"ok": True, "orders": []}

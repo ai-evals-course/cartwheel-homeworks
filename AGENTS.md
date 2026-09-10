@@ -6,7 +6,7 @@ Cartwheel is the support agent used throughout "Evaluating and Improving AI Agen
 
 - Read [README.md](README.md) for setup and commands. Run commands from the repository root.
 - For homework help, identify the assignment from the request and existing work. If it is unclear, ask which assignment the student is working on. The [homework index](homework/README.md) lists released assignments.
-- For HW1 or HW2, read [Module 1 instructions](homework/module-1/AGENTS.md) before proceeding, including when changing files outside that folder. Follow the relevant handout for requirements and deliverables.
+- For HW1, HW2, or HW3, read [Module 1 instructions](homework/module-1/AGENTS.md) before proceeding, including when changing files outside that folder. Follow the relevant handout for requirements and deliverables.
 - For repository maintenance, follow the requested change directly. Preserve unfinished homework functions unless implementing them is part of the request.
 
 ## Shared rules

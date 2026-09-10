@@ -8,3 +8,4 @@ Assignments are released incrementally. More will appear here as the course prog
 
 - [Homework 1](module-1/hw1.md) covers the support agent tools.
 - [Homework 2](module-1/hw2.md) covers authenticated sessions and tracing.
+- [Homework 3](module-1/hw3.md) covers the support scenario dataset and trace export.

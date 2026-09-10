@@ -106,3 +106,32 @@ def test_supplied_callers_close_connections(world_copy: Path, monkeypatch, opera
     assert len(opened) == 1
     with pytest.raises(sqlite3.ProgrammingError, match="closed"):
         opened[0].execute("SELECT 1")
+
+
+@pytest.mark.parametrize("scope", [{"user_id": 1}, {"store_id": 2}, {"all_orders": True}])
+def test_order_search_candidates_include_old_matches(order_search_cases, scope):
+    title, expected = order_search_cases
+    with db.connection() as conn:
+        titles = {p.id: p.title for p in db.list_products(conn)}
+        candidates = db.list_order_search_candidates(conn, **scope)
+        assert len(candidates) > 20
+        assert not any(titles[o.product_id] == title for o in candidates[:20])
+        matches = [o for o in candidates if titles[o.product_id] == title]
+        scope_id = "shopper" if "user_id" in scope else "merchant" if "store_id" in scope else "support"
+        assert [o.id for o in matches] == expected[scope_id]
+        assert all(isinstance(o, db.Order) for o in candidates)
+        if "user_id" in scope:
+            assert all(o.user_id == scope["user_id"] for o in candidates)
+        if "store_id" in scope:
+            assert all(o.store_id == scope["store_id"] for o in candidates)
+        assert [(o.ordered_at, o.id) for o in candidates] == sorted(
+            [(o.ordered_at, o.id) for o in candidates], reverse=True
+        )
+        assert len(db.list_orders_for_user(conn, 1)) == 20
+
+
+@pytest.mark.parametrize("scope", [{}, {"user_id": 1, "store_id": 1}, {"user_id": 1, "all_orders": True}, {"store_id": 1, "all_orders": True}])
+def test_order_search_requires_one_explicit_scope(world, scope):
+    with db.connection(world["db"]) as conn:
+        with pytest.raises(ValueError, match="exactly one"):
+            db.list_order_search_candidates(conn, **scope)

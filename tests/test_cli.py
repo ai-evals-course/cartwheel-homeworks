@@ -7,7 +7,7 @@ import asyncio
 import httpx
 import langfuse
 import pytest
-from agents import Agent, function_tool
+from agents import Agent, Runner, function_tool
 from agents.tracing import get_trace_provider, set_trace_provider, trace
 from agents.tracing.processors import BackendSpanExporter, BatchTraceProcessor
 from agents.tracing.provider import DefaultTraceProvider
@@ -28,6 +28,7 @@ def hosted_exports(monkeypatch):
     """Isolate SDK tracing and capture hosted exports without network calls."""
     monkeypatch.setattr(instrument, "load_env", lambda: None)
     monkeypatch.setattr(instrument, "_genai_instrumented", False)
+    monkeypatch.setattr(instrument, "_openai_tracing_enabled", False)
     requests = []
 
     def reject_export(request):
@@ -38,6 +39,7 @@ def hosted_exports(monkeypatch):
     exporter._client.close()
     exporter._client = httpx.Client(transport=httpx.MockTransport(reject_export))
     hosted_processor = BatchTraceProcessor(exporter)
+    monkeypatch.setattr(instrument, "default_processor", lambda: hosted_processor)
     previous_provider = get_trace_provider()
     provider = DefaultTraceProvider()
     provider.set_disabled(False)
@@ -76,6 +78,7 @@ def test_cli_tool_results(debug, tracing, tmp_path, monkeypatch, capsys, caplog,
     messages = iter(["Check both orders", "quit"])
     argv = ["agent.cli"] + (["--debug"] if debug else [])
     if tracing == "openai":
+        monkeypatch.setenv("OPENAI_API_KEY", "offline-placeholder")
         argv.append("--trace-openai")
     elif tracing != "plain":
         argv.append("--trace")
@@ -172,3 +175,85 @@ def test_instrumentation_failure_does_not_report_success(monkeypatch) -> None:
     with pytest.raises(RuntimeError, match="failed to install"):
         instrument.instrument_genai(NoOpTracerProvider())
     assert instrument._genai_instrumented is False
+
+
+@pytest.mark.parametrize("has_key", [False, True])
+@pytest.mark.parametrize("model_name", ["ollama_chat/local-model", "claude-opus-4-6"])
+def test_non_openai_direct_run_does_not_export(
+    has_key, model_name, monkeypatch, hosted_exports, caplog,
+) -> None:
+    from agent import agent as support
+    from agents.extensions.models.litellm_model import LitellmModel
+
+    if has_key:
+        monkeypatch.setenv("OPENAI_API_KEY", "offline-placeholder")
+    else:
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    # Exercise real provider selection and agent construction, replacing only
+    # the remote model call with an offline implementation.
+    agent = support.build_agent(AuthContext(user_id=1, role="shopper"), model=model_name)
+    assert isinstance(agent.model, LitellmModel)
+    model = FakeModel()
+    model.set_next_output([text_message("Local response")])
+    agent.model = model
+    result = asyncio.run(Runner.run(agent, "Hello"))
+    assert result.final_output == "Local response"
+    processor, requests = hosted_exports
+    processor.force_flush()
+    assert requests == []
+    assert "skipping trace export" not in caplog.text
+
+
+def test_non_openai_direct_run_preserves_langfuse(monkeypatch, hosted_exports) -> None:
+    from agent import agent as support
+
+    provider = TracerProvider()
+    exporter = InMemorySpanExporter()
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    try:
+        # First disable implicit export, then explicitly enable local OTel.
+        support.build_agent(AuthContext(user_id=1, role="shopper"), model="ollama_chat/local")
+        instrument.instrument_genai(provider)
+        agent = support.build_agent(AuthContext(user_id=1, role="shopper"), model="ollama_chat/local")
+        model = FakeModel()
+        model.set_next_output([text_message("Local response")])
+        agent.model = model
+        result = asyncio.run(Runner.run(agent, "Hello"))
+        assert result.final_output == "Local response"
+        assert exporter.get_finished_spans()
+        processor, requests = hosted_exports
+        processor.force_flush()
+        assert requests == []
+    finally:
+        provider.shutdown()
+
+
+def test_non_openai_explicit_hosted_export(monkeypatch, hosted_exports) -> None:
+    from agent import agent as support
+
+    # An explicit choice can restore hosted export after a local-only run.
+    ctx = AuthContext(user_id=1, role="shopper")
+    support.build_agent(ctx, model="ollama_chat/local")
+    monkeypatch.setenv("OPENAI_API_KEY", "offline-placeholder")
+    instrument.setup_openai_tracing()
+    agent = support.build_agent(ctx, model="ollama_chat/local")
+    model = FakeModel()
+    model.set_next_output([text_message("Local response")])
+    agent.model = model
+    assert asyncio.run(Runner.run(agent, "Hello")).final_output == "Local response"
+    processor, requests = hosted_exports
+    processor.force_flush()
+    assert len(requests) == 1
+
+
+def test_explicit_hosted_export_requires_key(monkeypatch, hosted_exports, capsys) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(cli, "load_env", lambda: None)
+    monkeypatch.setattr("sys.argv", ["agent.cli", "--trace-openai"])
+    with pytest.raises(SystemExit) as exc:
+        cli.main()
+    assert exc.value.code == 2
+    assert "--trace-openai requires OPENAI_API_KEY" in capsys.readouterr().err
+    processor, requests = hosted_exports
+    processor.force_flush()
+    assert requests == []

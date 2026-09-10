@@ -1,6 +1,6 @@
 # Module 1 homework help
 
-Read the repository's [shared instructions](../../AGENTS.md). These instructions apply when helping with HW1 or HW2, including implementation in `agent/`, `server/`, or `observability/`.
+Read the repository's [shared instructions](../../AGENTS.md). These instructions apply when helping with HW1, HW2, or HW3, including implementation in `agent/`, `server/`, `observability/`, or `scenarios/`.
 
 ## HW1: choose how to help
 
@@ -18,4 +18,8 @@ For the guided choice, read [the HW1 tutorial](hw1-tutorial.md) and follow its c
 
 ## HW2
 
-Read [Homework 2](hw2.md) and work from its requirements. The HW1 tutorial does not cover HW2. If a missing HW1 prerequisite blocks HW2, explain the specific dependency and help with it; offer the full HW1 tutorial only when the student wants that walkthrough.
+Read [Homework 2](hw2.md) and work from its requirements. The HW1 tutorial does not cover HW2. The handout opens with a walkthrough prompt for students who want an interactive tutorial; when the student pastes it, follow it: one step at a time, a plain language proposal before each step, nothing run or changed until the student says to go ahead, understanding confirmed with few questions, and a diagram where one helps. If a missing HW1 prerequisite blocks HW2, explain the specific dependency and help with it; offer the full HW1 tutorial only when the student wants that walkthrough.
+
+## HW3
+
+Read [Homework 3](hw3.md) and work from its requirements. The handout opens with a walkthrough prompt for students who want an interactive tutorial; when the student pastes it, follow it, propose each step and wait for the student's go ahead before acting, and stop at the handout's review points so the student makes those decisions. The assignment generates the support scenario dataset with the synthetic data skill in `scenarios/skill/SKILL.md`; follow the skill's procedure, including the human review points, rather than writing scenarios directly. Every expected outcome comes from the database, the eligibility function, the policy documents, or the data quality table, never from a model's assertion. HW3 needs the HW2 endpoints; a student who skipped HW2 applies `hw2-reference.patch` as the handout describes. Keep pilot and final scenario identifiers distinct, reset the data before the final run, and report which runs used a live model.

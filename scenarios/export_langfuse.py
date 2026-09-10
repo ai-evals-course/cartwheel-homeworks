@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -19,19 +19,54 @@ from scenarios.validate import load_jsonl, validate_scenarios
 
 
 def _jsonable(value: Any) -> Any:
+    """Convert an SDK response model into plain JSON data.
+
+    The Langfuse SDK returns pydantic v1 models, whose ``dict()`` keeps
+    datetime objects, so those models go through their own JSON encoder.
+    """
     if hasattr(value, "model_dump"):
         return value.model_dump(mode="json", by_alias=True)
+    if hasattr(value, "json") and hasattr(value, "dict"):
+        return json.loads(value.json(by_alias=True))
     if hasattr(value, "dict"):
         return value.dict(by_alias=True)
     return value
 
 
+def _json_default(value: Any) -> str:
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    return str(value)
+
+
+def _attribute_scenario_id(metadata: Any) -> str | None:
+    """Read the scenario id from trace or observation metadata.
+
+    Langfuse stores OpenTelemetry span attributes under ``metadata.attributes``
+    (a JSON string in ClickHouse, a dict from the API), so the id is checked
+    there as well as at the top level.
+    """
+    if not isinstance(metadata, dict):
+        return None
+    value = metadata.get("cartwheel.scenario_id")
+    if not value:
+        attributes = metadata.get("attributes")
+        if isinstance(attributes, str):
+            try:
+                attributes = json.loads(attributes)
+            except ValueError:
+                attributes = None
+        if isinstance(attributes, dict):
+            value = attributes.get("cartwheel.scenario_id")
+    return str(value) if value else None
+
+
 def _scenario_id(record: Any) -> str | None:
     """Find the scenario attribute on a trace or one of its observations."""
     if isinstance(record, dict):
-        metadata = record.get("metadata")
-        if isinstance(metadata, dict) and metadata.get("cartwheel.scenario_id"):
-            return str(metadata["cartwheel.scenario_id"])
+        found = _attribute_scenario_id(record.get("metadata"))
+        if found:
+            return found
         for value in record.values():
             found = _scenario_id(value)
             if found:
@@ -54,8 +89,7 @@ def export_scenario_traces(
         response = client.api.trace.list(page=page, limit=page_size)
         batch = list(response.data or [])
         for trace_summary in batch:
-            metadata = getattr(trace_summary, "metadata", None) or {}
-            scenario_id = metadata.get("cartwheel.scenario_id")
+            scenario_id = _attribute_scenario_id(getattr(trace_summary, "metadata", None))
             full = client.api.trace.get(getattr(trace_summary, "id"))
             record = _jsonable(full)
             scenario_id = scenario_id or _scenario_id(record)
@@ -104,7 +138,9 @@ def main() -> None:
         "traces": traces,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    args.output.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=_json_default) + "\n"
+    )
     print(
         f"Exported {len(traces)} traces for {len(exported_ids)} of "
         f"{len(scenario_ids)} scenarios to {args.output}"

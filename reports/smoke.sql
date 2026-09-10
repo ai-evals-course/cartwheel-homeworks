@@ -4,10 +4,11 @@
 --
 -- These queries target the ClickHouse tables inside self-hosted Langfuse
 -- (v3), where `traces` holds one row per trace and `observations` one row
--- per span/generation/event. NOTE: table and column names below may need
--- adjusting to your Langfuse version's ClickHouse schema; check with
--- `SHOW TABLES` and `DESCRIBE traces` first. Attribute-bearing fields are
--- Map(String, String) columns named `metadata`.
+-- per span/generation/event. Verified against Langfuse 3.205.1 (ClickHouse
+-- 24.8): OpenTelemetry span attributes are stored as one JSON string under
+-- metadata['attributes'], so the cartwheel.* fields are read with
+-- JSONExtractString. Tool spans have type 'TOOL'. If your Langfuse version
+-- differs, check with `SHOW TABLES` and `DESCRIBE traces` first.
 --
 -- Save the complete report from the Cartwheel root (noninteractive so the
 -- committed file is reproducible):
@@ -17,17 +18,17 @@
 --
 -- 1. Traces per scenario (are scenario ids flowing end to end?)
 SELECT
-    metadata['cartwheel.scenario_id'] AS scenario_id,
+    JSONExtractString(metadata['attributes'], 'cartwheel.scenario_id') AS scenario_id,
     count() AS traces
 FROM traces
-WHERE metadata['cartwheel.scenario_id'] != ''
+WHERE scenario_id != ''
 GROUP BY scenario_id
 ORDER BY traces DESC
 LIMIT 50;
 
 -- 2. Traces per user role (are all three roles represented?)
 SELECT
-    metadata['cartwheel.user_role'] AS role,
+    JSONExtractString(metadata['attributes'], 'cartwheel.user_role') AS role,
     count() AS traces
 FROM traces
 GROUP BY role
@@ -60,7 +61,7 @@ WHERE type = 'GENERATION';
 SELECT
     trace_id,
     count() AS spans,
-    max(end_time) - min(start_time) AS duration
+    dateDiff('millisecond', min(start_time), max(end_time)) AS duration_ms
 FROM observations
 GROUP BY trace_id
 ORDER BY spans DESC
@@ -71,7 +72,7 @@ SELECT
     name,
     count() AS calls
 FROM observations
-WHERE type = 'SPAN'
+WHERE type = 'TOOL'
 GROUP BY name
 ORDER BY calls DESC
 LIMIT 20;
@@ -80,4 +81,4 @@ LIMIT 20;
 --    attribute to be implemented)
 SELECT count() AS permission_denials
 FROM observations
-WHERE metadata['cartwheel.permission_denied'] = 'true';
+WHERE JSONExtractString(metadata['attributes'], 'cartwheel.permission_denied') = 'true';

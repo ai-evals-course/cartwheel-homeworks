@@ -28,7 +28,7 @@ from agent.auth import AuthContext, can_refund_order, can_view_order, permission
 from agent.config import load_facts
 from agent.helpcenter import get_index
 from agent.killswitch import kill_switch
-from observability.instrument import record_tool_result
+from observability.instrument import configure_model_tracing, record_tool_result
 from seed.eligibility import refund_needs_approval
 
 # ---------------------------------------------------------------------------
@@ -499,6 +499,7 @@ def build_agent(
     it, never a replacement for it.
     """
     resolved = resolve_model(model)
+    configure_model_tracing(openai_model=isinstance(resolved, str))
     if not defenses:
         return Agent[AuthContext](
             name="cartwheel-support",

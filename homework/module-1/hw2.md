@@ -2,6 +2,18 @@
 
 Homework 2 asks you to expose the support agent through an authenticated HTTP endpoint and record its execution using OpenTelemetry GenAI semantic conventions. You will inspect model inputs, outputs, and tool results, then verify which authenticated identity reached the tools.
 
+## Working through the assignment with a coding agent
+
+If you would like a coding agent to walk you through the assignment, paste the prompt below at the start of a session in your repository. The prompt assumes no programming background, so it suits an analyst or a product manager as well as an engineer. The Homework 1 tutorial does not cover Homework 2.
+
+> Walk me through Homework 2 in `homework/module-1/hw2.md` as an interactive tutorial. Read `AGENTS.md`, `homework/module-1/AGENTS.md`, the handout, and `SPEC.md` first. I may not have a programming background, so assume nothing about what I know, and adapt once you see what I do know.
+>
+> I am driving. Work one step at a time, in the handout's order. Before each step, explain in plain language what you propose to do and why the assignment needs it, and show me the command you would run or the change you would make. Then wait for me to say go. Do not run a command, change a file, or generate anything until I have said so, and do not take several steps on one go ahead. Reading files to prepare a proposal is fine. Once I say go, do that step, show me the result, and explain what it means. Move on only when you are confident I understand the current step. One short question about what I expect to see, or what a result means, is enough to check; keep questions few, and do not turn the session into a quiz. Explain every unfamiliar term the first time it appears, using the actual files and outputs as examples. When a picture would help, draw one; a text diagram is fine.
+>
+> If something fails, read the error, explain it plainly, and propose a focused fix. Keep a short progress note of what is done and what is next, so we can resume later, and keep a checklist of every deliverable so nothing is skipped. Leave the assessments and the video to me. Do not call the assignment done until every file in the "Files to commit" list exists and the checks in the handout pass.
+>
+> Concepts I need to understand before we use them: what an HTTP endpoint and a session are, why the server, not the conversation, decides who I am, what a trace and a span are, and how the standard `gen_ai.*` fields differ from the application's `cartwheel.*` fields. Diagrams that would help me: the path from my message to the endpoint, the agent, the tools, and the trace, and the tree of spans inside one trace.
+
 ## Expected work
 
 - Estimated time: 4 to 6 hours.
@@ -37,9 +49,9 @@ Implement `record_tool_result` and `_set_permission_denied_attributes` in `obser
 
 Use the active tool span returned by `trace.get_current_span()`. Add the following application attributes:
 
-- `cartwheel.user_role`, as a string
-- `cartwheel.user_id`, as the decimal user identifier stored in a string
-- `cartwheel.store_id`, as an integer when the caller is a merchant
+- `cartwheel.user_role`, as a string (same for every tool call in the request)
+- `cartwheel.user_id`, as the decimal user identifier stored in a string (same for every tool call in the request)
+- `cartwheel.store_id`, as an integer when the caller is a merchant (same for every tool call in the request)
 - `cartwheel.permission_denied`, as a Boolean value
 - `cartwheel.permission_denied.reason`, when permission was denied
 
@@ -71,7 +83,7 @@ uv run pytest --runxfail -vv tests/test_hw_holes.py -k "create_session_binds"
 
 ## Part C, implement the traced message endpoint
 
-With sessions in place, you can now accept user messages over HTTP. The message endpoint ties together authentication, the agent loop, and tracing so that every request produces a fully attributed trace.
+The supplied OTel GenAI instrumentation already records model spans and tool spans automatically. Part A added application attributes to the tool spans. In this part you create the root span that wraps the full request and carries the remaining application attributes.
 
 Implement `post_message` in `server/app.py`. The endpoint must authorize the bearer token before it runs the agent. The authorization checks are already provided in `_authorize`: a missing or invalid token returns HTTP 401, a token issued for a different session returns HTTP 403, and an unknown session returns HTTP 404. The endpoint must then recover the session stored by the server and compute the version of the rendered system prompt.
 
@@ -81,12 +93,12 @@ Run the agent inside a root span named `cartwheel.session_message`. Record the f
 - `cartwheel.user_id`, as the decimal user identifier stored in a string
 - `cartwheel.prompt_version`
 - `cartwheel.scenario_id`, when the request supplies a nonempty value
-- `gen_ai.input.messages`, containing the incoming user message when content capture is enabled
-- `gen_ai.output.messages`, containing the final assistant reply after the run completes, when content capture is enabled
+- `gen_ai.input.messages`, containing the incoming user message
+- `gen_ai.output.messages`, containing the final assistant reply after the run completes
 
 Use the OTel GenAI message format, serialized with `json.dumps`, for both message attributes. For example, the input is `[{"role": "user", "parts": [{"type": "text", "content": body.message}]}]`. The output uses the same structure with role `assistant` and the final reply as its text. The automatic model spans contain the full input for each model call, including conversation history and tool results.
 
-Return the session identifier, final reply, and prompt version. The supplied OTel GenAI instrumentation records model and tool spans within the request span.
+Return the session identifier, final reply, and prompt version.
 
 Verify the root span and its attributes in Langfuse in Part E.
 

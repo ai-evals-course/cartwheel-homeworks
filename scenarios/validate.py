@@ -22,8 +22,9 @@ ROLES = {"shopper", "merchant", "support"}
 REQUIRED_TUPLE_FIELDS = {
     "role",
     "intent",
-    "order_state",
+    "record_state",
     "applicable_policy",
+    "tools_needed",
     "turn_count",
     "difficulty",
 }
@@ -144,10 +145,15 @@ def validate_scenarios(
                 f"{label}: tuple is missing required fields "
                 f"{', '.join(missing_tuple_fields)}"
             )
-        for field in ("order_state", "applicable_policy", "difficulty"):
+        for field in ("record_state", "applicable_policy", "difficulty"):
             value = tuple_.get(field)
             if value is not None and not _nonempty_string(value):
                 errors.append(f"{label}: tuple.{field} must be null or a nonempty string")
+        tools = tuple_.get("tools_needed")
+        if "tools_needed" in tuple_ and not (
+            _nonempty_string(tools) or (isinstance(tools, int) and not isinstance(tools, bool) and tools >= 0)
+        ):
+            errors.append(f"{label}: tuple.tools_needed must be a nonempty string or a nonnegative integer")
         if not _nonempty_string(scenario.get("opening_message")):
             errors.append(f"{label}: opening_message must be a nonempty string")
         followups = scenario.get("followups")

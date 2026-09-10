@@ -56,7 +56,7 @@ The supplied data access layer in `agent/db.py` provides the database operations
 - `list_my_orders` uses `list_orders_for_user` or `list_orders_for_store`.
 - `cancel_order` uses `get_order` and `set_order_status`.
 - `get_policy` reads the generated policy files with `load_policy_docs` from `agent/helpcenter.py`.
-- `find_order` searches the authenticated user's orders by product name. Use `list_orders_for_user` and filter by matching the query against product names.
+- `find_order` uses `list_order_search_candidates` to retrieve the complete authorised order scope and `list_products` to map product IDs to titles. Pass `user_id=ctx.user_id` for shoppers, `store_id=ctx.store_id` for merchants, or `all_orders=True` only for support staff. These scope values come from the authenticated context, never from the search query. The helper requires exactly one scope; do not omit it or use unrestricted access as a fallback for an invalid role or missing identity.
 
 Use `with db.connection() as conn:` for database access. It closes the connection
 automatically, including on early returns and errors:
@@ -71,7 +71,7 @@ closing; it does not commit pending writes. Existing code that uses `db.connect(
 and closes it explicitly still works. A bare `with db.connect()` does not close
 a SQLite connection.
 
-Use the supplied functions rather than writing a second database layer. Each tool docstring states the required inputs, return value, and error behavior.
+Use the supplied functions rather than writing a second database layer. No changes to `db.py` are needed for `find_order`: implement the role selection and product-name matching in the tool, keep matches in the helper's newest-first order (descending order ID breaks ties), and return the first five using `Order.to_public_dict()`. Apply matching before the five-result limit; the older listing helpers default to 20 recent orders and can miss older matches. Each tool docstring states the required inputs, return value, and error behavior.
 
 `SPEC.md` is a design document; the running application does not load it. The starter translates the specification into three kinds of implementation:
 
@@ -93,7 +93,7 @@ Implement the following functions in `agent/tools.py`:
 
 Follow the contract in each docstring, including its return schema and error behavior. For `cancel_order`, check whether the caller may access the order before returning any information about it. After authorization succeeds, check whether the shipment state permits cancellation.
 
-`find_order` takes a natural language query (e.g., "earmuffs I bought last week") and searches the authenticated user's orders by product name. You may use a fuzzy string matching library such as `thefuzz` or `rapidfuzz`, or SQLite's `LIKE` operator for a simpler approach.
+`find_order` takes a natural language query (e.g., "earmuffs I bought last week") and searches orders within the caller's authorised scope by product name. You may use a fuzzy string matching library such as `thefuzz` or `rapidfuzz`, or case-insensitive substring matching for a simpler approach.
 
 Run the focused tests while you work:
 
@@ -101,7 +101,7 @@ Run the focused tests while you work:
 uv run pytest --runxfail tests/test_hw_holes.py -k hw1
 ```
 
-The `--runxfail` option makes an unfinished function fail instead of appearing as an expected failure. Before you implement a function, its test should report a `NotImplementedError`. After you implement all five functions correctly, the command should report five passing tests.
+The `--runxfail` option makes an unfinished function fail instead of appearing as an expected failure. Before you implement a function, its test should report a `NotImplementedError`. After you implement all five functions correctly, all selected HW1 tests should pass, including the additional `find_order` role and search-coverage cases.
 
 During Part B conversations you will notice things the agent cannot do because no tool exists. Add more tools of your own to fill those gaps. Some ideas:
 

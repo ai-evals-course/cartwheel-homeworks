@@ -55,3 +55,44 @@ def analysis_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     shutil.copytree(src, dst)
     monkeypatch.setenv("CARTWHEEL_ANALYSIS_STATE", str(dst))
     return dst
+
+
+@pytest.fixture
+def order_search_cases(world_copy):
+    """Old matches across independent user/store scopes behind 20 newer orders."""
+    from agent import db
+
+    with db.connection() as conn:
+        title = "Unique Search Fixture Product"
+        matching_products = {}
+        ordinary_products = {}
+        for store in (1, 2):
+            products = db.list_products(conn, store_id=store)
+            ordinary_products[store] = products[0].id
+            matching_products[store] = products[1].id
+            conn.execute("UPDATE products SET title = ? WHERE id = ?", (title, products[1].id))
+            conn.execute(
+                "UPDATE orders SET product_id = ? WHERE store_id = ?",
+                (products[0].id, store),
+            )
+        ids = [row["id"] for row in conn.execute("SELECT id FROM orders ORDER BY id LIMIT 60")]
+        matches = []
+        for i, order_id in enumerate(ids):
+            user = i % 2 + 1
+            store = i // 2 % 2 + 1
+            is_match = i < 8
+            product = matching_products[store] if is_match else ordinary_products[store]
+            ordered_at = "1900-01-01" if is_match else "2099-01-01"
+            conn.execute(
+                "UPDATE orders SET user_id = ?, store_id = ?, product_id = ?, ordered_at = ? WHERE id = ?",
+                (user, store, product, ordered_at, order_id),
+            )
+            if is_match:
+                matches.append((order_id, user, store))
+        conn.commit()
+        expected = {
+            "shopper": [oid for oid, user, store in reversed(matches) if user == 1],
+            "merchant": [oid for oid, user, store in reversed(matches) if store == 2],
+            "support": [oid for oid, user, store in reversed(matches)],
+        }
+    return title, expected
