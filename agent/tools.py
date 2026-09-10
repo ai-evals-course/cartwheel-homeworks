@@ -64,6 +64,43 @@ def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
     return {"ok": False, "error": "not_found", "reason": f"no policy doc with id {policy_id!r}"}
 
 
+def get_store_info(ctx: AuthContext, store_id: int) -> dict[str, Any]:
+    """Look up one store's public info by id. Risk tier: read.
+
+    Fills the gap where a tool (e.g. search_products) returns a bare
+    store_id with no way to resolve it to the store's name or its policy
+    override doc. Every role may look up any store (this is public
+    storefront info), so no permission check is needed.
+
+    Args:
+        ctx: The caller's auth context. Unused here, but every tool takes it.
+        store_id: The numeric store id, e.g. from a product or order result.
+
+    Returns:
+        On success: {"ok": True, "store_id": int, "name": str, "slug": str,
+        "category": str, "return_window_days_override": int | None,
+        "restocking_fee_opt_in": bool}. A non-null
+        return_window_days_override means this store's return window
+        replaces the platform default; its override policy doc is named
+        "store-{slug}-policy" (fetch it with get_policy).
+        If no store has that id: {"ok": False, "error": "not_found",
+        "reason": ...} naming the id that was requested.
+    """
+    with db.connection() as conn:
+        store = db.get_store(conn, store_id)
+    if store is None:
+        return {"ok": False, "error": "not_found", "reason": f"no store with id {store_id}"}
+    return {
+        "ok": True,
+        "store_id": store.id,
+        "name": store.name,
+        "slug": store.slug,
+        "category": store.category,
+        "return_window_days_override": store.return_window_days_override,
+        "restocking_fee_opt_in": store.restocking_fee_opt_in,
+    }
+
+
 def search_products(
     ctx: AuthContext,
     query: str,
