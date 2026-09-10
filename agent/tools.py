@@ -322,26 +322,29 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
     """
     from rapidfuzz import fuzz
 
-    with db.connection() as conn:
-        if ctx.role == "shopper":
-            orders = db.list_orders_for_user(conn, ctx.user_id, limit=DEFAULT_ORDER_LIMIT)
-        elif ctx.role == "merchant":
-            orders = db.list_orders_for_store(conn, ctx.store_id, limit=DEFAULT_ORDER_LIMIT)
-        else:  # support: search across all orders
-            order_ids = [row[0] for row in conn.execute("SELECT id FROM orders").fetchall()]
-            orders = [db.get_order(conn, oid) for oid in order_ids]
+    if ctx.role == "shopper":
+        scope_kwargs: dict[str, Any] = {"user_id": ctx.user_id}
+    elif ctx.role == "merchant":
+        scope_kwargs = {"store_id": ctx.store_id}
+    else:  # support: search across all orders
+        scope_kwargs = {"all_orders": True}
 
+    query_lower = query.lower().strip()
+
+    with db.connection() as conn:
+        orders = db.list_order_search_candidates(conn, **scope_kwargs)
         products_by_id = {p.id: p for p in db.list_products(conn)}
 
-    scored = []
+    matches = []
     for order in orders:
         product = products_by_id.get(order.product_id)
-        if product is None:
-            continue
-        score = fuzz.partial_ratio(query.lower(), product.title.lower())
-        if score >= 60:
-            scored.append((score, order))
+        if product is None or not product.title:
+            continue  # dq-product-missing-title: never match a blank product name
+        title = product.title.lower()
+        if title in query_lower or fuzz.partial_ratio(query_lower, title) >= 80:
+            matches.append(order)
+            if len(matches) == 5:
+                break
 
-    scored.sort(key=lambda pair: pair[0], reverse=True)
-    top_orders = [order.to_public_dict() for _, order in scored[:5]]
+    top_orders = [order.to_public_dict() for order in matches]
     return {"ok": True, "orders": top_orders}
