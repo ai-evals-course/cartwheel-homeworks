@@ -149,8 +149,7 @@ async def post_message(
     """Run one authenticated conversation turn inside a root trace span.
 
     Authorize the token, recover the server-side session, and build the agent
-    for the authenticated context. Compute the system prompt template's
-    version with prompt_version().
+    for the authenticated context. Hash only the system prompt template.
     The cartwheel.session_message span must record the user role, user id,
     prompt version, and a nonempty scenario id when one is supplied. Run the
     agent inside that span, then return the session id, final reply, and
