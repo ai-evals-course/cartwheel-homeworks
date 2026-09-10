@@ -91,9 +91,9 @@ def render_system_prompt(ctx: AuthContext, template: str | None = None) -> str:
     )
 
 
-def prompt_version(rendered_prompt: str) -> str:
-    """Hash of the rendered prompt. Stamped on every trace (Lecture 2.2)."""
-    return hashlib.sha256(rendered_prompt.encode()).hexdigest()[:12]
+def prompt_version(template: str | None = None) -> str:
+    """Hash the system prompt template before injecting user context."""
+    return hashlib.sha256((template or SYSTEM_PROMPT_TEMPLATE).encode()).hexdigest()[:12]
 
 
 # ---------------------------------------------------------------------------

@@ -257,3 +257,43 @@ def test_explicit_hosted_export_requires_key(monkeypatch, hosted_exports, capsys
     processor, requests = hosted_exports
     processor.force_flush()
     assert requests == []
+
+
+def test_prompt_version_tracks_template_not_identity(
+    tmp_path, monkeypatch, capsys, hosted_exports,
+) -> None:
+    from agent import agent as support
+
+    provider = TracerProvider()
+    exporter = InMemorySpanExporter()
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    monkeypatch.setattr(cli, "_tracer", provider.get_tracer(__name__))
+    monkeypatch.setattr(cli, "SESSIONS_DB", tmp_path / "sessions.db")
+    contexts = [
+        AuthContext(user_id=1, role="shopper"),
+        AuthContext(user_id=2, role="shopper"),
+        AuthContext(user_id=9002, role="merchant", store_id=2),
+        AuthContext(user_id=9002, role="merchant", store_id=3),
+        AuthContext(user_id=9501, role="support"),
+    ]
+    original = support.prompt_version()
+    edited = support.SYSTEM_PROMPT_TEMPLATE + "\nKeep answers brief."
+    assert support.prompt_version(edited) != original
+    try:
+        for index, ctx in enumerate([*contexts, contexts[0]]):
+            if index == len(contexts):
+                monkeypatch.setattr(support, "SYSTEM_PROMPT_TEMPLATE", edited)
+            model = FakeModel()
+            model.set_next_output([text_message("Hello.")])
+            monkeypatch.setattr(support, "resolve_model", lambda _: model)
+            messages = iter(["Hello", "quit"])
+            monkeypatch.setattr("builtins.input", lambda _: next(messages))
+            asyncio.run(cli.chat(ctx, model=None))
+            expected = original if index < len(contexts) else support.prompt_version(edited)
+            assert f"prompt_version={expected}" in capsys.readouterr().out
+            span = exporter.get_finished_spans()[-1]
+            assert span.attributes["cartwheel.prompt_version"] == expected
+            assert span.attributes["cartwheel.user_id"] == str(ctx.user_id)
+            assert model.requests[0]["system_instructions"] == support.render_system_prompt(ctx)
+    finally:
+        provider.shutdown()

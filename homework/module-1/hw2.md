@@ -85,7 +85,7 @@ uv run pytest --runxfail -vv tests/test_hw_holes.py -k "create_session_binds"
 
 The supplied OTel GenAI instrumentation already records model spans and tool spans automatically. Part A added application attributes to the tool spans. In this part you create the root span that wraps the full request and carries the remaining application attributes.
 
-Implement `post_message` in `server/app.py`. The endpoint must authorize the bearer token before it runs the agent. The authorization checks are already provided in `_authorize`: a missing or invalid token returns HTTP 401, a token issued for a different session returns HTTP 403, and an unknown session returns HTTP 404. The endpoint must then recover the session stored by the server and compute the version of the rendered system prompt.
+Implement `post_message` in `server/app.py`. The endpoint must authorize the bearer token before it runs the agent. The authorization checks are already provided in `_authorize`: a missing or invalid token returns HTTP 401, a token issued for a different session returns HTTP 403, and an unknown session returns HTTP 404. The endpoint must then recover the session stored by the server and compute the system prompt template version with `prompt_version()`. Hash the template before inserting the user role, user ID, or store ID, so switching users keeps the same version. If you already implemented this endpoint, replace `prompt_version(render_system_prompt(ctx))` with `prompt_version()`.
 
 Run the agent inside a root span named `cartwheel.session_message`. Record the following attributes on the root span:
 

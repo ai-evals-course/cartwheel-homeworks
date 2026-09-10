@@ -87,7 +87,7 @@
 +    ctx = _authorize(session_id, authorization)
 +    _, session = _SESSIONS[session_id]
 +    agent = build_agent(ctx, model=body.model)
-+    version = prompt_version(render_system_prompt(ctx))
++    version = prompt_version()
 +    capture = os.environ.get("TRACELOOP_TRACE_CONTENT", "false").lower() == "true"
 +    with _tracer.start_as_current_span("cartwheel.session_message") as span:
 +        if span.is_recording():
