@@ -110,7 +110,13 @@ During Part B conversations you will notice things the agent cannot do because n
 - Look up public store information and policy overrides
 - Summarize a customer's recent order history
 
-To add a tool, write the logic as a plain function in `agent/tools.py` that takes `ctx: AuthContext` first, then add a wrapper in `agent/agent.py` that takes `wrapper: RunContextWrapper[AuthContext]`, is decorated with `@function_tool`, has a clear docstring (the SDK uses it as the tool description the model sees), and returns `_call(wrapper, hw_tools.<name>, ...)`, like `get_policy` does. Then add the wrapper to `TOOLS_BY_ROLE` for the appropriate roles. Never decorate a function whose first parameter is `AuthContext` directly: the SDK would expose `ctx` as a model-supplied argument, letting the model claim another user's identity.
+To add a tool, follow the pattern `get_policy` already uses:
+
+1. In `agent/tools.py`, write the tool as a plain function whose first parameter is `ctx: AuthContext` (the logged-in user). No decorator.
+2. In `agent/agent.py`, add a small wrapper decorated with `@function_tool`. Its first parameter is `wrapper: RunContextWrapper[AuthContext]`, its docstring is the tool description the model sees, and its body is `return _call(wrapper, hw_tools.<your_function>, <other args>)`.
+3. Add the wrapper to `TOOLS_BY_ROLE` for the roles that should have it.
+
+Do not put `@function_tool` on the `agent/tools.py` function itself. The SDK turns every parameter of a decorated function into something the model fills in, so `ctx` would become a value the model chooses, and it could claim to be any user. The wrapper is what keeps the real user's identity out of the model's hands.
 
 Then run the supplied tests for the completed tools, authorization rules, and refund rules:
 
