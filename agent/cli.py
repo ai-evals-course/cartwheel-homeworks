@@ -42,7 +42,7 @@ from agents.items import RunItem
 from opentelemetry import trace
 
 from agent import db
-from agent.agent import build_agent, prompt_version, render_system_prompt
+from agent.agent import build_agent, prompt_version
 from agent.auth import AuthContext
 from agent.config import REPO_ROOT
 from observability.instrument import load_env, setup_openai_tracing, setup_tracing
@@ -109,7 +109,7 @@ async def chat(
     session = SQLiteSession(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
     )
-    version = prompt_version(render_system_prompt(ctx))
+    version = prompt_version()
     print(
         f"Cartwheel support CLI | role={ctx.role} user={ctx.user_id} "
         f"store={ctx.store_id} prompt_version={version} defenses={'on' if defenses else 'off'}"

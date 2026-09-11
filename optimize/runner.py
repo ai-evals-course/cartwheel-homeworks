@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import statistics
@@ -16,7 +15,7 @@ from observability.instrument import load_env
 from replay.__main__ import make_runner
 from replay.harness import replay_case
 from replay.rollout import WRITE_TOOLS, load_cases, load_frozen_judge, world_reset
-from agent.agent import SYSTEM_PROMPT_TEMPLATE
+from agent.agent import prompt_version
 
 from optimize.workflow import (
     CASES_PATH,
@@ -106,9 +105,7 @@ def run_evaluation(args: argparse.Namespace) -> dict[str, Any]:
 
     price_date, input_price, output_price = read_prices(args.config, args.model)
     prompt_template = args.prompt_file.read_text() if args.prompt_file else None
-    prompt_hash = hashlib.sha256(
-        (prompt_template or SYSTEM_PROMPT_TEMPLATE).encode()
-    ).hexdigest()[:12]
+    prompt_hash = prompt_version(prompt_template)
     world_temp = tempfile.TemporaryDirectory(prefix="hw9-eval-")
     world_root = Path(world_temp.name)
     records: list[dict[str, Any]] = []

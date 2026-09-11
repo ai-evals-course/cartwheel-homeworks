@@ -38,7 +38,7 @@ from opentelemetry import trace
 from pydantic import BaseModel
 
 from agent import db
-from agent.agent import build_agent, prompt_version, render_system_prompt
+from agent.agent import build_agent, prompt_version
 from agent.auth import ROLES, AuthContext
 from agent.config import REPO_ROOT, db_path
 from observability.instrument import load_env, setup_tracing
@@ -149,7 +149,7 @@ async def post_message(
     """Run one authenticated conversation turn inside a root trace span.
 
     Authorize the token, recover the server-side session, and build the agent
-    for the authenticated context. Compute the rendered prompt's version.
+    for the authenticated context. Hash only the system prompt template.
     The cartwheel.session_message span must record the user role, user id,
     prompt version, and a nonempty scenario id when one is supplied. Run the
     agent inside that span, then return the session id, final reply, and
