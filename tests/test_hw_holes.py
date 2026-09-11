@@ -111,6 +111,7 @@ def test_hw1_cancel_order(world_copy: Path) -> None:
     denied = tools.cancel_order(stranger, order_id, "not mine")
     assert denied["ok"] is False
     assert denied["error"] == "permission_denied"
+    assert tools.cancel_order(SHOPPER_2, 4127, "not mine")["error"] == "permission_denied"
 
     # Pre-shipment rule: a delivered order is not cancellable even in scope.
     delivered = tools.cancel_order(SHOPPER_1, 4127, "too late")
