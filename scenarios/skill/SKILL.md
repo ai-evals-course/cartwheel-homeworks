@@ -17,7 +17,8 @@ behavior specification, and authoritative data already exist.
 - Authoritative data, policies, deterministic functions, or simulator.
 - Executable application interface.
 - Trace destination and export path.
-- Executable scenario validator.
+- Executable conversation plan validator.
+- Project-specific conversation plan schema.
 - Dataset size, model configuration, time budget, and cost budget.
 
 ## Invariants
@@ -25,7 +26,7 @@ behavior specification, and authoritative data already exist.
 1. Ground expected outcomes in authoritative sources. Neither the request
    generator nor the application under evaluation is its own oracle.
 2. Keep hidden expected answers out of request generation prompts.
-3. Generate and review requests before running the application.
+3. Write and review conversation plans before running the application.
 4. Preserve ordinary coverage while adding difficult cases.
 5. Preserve human decisions at the dimension and request review gates.
 
@@ -46,17 +47,23 @@ Do not start bulk generation until authentication, tracing, and state reset work
 
 ### 2. Define dimensions
 
-Derive dimensions from the specification, data, and intended analysis. Common
-dimensions include role, intent, entity and state, applicable rule, expected
-tool path, difficulty, user language style, and conversation length.
+Derive dimensions from the specification, data, and intended analysis. A useful
+dimension changes the expected behavior, execution path, or quality requirement.
+Do not add a dimension merely because it is easy to vary.
 
-Every dimension needs a reason. Include varied language styles when response
-quality matters, for example terse fragments, typos, confusion, frustration,
-operational shorthand, and requests for a short answer.
+Examples:
 
-Show the dimension plan and values to a person. Stop for approval.
+| Application | Useful dimensions | Reason |
+| --- | --- | --- |
+| Support agent | user role, intent, record state, applicable policy, user style | Permissions, tools, rules, and response requirements vary. |
+| Coding agent | task type, language, repository size, test state, ambiguity | Context needs, tool paths, and completion checks vary. |
+| Research agent | question type, source availability, recency, conflicting evidence | Retrieval, synthesis, and citation requirements vary. |
+| Browser agent | workflow, authentication state, page state, interruption point | Available actions and recovery behavior vary. |
 
-### 3. Build grounded plans
+Show the proposed dimensions, values, and reason for each dimension to a person.
+Stop for approval.
+
+### 3. Build grounded conversation plans
 
 Sample valid combinations of approved dimension values. Do not enumerate the
 full Cartesian product. Count selected values and deliberately include rare or
@@ -84,15 +91,18 @@ Use a human judgment expectation when several responses could satisfy the
 requirement. Record a precise criterion and the supporting requirement or
 rubric.
 
-Store expectations in scenario records, but do not expose hidden facts or
-expected answers to request generators.
+Store expectations in conversation plan records, but do not expose hidden facts
+or expected answers to request generators.
 
-### 5. Generate user interactions
+### 5. Generate conversations concurrently
 
-Generate requests separately from application execution. Use independent model
-calls per scenario, or small batches assigned to separate subagents when the
-coding environment provides them. Record the generation method and model. Do
-not claim to use subagents when none are available.
+Generate user conversations separately from application execution. Use one
+independent model call per conversation and launch the calls concurrently with
+a bounded pool of at least two workers. Parallel coding subagents may provide
+the pool when the environment supports them. Otherwise, use concurrent API
+calls. Record the generation method, model, and concurrency. Do not ask one
+model call to draft the whole dataset, and do not claim to use subagents when
+none are available.
 
 Give the generator only the role, user goal, selected style, user visible facts,
 and required length. Do not fill the dataset with a shared opening or followup
@@ -110,11 +120,11 @@ For multi-turn interactions:
 Use the project's turn limit. Repeated requests to check, compare, cite,
 confirm, or summarize do not create useful length.
 
-### 6. Check and review requests
+### 6. Check and review conversations
 
-Use an independent critic model or subagent when available. The critic may
-rewrite language, but must preserve the grounded plan, expectation, and assigned
-style.
+Use an independent critic call for each conversation and run critic calls in a
+bounded concurrent pool. The critic may rewrite language, but must preserve the
+grounded plan, expectation, and assigned style.
 
 Run mechanical checks for:
 
@@ -173,7 +183,24 @@ Before error analysis:
 The workflow ends with a verified trace dataset. Failure taxonomy discovery and
 quality measurement belong to the subsequent error analysis workflow.
 
-## Conceptual scenario record
+## Artifacts
+
+The workflow creates three separate artifacts:
+
+1. **Conversation plans**, written before application execution. Each record
+   defines one complete planned conversation: its dimensions, opening message,
+   followups, and expected behavior.
+2. **Run records**, written by the runner. Each record reports whether one
+   planned conversation completed and preserves its observed messages, errors,
+   duration, and model configuration.
+3. **Traces**, written by the application's instrumentation. A conversation may
+   produce one trace for the whole conversation or one trace per user turn,
+   depending on the application. Stable plan identifiers link traces and run
+   records back to the conversation plan.
+
+Conversation plans are inputs to execution; they are not traces.
+
+## Conceptual conversation plan record
 
 Use the project's executable schema. Preserve at least the following concepts,
 even when field names differ:
