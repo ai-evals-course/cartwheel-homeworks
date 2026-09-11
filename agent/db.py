@@ -235,6 +235,20 @@ def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> No
     conn.commit()
 
 
+def claim_refund(conn: sqlite3.Connection, order_id: int) -> bool:
+    """Mark a delivered order refunded; False if it was no longer eligible.
+
+    Left uncommitted so the caller's insert_refund lands in the same transaction.
+    """
+    return (
+        conn.execute(
+            "UPDATE orders SET status = 'refunded', refund_eligible = 0 WHERE id = ? AND refund_eligible = 1",
+            (order_id,),
+        ).rowcount
+        == 1
+    )
+
+
 def insert_refund(
     conn: sqlite3.Connection,
     *,

@@ -256,6 +256,12 @@ def issue_refund_logic(
                     f"a human support agent will review it"
                 ),
             }
+        if not db.claim_refund(conn, order_id):
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": f"order #{order_id} was already refunded",
+            }
         refund_id = db.insert_refund(
             conn,
             order_id=order_id,
@@ -264,7 +270,6 @@ def issue_refund_logic(
             status="auto_approved",
             created_at=today,
         )
-        db.set_order_status(conn, order_id, "refunded")
         return {
             "ok": True,
             "status": "auto_approved",
