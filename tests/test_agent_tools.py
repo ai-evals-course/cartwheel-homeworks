@@ -66,6 +66,12 @@ def test_refund_below_threshold_auto_approves(world_copy: Path) -> None:
     assert refund == ("auto_approved", 8400)
 
 
+def test_second_refund_is_rejected(world_copy: Path) -> None:
+    assert issue_refund_logic(SHOPPER_1, 4127, 84.0, "arrived chipped")["ok"] is True
+    assert issue_refund_logic(SHOPPER_1, 4127, 84.0, "again")["error"] == "not_eligible"
+    assert get_order_logic(SHOPPER_1, 4127)["order"]["refund_eligible"] is False
+
+
 def test_refund_above_threshold_queues(world_copy: Path) -> None:
     result = issue_refund_logic(SHOPPER_1, 4455, 240.0, "wrong item")
     assert result["ok"] is True

@@ -228,7 +228,10 @@ def list_products(
 
 
 def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> None:
-    conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    conn.execute(
+        "UPDATE orders SET status = ?, refund_eligible = MIN(refund_eligible, ?) WHERE id = ?",
+        (status, int(status == "delivered"), order_id),
+    )
     conn.commit()
 
 
