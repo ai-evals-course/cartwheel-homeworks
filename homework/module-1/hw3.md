@@ -8,7 +8,7 @@ You will begin by deciding which kinds of support requests to include. You will 
 
 If you would like a coding agent to walk you through the assignment, paste the prompt below at the start of a session in your repository. The prompt assumes no programming background, so it suits an analyst or a product manager as well as an engineer. The agent generates the scenario files with the synthetic data skill; the handout's review points are where you decide.
 
-> Walk me through Homework 3 in `homework/module-1/hw3.md` as an interactive tutorial. Read `AGENTS.md`, `homework/module-1/AGENTS.md`, the handout, `SPEC.md`, and `scenarios/skill/SKILL.md` first. I may not have a programming background, so assume nothing about what I know, and adapt once you see what I do know.
+> Walk me through Homework 3 in `homework/module-1/hw3.md` as an interactive tutorial. Read `AGENTS.md`, the handout, `SPEC.md`, and `scenarios/skill/SKILL.md` first. I may not have a programming background, so assume nothing about what I know, and adapt once you see what I do know.
 >
 > I am driving. Work one step at a time, in the handout's order. Before each step, explain in plain language what you propose to do and why the assignment needs it, and show me the command you would run or the change you would make. Then wait for me to say go. Do not run a command, change a file, or generate anything until I have said so, and do not take several steps on one go ahead. Reading files to prepare a proposal is fine. Once I say go, do that step, show me the result, and explain what it means. Move on only when you are confident I understand the current step. One short question about what I expect to see, or what a result means, is enough to check; keep questions few, and do not turn the session into a quiz. Explain every unfamiliar term the first time it appears, using the actual files and outputs as examples. When a picture would help, draw one; a text diagram is fine.
 >
@@ -76,8 +76,9 @@ The plan must include the following dimensions:
 - Applicable platform or store policy.
 - Number of tool calls needed.
 - Request difficulty.
+- User language style: neutral conversational, terse or fragmentary, typo-heavy, confused or rambling, frustrated or impatient, repetitive or pressuring, merchant or support operational shorthand, or a request for a short plain-language answer. The language style dimension is required because `SPEC.md`, RESP-5 applies across different ways that users communicate.
 
-Add another dimension only when `SPEC.md` or the seeded data provides a reason for it. Each scenario also records its turn count, which equals one plus the number of followups; the validator checks it.
+Add another dimension only when `SPEC.md` or the seeded data provides a reason for it. Each scenario also records its turn count, from 1 through 25, which equals one plus the number of followups; the validator checks it.
 
 The *coverage set* includes ordinary and difficult requests across every important dimension. The *challenge set* includes requests that are intentionally difficult, e.g., missing information, a correction across turns, a store policy override, an authorization boundary, or a damaged record.
 
@@ -92,13 +93,54 @@ sqlite3 -header -column data/cartwheel.db \
 
 A scenario about a damaged record must use an authenticated user who may access the record. It must also record the matching `case_id` in `data_quality_case_id`. Scenarios that do not target a damaged record should set `data_quality_case_id` to `null`.
 
+### Cartwheel scenario record
+
+The general skill does not define a project schema. Cartwheel stores one JSON object per line with the following fields:
+
+```json
+{
+  "id": "support-0042",
+  "scenario_group": "challenge",
+  "data_quality_case_id": "dq-order-missing-delivery-date",
+  "tuple": {
+    "role": "shopper",
+    "user_id": 392,
+    "intent": "return_deadline",
+    "record_state": "order_missing_delivery_date",
+    "applicable_policy": "cw-returns",
+    "tools_needed": "one_lookup",
+    "difficulty": "missing_information",
+    "user_style": "confused_rambling",
+    "turn_count": 1,
+    "order_id": 8002
+  },
+  "opening_message": "When does the return period end for order 8002?",
+  "followups": [],
+  "expected": {
+    "evaluation": "objective",
+    "outcome": "do_not_compute_return_deadline",
+    "reason": "The delivered order has no delivery date.",
+    "source": {
+      "type": "data_quality_table",
+      "reference": "dq-order-missing-delivery-date"
+    }
+  }
+}
+```
+
+An objective source type is `sql`, `eligibility_function`, `policy_document`, or `data_quality_table`. When several responses could be acceptable, use `evaluation: "human_judgment"`, replace `outcome` and `reason` with a precise `criterion`, and use a `specification` source that names the relevant requirement in `SPEC.md`.
+
 ## Part B, run a pilot and confirm failures
 
 You will run a small pilot before creating all 250 scenarios. The pilot gives you a cheaper way to find invalid or repetitive scenarios, and it confirms that the agent produces failures you can study in Homework 4.
 
 Have the coding agent generate `scenarios/pilot_scenarios.jsonl` with the skill: 30 scenarios with broad role and intent coverage, including ordinary requests and difficult requests from the dimensions in Part A.
 
-Each scenario must record what the agent should do and the source that supports the answer. For example, if an order has no delivery date, the scenario records that the agent must not calculate a return deadline and cites the damaged record. The scenario skill shows the required JSON fields.
+Each scenario must record what the agent should do and the source that supports the answer. For example, if an order has no delivery date, the scenario records that the agent must not calculate a return deadline and cites the damaged record. Use the Cartwheel scenario record defined in Part A.
+
+Generate the user queries before running the Cartwheel agent. Use independent model calls or separate coding subagents to draft small batches from grounded tuples, then use a separate critic pass to remove repetitive, implausible, or template-like conversations. The query generation model must receive only facts the simulated user could know, not the hidden expected answer. Do not use one shared followup template for the dataset.
+
+Review five complete generated conversations before making application model calls. Include the longest conversation, both scenario groups, a write scenario, a difficult scenario, and several user language styles. Read the opening and every followup, revise language that a real user would not say, and confirm that no followup assumes a particular unseen agent reply. Preserve intentional fragments, typos, frustration, and operational shorthand rather than editing every user into polite grammatical prose. Query generation and trace generation are separate stages, so do not start the runner until the query sample is acceptable.
 
 Validate the file, then run the scenarios on your selected model. Replace `YOUR_MODEL` with the value of `CARTWHEEL_MODEL` in `.env`:
 

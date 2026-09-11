@@ -22,7 +22,7 @@ The starter repository is https://github.com/ai-evals-course/cartwheel-homeworks
 
 Check whether this session is already in the Cartwheel homework repository. If it is, use the existing files and preserve any work. If it isn't, help me find my copy or clone the repository into a suitable folder. Explain where it will live. If you need me to select or open a folder in the app, give me one concrete action and wait.
 
-Read the [repository instructions](../../AGENTS.md), [Module 1 instructions](AGENTS.md), and [HW1 handout](hw1.md), along with README.md and SPEC.md at the repository root. Inspect relevant code as needed. Use the current handout as the checklist. The student has chosen the tutorial, so begin orientation without asking them to choose a help style again.
+Read the [repository instructions](../../AGENTS.md) and [HW1 handout](hw1.md), along with README.md and SPEC.md at the repository root. Inspect relevant code as needed. Use the current handout as the checklist. The student has chosen the tutorial, so begin orientation without asking them to choose a help style again.
 
 Explain what Cartwheel does and why we'll use it for later evals. Show me where SPEC.md lives and summarize what it already defines. Explain how an intended behavior gets implemented in the system prompt or tool code. Editing SPEC.md alone does not change the running application.
 

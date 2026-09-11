@@ -1,137 +1,220 @@
 ---
-name: synthetic-scenarios
+name: synthetic-trace-generation
 description: >
-  Generate grounded eval scenarios from a spec plus ground-truth access.
-  Use when you have a written spec for an agent and a database or corpus
-  that can compute expected outcomes, and you need realistic usage data
-  (scenarios) to run against the agent.
+  Generate grounded, diverse user interactions and run them against an
+  instrumented application to create a verified trace dataset.
 ---
 
-# Synthetic scenario generation
+# Synthetic trace generation
 
-The file provides a versioned procedure for a coding agent. The procedure is
-included in the Cartwheel scaffold, introduced in Lecture 3.2, and used in
-Homework 3 to generate support scenarios from the Cartwheel specification.
-
-## When to use
-
-Use the procedure when a specification and an authoritative data source
-already exist, but representative requests and traces do not. The procedure
-generates requests against an existing application; it does not invent the
-application's database, policies, or expected outcomes.
+Use the workflow when production traces are unavailable or do not cover enough
+behavior for error analysis. The workflow assumes that the application, its
+behavior specification, and authoritative data already exist.
 
 ## Inputs
 
-- The path to the support agent specification, `SPEC.md`.
-- A DB or corpus handle for computing expected outcomes (for Cartwheel:
-  `data/cartwheel.db` and `data/policies/`).
+- Behavior specification or rubric.
+- Authoritative data, policies, deterministic functions, or simulator.
+- Executable application interface.
+- Trace destination and export path.
+- Executable scenario validator.
+- Dataset size, model configuration, time budget, and cost budget.
 
-## Procedure
+## Invariants
 
-1. Read the spec, propose the six required dimensions with their values,
-   and show them to the human before generating anything. Add another
-   dimension only with a stated reason. The six required dimensions are:
-   the authenticated role; the intent; the record involved (an order and
-   its state, a product, a store policy page, or none); the applicable
-   policy (platform rule, store override, or none); the number of tool
-   calls needed (none, one lookup, or several); and the difficulty. Each
-   scenario also records its turn count (1 to 3), which equals one plus
-   the number of followups.
-2. Generate tuples from the approved dimensions, using a few tuples the
-   human wrote as examples. Do not enumerate the full Cartesian product;
-   some combinations are invalid and the product grows quickly. Count how
-   often each value appears, and sample the rare and risky combinations on
-   purpose. Keep a coverage pool in which every dimension value appears
-   repeatedly and a separate challenge pool of difficult but valid
-   combinations. Do not select a challenge merely because a model failed
-   on the exact case.
-3. Draft one natural opening message per tuple. For a multi-turn scenario,
-   put one or two exact user utterances in `followups`; the runner sends every
-   string verbatim, so do not place persona notes or generation instructions
-   in the field.
-4. Check for duplicate requests, unrealistic phrasing, and missing dimension
-   values. Assign `scenario_group` as `coverage` or `challenge`. The coverage
-   group exercises the planned dimensions. The challenge group concentrates
-   on valid requests that are difficult for a stated reason.
-5. Compute the expected outcome per scenario from ground truth (SQL against
-   the database, or the eligibility function in `seed/eligibility.py`).
-   A model assertion is not ground truth. When code or a policy document
-   cannot determine the expected outcome, mark the scenario for later human
-   judgment.
-6. Run a pilot on the selected model. Confirm failures against the recorded
-   expected results, then identify dimensions associated with the difficult
-   cases. If the first pilot produces too few failures, use a lower capability
-   model from the same provider. Do not create a failure taxonomy during
-   scenario generation.
-7. Generate new challenge scenarios from the difficult dimensions. Preserve
-   the coverage pool, because a dataset containing only failures cannot show
-   ordinary behavior.
-8. Emit JSONL, one scenario per line.
-9. Run the executable contract before any model calls:
-   `uv run python -m scenarios.validate scenarios/support_scenarios.jsonl --final`.
-   Repair every reported error before starting the final run.
+1. Ground expected outcomes in authoritative sources. Neither the request
+   generator nor the application under evaluation is its own oracle.
+2. Keep hidden expected answers out of request generation prompts.
+3. Generate and review requests before running the application.
+4. Preserve ordinary coverage while adding difficult cases.
+5. Preserve human decisions at the dimension and request review gates.
 
-## Output schema
+## Steps
+
+### 1. Verify the application and tracing
+
+Read the specification, tool contracts, permission rules, and ground truth
+sources. Run one inexpensive request and verify that its trace contains:
+
+- user and application messages;
+- model identity and settings;
+- tool calls and results;
+- a stable scenario identifier;
+- token usage and errors where available.
+
+Do not start bulk generation until authentication, tracing, and state reset work.
+
+### 2. Define dimensions
+
+Derive dimensions from the specification, data, and intended analysis. Common
+dimensions include role, intent, entity and state, applicable rule, expected
+tool path, difficulty, user language style, and conversation length.
+
+Every dimension needs a reason. Include varied language styles when response
+quality matters, for example terse fragments, typos, confusion, frustration,
+operational shorthand, and requests for a short answer.
+
+Show the dimension plan and values to a person. Stop for approval.
+
+### 3. Build grounded plans
+
+Sample valid combinations of approved dimension values. Do not enumerate the
+full Cartesian product. Count selected values and deliberately include rare or
+risky combinations.
+
+Maintain two pools:
+
+- `coverage`: ordinary cases that repeatedly exercise important values;
+- `challenge`: valid boundary conditions, missing information, corrections,
+  permission boundaries, inconsistent records, and other supported difficulty.
+
+Select concrete records from ground truth. Verify access permissions. Ensure
+state changing scenarios target distinct records unless interaction is
+intentional.
+
+### 4. Record expectations
+
+Compute the expected result before generating user language.
+
+Use an objective expectation when authoritative data or deterministic code fixes
+the answer or action. Record the outcome, reason, source type, and stable source
+reference.
+
+Use a human judgment expectation when several responses could satisfy the
+requirement. Record a precise criterion and the supporting requirement or
+rubric.
+
+Store expectations in scenario records, but do not expose hidden facts or
+expected answers to request generators.
+
+### 5. Generate user interactions
+
+Generate requests separately from application execution. Use independent model
+calls per scenario, or small batches assigned to separate subagents when the
+coding environment provides them. Record the generation method and model. Do
+not claim to use subagents when none are available.
+
+Give the generator only the role, user goal, selected style, user visible facts,
+and required length. Do not fill the dataset with a shared opening or followup
+template.
+
+For multi-turn interactions:
+
+- write one opening and an ordered list of exact user followups;
+- keep every followup plausible for an unknown preceding response;
+- develop one coherent issue through clarification, correction, pressure, or a
+  decision;
+- preserve the assigned style rather than polishing every user;
+- omit stage directions, persona notes, evaluator language, and hidden facts.
+
+Use the project's turn limit. Repeated requests to check, compare, cite,
+confirm, or summarize do not create useful length.
+
+### 6. Check and review requests
+
+Use an independent critic model or subagent when available. The critic may
+rewrite language, but must preserve the grounded plan, expectation, and assigned
+style.
+
+Run mechanical checks for:
+
+- schema and turn count errors;
+- duplicate conversations or repeated utterances;
+- invented identifiers, amounts, dates, entities, or personal facts;
+- impossible role and record combinations;
+- accidental or repeated write requests;
+- followups that assume a specific unseen response;
+- references to tools, traces, prompts, tests, or expected outcomes;
+- missing coverage values.
+
+Regenerate weak interactions from their plans. Run the executable validator.
+
+Show a person complete conversations, including the longest examples, both
+pools, all roles and styles, a state changing case, and difficult cases. Stop
+until the person accepts or revises the language.
+
+### 7. Run a pilot
+
+Reset mutable state. Run a small representative set with one fixed application
+model configuration. Persist status, errors, duration, observed messages, and
+model identity for every scenario.
+
+Verify trace completeness and scenario identifiers. Compare results with
+recorded expectations. Treat provider refusals, timeouts, transport errors, and
+missing traces as execution failures, not application quality failures.
+
+Revise invalid scenarios and enrich challenge cases from difficult dimensions,
+not by copying requests that happened to fail.
+
+### 8. Run the final set
+
+Repeat generation, criticism, human review, and validation for the final set.
+Reset mutable state immediately before execution and keep the application model
+configuration fixed.
+
+Sequential execution is safest for shared mutable state. Use parallel execution
+only when state changes are independent and provider limits, timeouts, tracing,
+and the cost budget support the selected concurrency.
+
+Rerun missing or failed scenarios without deleting completed run records.
+
+### 9. Verify and export
+
+Before error analysis:
+
+1. Count completed scenario identifiers.
+2. Confirm that every completed scenario has the expected traces.
+3. Inspect traces across roles, lengths, styles, and scenario groups.
+4. Confirm that messages, tool activity, model metadata, usage, and scenario
+   identifiers are present.
+5. Export the trace set with generation and application model provenance.
+6. Report coverage and challenge results separately.
+
+The workflow ends with a verified trace dataset. Failure taxonomy discovery and
+quality measurement belong to the subsequent error analysis workflow.
+
+## Conceptual scenario record
+
+Use the project's executable schema. Preserve at least the following concepts,
+even when field names differ:
 
 ```json
 {
-  "id": "support-0042",
+  "id": "scenario-0042",
   "scenario_group": "challenge",
-  "data_quality_case_id": "dq-order-missing-delivery-date",
-  "tuple": {"role": "shopper", "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002},
-  "opening_message": "When does the return period end for order 8002?",
-  "followups": [],
+  "dimensions": {
+    "role": "user_role",
+    "intent": "requested_action",
+    "record_state": "relevant_state",
+    "difficulty": "boundary",
+    "user_style": "terse_fragmentary",
+    "turn_count": 3
+  },
+  "opening_message": "First user message",
+  "followups": ["Second user message", "Third user message"],
   "expected": {
     "evaluation": "objective",
-    "outcome": "do_not_compute_return_deadline",
-    "reason": "The order is marked delivered, but its delivery date is missing.",
+    "outcome": "expected result",
+    "reason": "reason derived from ground truth",
     "source": {
-      "type": "data_quality_table",
-      "reference": "dq-order-missing-delivery-date"
+      "type": "deterministic_oracle",
+      "reference": "stable source reference"
     }
   }
 }
 ```
 
-For an objective case, `expected.source.type` is `sql`,
-`eligibility_function`, `policy_document`, or `data_quality_table`.
-`expected.source.reference` identifies the query, function input, document,
-or data quality case used to determine the answer.
+For human judgment, replace `outcome` and `reason` with a precise `criterion`
+and reference the supporting requirement or rubric.
 
-Use the following form when a person must judge the resulting trace:
+## Limitations
 
-```json
-{
-  "expected": {
-    "evaluation": "human_judgment",
-    "criterion": "The response should explain the missing information without inventing a date.",
-    "source": {
-      "type": "specification",
-      "reference": "SPEC.md, RESP-3"
-    }
-  }
-}
-```
+Synthetic users are usually more relevant and consistent than production users,
+even when generation prompts request varied styles. Synthetic traces complement
+rather than replace production traffic.
 
-Choose one expected form for each scenario. Use `objective` when the scenario
-tests an answer or action that data, code, or a policy document fixes exactly.
-Use `human_judgment` when the scenario tests a response quality that has
-several acceptable answers. A model response cannot be the source of an
-expected result, because the response may contain the error the evaluation
-needs to find.
+Challenge enrichment changes failure frequency. A combined coverage and
+challenge failure rate is not an estimate of production prevalence.
 
-`id` links the scenario to its traces through the
-`cartwheel.scenario_id` span attribute. Use `data_quality_case_id: null` for
-an ordinary scenario. A scenario involving a documented defect uses the
-matching identifier from `data_quality_cases`, belongs to the challenge
-group, uses an objective `data_quality_table` source, and records the affected
-`product_id` or `order_id` in `tuple`.
-
-## Known limits
-
-Queries drafted by a model tend to be more polite, grammatical, and relevant
-than requests from actual users. Synthetic scenarios therefore do not replace
-production traffic. Challenge enrichment also changes the observed failure
-frequency. Report results separately for the coverage and challenge groups,
-and do not interpret the combined frequency as an estimate of production
-prevalence.
+Scripted followups cannot react to an exact preceding response. Adaptive user
+simulation requires a runtime user model with separate evaluation and cost.

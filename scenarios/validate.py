@@ -19,6 +19,16 @@ from agent.config import db_path
 
 GROUPS = {"coverage", "challenge"}
 ROLES = {"shopper", "merchant", "support"}
+USER_STYLES = {
+    "neutral_conversational",
+    "terse_fragmentary",
+    "typo_heavy",
+    "confused_rambling",
+    "frustrated_impatient",
+    "repetitive_pressuring",
+    "operational_shorthand",
+    "requests_short_plain_answer",
+}
 REQUIRED_TUPLE_FIELDS = {
     "role",
     "intent",
@@ -27,6 +37,7 @@ REQUIRED_TUPLE_FIELDS = {
     "tools_needed",
     "turn_count",
     "difficulty",
+    "user_style",
 }
 OBJECTIVE_SOURCE_TYPES = {
     "sql",
@@ -34,6 +45,7 @@ OBJECTIVE_SOURCE_TYPES = {
     "policy_document",
     "data_quality_table",
 }
+MAX_SCENARIO_TURNS = 25
 
 
 class ScenarioValidationError(ValueError):
@@ -137,6 +149,10 @@ def validate_scenarios(
             tuple_ = {}
         if tuple_.get("role") not in ROLES:
             errors.append(f"{label}: tuple.role must be shopper, merchant, or support")
+        if tuple_.get("user_style") not in USER_STYLES:
+            errors.append(
+                f"{label}: tuple.user_style must be one of {sorted(USER_STYLES)}"
+            )
         if not _nonempty_string(tuple_.get("intent")):
             errors.append(f"{label}: tuple.intent must be a nonempty string")
         missing_tuple_fields = sorted(REQUIRED_TUPLE_FIELDS - tuple_.keys())
@@ -145,7 +161,7 @@ def validate_scenarios(
                 f"{label}: tuple is missing required fields "
                 f"{', '.join(missing_tuple_fields)}"
             )
-        for field in ("record_state", "applicable_policy", "difficulty"):
+        for field in ("record_state", "applicable_policy", "difficulty", "user_style"):
             value = tuple_.get(field)
             if value is not None and not _nonempty_string(value):
                 errors.append(f"{label}: tuple.{field} must be null or a nonempty string")
@@ -159,8 +175,11 @@ def validate_scenarios(
         followups = scenario.get("followups")
         if not isinstance(followups, list) or not all(_nonempty_string(x) for x in followups):
             errors.append(f"{label}: followups must be a list of nonempty strings")
-        elif len(followups) > 2:
-            errors.append(f"{label}: at most two followups are allowed (three turns total)")
+        elif len(followups) >= MAX_SCENARIO_TURNS:
+            errors.append(
+                f"{label}: at most {MAX_SCENARIO_TURNS - 1} followups are allowed "
+                f"({MAX_SCENARIO_TURNS} turns total)"
+            )
         elif tuple_.get("turn_count") != 1 + len(followups):
             errors.append(
                 f"{label}: tuple.turn_count must equal 1 + len(followups)"

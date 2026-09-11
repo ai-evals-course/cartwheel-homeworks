@@ -1,7 +1,7 @@
 """Scripted scenario runner. Instructor-provided and complete.
 
 Plays each scenario from a JSONL file against the running endpoint
-(server/app.py), 1 to 3 turns, sequentially. Sequential execution is fine at
+(server/app.py), 1 to 25 turns, sequentially. Sequential execution is fine at
 course scale; a full simulated-user loop is deferred to Module 3's sandbox.
 
 Each turn sends the scenario id along, so the server stamps
@@ -34,7 +34,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from scenarios.validate import load_jsonl, validate_scenarios
+from scenarios.validate import MAX_SCENARIO_TURNS, load_jsonl, validate_scenarios
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = REPO_ROOT / "scenarios" / "results"
@@ -42,7 +42,7 @@ RESULTS_DIR = REPO_ROOT / "scenarios" / "results"
 # Demo users per role (seeded by seed/generate.py). A scenario tuple may
 # name an explicit user_id instead.
 DEFAULT_USERS = {"shopper": 1, "merchant": 9001, "support": 9501}
-MAX_TURNS_PER_SCENARIO = 3
+MAX_TURNS_PER_SCENARIO = MAX_SCENARIO_TURNS
 REQUEST_TIMEOUT_S = 180
 
 
