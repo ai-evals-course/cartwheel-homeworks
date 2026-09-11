@@ -228,19 +228,24 @@ def list_products(
 
 
 def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> None:
-    conn.execute(
-        "UPDATE orders SET status = ?, refund_eligible = MIN(refund_eligible, ?) WHERE id = ?",
-        (status, int(status == "delivered"), order_id),
-    )
+    """Change an order's status. Only delivered orders can be refunded, so any
+    other status also switches off refund_eligible."""
+    if status == "delivered":
+        conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    else:
+        conn.execute(
+            "UPDATE orders SET status = ?, refund_eligible = 0 WHERE id = ?", (status, order_id)
+        )
     conn.commit()
 
 
 def claim_refund(conn: sqlite3.Connection, order_id: int) -> bool:
-    """Atomically mark a refund-eligible order refunded.
+    """Switch an order from refund-eligible to refunded in one step.
 
-    Returns False if the order was no longer eligible (e.g. a concurrent
-    refund already claimed it). Left uncommitted so the caller's
-    insert_refund lands in the same transaction.
+    Returns True if this call made the change, False if the order was already
+    refunded or otherwise no longer eligible (e.g. a second refund request
+    arrived at the same moment). Does not commit: the caller commits this
+    together with the refund row it inserts next, so both happen or neither.
     """
     return (
         conn.execute(

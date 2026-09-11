@@ -60,7 +60,7 @@ def test_existing_helper_commits_survive_later_error(world_copy: Path) -> None:
         assert db.get_order(conn, 4127).status == "cancelled"
 
 
-def test_claim_refund_succeeds_once(world_copy: Path) -> None:
+def test_claim_refund_only_first_caller_wins(world_copy: Path) -> None:
     with db.connection() as conn:
         assert db.claim_refund(conn, 4127) is True
         assert db.claim_refund(conn, 4127) is False
