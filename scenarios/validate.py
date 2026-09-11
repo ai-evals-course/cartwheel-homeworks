@@ -15,10 +15,12 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from agent.auth import AuthContext, can_view_order
 from agent.config import db_path
 
 GROUPS = {"coverage", "challenge"}
 ROLES = {"shopper", "merchant", "support"}
+REPEAT_REFUND_INTENT = "repeat_refund"
 REQUIRED_TUPLE_FIELDS = {
     "role",
     "intent",
@@ -86,8 +88,9 @@ def validate_scenarios(
     """Validate records and return a compact summary.
 
     In final mode, the database manifest is also used to prove that every
-    documented defect has five challenge scenarios and that each scenario's
-    tuple points at the affected entity.
+    documented defect has five challenge scenarios, each damaged-order
+    scenario uses an identity that can view the order, and the repeat-refund
+    diagnostic is present.
     """
     errors: list[str] = []
     ids: list[str] = []
@@ -95,6 +98,9 @@ def validate_scenarios(
     groups: Counter[str] = Counter()
     dq_counts: Counter[str] = Counter()
     dq_rows: dict[str, tuple[str, int]] = {}
+    order_scopes: dict[int, tuple[int, int]] = {}
+    users: dict[int, tuple[str, int | None]] = {}
+    repeat_refund_count = 0
 
     if final:
         database = db or db_path()
@@ -107,6 +113,18 @@ def validate_scenarios(
             rows = conn.execute(
                 "SELECT case_id, entity_type, entity_id FROM data_quality_cases"
             ).fetchall()
+            order_scopes = {
+                order_id: (user_id, store_id)
+                for order_id, user_id, store_id in conn.execute(
+                    "SELECT id, user_id, store_id FROM orders"
+                )
+            }
+            users = {
+                user_id: (role, store_id)
+                for user_id, role, store_id in conn.execute(
+                    "SELECT id, role, store_id FROM users"
+                )
+            }
         finally:
             conn.close()
         dq_rows = {case_id: (entity_type, entity_id) for case_id, entity_type, entity_id in rows}
@@ -171,6 +189,27 @@ def validate_scenarios(
                 conversations.append(tuple(message.strip().casefold() for message in messages))
         _validate_expected(scenario.get("expected"), label, errors)
 
+        if tuple_.get("intent") == REPEAT_REFUND_INTENT:
+            repeat_refund_count += 1
+            acting_user = tuple_.get("user_id")
+            if (
+                group != "challenge"
+                or tuple_.get("role") != "shopper"
+                or acting_user != 1
+                or tuple_.get("order_id") != 4127
+                or not isinstance(followups, list)
+                or len(followups) < 1
+            ):
+                errors.append(
+                    f"{label}: repeat_refund must be a multi-turn challenge for shopper 1 and order 4127"
+                )
+            expected = scenario.get("expected", {})
+            source = expected.get("source", {}) if isinstance(expected, dict) else {}
+            if source.get("type") != "eligibility_function":
+                errors.append(
+                    f"{label}: repeat_refund expected source must use the eligibility_function"
+                )
+
         dq_id = scenario.get("data_quality_case_id")
         if dq_id is not None:
             if not _nonempty_string(dq_id):
@@ -187,6 +226,10 @@ def validate_scenarios(
                     errors.append(
                         f"{label}: data-quality expected source must reference {dq_id!r}"
                     )
+                if dq_id.startswith("dq-order-") and "user_id" not in tuple_:
+                    errors.append(
+                        f"{label}: a data-quality order scenario must include tuple.user_id"
+                    )
                 if final:
                     manifest = dq_rows.get(dq_id)
                     if manifest is None:
@@ -198,6 +241,29 @@ def validate_scenarios(
                             errors.append(
                                 f"{label}: tuple.{entity_key} must be {entity_id} for {dq_id}"
                             )
+                        if entity_type == "order" and entity_id in order_scopes:
+                            role = tuple_.get("role")
+                            acting_user = tuple_.get("user_id")
+                            user = users.get(acting_user)
+                            if user is None:
+                                errors.append(
+                                    f"{label}: tuple.user_id {acting_user!r} does not exist"
+                                )
+                            elif user[0] != role:
+                                errors.append(
+                                    f"{label}: user {acting_user} has role {user[0]!r}, not {role!r}"
+                                )
+                            else:
+                                order_user_id, order_store_id = order_scopes[entity_id]
+                                ctx = AuthContext(
+                                    user_id=acting_user,
+                                    role=role,
+                                    store_id=user[1] if role == "merchant" else None,
+                                )
+                                if not can_view_order(ctx, order_user_id, order_store_id):
+                                    errors.append(
+                                        f"{label}: {role} user {acting_user} cannot view order {entity_id}"
+                                    )
 
     duplicates = sorted(key for key, count in Counter(ids).items() if count > 1)
     if duplicates:
@@ -224,6 +290,10 @@ def validate_scenarios(
                 errors.append(
                     f"final dataset must contain 5 scenarios for {case_id}, found {dq_counts[case_id]}"
                 )
+        if repeat_refund_count < 1:
+            errors.append(
+                "final dataset must contain a repeat_refund challenge for shopper 1 and order 4127"
+            )
 
     if errors:
         raise ScenarioValidationError("scenario validation failed:\n- " + "\n- ".join(errors))

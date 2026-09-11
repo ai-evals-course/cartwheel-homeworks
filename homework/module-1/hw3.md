@@ -98,6 +98,11 @@ You will run a small pilot before creating all 250 scenarios. The pilot gives yo
 
 Have the coding agent generate `scenarios/pilot_scenarios.jsonl` with the skill: 30 scenarios with broad role and intent coverage, including ordinary requests and difficult requests from the dimensions in Part A.
 
+Include both required diagnostic cases in the pilot:
+
+- Shopper user `392` asks for the return deadline on order `8002`. The order is marked delivered but has no delivery date, so the expected result must say not to compute a deadline.
+- Shopper user `1` requests the full $84 refund for order `4127`, then asks for the same refund again in a followup. Set `tuple.intent` to `repeat_refund`. The expected result must say that the second request is `not_eligible` because the first refund changed the order status to `refunded`, and it must cite `seed/eligibility.py`. Do not use order `4127` in another write scenario in the same run.
+
 Each scenario must record what the agent should do and the source that supports the answer. For example, if an order has no delivery date, the scenario records that the agent must not calculate a return deadline and cites the damaged record. The scenario skill shows the required JSON fields.
 
 Validate the file, then run the scenarios on your selected model. Replace `YOUR_MODEL` with the value of `CARTWHEEL_MODEL` in `.env`:
@@ -110,6 +115,8 @@ uv run python -m scenarios.runner scenarios/pilot_scenarios.jsonl \
 ```
 
 Review at least 10 pilot results in Langfuse. Start with difficult scenarios and cases where the model used an unexpected tool, changed data, or gave an answer that conflicts with the recorded expected result.
+
+Review both required diagnostic cases. Record whether the observed agent behavior failed the expected result. Keep a valid case even when the agent handles it correctly, because Homework 4 needs both successes and failures.
 
 Create `scenarios/pilot_review.jsonl` with one record for each scenario you review. Record:
 
@@ -133,6 +140,7 @@ Save the final dataset in `scenarios/support_scenarios.jsonl`. It must contain:
 
 - 175 scenarios with `scenario_group` set to `coverage`.
 - 75 scenarios with `scenario_group` set to `challenge`, including five for each of the six damaged records.
+- A new version of the `repeat_refund` challenge used in the pilot. Keep it as the only scenario that writes to order `4127` in the final run.
 
 Give every final scenario a new identifier, distinct from the pilot identifiers. The export in Part E selects traces by scenario identifier, so a reused identifier would pull in the pilot run's traces as well.
 
@@ -152,7 +160,7 @@ Validate the final file:
 uv run python -m scenarios.validate scenarios/support_scenarios.jsonl --final
 ```
 
-The command checks the schema, unique identifiers, group counts, turn counts, duplicate conversations, and damaged record coverage. Repair every reported error before starting the final run, because the run makes model calls for every scenario.
+The command checks the schema, unique identifiers, group counts, turn counts, duplicate conversations, damaged record coverage, access to damaged orders, and the required repeat-refund challenge. Repair every reported error before starting the final run, because the run makes model calls for every scenario.
 
 ## Part D, run the final dataset
 

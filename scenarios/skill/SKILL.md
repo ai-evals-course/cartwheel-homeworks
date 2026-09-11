@@ -49,6 +49,15 @@ application's database, policies, or expected outcomes.
    put one or two exact user utterances in `followups`; the runner sends every
    string verbatim, so do not place persona notes or generation instructions
    in the field.
+   Include both required diagnostic cases in the pilot and final sets:
+   - Shopper 392 asks for the return deadline on order 8002, whose delivery
+     date is missing. The expected result must say not to compute a deadline.
+   - Shopper 1 requests a full refund for order 4127 and then asks for the same
+     refund again in a followup. The expected result must say that the second
+     request is `not_eligible` because the first refund changed the order's
+     status to `refunded`. Use `repeat_refund` as the intent and the eligibility
+     function as the expected source. Do not use order 4127 in another write
+     scenario in the same run.
 4. Check for duplicate requests, unrealistic phrasing, and missing dimension
    values. Assign `scenario_group` as `coverage` or `challenge`. The coverage
    group exercises the planned dimensions. The challenge group concentrates
@@ -78,7 +87,7 @@ application's database, policies, or expected outcomes.
   "id": "support-0042",
   "scenario_group": "challenge",
   "data_quality_case_id": "dq-order-missing-delivery-date",
-  "tuple": {"role": "shopper", "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002},
+  "tuple": {"role": "shopper", "user_id": 392, "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002},
   "opening_message": "When does the return period end for order 8002?",
   "followups": [],
   "expected": {
@@ -125,7 +134,9 @@ needs to find.
 an ordinary scenario. A scenario involving a documented defect uses the
 matching identifier from `data_quality_cases`, belongs to the challenge
 group, uses an objective `data_quality_table` source, and records the affected
-`product_id` or `order_id` in `tuple`.
+`product_id` or `order_id` in `tuple`. For an order, record `tuple.user_id`
+explicitly and choose a user who can view it. The runner uses `tuple.user_id`
+when it creates the session and otherwise uses the default user for the role.
 
 ## Known limits
 

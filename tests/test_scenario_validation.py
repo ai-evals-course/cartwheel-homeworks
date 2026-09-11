@@ -68,6 +68,25 @@ def test_pilot_validation_rejects_duplicate_conversations() -> None:
         validate_scenarios([first, second])
 
 
+def test_pilot_validation_requires_user_for_data_quality_order() -> None:
+    scenario = valid_scenario()
+    scenario.update(
+        scenario_group="challenge",
+        data_quality_case_id="dq-order-missing-delivery-date",
+    )
+    scenario["tuple"]["order_id"] = 8002
+    scenario["expected"] = {
+        "evaluation": "objective",
+        "outcome": "do_not_compute_return_deadline",
+        "source": {
+            "type": "data_quality_table",
+            "reference": "dq-order-missing-delivery-date",
+        },
+    }
+    with pytest.raises(ScenarioValidationError, match="must include tuple.user_id"):
+        validate_scenarios([scenario])
+
+
 def test_final_validation_enforces_counts_and_dirty_case_entity(world: dict) -> None:
     scenario = valid_scenario()
     scenario.update(
@@ -89,6 +108,27 @@ def test_final_validation_enforces_counts_and_dirty_case_entity(world: dict) -> 
     assert "tuple.order_id must be 8002" in text
     assert "must contain 250 records" in text
     assert "must contain 5 scenarios for dq-order-missing-delivery-date" in text
+    assert "must contain a repeat_refund challenge" in text
+
+
+def test_final_validation_rejects_inaccessible_damaged_order(world: dict) -> None:
+    scenario = valid_scenario()
+    scenario.update(
+        scenario_group="challenge",
+        data_quality_case_id="dq-order-missing-delivery-date",
+    )
+    scenario["tuple"].update(order_id=8002, user_id=1)
+    scenario["expected"] = {
+        "evaluation": "objective",
+        "outcome": "do_not_compute_return_deadline",
+        "source": {
+            "type": "data_quality_table",
+            "reference": "dq-order-missing-delivery-date",
+        },
+    }
+    with pytest.raises(ScenarioValidationError) as exc:
+        validate_scenarios([scenario], final=True, db=world["db"])
+    assert "shopper user 1 cannot view order 8002" in str(exc.value)
 
 
 def test_final_validation_accepts_complete_composition(world: dict) -> None:
@@ -113,11 +153,35 @@ def test_final_validation_accepts_complete_composition(world: dict) -> None:
             scenario = records[175 + offset * 5 + repetition]
             scenario["data_quality_case_id"] = case_id
             scenario["tuple"][entity_key] = entity_id
+            if entity_key == "order_id":
+                if case_id == "dq-order-missing-delivery-date":
+                    scenario["tuple"].update(role="shopper", user_id=392)
+                else:
+                    scenario["tuple"].update(role="support", user_id=9501)
             scenario["expected"] = {
                 "evaluation": "objective",
                 "outcome": "follow_manifest_expected_handling",
                 "source": {"type": "data_quality_table", "reference": case_id},
             }
+
+    repeat_refund = records[205]
+    repeat_refund["tuple"].update(
+        role="shopper",
+        user_id=1,
+        intent="repeat_refund",
+        order_id=4127,
+        turn_count=2,
+    )
+    repeat_refund["opening_message"] = "Refund the full $84 for order 4127."
+    repeat_refund["followups"] = ["Please issue the same full refund again."]
+    repeat_refund["expected"] = {
+        "evaluation": "objective",
+        "outcome": "reject_second_refund_as_not_eligible",
+        "source": {
+            "type": "eligibility_function",
+            "reference": "is_refund_eligible(status='refunded')",
+        },
+    }
 
     summary = validate_scenarios(records, final=True, db=world["db"])
     assert summary == {
