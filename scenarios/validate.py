@@ -95,7 +95,7 @@ def validate_scenarios(
     groups: Counter[str] = Counter()
     dq_counts: Counter[str] = Counter()
     dq_rows: dict[str, tuple[Any, ...]] = {}
-    merchant_stores: dict[int, int] = {}
+    users: dict[int, tuple[str, int | None]] = {}
 
     if final:
         database = db or db_path()
@@ -110,9 +110,10 @@ def validate_scenarios(
                 "FROM data_quality_cases c LEFT JOIN orders o "
                 "ON c.entity_type = 'order' AND o.id = c.entity_id"
             ).fetchall()
-            merchant_stores = dict(
-                conn.execute("SELECT id, store_id FROM users WHERE role = 'merchant'")
-            )
+            users = {
+                uid: (role, store_id)
+                for uid, role, store_id in conn.execute("SELECT id, role, store_id FROM users")
+            }
         finally:
             conn.close()
         dq_rows = {row[0]: row[1:] for row in rows}
@@ -204,11 +205,13 @@ def validate_scenarios(
                             errors.append(
                                 f"{label}: tuple.{entity_key} must be {entity_id} for {dq_id}"
                             )
-                        role, user_id = tuple_.get("role"), tuple_.get("user_id")
-                        can_view = (
+                        role = tuple_.get("role")
+                        user_id = tuple_.get("user_id")
+                        user_role, user_store = users.get(user_id, (None, None))
+                        can_view = user_role == role and (
                             role == "support"
                             or (role == "shopper" and user_id == owner)
-                            or (role == "merchant" and merchant_stores.get(user_id) == store)
+                            or (role == "merchant" and user_store == store)
                         )
                         if entity_type == "order" and not can_view:
                             errors.append(

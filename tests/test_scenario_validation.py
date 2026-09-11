@@ -93,6 +93,9 @@ def test_final_validation_enforces_counts_and_dirty_case_entity(world: dict) -> 
     scenario["tuple"]["order_id"] = 8002
     with pytest.raises(ScenarioValidationError, match="user_id must be a shopper who can view order 8002"):
         validate_scenarios([copy.deepcopy(scenario)], final=True, db=world["db"])
+    scenario["tuple"].update(role="support", user_id=1)
+    with pytest.raises(ScenarioValidationError, match="user_id must be a support who can view order 8002"):
+        validate_scenarios([copy.deepcopy(scenario)], final=True, db=world["db"])
 
 
 def test_final_validation_accepts_complete_composition(world: dict) -> None:
