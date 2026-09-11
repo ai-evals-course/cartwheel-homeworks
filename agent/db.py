@@ -236,9 +236,11 @@ def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> No
 
 
 def claim_refund(conn: sqlite3.Connection, order_id: int) -> bool:
-    """Mark a delivered order refunded; False if it was no longer eligible.
+    """Atomically mark a refund-eligible order refunded.
 
-    Left uncommitted so the caller's insert_refund lands in the same transaction.
+    Returns False if the order was no longer eligible (e.g. a concurrent
+    refund already claimed it). Left uncommitted so the caller's
+    insert_refund lands in the same transaction.
     """
     return (
         conn.execute(
