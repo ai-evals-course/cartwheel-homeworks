@@ -78,7 +78,7 @@ application's database, policies, or expected outcomes.
   "id": "support-0042",
   "scenario_group": "challenge",
   "data_quality_case_id": "dq-order-missing-delivery-date",
-  "tuple": {"role": "shopper", "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002},
+  "tuple": {"role": "shopper", "intent": "return_deadline", "record_state": "order_missing_delivery_date", "applicable_policy": "cw-returns", "tools_needed": "one_lookup", "turn_count": 1, "difficulty": "boundary", "order_id": 8002, "user_id": 392},
   "opening_message": "When does the return period end for order 8002?",
   "followups": [],
   "expected": {
@@ -125,7 +125,9 @@ needs to find.
 an ordinary scenario. A scenario involving a documented defect uses the
 matching identifier from `data_quality_cases`, belongs to the challenge
 group, uses an objective `data_quality_table` source, and records the affected
-`product_id` or `order_id` in `tuple`.
+`product_id` or `order_id` in `tuple`. The runner opens the session as
+`tuple.user_id`, so a damaged-order scenario must name a user who can view
+that order; `--final` validation rejects one that cannot.
 
 ## Known limits
 

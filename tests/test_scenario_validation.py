@@ -90,6 +90,10 @@ def test_final_validation_enforces_counts_and_dirty_case_entity(world: dict) -> 
     assert "must contain 250 records" in text
     assert "must contain 5 scenarios for dq-order-missing-delivery-date" in text
 
+    scenario["tuple"]["order_id"] = 8002
+    with pytest.raises(ScenarioValidationError, match="user_id must be a shopper who can view order 8002"):
+        validate_scenarios([copy.deepcopy(scenario)], final=True, db=world["db"])
+
 
 def test_final_validation_accepts_complete_composition(world: dict) -> None:
     records = []
@@ -101,18 +105,19 @@ def test_final_validation_accepts_complete_composition(world: dict) -> None:
         records.append(scenario)
 
     cases = [
-        ("dq-product-duplicate-title", "product_id", 2),
-        ("dq-product-missing-title", "product_id", 3),
-        ("dq-product-invalid-price", "product_id", 4),
-        ("dq-order-reversed-dates", "order_id", 8001),
-        ("dq-order-missing-delivery-date", "order_id", 8002),
-        ("dq-order-store-mismatch", "order_id", 8003),
+        ("dq-product-duplicate-title", "product_id", 2, None),
+        ("dq-product-missing-title", "product_id", 3, None),
+        ("dq-product-invalid-price", "product_id", 4, None),
+        ("dq-order-reversed-dates", "order_id", 8001, 174),
+        ("dq-order-missing-delivery-date", "order_id", 8002, 392),
+        ("dq-order-store-mismatch", "order_id", 8003, 119),
     ]
-    for offset, (case_id, entity_key, entity_id) in enumerate(cases):
+    for offset, (case_id, entity_key, entity_id, user_id) in enumerate(cases):
         for repetition in range(5):
             scenario = records[175 + offset * 5 + repetition]
             scenario["data_quality_case_id"] = case_id
             scenario["tuple"][entity_key] = entity_id
+            scenario["tuple"]["user_id"] = user_id
             scenario["expected"] = {
                 "evaluation": "objective",
                 "outcome": "follow_manifest_expected_handling",

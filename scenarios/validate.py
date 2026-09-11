@@ -94,7 +94,8 @@ def validate_scenarios(
     conversations: list[tuple[str, ...]] = []
     groups: Counter[str] = Counter()
     dq_counts: Counter[str] = Counter()
-    dq_rows: dict[str, tuple[str, int]] = {}
+    dq_rows: dict[str, tuple[Any, ...]] = {}
+    merchant_stores: dict[int, int] = {}
 
     if final:
         database = db or db_path()
@@ -105,11 +106,16 @@ def validate_scenarios(
         conn = sqlite3.connect(database)
         try:
             rows = conn.execute(
-                "SELECT case_id, entity_type, entity_id FROM data_quality_cases"
+                "SELECT c.case_id, c.entity_type, c.entity_id, o.user_id, o.store_id "
+                "FROM data_quality_cases c LEFT JOIN orders o "
+                "ON c.entity_type = 'order' AND o.id = c.entity_id"
             ).fetchall()
+            merchant_stores = dict(
+                conn.execute("SELECT id, store_id FROM users WHERE role = 'merchant'")
+            )
         finally:
             conn.close()
-        dq_rows = {case_id: (entity_type, entity_id) for case_id, entity_type, entity_id in rows}
+        dq_rows = {row[0]: row[1:] for row in rows}
         if not dq_rows:
             errors.append("database contains no documented data_quality_cases")
 
@@ -192,11 +198,21 @@ def validate_scenarios(
                     if manifest is None:
                         errors.append(f"{label}: unknown data_quality_case_id {dq_id!r}")
                     else:
-                        entity_type, entity_id = manifest
+                        entity_type, entity_id, owner, store = manifest
                         entity_key = f"{entity_type}_id"
                         if tuple_.get(entity_key) != entity_id:
                             errors.append(
                                 f"{label}: tuple.{entity_key} must be {entity_id} for {dq_id}"
+                            )
+                        role, user_id = tuple_.get("role"), tuple_.get("user_id")
+                        can_view = (
+                            role == "support"
+                            or (role == "shopper" and user_id == owner)
+                            or (role == "merchant" and merchant_stores.get(user_id) == store)
+                        )
+                        if entity_type == "order" and not can_view:
+                            errors.append(
+                                f"{label}: tuple.user_id must be a {role} who can view order {entity_id}"
                             )
 
     duplicates = sorted(key for key, count in Counter(ids).items() if count > 1)
