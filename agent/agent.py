@@ -224,7 +224,7 @@ def issue_refund_logic(
                 "error": "invalid_argument",
                 "reason": f"refund amount ${amount_usd:.2f} exceeds order total ${order.total_usd:.2f}",
             }
-        if not order.refund_eligible:
+        if not order.refund_eligible or order.status != "delivered":
             return {
                 "ok": False,
                 "error": "not_eligible",
@@ -233,6 +233,12 @@ def issue_refund_logic(
                     f"(status '{order.status}', delivered {order.delivered_at}); "
                     f"the return window counts from the delivery date"
                 ),
+            }
+        if db.has_refund_for_order(conn, order_id):
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": f"order #{order_id} already has a refund request",
             }
         today = db.world_asof(conn).isoformat()
         threshold = facts["refund_auto_approve_threshold_usd"]

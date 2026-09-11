@@ -54,22 +54,30 @@ def test_refund_below_threshold_auto_approves(world_copy: Path) -> None:
     result = issue_refund_logic(SHOPPER_1, 4127, 84.0, "arrived chipped")
     assert result["ok"] is True
     assert result["status"] == "auto_approved"
+    duplicate = issue_refund_logic(SHOPPER_1, 4127, 84.0, "arrived chipped")
+    assert duplicate["ok"] is False
+    assert duplicate["error"] == "not_eligible"
     conn = sqlite3.connect(world_copy)
     try:
-        status = conn.execute("SELECT status FROM orders WHERE id = 4127").fetchone()[0]
-        refund = conn.execute(
-            "SELECT status, amount_cents FROM refunds WHERE order_id = 4127"
+        order = conn.execute(
+            "SELECT status, refund_eligible FROM orders WHERE id = 4127"
         ).fetchone()
+        refunds = conn.execute(
+            "SELECT status, amount_cents FROM refunds WHERE order_id = 4127"
+        ).fetchall()
     finally:
         conn.close()
-    assert status == "refunded"
-    assert refund == ("auto_approved", 8400)
+    assert order == ("refunded", 0)
+    assert refunds == [("auto_approved", 8400)]
 
 
 def test_refund_above_threshold_queues(world_copy: Path) -> None:
     result = issue_refund_logic(SHOPPER_1, 4455, 240.0, "wrong item")
     assert result["ok"] is True
     assert result["status"] == "queued_for_approval"
+    duplicate = issue_refund_logic(SHOPPER_1, 4455, 240.0, "wrong item")
+    assert duplicate["ok"] is False
+    assert duplicate["error"] == "not_eligible"
     conn = sqlite3.connect(world_copy)
     try:
         # Queued means no money moved: the order is untouched.

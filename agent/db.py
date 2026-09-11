@@ -228,8 +228,21 @@ def list_products(
 
 
 def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> None:
-    conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    if status == "delivered":
+        conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    else:
+        conn.execute(
+            "UPDATE orders SET status = ?, refund_eligible = 0 WHERE id = ?",
+            (status, order_id),
+        )
     conn.commit()
+
+
+def has_refund_for_order(conn: sqlite3.Connection, order_id: int) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM refunds WHERE order_id = ? LIMIT 1", (order_id,)
+    ).fetchone()
+    return row is not None
 
 
 def insert_refund(
