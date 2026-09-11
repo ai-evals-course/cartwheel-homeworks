@@ -125,9 +125,12 @@ needs to find.
 an ordinary scenario. A scenario involving a documented defect uses the
 matching identifier from `data_quality_cases`, belongs to the challenge
 group, uses an objective `data_quality_table` source, and records the affected
-`product_id` or `order_id` in `tuple`. The runner opens the session as
-`tuple.user_id`, so a damaged-order scenario must name a user who can view
-that order; `--final` validation rejects one that cannot.
+`product_id` or `order_id` in `tuple`. The runner signs in as `tuple.user_id`
+when it plays the scenario, so a scenario about a specific order must also set
+`user_id` to someone allowed to see that order: the shopper who placed it, a
+merchant of its store, or a support agent. `--final` validation rejects any
+other user, because the agent would just refuse and the scenario would never
+reach the defect.
 
 ## Known limits
 

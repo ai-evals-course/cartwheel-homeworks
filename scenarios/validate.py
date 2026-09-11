@@ -94,7 +94,9 @@ def validate_scenarios(
     conversations: list[tuple[str, ...]] = []
     groups: Counter[str] = Counter()
     dq_counts: Counter[str] = Counter()
-    dq_rows: dict[str, tuple[Any, ...]] = {}
+    # case_id -> (entity_type, entity_id, order owner user_id, order store_id)
+    dq_rows: dict[str, tuple[str, int, int | None, int | None]] = {}
+    # user_id -> (role, store_id for merchants)
     users: dict[int, tuple[str, int | None]] = {}
 
     if final:
@@ -116,7 +118,7 @@ def validate_scenarios(
             }
         finally:
             conn.close()
-        dq_rows = {row[0]: row[1:] for row in rows}
+        dq_rows = {case_id: rest for case_id, *rest in rows}
         if not dq_rows:
             errors.append("database contains no documented data_quality_cases")
 
@@ -199,23 +201,26 @@ def validate_scenarios(
                     if manifest is None:
                         errors.append(f"{label}: unknown data_quality_case_id {dq_id!r}")
                     else:
-                        entity_type, entity_id, owner, store = manifest
+                        entity_type, entity_id, order_owner_id, order_store_id = manifest
                         entity_key = f"{entity_type}_id"
                         if tuple_.get(entity_key) != entity_id:
                             errors.append(
                                 f"{label}: tuple.{entity_key} must be {entity_id} for {dq_id}"
                             )
+                        # The runner signs in as tuple.user_id, so that user must really
+                        # hold tuple.role and be allowed to see the order.
                         role = tuple_.get("role")
                         user_id = tuple_.get("user_id")
-                        user_role, user_store = users.get(user_id, (None, None))
-                        can_view = user_role == role and (
+                        stored_role, merchant_store_id = users.get(user_id, (None, None))
+                        can_view = stored_role == role and (
                             role == "support"
-                            or (role == "shopper" and user_id == owner)
-                            or (role == "merchant" and user_store == store)
+                            or (role == "shopper" and user_id == order_owner_id)
+                            or (role == "merchant" and merchant_store_id == order_store_id)
                         )
                         if entity_type == "order" and not can_view:
                             errors.append(
-                                f"{label}: tuple.user_id must be a {role} who can view order {entity_id}"
+                                f"{label}: tuple.user_id {user_id!r} is not a {role} who can view "
+                                f"order {entity_id} (its shopper, a merchant of its store, or support)"
                             )
 
     duplicates = sorted(key for key, count in Counter(ids).items() if count > 1)
