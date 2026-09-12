@@ -124,7 +124,7 @@ Store conversation plans as JSON Lines. Each line is one complete planned conver
     "turn_count": 1,
     "order_id": 8002
   },
-  "opening_message": "When does the return period end for order 8002?",
+  "opening_message": "Can I still send back the pencil set I got from Atlas Stationery?",
   "followups": [],
   "expected": {
     "evaluation": "objective",
