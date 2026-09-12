@@ -51,7 +51,7 @@ Use the active tool span returned by `trace.get_current_span()`. Add the followi
 
 - `cartwheel.user_role`, as a string (same for every tool call in the request)
 - `cartwheel.user_id`, as the decimal user identifier stored in a string (same for every tool call in the request)
-- `cartwheel.store_id`, as an integer when the caller is a merchant (same for every tool call in the request)
+- `cartwheel.store_id`, as a string when the caller is a merchant (same for every tool call in the request)
 - `cartwheel.permission_denied`, as a Boolean value
 - `cartwheel.permission_denied.reason`, when permission was denied
 
