@@ -84,7 +84,9 @@ Each scenario also records its **turn count** (1 through 25), which equals one p
 
 ### Proposing dimensions to the human
 
-After reading the specification, the data, and any ground truth sources, propose the dimensions and their values to the human for approval. Use AskUserQuestion to present the proposed dimensions and wait for the human's decision before generating any scenarios. The human may add, remove, or revise dimensions. Do not generate scenarios until the dimensions are approved.
+Do not present a finished dimension list. Start by asking the human to brainstorm in their own words: give one example dimension with a reason (e.g., "One dimension is the user's role, because different roles have different permissions. What other sources of variation do you think would change the agent's behavior?"). Let the human type their own ideas freely. Do not offer multiple choice options for this step. Wait for the human to name at least two dimensions before you propose additional ones.
+
+After the human has contributed dimensions, read the specification, the data, and any ground truth sources to fill in gaps the human may have missed. Present the combined list (the human's dimensions and your additions, each with a reason) and ask the human to approve, revise, or add more. Do not generate scenarios until the dimensions are approved.
 
 Any dimension needs a reason from the specification or the data. A dimension without a reason from either source is unlikely to change the expected behavior.
 

@@ -411,7 +411,7 @@ function renderMsg(m, idx) {
     }
   } else {
     const text = m.text !== undefined ? m.text : pretty(m.content);
-    inner = `<div class="text annotatable" data-idx="${idx}">${escape(text)}</div>`;
+    inner = `<div class="text annotatable" data-idx="${idx}">${md(text)}</div>`;
   }
   return `<div class="msg${boiler}" data-role="${role}" data-idx="${idx}">` +
          `<div class="role">${escape(label)}</div>${inner}</div>`;
@@ -777,8 +777,8 @@ document.getElementById('next').onclick = () => {
 };
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
-  if (e.key === 'j' || e.key === 'ArrowDown') document.getElementById('next').click();
-  if (e.key === 'k' || e.key === 'ArrowUp') document.getElementById('prev').click();
+  if (e.key === 'j' || e.key === 'ArrowDown' || e.key === 'ArrowRight') document.getElementById('next').click();
+  if (e.key === 'k' || e.key === 'ArrowUp' || e.key === 'ArrowLeft') document.getElementById('prev').click();
 });
 
 function switchView(name) {
@@ -847,6 +847,13 @@ async function poll() {
 function escape(s) {
   return String(s === undefined || s === null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function md(s) {
+  return escape(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
 }
 function pretty(v) {
   if (typeof v === 'string') return v;
