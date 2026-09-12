@@ -17,3 +17,4 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+scenarios/demo_pilot_gt.json
