@@ -1,16 +1,6 @@
 # Homework 3, creating the support trace dataset
 
-Homework 3 asks you to create a collection of Cartwheel support traces for Homework 4. You first write a *conversation plan* for every simulated support conversation. Each plan contains the user's messages and the expected agent behavior. The plans are inputs to the runner, not traces.
-
-Running a plan creates two separate outputs: one result record for the attempted conversation and Langfuse traces from the instrumented application. Cartwheel creates one trace per user turn and links every trace to its plan identifier.
-
-```text
-conversation plans (.jsonl) -> runner -> run results (.jsonl)
-                                  |
-                                  +------> Langfuse traces -> trace export (.json)
-```
-
-The existing Cartwheel commands and field names use *scenario* to mean one conversation plan.
+Homework 3 asks you to create a collection of Cartwheel support traces for Homework 4. A *scenario* is a planned support request with a recorded *expected result*, which states what the agent should do. When you run a scenario, Cartwheel records the conversation, model calls, and tool calls in a *trace*.
 
 You will begin by deciding which kinds of support requests to include. You will run 30 scenarios first, so you can fix unclear requests and confirm that the agent produces some failures. You will then create the full set of 250 scenarios and export their traces. In Homework 4, you will use the traces to find repeated failure patterns.
 
@@ -18,7 +8,7 @@ You will begin by deciding which kinds of support requests to include. You will 
 
 If you would like a coding agent to walk you through the assignment, paste the prompt below at the start of a session in your repository. The prompt assumes no programming background, so it suits an analyst or a product manager as well as an engineer. The agent generates the scenario files with the synthetic data skill; the handout's review points are where you decide.
 
-> Walk me through Homework 3 in `homework/module-1/hw3.md` as an interactive tutorial. Read `AGENTS.md`, the handout, `SPEC.md`, and `scenarios/skill/SKILL.md` first. I may not have a programming background, so assume nothing about what I know, and adapt once you see what I do know.
+> Walk me through Homework 3 in `homework/module-1/hw3.md` as an interactive tutorial. Read `AGENTS.md`, `homework/module-1/AGENTS.md`, the handout, `SPEC.md`, and `scenarios/skill/SKILL.md` first. I may not have a programming background, so assume nothing about what I know, and adapt once you see what I do know.
 >
 > I am driving. Work one step at a time, in the handout's order. Before each step, explain in plain language what you propose to do and why the assignment needs it, and show me the command you would run or the change you would make. Then wait for me to say go. Do not run a command, change a file, or generate anything until I have said so, and do not take several steps on one go ahead. Reading files to prepare a proposal is fine. Once I say go, do that step, show me the result, and explain what it means. Move on only when you are confident I understand the current step. One short question about what I expect to see, or what a result means, is enough to check; keep questions few, and do not turn the session into a quiz. Explain every unfamiliar term the first time it appears, using the actual files and outputs as examples. When a picture would help, draw one; a text diagram is fine.
 >
@@ -86,9 +76,8 @@ The plan must include the following dimensions:
 - Applicable platform or store policy.
 - Number of tool calls needed.
 - Request difficulty.
-- User language style, using one of the validator's allowed values, to exercise `RESP-5`.
 
-Add another dimension only when `SPEC.md` or the seeded data provides a reason for it. Each scenario also records its turn count, from 1 through 25, which equals one plus the number of followups; the validator checks it.
+Add another dimension only when `SPEC.md` or the seeded data provides a reason for it. Each scenario also records its turn count, which equals one plus the number of followups; the validator checks it.
 
 The *coverage set* includes ordinary and difficult requests across every important dimension. The *challenge set* includes requests that are intentionally difficult, e.g., missing information, a correction across turns, a store policy override, an authorization boundary, or a damaged record.
 
@@ -103,54 +92,13 @@ sqlite3 -header -column data/cartwheel.db \
 
 A scenario about a damaged record must use an authenticated user who may access the record. It must also record the matching `case_id` in `data_quality_case_id`. Scenarios that do not target a damaged record should set `data_quality_case_id` to `null`.
 
-### Conversation plan file
-
-Store conversation plans as JSON Lines. Each line is one complete planned conversation with a unique identifier, dimensions, user messages, and expected behavior:
-
-```json
-{
-  "id": "support-0042",
-  "scenario_group": "challenge",
-  "data_quality_case_id": "dq-order-missing-delivery-date",
-  "tuple": {
-    "role": "shopper",
-    "user_id": 392,
-    "intent": "return_deadline",
-    "record_state": "order_missing_delivery_date",
-    "applicable_policy": "cw-returns",
-    "tools_needed": "one_lookup",
-    "difficulty": "missing_information",
-    "user_style": "confused_rambling",
-    "turn_count": 1,
-    "order_id": 8002
-  },
-  "opening_message": "Can I still send back the pencil set I got from Atlas Stationery?",
-  "followups": [],
-  "expected": {
-    "evaluation": "objective",
-    "outcome": "do_not_compute_return_deadline",
-    "reason": "The delivered order has no delivery date.",
-    "source": {
-      "type": "data_quality_table",
-      "reference": "dq-order-missing-delivery-date"
-    }
-  }
-}
-```
-
-The `expected` object is an answer key grounded in an authoritative source, not a prediction from the model being evaluated. Use `sql`, `eligibility_function`, `policy_document`, or `data_quality_table` as an objective source type. When several responses could be acceptable, use `evaluation: "human_judgment"`, replace `outcome` and `reason` with a precise `criterion`, and cite the relevant `SPEC.md` requirement with source type `specification`.
-
 ## Part B, run a pilot and confirm failures
 
 You will run a small pilot before creating all 250 scenarios. The pilot gives you a cheaper way to find invalid or repetitive scenarios, and it confirms that the agent produces failures you can study in Homework 4.
 
 Have the coding agent generate `scenarios/pilot_scenarios.jsonl` with the skill: 30 scenarios with broad role and intent coverage, including ordinary requests and difficult requests from the dimensions in Part A.
 
-Each scenario must record what the agent should do and the source that supports the answer. For example, if an order has no delivery date, the scenario records that the agent must not calculate a return deadline and cites the damaged record. Use the conversation plan format defined in Part A.
-
-Generate the user conversations before running the Cartwheel agent. Use one independent generation call per conversation, with a bounded pool of at least two concurrent API calls or parallel coding subagents. Do not ask one call to write all 30 conversations. Then run independent critic calls concurrently to remove repetitive, implausible, or template-like conversations. The generation model receives only facts the simulated user could know, not the hidden expected answer. Do not use one shared followup template for the dataset.
-
-Review five complete generated conversations before making application model calls. Include the longest conversation, both scenario groups, a write scenario, a difficult scenario, and several user language styles. Read the opening and every followup, revise language that a real user would not say, and confirm that no followup assumes a particular unseen agent reply. Preserve intentional fragments, typos, frustration, and operational shorthand rather than editing every user into polite grammatical prose. Query generation and trace generation are separate stages, so do not start the runner until the query sample is acceptable.
+Each scenario must record what the agent should do and the source that supports the answer. For example, if an order has no delivery date, the scenario records that the agent must not calculate a return deadline and cites the damaged record. The scenario skill shows the required JSON fields.
 
 Validate the file, then run the scenarios on your selected model. Replace `YOUR_MODEL` with the value of `CARTWHEEL_MODEL` in `.env`:
 
@@ -216,7 +164,7 @@ Reset the development data first. The pilot changed order states through refunds
 uv run python -m seed.generate
 ```
 
-Then run the final set. The input remains the reviewed conversation plan file; the runner writes a separate result record for each conversation, while the server sends one Langfuse trace per user turn:
+Then run the final set:
 
 ```bash
 uv run python -m scenarios.runner scenarios/support_scenarios.jsonl \
