@@ -11,9 +11,11 @@
 # the patch. The patch fills create_session and post_message in server/app.py
 # and record_tool_result and _set_permission_denied_attributes in
 # observability/instrument.py.
+diff --git a/observability/instrument.py b/observability/instrument.py
+index f6b2b17..14ad0a8 100644
 --- a/observability/instrument.py
 +++ b/observability/instrument.py
-@@ -91,10 +91,11 @@
+@@ -122,10 +122,11 @@ def record_tool_result(ctx: "AuthContext", result: dict[str, Any]) -> None:
      span = trace.get_current_span()
      if not span.is_recording():
          return
@@ -24,12 +26,12 @@
 +    span.set_attribute("cartwheel.user_role", ctx.role)
 +    span.set_attribute("cartwheel.user_id", str(ctx.user_id))
 +    if ctx.role == "merchant" and ctx.store_id is not None:
-+        span.set_attribute("cartwheel.store_id", int(ctx.store_id))
++        span.set_attribute("cartwheel.store_id", str(ctx.store_id))
 +    _set_permission_denied_attributes(span, result)
  
  
  def _set_permission_denied_attributes(
-@@ -118,5 +119,7 @@
+@@ -149,5 +150,7 @@ def _set_permission_denied_attributes(
      the smoke report counts them and Module 3 asserts on them. This is the one place in the
      course where you touch instrumentation by hand.
      """
@@ -39,9 +41,11 @@
 +    span.set_attribute("cartwheel.permission_denied", bool(denied))
 +    if denied:
 +        span.set_attribute("cartwheel.permission_denied.reason", str(result.get("reason") or ""))
+diff --git a/server/app.py b/server/app.py
+index 3828638..ee13798 100644
 --- a/server/app.py
 +++ b/server/app.py
-@@ -123,8 +123,34 @@
+@@ -123,8 +123,34 @@ def create_session(body: SessionCreate) -> dict[str, Any]:
      session id and a signed token. The token payload must contain session_id,
      user_id, role, store_id, and issued_at.
      """
@@ -78,7 +82,7 @@
  
  
  def _authorize(session_id: str, authorization: str | None) -> AuthContext:
-@@ -158,8 +184,33 @@
+@@ -158,8 +184,34 @@ async def post_message(
      gen_ai.output.messages on the root span as JSON arrays of OTel GenAI
      messages with role and parts fields.
      """
@@ -91,6 +95,7 @@
 +    capture = os.environ.get("TRACELOOP_TRACE_CONTENT", "false").lower() == "true"
 +    with _tracer.start_as_current_span("cartwheel.session_message") as span:
 +        if span.is_recording():
++            span.set_attribute("cartwheel.session_id", session_id)
 +            span.set_attribute("cartwheel.user_role", ctx.role)
 +            span.set_attribute("cartwheel.user_id", str(ctx.user_id))
 +            span.set_attribute("cartwheel.prompt_version", version)

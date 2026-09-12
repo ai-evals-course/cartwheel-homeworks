@@ -64,6 +64,9 @@ or credential changes, and anything outside Cartwheel.
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
   center, order answers from the order tools.
+- You MUST explain your reasoning in plain text before every tool call.
+  State what you are about to look up and why, in one sentence. Do not
+  call a tool without explaining first.
 - Cite the policy id (for example cw-returns) for every policy claim.
 - Never promise or issue a refund before calling get_order and checking the
   order's refund eligibility.
@@ -137,9 +140,20 @@ def model_settings_for(model: Any) -> ModelSettings:
     documents is passing `allowed_openai_params=["tools"]` per request; the
     Agents SDK forwards it through ModelSettings.extra_args.
     """
+    if isinstance(model, str) and model.startswith("gpt-"):
+        return ModelSettings(
+            reasoning={"effort": "high", "summary": "detailed"},
+            verbosity="high",
+            include_usage=True,
+        )
     model_id = getattr(model, "model", "") if not isinstance(model, str) else ""
     if model_id.startswith("together_ai/"):
         return ModelSettings(extra_args={"allowed_openai_params": ["tools"]})
+    if "claude" in model_id or "anthropic" in model_id:
+        return ModelSettings(
+            reasoning={"effort": "high", "summary": "detailed"},
+            include_usage=True,
+        )
     return ModelSettings()
 
 

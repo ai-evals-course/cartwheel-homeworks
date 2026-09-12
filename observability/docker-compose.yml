@@ -136,10 +136,7 @@ services:
       retries: 10
 
   minio:
-    # MinIO does not publish major-version tags; the official Langfuse
-    # compose also tracks latest. Pin a RELEASE.* tag here if you need
-    # stricter reproducibility.
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     restart: always
     entrypoint: sh
     command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'

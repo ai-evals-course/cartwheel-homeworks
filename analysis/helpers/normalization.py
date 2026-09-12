@@ -26,6 +26,15 @@ def _text(value: Any) -> str:
         return ""
     if isinstance(value, str):
         return value
+    if isinstance(value, list):
+        parts = []
+        for item in value:
+            if isinstance(item, dict):
+                for p in item.get("parts") or []:
+                    if isinstance(p, dict) and p.get("content"):
+                        parts.append(str(p["content"]))
+        if parts:
+            return "\n".join(parts)
     return json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
 
 
@@ -144,10 +153,33 @@ def _messages(record: dict[str, Any]) -> list[dict[str, Any]]:
     messages = []
     if record.get("input") is not None:
         messages.append({"role": "user", "text": _text(record.get("input"))})
-    for observation in record.get("observations") or []:
+    sorted_obs = sorted(
+        record.get("observations") or [],
+        key=lambda o: _data(o).get("startTime") or _data(o).get("start_time") or "" if isinstance(_data(o), dict) else "",
+    )
+    for observation in sorted_obs:
+        obs = _data(observation)
+        if not isinstance(obs, dict):
+            continue
+        obs_type = obs.get("type")
+        if obs_type in {"AGENT", "SPAN"}:
+            continue
+        if obs_type == "GENERATION":
+            out = obs.get("output")
+            if isinstance(out, list):
+                for item in out:
+                    if not isinstance(item, dict):
+                        continue
+                    for part in item.get("parts") or []:
+                        if isinstance(part, dict) and part.get("type") == "text" and part.get("content", "").strip():
+                            messages.append({"role": "assistant", "text": part["content"]})
+            continue
         messages.extend(_observation_message(observation))
     if record.get("output") is not None:
-        messages.append({"role": "assistant", "text": _text(record.get("output"))})
+        text = _text(record.get("output"))
+        existing = {m.get("text") for m in messages if m.get("role") == "assistant"}
+        if text not in existing:
+            messages.append({"role": "assistant", "text": text})
 
     segments = record.get("segments")
     if not messages and isinstance(segments, dict):
@@ -254,10 +286,48 @@ def normalize_trace(value: Any) -> dict[str, Any]:
     }
 
 
+def _merge_multi_turn(traces: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge traces that share a scenario_id into one conversation."""
+    from collections import defaultdict
+
+    by_scenario: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    no_scenario: list[dict[str, Any]] = []
+    for trace in traces:
+        sid = trace["meta"].get("scenario_id")
+        if sid:
+            by_scenario[sid].append(trace)
+        else:
+            no_scenario.append(trace)
+
+    merged: list[dict[str, Any]] = list(no_scenario)
+    for sid, group in by_scenario.items():
+        if len(group) == 1:
+            merged.append(group[0])
+            continue
+        group.sort(key=lambda t: t.get("timestamp") or "")
+        first = dict(group[0])
+        for later in group[1:]:
+            first["trace"].extend(later["trace"])
+            first["observations"].extend(later["observations"])
+            first["models"] = list(
+                dict.fromkeys(first["models"] + later["models"])
+            )
+        first["text"] = _flatten(first["trace"])
+        first["features"]["turn_count"] = sum(
+            m.get("role") in {"user", "assistant"} for m in first["trace"]
+        )
+        first["features"]["tool_call_count"] = sum(
+            m.get("role") == "tool_call" for m in first["trace"]
+        )
+        merged.append(first)
+    return merged
+
+
 def normalize_traces(values: list[Any]) -> list[dict[str, Any]]:
-    """Normalize a collection and reject duplicate identifiers."""
+    """Normalize, merge multi-turn conversations, reject duplicate ids."""
     normalized = [normalize_trace(value) for value in values]
-    ids = [record["id"] for record in normalized]
+    merged = _merge_multi_turn(normalized)
+    ids = [record["id"] for record in merged]
     if len(ids) != len(set(ids)):
         raise ValueError("the trace source contains duplicate identifiers")
-    return normalized
+    return merged

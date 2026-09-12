@@ -150,8 +150,8 @@ async def post_message(
 
     Authorize the token, recover the server-side session, and build the agent
     for the authenticated context. Hash only the system prompt template.
-    The cartwheel.session_message span must record the user role, user id,
-    prompt version, and a nonempty scenario id when one is supplied. Run the
+    The cartwheel.session_message span must record the session id, user role,
+    user id, prompt version, and a nonempty scenario id when one is supplied. Run the
     agent inside that span, then return the session id, final reply, and
     prompt version.
     When TRACELOOP_TRACE_CONTENT is true, record gen_ai.input.messages and

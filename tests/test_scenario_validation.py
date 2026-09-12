@@ -20,6 +20,7 @@ def valid_scenario() -> dict:
             "applicable_policy": None,
             "turn_count": 1,
             "difficulty": "ordinary",
+            "user_style": "neutral_conversational",
             "order_id": 4127,
         },
         "opening_message": "Where is order 4127?",
@@ -49,8 +50,13 @@ def test_pilot_validation_accepts_contract() -> None:
         (lambda s: s["expected"].update(evaluation="model_guess"), "expected.evaluation"),
         (lambda s: s["tuple"].pop("intent"), "tuple.intent"),
         (lambda s: s["tuple"].pop("difficulty"), "missing required fields"),
+        (lambda s: s["tuple"].pop("user_style"), "tuple.user_style"),
+        (lambda s: s["tuple"].update(user_style="robotic"), "tuple.user_style"),
         (lambda s: s["tuple"].update(turn_count=2), "tuple.turn_count"),
-        (lambda s: s.update(followups=["one", "two", "three"]), "three turns total"),
+        (
+            lambda s: s.update(followups=[f"followup {i}" for i in range(25)]),
+            "25 turns total",
+        ),
     ],
 )
 def test_pilot_validation_rejects_bad_records(mutation, message: str) -> None:

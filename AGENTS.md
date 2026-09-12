@@ -6,7 +6,7 @@ Cartwheel is the support agent used throughout "Evaluating and Improving AI Agen
 
 - Read [README.md](README.md) for setup and commands. Run commands from the repository root.
 - For homework help, identify the assignment from the request and existing work. If it is unclear, ask which assignment the student is working on. The [homework index](homework/README.md) lists released assignments.
-- For HW1, HW2, or HW3, read [Module 1 instructions](homework/module-1/AGENTS.md) before proceeding, including when changing files outside that folder. Follow the relevant handout for requirements and deliverables.
+- For HW1, HW2, or HW3, read the relevant handout in `homework/module-1/` and follow its requirements and deliverables. When the student invokes a handout's interactive walkthrough, follow its pacing and review points. For HW3, also read and follow `scenarios/skill/SKILL.md`; keep query generation separate from application execution and stop for the required human reviews.
 - For repository maintenance, follow the requested change directly. Preserve unfinished homework functions unless implementing them is part of the request.
 
 ## Shared rules
@@ -19,4 +19,4 @@ Cartwheel is the support agent used throughout "Evaluating and Improving AI Agen
 - Homework placeholders intentionally raise `NotImplementedError`. Expected failures are unfinished work, not proof of completion. Follow the handout's focused tests and run relevant regression checks; resolve mismatches without weakening requirements or tests merely to pass.
 - Report which checks ran offline and which used a live model, and record only observed conversations and tool results. When helping with a submission, leave the student's assessments and recording to the student, and keep unverified deliverables marked as pending.
 
-`AGENTS.md` is the canonical instruction file at each level. `CLAUDE.md` is a relative symlink to it; edit the target rather than maintaining a second copy.
+The repository root `AGENTS.md` is the canonical instruction file. The root `CLAUDE.md` is a relative symlink to it; edit the target rather than maintaining a second copy.
