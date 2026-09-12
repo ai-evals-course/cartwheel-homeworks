@@ -357,6 +357,14 @@ function renderHeader() {
   if (m.store) bits.push(`<span class="meta">store: ${escape(m.store)}</span>`);
   if (m.prompt_version) bits.push(`<span class="meta">prompt: ${escape(m.prompt_version)}</span>`);
   (s.flags || []).forEach(f => bits.push(`<span class="flag">${escape(f)}</span>`));
+  if (s.expected) {
+    const exp = s.expected;
+    const parts = [];
+    if (exp.order) parts.push(exp.order);
+    if (exp.store_override) parts.push(exp.store_override);
+    if (exp.data_error) parts.push('⚠ ' + exp.data_error);
+    if (parts.length) bits.push(`<div style="margin-top:8px;padding:6px 12px;background:rgba(0,0,0,0.03);border-radius:6px;font-size:12px;color:var(--muted)"><strong style="color:var(--ink)">Ground truth:</strong> ${escape(parts.join(' · '))}</div>`);
+  }
   h.innerHTML = bits.join(' ');
 }
 
