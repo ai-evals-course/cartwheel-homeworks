@@ -12,7 +12,7 @@ If you would like a coding agent to walk you through the assignment, paste the p
 >
 > If something fails, read the error, explain it plainly, and propose a focused fix. Keep a short progress note of what is done and what is next, so we can resume later, and keep a checklist of every deliverable so nothing is skipped. Leave the assessments and the video to me. Do not call the assignment done until every file in the "Files to commit" list exists and the checks in the handout pass.
 >
-> Concepts I need to understand before we use them: what an HTTP endpoint and a session are, why the server, not the conversation, decides who I am, what a trace and a span are, and how the standard `gen_ai.*` fields differ from the application's `cartwheel.*` fields. Diagrams that would help me: the path from my message to the endpoint, the agent, the tools, and the trace, and the tree of spans inside one trace.
+> Separate eval concepts from plumbing. Explain the eval concepts (traces, spans, attributes, prompt versioning) in depth because those are what I need to understand. Treat the infrastructure steps (Docker, endpoints, tokens, environment variables) as a checklist I follow without needing to understand the internals. Concepts I need to understand before we use them: what a trace and a span are, how the standard `gen_ai.*` fields differ from the application's `cartwheel.*` fields, why the server (not the conversation) decides who I am, and what prompt versioning is for. Diagrams that would help me: the path from my message to the endpoint, the agent, the tools, and the trace, and the tree of spans inside one trace.
 
 ## Expected work
 
