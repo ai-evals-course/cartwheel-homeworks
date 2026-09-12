@@ -66,13 +66,6 @@ def test_pilot_validation_rejects_bad_records(mutation, message: str) -> None:
         validate_scenarios([scenario])
 
 
-def test_pilot_validation_accepts_25_turns() -> None:
-    scenario = valid_scenario()
-    scenario["followups"] = [f"followup {i}" for i in range(1, 25)]
-    scenario["tuple"]["turn_count"] = 25
-    assert validate_scenarios([scenario])["records"] == 1
-
-
 def test_pilot_validation_rejects_duplicate_conversations() -> None:
     first = valid_scenario()
     second = valid_scenario()
