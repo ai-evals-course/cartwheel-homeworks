@@ -228,8 +228,41 @@ def list_products(
 
 
 def set_order_status(conn: sqlite3.Connection, order_id: int, status: str) -> None:
-    conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    """Change an order's status.
+
+    Only a delivered order can be refunded, so moving to any other status
+    (cancelled, refunded, ...) also switches off refund_eligible -- otherwise
+    the flag stays stamped True from seed time forever, and a later refund
+    request on an already-settled order slips through.
+    """
+    if status == "delivered":
+        conn.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
+    else:
+        conn.execute(
+            "UPDATE orders SET status = ?, refund_eligible = 0 WHERE id = ?",
+            (status, order_id),
+        )
     conn.commit()
+
+
+def claim_refund(conn: sqlite3.Connection, order_id: int) -> bool:
+    """Atomically move an order from refund-eligible to refunded.
+
+    Returns True if this call made the change, False if the order was
+    already refunded (or otherwise not eligible) -- including when two
+    refund requests for the same order arrive close together, since only one
+    of them can win this conditional UPDATE. Does not commit: the caller
+    commits this together with the refund row it inserts next, so both
+    happen or neither does.
+    """
+    return (
+        conn.execute(
+            "UPDATE orders SET status = 'refunded', refund_eligible = 0 "
+            "WHERE id = ? AND refund_eligible = 1",
+            (order_id,),
+        ).rowcount
+        == 1
+    )
 
 
 def insert_refund(

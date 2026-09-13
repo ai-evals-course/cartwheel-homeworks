@@ -232,6 +232,19 @@ def issue_refund_logic(
             return permission_denied(
                 f"role '{ctx.role}' (user {ctx.user_id}) may not refund order #{order_id}"
             )
+        if order.status == "refunded":
+            # order.refund_eligible is stamped once by the seed script and
+            # never invalidated afterward, so it stays True even once the
+            # order has actually been refunded. Without this explicit check,
+            # a second (or third...) refund could be auto-approved on an
+            # order that already paid out. This also blocks queuing a fresh
+            # refund request against an order that is already settled, which
+            # db.claim_refund below does not cover on its own.
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": f"order #{order_id} has already been refunded",
+            }
         if amount_usd > order.total_usd:
             return {
                 "ok": False,
@@ -270,6 +283,16 @@ def issue_refund_logic(
                     f"a human support agent will review it"
                 ),
             }
+        if not db.claim_refund(conn, order_id):
+            # Guards the race the status check above cannot: two auto-approve
+            # requests for the same order arriving close together could both
+            # read refund_eligible=True before either writes. claim_refund's
+            # conditional UPDATE lets only one of them win.
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": f"order #{order_id} was already refunded",
+            }
         refund_id = db.insert_refund(
             conn,
             order_id=order_id,
@@ -278,7 +301,6 @@ def issue_refund_logic(
             status="auto_approved",
             created_at=today,
         )
-        db.set_order_status(conn, order_id, "refunded")
         return {
             "ok": True,
             "status": "auto_approved",

@@ -6,6 +6,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+from agent import db
 from agent.agent import (
     get_order_logic,
     issue_refund_logic,
@@ -93,3 +94,43 @@ def test_refund_respects_scope(world_copy: Path) -> None:
     result = issue_refund_logic(SHOPPER_2, 4127, 84.0, "not my order")
     assert result["ok"] is False
     assert result["error"] == "permission_denied"
+
+
+def test_refund_rejects_an_already_refunded_order(world_copy: Path) -> None:
+    """order.refund_eligible is stamped once by the seed script and never
+    invalidated, so without an explicit status check a second refund
+    auto-approves on an order that already paid out (issue #28)."""
+    first = issue_refund_logic(SHOPPER_1, 4127, 84.0, "arrived chipped")
+    assert first["ok"] is True and first["status"] == "auto_approved"
+
+    second = issue_refund_logic(SHOPPER_1, 4127, 84.0, "trying again")
+    assert second == {
+        "ok": False,
+        "error": "not_eligible",
+        "reason": "order #4127 has already been refunded",
+    }
+
+    conn = sqlite3.connect(world_copy)
+    try:
+        refund_count = conn.execute(
+            "SELECT COUNT(*) FROM refunds WHERE order_id = 4127"
+        ).fetchone()[0]
+    finally:
+        conn.close()
+    assert refund_count == 1  # exactly one payout, not two
+
+
+def test_claim_refund_is_atomic(world_copy: Path) -> None:
+    """Direct test of the db-layer guard: two calls racing on the same read
+    (both seeing refund_eligible=1 before either writes) must not both be
+    able to claim the same order. The conditional UPDATE means only the
+    first call's rowcount is 1."""
+    conn = db.connect()
+    try:
+        first = db.claim_refund(conn, 4127)
+        second = db.claim_refund(conn, 4127)  # simulates a near-simultaneous retry
+        conn.commit()
+    finally:
+        conn.close()
+    assert first is True
+    assert second is False
