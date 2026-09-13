@@ -6,6 +6,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+import pytest
+
 from agent import db
 from agent.agent import (
     get_order_logic,
@@ -120,17 +122,45 @@ def test_refund_rejects_an_already_refunded_order(world_copy: Path) -> None:
     assert refund_count == 1  # exactly one payout, not two
 
 
-def test_claim_refund_is_atomic(world_copy: Path) -> None:
-    """Direct test of the db-layer guard: two calls racing on the same read
-    (both seeing refund_eligible=1 before either writes) must not both be
-    able to claim the same order. The conditional UPDATE means only the
-    first call's rowcount is 1."""
+def test_claim_refund_is_idempotent_on_one_connection(world_copy: Path) -> None:
+    """Sequential calls on a single connection: the conditional UPDATE's
+    WHERE refund_eligible = 1 means a second call after the first has
+    already claimed the order matches no row. This proves idempotency, not
+    cross-transaction exclusion -- see
+    test_claim_refund_excludes_a_concurrent_connection for that."""
     conn = db.connect()
     try:
         first = db.claim_refund(conn, 4127)
-        second = db.claim_refund(conn, 4127)  # simulates a near-simultaneous retry
+        second = db.claim_refund(conn, 4127)
         conn.commit()
     finally:
         conn.close()
     assert first is True
     assert second is False
+
+
+def test_claim_refund_excludes_a_concurrent_connection(world_copy: Path) -> None:
+    """Real cross-transaction concurrency: two independent connections, not
+    one connection called twice. While connection A's claim is still
+    uncommitted, SQLite's writer-exclusion lock must block connection B's
+    claim attempt on the same order outright (a locked-database error), not
+    silently interleave the two writes. Once A commits, B's conditional
+    UPDATE then runs but matches no row, since refund_eligible is already 0."""
+    conn_a = db.connect(world_copy)
+    conn_b = db.connect(world_copy)
+    conn_b.execute("PRAGMA busy_timeout = 200")
+    try:
+        claimed_a = db.claim_refund(conn_a, 4127)  # left uncommitted on purpose
+
+        with pytest.raises(sqlite3.OperationalError, match="locked"):
+            db.claim_refund(conn_b, 4127)
+
+        conn_a.commit()
+
+        claimed_b = db.claim_refund(conn_b, 4127)
+        conn_b.commit()
+    finally:
+        conn_a.close()
+        conn_b.close()
+    assert claimed_a is True
+    assert claimed_b is False
