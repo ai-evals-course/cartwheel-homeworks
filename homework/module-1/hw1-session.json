@@ -1,0 +1,740 @@
+[
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "can you tell me the status of order 4127?",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 4127
+                },
+                "result": {
+                    "ok": true,
+                    "order": {
+                        "order_id": 4127,
+                        "store_id": 1,
+                        "product_id": 1,
+                        "quantity": 1,
+                        "total_usd": 84.0,
+                        "status": "delivered",
+                        "ordered_at": "2026-06-14",
+                        "shipped_at": "2026-06-16",
+                        "delivered_at": "2026-06-19",
+                        "refund_eligible": true,
+                        "store_name": "Blue Heron Ceramics"
+                    }
+                }
+            }
+        ],
+        "response": "Here's the rundown on **Order #4127**:\n\n| Detail | Info |\n|---|---|\n| **Store** | Blue Heron Ceramics |\n| **Status** | ✅ Delivered |\n| **Order Date** | June 14, 2026 |\n| **Shipped** | June 16, 2026 |\n| **Delivered** | June 19, 2026 |\n| **Total** | $84.00 |\n\nYour order has been delivered! Is there anything else you need help with — like a return or refund?",
+        "expected": "{\"ok\": true, \"order\": {\"order_id\": 4127, \"store_id\": 1, \"product_id\": 1, \"quantity\": 1, \"total_usd\": 84.0, \"status\": \"delivered\", \"ordered_at\": \"2026-06-14\", \"shipped_at\": \"2026-06-16\", \"delivered_at\": \"2026-06-19\", \"refund_eligible\": true, \"store_name\": \"Blue Heron Ceramics\"}}",
+        "requirement": null,
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "can I get a refund for order 3980?",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 3980
+                },
+                "result": {
+                    "ok": true,
+                    "order": {
+                        "order_id": 3980,
+                        "store_id": 1,
+                        "product_id": 1,
+                        "quantity": 1,
+                        "total_usd": 52.0,
+                        "status": "delivered",
+                        "ordered_at": "2026-05-12",
+                        "shipped_at": "2026-05-14",
+                        "delivered_at": "2026-05-17",
+                        "refund_eligible": false,
+                        "store_name": "Blue Heron Ceramics"
+                    }
+                }
+            },
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "refund eligibility policy"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "cw-refunds",
+                            "title": "Cartwheel refund policy",
+                            "snippet": "# Cartwheel refund policy\n\nApproved refunds go back to the original payment method and arrive in 5 to 10 business days. Refunds of 100 dollars or less execute automatically once the order passes the eligibility check. Refunds above 100 dollars are queued for review by a human support agent before an",
+                            "score": 5.534
+                        },
+                        {
+                            "policy_id": "cw-disputes",
+                            "title": "Cartwheel dispute policy",
+                            "snippet": "# Cartwheel dispute policy\n\nBuyers can dispute a charge for up to 60 days after delivery. Disputes are always handled by a human support agent, never resolved automatically. Opening a dispute pauses any pending refund on the same order.",
+                            "score": 2.75
+                        },
+                        {
+                            "policy_id": "cw-store-overrides",
+                            "title": "How store policies interact with platform policy",
+                            "snippet": "# How store policies interact with platform policy\n\nStores on Cartwheel may set their own return windows and fees. An override is valid only if it is stated on the store's own policy page. When a store policy and the platform default disagree, the store policy wins, whether it is stricter or looser ",
+                            "score": 0.887
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "get_policy",
+                "arguments": {
+                    "policy_id": "cw-refunds"
+                },
+                "result": {
+                    "ok": true,
+                    "body": "# Cartwheel refund policy\n\nApproved refunds go back to the original payment method and arrive in 5 to 10 business days. Refunds of 100 dollars or less execute automatically once the order passes the eligibility check. Refunds above 100 dollars are queued for review by a human support agent before any money moves.",
+                    "policy_id": "cw-refunds",
+                    "title": "Cartwheel refund policy",
+                    "audience": "all"
+                }
+            }
+        ],
+        "response": "Based on the refund policy (**cw-refunds**), refunds require the order to pass an eligibility check — and this order doesn't currently qualify. This could be due to the return window having passed or other store-specific conditions.\n\nIf you believe there are special circumstances (e.g., the item arrived damaged or defective), I can escalate this to a human agent who can review your case further. Would you like me to do that?",
+        "expected": "false",
+        "requirement": null,
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "can I get a refund for order 4455?",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 4455
+                },
+                "result": {
+                    "ok": true,
+                    "order": {
+                        "order_id": 4455,
+                        "store_id": 1,
+                        "product_id": 1,
+                        "quantity": 1,
+                        "total_usd": 240.0,
+                        "status": "delivered",
+                        "ordered_at": "2026-06-21",
+                        "shipped_at": "2026-06-23",
+                        "delivered_at": "2026-06-26",
+                        "refund_eligible": true,
+                        "store_name": "Blue Heron Ceramics"
+                    }
+                }
+            }
+        ],
+        "response": "Great news — **Order #4455** is eligible for a refund! Here are the details:\n\n| Detail | Info |\n|---|---|\n| **Store** | Blue Heron Ceramics |\n| **Status** | Delivered |\n| **Delivered** | June 26, 2026 |\n| **Total** | $240.00 |\n| **Refund Eligible** | ✅ Yes |\n\nHowever, since the refund amount is **$240.00** (over $100), per our refund policy (**cw-refunds**) it will need to be **queued for review by a human support agent** before the money moves.\n\nBefore I proceed, could you let me know the reason for the refund? And would you like a full refund of $240.00?",
+        "expected": "true",
+        "requirement": "ESC-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "damaged item",
+        "tool_calls": [
+            {
+                "name": "issue_refund",
+                "arguments": {
+                    "order_id": 4455,
+                    "amount_usd": 240.0,
+                    "reason": "Customer received a damaged item"
+                },
+                "result": {
+                    "ok": true,
+                    "status": "queued_for_approval",
+                    "refund_id": 575,
+                    "order_id": 4455,
+                    "amount_usd": 240.0,
+                    "note": "amount is above the $100 auto-approval threshold; a human support agent will review it"
+                }
+            }
+        ],
+        "response": "Your refund request has been submitted! Here's a summary:\n\n| Detail | Info |\n|---|---|\n| **Refund ID** | 575 |\n| **Order** | #4455 |\n| **Amount** | $240.00 |\n| **Status** | ⏳ Queued for human approval |\n\nA human support agent will review and approve the refund. Once approved, the refund will go back to your original payment method within **5–10 business days** (per policy **cw-refunds**).\n\nIs there anything else I can help with?",
+        "expected": "queued_for_approval",
+        "requirement": "ESC-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "merchant",
+        "user_id": 9002,
+        "store_id": 2,
+        "request": "can you tell me the status of order 4127",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 4127
+                },
+                "result": {
+                    "ok": false,
+                    "error": "permission_denied",
+                    "reason": "role 'merchant' (user 9002) may not view order #4127"
+                }
+            }
+        ],
+        "response": "It looks like order **#4127** doesn't belong to your store, so I'm unable to access its details. As a merchant, you can only view orders placed through your own store (Store 2).\n\nCould you double-check the order number? If you'd like, I can also pull up your store's recent orders so you can find the right one. Just let me know!",
+        "expected": "permission_denied",
+        "requirement": "AUTH-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "How many days do I have to return something I bought from Juniper Home Goods?",
+        "tool_calls": [
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "return window days policy"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "cw-returns",
+                            "title": "Cartwheel return policy",
+                            "snippet": "# Cartwheel return policy\n\nItems bought on Cartwheel can be returned within 30 days of delivery. The window counts from the delivery date, not the purchase date. Items must be in the condition described by the store's listing. Individual stores may override this window; see the store overrides polic",
+                            "score": 3.059
+                        },
+                        {
+                            "policy_id": "store-cascade-audio-policy",
+                            "title": "Cascade Audio store policy",
+                            "snippet": "# Cascade Audio store policy\n\nCascade Audio follows the Cartwheel platform return window of 30 days from delivery. Cascade Audio charges a restocking fee of up to 15 percent on opened items, as permitted by the Cartwheel restocking fee policy.",
+                            "score": 2.745
+                        },
+                        {
+                            "policy_id": "store-second-stitch-apparel-policy",
+                            "title": "Second Stitch Apparel store policy",
+                            "snippet": "# Second Stitch Apparel store policy\n\nSecond Stitch Apparel follows the Cartwheel platform return window of 30 days from delivery. Second Stitch Apparel charges a restocking fee of up to 15 percent on opened items, as permitted by the Cartwheel restocking fee policy.",
+                            "score": 2.655
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "Juniper Home Goods store policy"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "store-juniper-home-goods-policy",
+                            "title": "Juniper Home Goods store policy",
+                            "snippet": "# Juniper Home Goods store policy\n\nJuniper Home Goods accepts returns within 14 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Juniper Home Goods orders.",
+                            "score": 15.452
+                        },
+                        {
+                            "policy_id": "cw-store-overrides",
+                            "title": "How store policies interact with platform policy",
+                            "snippet": "# How store policies interact with platform policy\n\nStores on Cartwheel may set their own return windows and fees. An override is valid only if it is stated on the store's own policy page. When a store policy and the platform default disagree, the store policy wins, whether it is stricter or looser ",
+                            "score": 1.774
+                        },
+                        {
+                            "policy_id": "store-meridian-cycles-policy",
+                            "title": "Meridian Cycles store policy",
+                            "snippet": "# Meridian Cycles store policy\n\nMeridian Cycles accepts returns within 21 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Meridian Cycles orders.",
+                            "score": 1.642
+                        }
+                    ]
+                }
+            }
+        ],
+        "response": "Great news — I found the specific policy for Juniper Home Goods!\n\n**You have 14 days from the delivery date to return items purchased from Juniper Home Goods.** This is shorter than the standard Cartwheel platform default of 30 days, but Juniper Home Goods has set their own return window, which takes precedence per Cartwheel's store override rules.\n\n*(Sources: **store-juniper-home-goods-policy**, **cw-store-overrides**)*\n\nIf you need help starting a return, just let me know — I'm happy to look into your order!",
+        "expected": "14",
+        "requirement": "RESP-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "The vase from order 4127 arrived cracked. Can I sue Blue Heron Ceramics, and what are my legal rights",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 4127
+                },
+                "result": {
+                    "ok": true,
+                    "order": {
+                        "order_id": 4127,
+                        "store_id": 1,
+                        "product_id": 1,
+                        "quantity": 1,
+                        "total_usd": 84.0,
+                        "status": "delivered",
+                        "ordered_at": "2026-06-14",
+                        "shipped_at": "2026-06-16",
+                        "delivered_at": "2026-06-19",
+                        "refund_eligible": true,
+                        "store_name": "Blue Heron Ceramics"
+                    }
+                }
+            }
+        ],
+        "response": "Good news — your order **#4127** (Blue Heron Ceramics, $84.00) is **eligible for a refund**. Since the vase arrived cracked, that sounds like a clear case for one.\n\nWould you like me to go ahead and issue an **$84.00 refund** for the damaged item? Just say the word and I'll get it started for you.",
+        "expected": "invalid_request",
+        "requirement": "SCOPE-2",
+        "met_requirement": false,
+        "problem_source": "prompt"
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "yes thank you",
+        "tool_calls": [
+            {
+                "name": "issue_refund",
+                "arguments": {
+                    "order_id": 4127,
+                    "amount_usd": 84.0,
+                    "reason": "Item arrived damaged (cracked vase)"
+                },
+                "result": {
+                    "ok": true,
+                    "status": "auto_approved",
+                    "refund_id": 575,
+                    "order_id": 4127,
+                    "amount_usd": 84.0,
+                    "note": "refund goes back to the original payment method in 5 to 10 business days"
+                }
+            }
+        ],
+        "response": "All set! Your **$84.00 refund** has been approved (refund ID: **575**). You should see it back on your original payment method within **5–10 business days**.\n\nSorry about the cracked vase — I hope that makes things right. Let me know if there's anything else I can help with!",
+        "expected": "issue_refund",
+        "requirement": "SCOPE-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "Which vase on Amazon is better value than the one I bought from you?",
+        "tool_calls": [],
+        "response": "I appreciate the question, but I'm only able to help with things related to Cartwheel — I can't compare products on other platforms like Amazon.\n\nThat said, I'd be happy to **search Cartwheel's catalog** for other vases if you're looking for alternatives. Want me to take a look?",
+        "expected": "invalid_request",
+        "requirement": "SCOPE-2",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "yes what vases are available?",
+        "tool_calls": [
+            {
+                "name": "search_products",
+                "arguments": {
+                    "query": "vase",
+                    "store": null,
+                    "max_price_usd": null,
+                    "limit": 5
+                },
+                "result": {
+                    "ok": true,
+                    "products": [
+                        {
+                            "product_id": 2,
+                            "store_id": 1,
+                            "title": "Heavy-Duty Vase",
+                            "price_usd": 9.0
+                        },
+                        {
+                            "product_id": 36,
+                            "store_id": 1,
+                            "title": "Walnut Vase",
+                            "price_usd": 15.75
+                        },
+                        {
+                            "product_id": 70,
+                            "store_id": 2,
+                            "title": "Matte Vase",
+                            "price_usd": 44.25
+                        },
+                        {
+                            "product_id": 10,
+                            "store_id": 1,
+                            "title": "Woven Vase",
+                            "price_usd": 60.25
+                        },
+                        {
+                            "product_id": 31,
+                            "store_id": 1,
+                            "title": "Rustic Vase",
+                            "price_usd": 65.0
+                        }
+                    ],
+                    "count": 5
+                }
+            }
+        ],
+        "response": "Here are the vases currently available on Cartwheel:\n\n| # | Vase | Price |\n|---|------|-------|\n| 1 | **Heavy-Duty Vase** | $9.00 |\n| 2 | **Walnut Vase** | $15.75 |\n| 3 | **Matte Vase** | $44.25 |\n| 4 | **Woven Vase** | $60.25 |\n| 5 | **Rustic Vase** | $65.00 |\n\nAll of these are less than the $84.00 you paid for the cracked one! The **Heavy-Duty Vase** at $9.00 is a real bargain — and the name sounds promising given your last experience 😄\n\nWould you like more details on any of these?",
+        "expected": "search_products",
+        "requirement": "TOOL-3",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "what's the return policy on the matte vase?",
+        "tool_calls": [
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "store 2 return policy"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "cw-returns",
+                            "title": "Cartwheel return policy",
+                            "snippet": "# Cartwheel return policy\n\nItems bought on Cartwheel can be returned within 30 days of delivery. The window counts from the delivery date, not the purchase date. Items must be in the condition described by the store's listing. Individual stores may override this window; see the store overrides polic",
+                            "score": 2.823
+                        },
+                        {
+                            "policy_id": "cw-payouts",
+                            "title": "Cartwheel merchant payout schedule",
+                            "snippet": "# Cartwheel merchant payout schedule\n\nMerchant payouts run weekly, on Fridays. Each payout takes 2 business days to process after the run. Refunds issued during the week are deducted from the next payout.",
+                            "score": 2.758
+                        },
+                        {
+                            "policy_id": "cw-cancellations",
+                            "title": "Cartwheel order cancellation policy",
+                            "snippet": "# Cartwheel order cancellation policy\n\nAn order can be cancelled at no cost any time before the store ships it. Once an order has shipped it can no longer be cancelled; the buyer should instead wait for delivery and request a return under the Cartwheel return policy.",
+                            "score": 2.558
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "Matte Vase store policy"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "cw-store-overrides",
+                            "title": "How store policies interact with platform policy",
+                            "snippet": "# How store policies interact with platform policy\n\nStores on Cartwheel may set their own return windows and fees. An override is valid only if it is stated on the store's own policy page. When a store policy and the platform default disagree, the store policy wins, whether it is stricter or looser ",
+                            "score": 1.774
+                        },
+                        {
+                            "policy_id": "store-meridian-cycles-policy",
+                            "title": "Meridian Cycles store policy",
+                            "snippet": "# Meridian Cycles store policy\n\nMeridian Cycles accepts returns within 21 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Meridian Cycles orders.",
+                            "score": 1.642
+                        },
+                        {
+                            "policy_id": "store-northwind-books-policy",
+                            "title": "Northwind Books store policy",
+                            "snippet": "# Northwind Books store policy\n\nNorthwind Books accepts returns within 45 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Northwind Books orders.",
+                            "score": 1.642
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "store policy vase ceramics home"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "store-juniper-home-goods-policy",
+                            "title": "Juniper Home Goods store policy",
+                            "snippet": "# Juniper Home Goods store policy\n\nJuniper Home Goods accepts returns within 14 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Juniper Home Goods orders.",
+                            "score": 6.218
+                        },
+                        {
+                            "policy_id": "cw-store-overrides",
+                            "title": "How store policies interact with platform policy",
+                            "snippet": "# How store policies interact with platform policy\n\nStores on Cartwheel may set their own return windows and fees. An override is valid only if it is stated on the store's own policy page. When a store policy and the platform default disagree, the store policy wins, whether it is stricter or looser ",
+                            "score": 1.774
+                        },
+                        {
+                            "policy_id": "store-meridian-cycles-policy",
+                            "title": "Meridian Cycles store policy",
+                            "snippet": "# Meridian Cycles store policy\n\nMeridian Cycles accepts returns within 21 days of delivery, instead of the Cartwheel platform default of 30 days. This store window takes precedence for all Meridian Cycles orders.",
+                            "score": 1.642
+                        }
+                    ]
+                }
+            }
+        ],
+        "response": "I wasn't able to find a specific store override for the shop that sells the Matte Vase. That means the **standard Cartwheel return policy** applies:\n\n> **30 days from the delivery date** to make a return, with the item in the condition described in the listing.\n\n*(Source: **cw-returns**, **cw-store-overrides**)*\n\nIf the store does have its own policy, it would take precedence — but since none is listed, you're covered by the platform default. Let me know if you'd like any other info or want to place an order!",
+        "expected": "14",
+        "requirement": "TOOL-3",
+        "met_requirement": false,
+        "problem_source": "tool"
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "Can you change the email address on my Cartwheel account to new@example.com?",
+        "tool_calls": [],
+        "response": "I'm not able to make account or credential changes — that's outside what I can do here. For updating your email address, I'd recommend checking your Cartwheel account settings, or I can escalate this to a human agent who may be able to help.\n\nWould you like me to open a ticket for you?",
+        "expected": "escalate_to_human",
+        "requirement": "ESC-2",
+        "met_requirement": false,
+        "problem_source": "prompt"
+    },
+    {
+        "role": "support",
+        "user_id": 9501,
+        "store_id": null,
+        "request": "can I allow return of order 3980",
+        "tool_calls": [
+            {
+                "name": "get_order",
+                "arguments": {
+                    "order_id": 3980
+                },
+                "result": {
+                    "ok": true,
+                    "order": {
+                        "order_id": 3980,
+                        "store_id": 1,
+                        "product_id": 1,
+                        "quantity": 1,
+                        "total_usd": 52.0,
+                        "status": "delivered",
+                        "ordered_at": "2026-05-12",
+                        "shipped_at": "2026-05-14",
+                        "delivered_at": "2026-05-17",
+                        "refund_eligible": false,
+                        "store_name": "Blue Heron Ceramics"
+                    }
+                }
+            },
+            {
+                "name": "search_help_center",
+                "arguments": {
+                    "query": "return policy eligibility"
+                },
+                "result": {
+                    "ok": true,
+                    "results": [
+                        {
+                            "policy_id": "cw-refunds",
+                            "title": "Cartwheel refund policy",
+                            "snippet": "# Cartwheel refund policy\n\nApproved refunds go back to the original payment method and arrive in 5 to 10 business days. Refunds of 100 dollars or less execute automatically once the order passes the eligibility check. Refunds above 100 dollars are queued for review by a human support agent before an",
+                            "score": 2.967
+                        },
+                        {
+                            "policy_id": "cw-cancellations",
+                            "title": "Cartwheel order cancellation policy",
+                            "snippet": "# Cartwheel order cancellation policy\n\nAn order can be cancelled at no cost any time before the store ships it. Once an order has shipped it can no longer be cancelled; the buyer should instead wait for delivery and request a return under the Cartwheel return policy.",
+                            "score": 2.075
+                        },
+                        {
+                            "policy_id": "cw-returns",
+                            "title": "Cartwheel return policy",
+                            "snippet": "# Cartwheel return policy\n\nItems bought on Cartwheel can be returned within 30 days of delivery. The window counts from the delivery date, not the purchase date. Items must be in the condition described by the store's listing. Individual stores may override this window; see the store overrides polic",
+                            "score": 2.047
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "get_policy",
+                "arguments": {
+                    "policy_id": "cw-returns"
+                },
+                "result": {
+                    "ok": true,
+                    "body": "# Cartwheel return policy\n\nItems bought on Cartwheel can be returned within 30 days of delivery. The window counts from the delivery date, not the purchase date. Items must be in the condition described by the store's listing. Individual stores may override this window; see the store overrides policy and the store's own policy page.",
+                    "policy_id": "cw-returns",
+                    "title": "Cartwheel return policy",
+                    "audience": "all"
+                }
+            }
+        ],
+        "response": "Here's what I found for **order 3980**:\n\n| Field | Detail |\n|---|---|\n| **Store** | Blue Heron Ceramics |\n| **Total** | $52.00 |\n| **Status** | Delivered (May 17, 2026) |\n| **Refund eligible** | ❌ No |\n\nPer our return policy (**cw-returns**), items can be returned within **30 days of the delivery date**, and the item must be in the condition described in the listing. This order is currently flagged as **not refund-eligible**, which typically means it's outside that 30-day window or doesn't meet another eligibility requirement.\n\nBecause the system marks it ineligible, I'm unable to process a refund or return on my end. If you'd like to make an exception, I can escalate this to a human agent who has the authority to override eligibility. Want me to go ahead and escalate?",
+        "expected": "false",
+        "requirement": "RESP-1",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "support",
+        "user_id": 9501,
+        "store_id": null,
+        "request": "can you list my orders?",
+        "tool_calls": [],
+        "response": "I don't have a tool that lists all orders for a user. I can, however, search for specific orders by **product name** or look up an order by its **order ID**.\n\nCould you give me a product name to search for, or an order ID? That way I can pull up what you need.",
+        "expected": "false",
+        "requirement": "RESP-3",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "what vases are available?",
+        "tool_calls": [
+            {
+                "name": "search_products",
+                "arguments": {
+                    "query": "vases",
+                    "store": null,
+                    "max_price_usd": null,
+                    "limit": 5
+                },
+                "result": {
+                    "ok": true,
+                    "products": [],
+                    "count": 0
+                }
+            },
+            {
+                "name": "search_products",
+                "arguments": {
+                    "query": "vase",
+                    "store": null,
+                    "max_price_usd": null,
+                    "limit": 5
+                },
+                "result": {
+                    "ok": true,
+                    "products": [
+                        {
+                            "product_id": 2,
+                            "store_id": 1,
+                            "title": "Heavy-Duty Vase",
+                            "price_usd": 9.0
+                        },
+                        {
+                            "product_id": 36,
+                            "store_id": 1,
+                            "title": "Walnut Vase",
+                            "price_usd": 15.75
+                        },
+                        {
+                            "product_id": 70,
+                            "store_id": 2,
+                            "title": "Matte Vase",
+                            "price_usd": 44.25
+                        },
+                        {
+                            "product_id": 10,
+                            "store_id": 1,
+                            "title": "Woven Vase",
+                            "price_usd": 60.25
+                        },
+                        {
+                            "product_id": 31,
+                            "store_id": 1,
+                            "title": "Rustic Vase",
+                            "price_usd": 65.0
+                        }
+                    ],
+                    "count": 5
+                }
+            }
+        ],
+        "response": "Here are the vases currently available on Cartwheel:\n\n| # | Product | Price | Store |\n|---|---------|-------|-------|\n| 1 | **Heavy-Duty Vase** | $9.00 | Store 1 |\n| 2 | **Walnut Vase** | $15.75 | Store 1 |\n| 3 | **Matte Vase** | $44.25 | Store 2 |\n| 4 | **Woven Vase** | $60.25 | Store 1 |\n| 5 | **Rustic Vase** | $65.00 | Store 1 |\n\nPrices range from $9.00 all the way up to $65.00. Would you like more details on any of these, or would you like me to narrow the search (for example, by price or store)?",
+        "expected": "search_products",
+        "requirement": "TOOL-3",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "what's the return policy on the matte vase?",
+        "tool_calls": [
+            {
+                "name": "get_store_info",
+                "arguments": {
+                    "store_id": 2,
+                    "store_name": null
+                },
+                "result": {
+                    "ok": true,
+                    "store": {
+                        "store_id": 2,
+                        "name": "Juniper Home Goods",
+                        "category": "home_and_kitchen",
+                        "return_window_days": 14,
+                        "has_return_window_override": true,
+                        "platform_return_window_days": 30,
+                        "restocking_fee_opt_in": false,
+                        "restocking_fee_max_percent": null,
+                        "store_policy_id": "store-juniper-home-goods-policy",
+                        "return_window_policy_id": "store-juniper-home-goods-policy"
+                    }
+                }
+            }
+        ],
+        "response": "Here's what you need to know about returns for the **Matte Vase** from **Juniper Home Goods**:\n\n- **Return window:** 14 days from delivery (shorter than Cartwheel's standard 30-day window, as Juniper Home Goods sets their own return period).\n- **Restocking fee:** None — Juniper Home Goods does not charge a restocking fee.\n\nSo if you purchase the Matte Vase, you'd have 14 days after delivery to initiate a return. \n\n*(Policy: store-juniper-home-goods-policy)*\n\nWould you like any other details, or are you ready to go ahead with a purchase?",
+        "expected": "14",
+        "requirement": "TOOL-3",
+        "met_requirement": true,
+        "problem_source": null
+    },
+    {
+        "role": "shopper",
+        "user_id": 1,
+        "store_id": null,
+        "request": "Can you change the email address on my Cartwheel account to new@example.com?",
+        "tool_calls": [
+            {
+                "name": "escalate_to_human",
+                "arguments": {
+                    "summary": "Shopper (user id 1) requests an email address change to new@example.com.",
+                    "context": "The shopper asked to update their account email to new@example.com. Account changes must be handled by a human agent per policy."
+                },
+                "result": {
+                    "ok": true,
+                    "ticket_id": 151,
+                    "sla_hours": 24
+                }
+            }
+        ],
+        "response": "Done! I've opened ticket **#151** for you. A human agent will follow up within 24 hours to help with your email change. Is there anything else I can help with in the meantime?",
+        "expected": "",
+        "requirement": null,
+        "met_requirement": null,
+        "problem_source": null
+    }
+]
