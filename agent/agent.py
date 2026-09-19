@@ -421,6 +421,22 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def get_store_info(
+    wrapper: RunContextWrapper[AuthContext],
+    store_id: int | None = None,
+    store_name: str | None = None,
+) -> dict[str, Any]:
+    """Look up a store by its store_id (as found on a product or an order) or by name.
+
+    Returns the store's name, the return window that applies to it (stores may
+    override the platform default), whether it charges a restocking fee, and the
+    policy id to cite. Use it before answering a return or fee question about a
+    specific store, product, or order. Give exactly one of store_id or store_name.
+    """
+    return _call(wrapper, hw_tools.get_store_info, store_id, store_name)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -429,6 +445,7 @@ _COMMON_TOOLS = [
     search_help_center,
     get_policy,
     search_products,
+    get_store_info,
     get_order,
     issue_refund,
     cancel_order,
