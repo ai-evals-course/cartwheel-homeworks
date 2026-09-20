@@ -37,6 +37,8 @@ from fastapi import FastAPI, Header, HTTPException
 from opentelemetry import trace
 from pydantic import BaseModel
 
+from langfuse import propagate_attributes
+
 from agent import db
 from agent.agent import build_agent, prompt_version
 from agent.auth import ROLES, AuthContext
@@ -189,28 +191,51 @@ async def post_message(
     agent = build_agent(ctx, model=body.model)
     version = prompt_version()
     capture = os.environ.get("TRACELOOP_TRACE_CONTENT", "false").lower() == "true"
-    with _tracer.start_as_current_span("cartwheel.session_message") as span:
-        if span.is_recording():
-            span.set_attribute("cartwheel.session_id", session_id)
-            span.set_attribute("cartwheel.user_role", ctx.role)
-            span.set_attribute("cartwheel.user_id", str(ctx.user_id))
-            span.set_attribute("cartwheel.prompt_version", version)
-            if body.scenario_id:
-                span.set_attribute("cartwheel.scenario_id", body.scenario_id)
-            if capture:
-                span.set_attribute(
-                    "gen_ai.input.messages",
-                    json.dumps([{"role": "user", "parts": [{"type": "text", "content": body.message}]}]),
-                )
-        result = await Runner.run(
-            agent, body.message, session=session, context=ctx, max_turns=MAX_TURNS
-        )
-        reply = str(result.final_output)
-        if span.is_recording() and capture:
-            span.set_attribute(
-                "gen_ai.output.messages",
-                json.dumps([{"role": "assistant", "parts": [{"type": "text", "content": reply}]}]),
+    trace_metadata: dict[str, str] = {
+        "cartwheel.session_id": session_id,
+        "cartwheel.user_role": ctx.role,
+        "cartwheel.user_id": str(ctx.user_id),
+        "cartwheel.prompt_version": version,
+    }
+    if body.scenario_id:
+        trace_metadata["cartwheel.scenario_id"] = body.scenario_id
+    with propagate_attributes(session_id=session_id, metadata=trace_metadata):
+        with _tracer.start_as_current_span("cartwheel.session_message") as span:
+            if span.is_recording():
+                span.set_attribute("cartwheel.session_id", session_id)
+                span.set_attribute("cartwheel.user_role", ctx.role)
+                span.set_attribute("cartwheel.user_id", str(ctx.user_id))
+                span.set_attribute("cartwheel.prompt_version", version)
+                if body.scenario_id:
+                    span.set_attribute("cartwheel.scenario_id", body.scenario_id)
+                if capture:
+                    span.set_attribute(
+                        "gen_ai.input.messages",
+                        json.dumps(
+                            [
+                                {
+                                    "role": "user",
+                                    "parts": [{"type": "text", "content": body.message}],
+                                }
+                            ]
+                        ),
+                    )
+            result = await Runner.run(
+                agent, body.message, session=session, context=ctx, max_turns=MAX_TURNS
             )
+            reply = str(result.final_output)
+            if span.is_recording() and capture:
+                span.set_attribute(
+                    "gen_ai.output.messages",
+                    json.dumps(
+                        [
+                            {
+                                "role": "assistant",
+                                "parts": [{"type": "text", "content": reply}],
+                            }
+                        ]
+                    ),
+                )
     return {"session_id": session_id, "reply": reply, "prompt_version": version}
 
 

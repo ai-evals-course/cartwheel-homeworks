@@ -45,7 +45,13 @@ from agent import db
 from agent.agent import build_agent, prompt_version
 from agent.auth import AuthContext
 from agent.config import REPO_ROOT
-from observability.instrument import load_env, setup_openai_tracing, setup_tracing
+from observability.instrument import (
+    flush_workshop,
+    load_env,
+    setup_openai_tracing,
+    setup_tracing,
+    setup_workshop,
+)
 
 DEFAULT_USERS = {"shopper": 1, "merchant": 9001, "support": 9501}
 MAX_TURNS = 12  # cap runaway loops; keeps conversations bounded
@@ -102,10 +108,11 @@ async def chat(
     defenses: bool = False,
     debug: bool = False,
     tracing: bool = False,
+    workshop: bool = False,
 ) -> None:
     agent = build_agent(ctx, model=model, defenses=defenses)
-    # main() enables callbacks for Langfuse or explicit OpenAI tracing.
-    run_config = RunConfig(tracing_disabled=not tracing)
+    # OpenAI Agents tracing must stay on for Langfuse and/or Workshop processors.
+    run_config = RunConfig(tracing_disabled=not (tracing or workshop))
     session = SQLiteSession(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
     )
@@ -218,9 +225,20 @@ def main() -> None:
         except ValueError as exc:
             parser.error(str(exc))
     ctx = resolve_auth(args.role, args.user)
-    asyncio.run(
-        chat(ctx, args.model, defenses=args.defenses, debug=args.debug, tracing=tracing)
-    )
+    workshop = setup_workshop(user_id=str(ctx.user_id))
+    try:
+        asyncio.run(
+            chat(
+                ctx,
+                args.model,
+                defenses=args.defenses,
+                debug=args.debug,
+                tracing=tracing,
+                workshop=workshop,
+            )
+        )
+    finally:
+        flush_workshop()
 
 
 if __name__ == "__main__":

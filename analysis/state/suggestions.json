@@ -1,1 +1,36 @@
-[]
+[
+  {
+    "mode": "premature_refund_offer",
+    "trace_id": "0500ad44a6eb6ec1ed8bf4b7cc9418b0",
+    "quote": "Depth search neighbor for premature_refund_offer",
+    "status": "rejected",
+    "reason": "Reviewed after batch-4 retrieval. Open code: no issue. Agent discussed refunds only after order context was established; not refund-before-confirm.",
+    "reviewed_at": "2026-09-17T17:30:00+00:00"
+  },
+  {
+    "mode": "premature_refund_offer",
+    "trace_id": "068c89e996aedc0b6795a496b413a8f2",
+    "quote": "Depth search neighbor for premature_refund_offer",
+    "status": "rejected",
+    "reason": "Reviewed after batch-4 retrieval. Open code: no issue. Close negative for premature_refund_offer; mode dropped from final taxonomy.",
+    "reviewed_at": "2026-09-17T17:32:00+00:00"
+  },
+  {
+    "mode": "insufficient_order_context",
+    "trace_id": "0f5fb35b-58d9-44dd-9a75-acab62470e29",
+    "source": "workshop",
+    "quote": "Merchant order table lists order ids without links",
+    "status": "rejected",
+    "reason": "Workshop hypothesis only. Same product fix as existing insufficient_order_context; not a separate mode.",
+    "reviewed_at": "2026-09-17T22:45:00+00:00"
+  },
+  {
+    "mode": "unconfirmed_write",
+    "trace_id": "e561d9c7-9357-40ce-83ef-543191cbc47e",
+    "source": "workshop",
+    "quote": "Refund policy language on already-refunded order",
+    "status": "rejected",
+    "reason": "Workshop run. No issue_refund call; reply states order already refunded. Close negative for unconfirmed_write.",
+    "reviewed_at": "2026-09-17T22:45:00+00:00"
+  }
+]

@@ -1,1 +1,263 @@
-{"modes": []}
+{
+  "status": "final",
+  "reviewed_trace_count": 100,
+  "rejected_modes": [
+    {
+      "name": "unconfirmed_write",
+      "reason": "Only one open-code instance after 100 traces. Overlaps duplicate_escalation_ticket and RESP-2; insufficient evidence for a separate binary mode."
+    },
+    {
+      "name": "premature_refund_offer",
+      "reason": "Single positive example; depth-search neighbors were close negatives. Fold into insufficient_order_context at labeling time when confirmation is missing."
+    },
+    {
+      "name": "insufficient_refusal_explanation",
+      "reason": "Single example; boundary with excessive_policy_exposition and abrupt_no_next_step was unclear after batch 4."
+    },
+    {
+      "name": "inefficient_tool_strategy",
+      "reason": "Single example; no confirming traces in depth search."
+    },
+    {
+      "name": "invalid_product_in_results",
+      "reason": "Merged into customer_unfriendly_formatting as invalid or misleading product presentation in replies and search results."
+    }
+  ],
+  "modes": [
+    {
+      "name": "excessive_policy_exposition",
+      "status": "final",
+      "definition": "The agent's reply includes unnecessary policy content, cites an internal policy identifier (for example `cw-returns`) in a shopper-facing reply, or cites platform Cartwheel policy when the user's order or store context calls for a store-specific answer.",
+      "boundary": "Fail per RESP-1 on internal policy ids, operational ids (refund request id), wrong-store platform policy dumps, or policy body text beyond what the question needs. Pass when the reply cites the relevant policy by human-readable title only, or makes no policy claims.",
+      "requirement_source": "RESP-1",
+      "evaluator_type": "llm_judge",
+      "count": 29,
+      "example_trace_ids": [
+        "db615d177ce3d84057cdbe4d08198b45",
+        "27c3e28767edf6baeaf4d3f146c8ada4",
+        "09eeff7735e6a1bb261f436a75791bdb",
+        "0029ed9d450f94973e805fc95c52da6f",
+        "080eee967d07af4af4f5e588159d0d7e",
+        "0812252fd59d5a8a82549d5ff45503cc",
+        "65df2b7462d04e429b293c17c4623304",
+        "750ee1298733d7314323d8f6972cfbfb",
+        "e6895b1d637482cb74b8a636631daf8c",
+        "5e8cf4c0a17ef207d958bb7c8ba41a19"
+      ],
+      "close_negative_trace_ids": [
+        "846d8497c408609a8813ee0a9f6c5b80",
+        "a29b95b636c86ca345221a2c2935a1e3",
+        "1e281cb3b1209f88452584b0ff2b4b87",
+        "00557e9b731aa3ab1f3afbf27430e79a",
+        "424413169fb67560ba64d87ea97c86c9",
+        "d75862299c48ab1eb67006fddca48191",
+        "a1f360448566af512703f3d1491ea341",
+        "d707f59b58842d24e2bbd2960b9ad003"
+      ],
+      "example_quotes": [
+        "still provides policy details",
+        "Policy: cw-refunds Refund request ID: 610",
+        "policy id provided",
+        "order is from harbor knits not cartwheel"
+      ],
+      "created_from": [
+        "oc1789602239366",
+        "oc1789602313783",
+        "oc1789602558487",
+        "oc1789602593367",
+        "oc1789657342397",
+        "oc1789657361038",
+        "oc1789657896024",
+        "oc1789657981134",
+        "oc1789658193166",
+        "oc1789658910047",
+        "oc1789658945760",
+        "oc1789660157608",
+        "oc1789660177850",
+        "oc1789665912288",
+        "oc1789665937842",
+        "oc1789665983880",
+        "oc1789666067616",
+        "oc1789666245412",
+        "oc1789666291764",
+        "oc1789666549582",
+        "oc1789666584346",
+        "oc1789666645768",
+        "oc1789666652471",
+        "oc1789666679519",
+        "oc1789671091777",
+        "oc1789671116660",
+        "oc1789671456068",
+        "oc1789671554930"
+      ]
+    },
+    {
+      "name": "insufficient_order_context",
+      "status": "final",
+      "definition": "The agent discusses a specific order or product without enough context for the recipient to identify the record or act (missing order or product link, tracking details, product title or summary, or delivery location when the user asked where an order is).",
+      "boundary": "Fail per RESP-6 when order or product status is discussed without links or identifying detail the recipient needs. Differs from excessive_policy_exposition (extra policy text) and customer_unfriendly_formatting (bare ids without useful summaries). Pass when the reply includes a link or sufficient identifying detail.",
+      "requirement_source": "RESP-6",
+      "evaluator_type": "llm_judge",
+      "count": 22,
+      "example_trace_ids": [
+        "102e4a27f2a29de684a3db8176eafffa",
+        "096926da6ee56f9fc5474fb96e5999f2",
+        "02814dc3f853df931143a7cdc0ded839",
+        "00ea96a6b16b657950bb80907a08e2e1",
+        "f48d950aa4503c502d275d503de5b7bb",
+        "61e6247b3fdee28909120c42edfd1a1e",
+        "8612857ff61c68c39bcf405611cff7fd"
+      ],
+      "close_negative_trace_ids": [
+        "0500ad44a6eb6ec1ed8bf4b7cc9418b0",
+        "068c89e996aedc0b6795a496b413a8f2",
+        "0804a318fb290992a84a6461b4b10234",
+        "c92aa5de1fc9eafc02145fc3b4cb7605"
+      ],
+      "example_quotes": [
+        "should provide link to order or product",
+        "for every request user has around an order agent should provide more details and link",
+        "link to order"
+      ],
+      "created_from": [
+        "oc1789601691672",
+        "oc1789602402335",
+        "oc1789657548793",
+        "oc1789658053372",
+        "oc1789657502011",
+        "oc1789658193166",
+        "oc1789658971092",
+        "oc1789660052838",
+        "oc1789660561215",
+        "oc1789660629511",
+        "oc1789660671246",
+        "oc1789660682376",
+        "oc1789662084349",
+        "oc1789660426403",
+        "oc1789666011906",
+        "oc1789666087754",
+        "oc1789666616580",
+        "oc1789666670130",
+        "oc1789666842310",
+        "oc1789666871210",
+        "oc1789671238244",
+        "oc1789671527089"
+      ]
+    },
+    {
+      "name": "customer_unfriendly_formatting",
+      "status": "final",
+      "definition": "The agent's reply uses machine-oriented formatting, bare internal identifiers, or invalid product presentation (for example negative prices) instead of a readable customer-facing answer with appropriate links or summaries.",
+      "boundary": "Fail on product ids without links, JSON-like listings, inconsistent formatting across items, or surfacing invalid product values without warning. Differs from excessive_policy_exposition (policy ids and policy body).",
+      "requirement_source": "RESP-5",
+      "evaluator_type": "llm_judge",
+      "count": 9,
+      "example_trace_ids": [
+        "0ede93519e2776a673315a082b74f6b1",
+        "009f30cb85e4978239747e0880792143",
+        "667f027fa705890a1ba515f3fbc0cc32",
+        "e4c6d6b313e5be97988d215fe974d17d",
+        "044e7675194e9f660329aca5ba1e5ede",
+        "8bbf69bbb4b6aa3a326f059f799664a0",
+        "8612857ff61c68c39bcf405611cff7fd"
+      ],
+      "close_negative_trace_ids": [
+        "a4c6faee0c28fdec92a4240007b2a104"
+      ],
+      "example_quotes": [
+        "product id doesnt do anything should provide details about the product",
+        "response should always be human readable not machine readable",
+        "should not show negative value products"
+      ],
+      "created_from": [
+        "oc1789658014765",
+        "oc1789658094624",
+        "oc1789659008801",
+        "oc1789660426403",
+        "oc1789666309658",
+        "oc1789658885951",
+        "oc1789660200734",
+        "oc1789666470685",
+        "oc1789670974954"
+      ]
+    },
+    {
+      "name": "duplicate_escalation_ticket",
+      "status": "final",
+      "definition": "The agent creates a new escalation ticket without checking for an existing open ticket on the same issue.",
+      "boundary": "Pass when the agent references an existing ticket or confirms none is open before creating one. Differs from abrupt_no_next_step (missing escalation offer) and RESP-2 (misreporting tool outcome).",
+      "requirement_source": "ESC-3",
+      "evaluator_type": "llm_judge",
+      "count": 3,
+      "example_trace_ids": [
+        "f7a146d1b7ea960330b6322bdcb662fc",
+        "00d56561ced2f287f7f4a91a66071feb",
+        "0a92599f69b5cf742c789dfb45d86ceb"
+      ],
+      "close_negative_trace_ids": [],
+      "example_quotes": [
+        "duplicate ticket. agent should check and confirm, only create new ticket if its truly a different issue"
+      ],
+      "created_from": [
+        "oc1789660724365",
+        "oc1789665889926",
+        "oc1789666708590"
+      ]
+    },
+    {
+      "name": "permission_mechanism_overshare",
+      "status": "final",
+      "definition": "The agent explains a permission denial by exposing internal authorization mechanics (store ids, role matrix details) instead of a natural-language explanation of what the caller can and cannot access.",
+      "boundary": "Fail per RESP-4 when internal store numbers or permission implementation details appear in the reply. Pass on plain-language refusals without inaccessible data.",
+      "requirement_source": "RESP-4",
+      "evaluator_type": "llm_judge",
+      "count": 2,
+      "example_trace_ids": [
+        "9b59d9f66232663b917ae92e65b8ef8a",
+        "e85a998fd77773bcbb8176346aabbb24"
+      ],
+      "close_negative_trace_ids": [
+        "1e281cb3b1209f88452584b0ff2b4b87",
+        "50fa5c8f26bc4563c6a86b5241e22210"
+      ],
+      "example_quotes": [
+        "no need to share that it can only share order details for the store",
+        "no need to state store 7. response should be natural language"
+      ],
+      "created_from": [
+        "oc1789660333505",
+        "oc1789660377794"
+      ]
+    },
+    {
+      "name": "abrupt_no_next_step",
+      "status": "final",
+      "definition": "The agent ends the reply without a useful next step when one is needed: a clarifying question, an offer to escalate, or guidance on what the user should do next.",
+      "boundary": "Fail when the agent stops without offering escalation on a blocked case, without asking for missing information, or when a follow-up turn had to supply the obvious next step (for example opening a ticket). Pass when the agent escalates, asks a targeted question, or states a clear blocker with actionable guidance.",
+      "requirement_source": "ESC-3",
+      "evaluator_type": "llm_judge",
+      "count": 4,
+      "example_trace_ids": [
+        "148960a824647e379d08958eddf5336f",
+        "0a3739372e664087e52e8066732326eb",
+        "f10e49d7fff9fd306ebfe4f6f7bfa9bd",
+        "312eb34dd243408fe51e84e916c76c33"
+      ],
+      "close_negative_trace_ids": [
+        "ea4de287eac863d86ebc84072465c829",
+        "ad28e7db36556cc04fd694a26e14f245"
+      ],
+      "example_quotes": [
+        "rather than end cold, could have suggested follow up to get more clarity",
+        "should have offered to open a ticket in the first response",
+        "should offer to escalate but didnt"
+      ],
+      "created_from": [
+        "oc1789602459776",
+        "oc1789666067616",
+        "oc1789671000908",
+        "oc1789671574324"
+      ]
+    }
+  ]
+}

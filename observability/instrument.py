@@ -29,6 +29,7 @@ log = logging.getLogger("cartwheel.instrument")
 
 _genai_instrumented = False
 _openai_tracing_enabled = False
+_workshop: Any = None
 
 
 def configure_model_tracing(*, openai_model: bool) -> None:
@@ -85,6 +86,46 @@ def load_env(path: Path | None = None) -> None:
         key, value = key.strip(), value.strip()
         if key and value:
             os.environ.setdefault(key, value)
+
+
+def setup_workshop(
+    *,
+    user_id: str | None = None,
+    convo_id: str | None = None,
+) -> bool:
+    """Register Raindrop Workshop tracing when RAINDROP_LOCAL_DEBUGGER is set."""
+    global _workshop
+    load_env()
+    endpoint = os.environ.get("RAINDROP_LOCAL_DEBUGGER", "").strip()
+    if not endpoint:
+        return False
+    if _workshop is not None:
+        return True
+    from raindrop_openai_agents import create_raindrop_openai_agents
+
+    # RAINDROP_LOCAL_DEBUGGER must keep the /v1/ suffix (see raindrop local_debugger).
+    _workshop = create_raindrop_openai_agents(
+        user_id=user_id,
+        convo_id=convo_id,
+        endpoint=endpoint,
+        tracing_enabled=False,
+        disable_auto_instrument=True,
+    )
+    log.info("Workshop tracing enabled; events go to %s", endpoint.rstrip("/"))
+    return True
+
+
+def flush_workshop() -> None:
+    """Ship pending Workshop telemetry before process exit."""
+    global _workshop
+    if _workshop is None:
+        return
+    try:
+        _workshop.shutdown()
+    except Exception:
+        log.exception("Workshop shutdown failed")
+    finally:
+        _workshop = None
 
 
 def setup_tracing() -> bool:
