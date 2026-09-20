@@ -1,0 +1,15 @@
+{"scenario_id": "support-0001", "decision": "accept", "reason": "Clear order lookup; expected matches orders.id=4127.", "change": null}
+{"scenario_id": "support-0017", "decision": "accept", "reason": "Refund above $100 threshold; expected outcome grounded.", "change": null}
+{"scenario_id": "support-0035", "decision": "accept", "reason": "Northwind 45-day store override; realistic policy question.", "change": null}
+{"scenario_id": "support-0052", "decision": "accept", "reason": "Product search with store and price filter.", "change": null}
+{"scenario_id": "support-0070", "decision": "accept", "reason": "Merchant lists own-store orders only.", "change": null}
+{"scenario_id": "support-0088", "decision": "accept", "reason": "Merchant refund on eligible in-window order.", "change": null}
+{"scenario_id": "support-0101", "decision": "accept", "reason": "Support role order lookup.", "change": null}
+{"scenario_id": "support-0111", "decision": "accept", "reason": "Account change escalated per ESC-2.", "change": null}
+{"scenario_id": "support-0121", "decision": "accept", "reason": "Out-of-scope request declined.", "change": null}
+{"scenario_id": "support-0131", "decision": "accept", "reason": "Ambiguous lookup; human_judgment criterion appropriate.", "change": null}
+{"scenario_id": "support-0141", "decision": "accept", "reason": "Cancellation of placed order before shipment.", "change": null}
+{"scenario_id": "support-0222", "decision": "accept", "reason": "2-turn Juniper refund denial with store override.", "change": null}
+{"scenario_id": "support-0176", "decision": "accept", "reason": "DQ missing delivery date; do not compute deadline.", "change": null}
+{"scenario_id": "support-0196", "decision": "accept", "reason": "DQ negative price; do not present as valid.", "change": null}
+{"scenario_id": "support-0206", "decision": "accept", "reason": "Merchant cross-store permission denial.", "change": null}

@@ -203,6 +203,49 @@ def _flatten(messages: list[dict[str, Any]]) -> str:
     return "\n".join(parts)
 
 
+def compute_trace_stats(
+    raw: dict[str, Any],
+    observations: list[dict[str, Any]],
+    features: dict[str, Any],
+    models: list[str],
+) -> dict[str, Any]:
+    """Summarize latency, tool use, and token totals for review headers."""
+    latency_s: float | None = None
+    for observation in observations:
+        if observation.get("name") == "cartwheel.session_message":
+            value = observation.get("latency_seconds")
+            if value is not None:
+                latency_s = float(value)
+                break
+    if latency_s is None:
+        value = raw.get("latency")
+        if value is not None:
+            latency_s = float(value)
+            if latency_s > 1000:
+                latency_s = latency_s / 1000.0
+
+    input_tokens = output_tokens = total_tokens = 0
+    for observation in observations:
+        usage = observation.get("usage_details") or {}
+        if not isinstance(usage, dict):
+            continue
+        input_tokens += int(usage.get("input") or 0)
+        output_tokens += int(usage.get("output") or 0)
+        total_tokens += int(usage.get("total") or 0)
+    if not total_tokens:
+        total_tokens = int(features.get("tokens") or 0)
+
+    return {
+        "latency_s": round(latency_s, 2) if latency_s is not None else None,
+        "tool_calls": int(features.get("tool_call_count") or 0),
+        "distinct_tools": int(features.get("distinct_tools") or 0),
+        "tokens_input": input_tokens or None,
+        "tokens_output": output_tokens or None,
+        "tokens_total": total_tokens or None,
+        "model": models[0] if models else None,
+    }
+
+
 def normalize_trace(value: Any) -> dict[str, Any]:
     """Return one trace in the shared Module 2 and Module 3 representation.
 
@@ -252,7 +295,16 @@ def normalize_trace(value: Any) -> dict[str, Any]:
         "scenario_id": raw.get("cartwheel_scenario_id")
         or metadata.get("cartwheel.scenario_id")
         or metadata.get("scenario_id"),
+        "session_id": metadata.get("cartwheel.session_id") or metadata.get("session_id"),
     }
+    if not meta.get("session_id"):
+        from .session_backfill import load_session_backfill
+
+        inferred = load_session_backfill().get(str(trace_id))
+        if inferred:
+            meta["session_id"] = inferred
+            metadata = dict(metadata)
+            metadata["cartwheel.session_id"] = inferred
     supplied_segments = raw.get("segments")
     segments = dict(supplied_segments) if isinstance(supplied_segments, dict) else {}
     segments.update({key: val for key, val in meta.items() if val is not None})
@@ -268,6 +320,7 @@ def normalize_trace(value: Any) -> dict[str, Any]:
             if observation.get("model")
         )
     )
+    stats = compute_trace_stats(raw, observations, features, models)
     return {
         "id": str(trace_id),
         "trace_id": str(trace_id),
@@ -279,6 +332,7 @@ def normalize_trace(value: Any) -> dict[str, Any]:
         "trace": messages,
         "text": text,
         "features": features,
+        "stats": stats,
         "meta": {key: val for key, val in meta.items() if val is not None},
         "segments": segments,
         "metadata": metadata,

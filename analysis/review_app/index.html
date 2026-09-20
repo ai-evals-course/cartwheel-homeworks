@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cartwheel HW4 review</title>
+<style>
+  :root {
+    --role-user: #2563eb;
+    --role-assistant: #059669;
+    --role-tool-call: #b45309;
+    --role-tool-result: #7c3aed;
+    --role-system: #6b7280;
+    --role-retrieval: #0891b2;
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --hl: #fde68a;
+    --hl-pending: #fef08a;
+    --sugg: #ddd6fe;
+    --sugg-border: #7c3aed;
+    --turn-bg: #f3f4f6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  code, pre, .mono { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 16px; padding: 10px 18px;
+    background: var(--panel); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; }
+  header h1 .dim { color: var(--muted); font-weight: 400; }
+  .views { display: flex; gap: 4px; flex-wrap: wrap; }
+  .views button {
+    border: 1px solid var(--line); background: var(--bg); padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; font: inherit;
+  }
+  .views button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .spacer { flex: 1; }
+  .counts { color: var(--muted); font-size: 13px; }
+  .nav { display: flex; gap: 4px; align-items: center; }
+  .nav button { border: 1px solid var(--line); background: var(--bg); width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font: inherit; }
+  .nav .pos { color: var(--muted); font-size: 13px; min-width: 90px; text-align: center; }
+
+  #toast {
+    position: fixed; right: 18px; bottom: 18px; z-index: 100;
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  #toast.show { opacity: 1; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  #conversation-view { padding: 20px 18px 140px; }
+  .trace-header {
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline;
+    max-width: 980px; margin: 0 auto 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+  }
+  .trace-header .tid { font-weight: 700; font-family: ui-monospace, monospace; font-size: 13px; }
+  .trace-header .meta { color: var(--muted); font-size: 13px; }
+  .trace-header a { color: var(--role-user); font-size: 13px; }
+  .trace-body-wrap { display: flex; gap: 24px; max-width: 980px; margin: 0 auto; align-items: flex-start; position: relative; }
+  .trace-body { flex: 1; max-width: 720px; }
+  .margin-col { width: 240px; position: relative; flex-shrink: 0; min-height: 40px; }
+
+  .turn-header {
+    margin: 28px 0 12px; padding: 8px 12px; background: var(--turn-bg);
+    border-radius: 8px; font-size: 13px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    cursor: pointer; border: 2px solid transparent;
+  }
+  .turn-header.active { border-color: var(--role-user); background: #eff6ff; }
+  .turn-header.in-sample { box-shadow: inset 3px 0 0 var(--role-user); }
+  .turn-header .badge {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 8px;
+    background: #dbeafe; color: #1e40af;
+  }
+  .turn-header .badge.sample { background: #fef3c7; color: #92400e; }
+  .stat-chip {
+    font-size: 11px; color: var(--muted); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px;
+  }
+  .trace-stats { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; width: 100%; }
+
+  .step { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; overflow: hidden; background: var(--panel); }
+  .msg { padding: 10px 14px; border-left: 4px solid var(--line); }
+  .msg + .msg { border-top: 1px solid var(--line); }
+  .msg .role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; }
+  .msg[data-role="user"] { border-left-color: var(--role-user); }
+  .msg[data-role="user"] .role { color: var(--role-user); }
+  .msg[data-role="assistant"] { border-left-color: var(--role-assistant); }
+  .msg[data-role="assistant"] .role { color: var(--role-assistant); }
+  .msg[data-role="tool_call"] { border-left-color: var(--role-tool-call); }
+  .msg[data-role="tool_call"] .role { color: var(--role-tool-call); }
+  .msg[data-role="tool_result"] { border-left-color: var(--role-tool-result); }
+  .msg[data-role="tool_result"] .role { color: var(--role-tool-result); }
+  .msg[data-role="system"] { border-left-color: var(--role-system); opacity: .55; }
+  .msg .text { white-space: pre-wrap; word-wrap: break-word; }
+  .fn { font-weight: 700; }
+  details.args summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  pre.json { background: #f3f4f6; border-radius: 6px; padding: 8px 10px; margin: 6px 0 0; font-size: 12.5px; overflow-x: auto; white-space: pre; }
+
+  .hl { background: var(--hl); border-radius: 2px; cursor: pointer; }
+  .hl.pending-highlight { background: var(--hl-pending); }
+  .hl.sugg { background: var(--sugg); border-bottom: 2px dashed var(--sugg-border); }
+  .hl.outline { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .mnote {
+    position: absolute; left: 0; width: 100%; background: var(--panel);
+    border-left: 3px solid var(--hl); border-radius: 4px; padding: 7px 9px;
+    font-size: 12.5px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .mnote.sugg { border-left-color: var(--sugg-border); background: #faf5ff; }
+  .mnote .quote { color: var(--muted); font-style: italic; margin-bottom: 3px; }
+  .mnote .acts { margin-top: 5px; display: flex; gap: 6px; }
+  .mnote .acts button { border: 1px solid var(--line); background: var(--bg); font: inherit; font-size: 11px; padding: 2px 8px; border-radius: 5px; cursor: pointer; }
+
+  #open-code-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--panel); border-top: 1px solid var(--line); padding: 12px 18px;
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  }
+  #open-code-bar input {
+    flex: 1; min-width: 240px; border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; font: inherit;
+  }
+  #open-code-bar button {
+    border: 1px solid var(--ink); background: var(--ink); color: #fff;
+    padding: 8px 14px; border-radius: 6px; cursor: pointer; font: inherit;
+  }
+  #open-code-bar .hint { color: var(--muted); font-size: 12px; width: 100%; }
+
+  #popover {
+    position: absolute; z-index: 200; display: none; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.16); padding: 8px;
+  }
+  #popover input { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font: inherit; width: 280px; }
+
+  #map-view { padding: 18px; }
+  #map { width: 100%; max-width: 980px; height: 620px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; display: block; margin: 0 auto; }
+
+  #progress-view { padding: 18px; max-width: 1100px; margin: 0 auto; }
+  #labels-view {
+    padding: 12px 14px 18px;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+  }
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 10px; }
+  .stat-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; min-width: 140px; }
+  .stat .num { font-size: 22px; font-weight: 700; }
+  .stat .lbl { color: var(--muted); font-size: 12px; }
+
+  #treemap { display: flex; flex-wrap: wrap; gap: 10px; }
+  .mode-block { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--panel); min-width: 210px; flex: 1 1 210px; }
+  .mode-block h3 { margin: 0 0 4px; font-size: 14px; font-family: ui-monospace, monospace; }
+
+  #sugg-queue { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+  .sugg-row { display: flex; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13px; }
+  .empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+
+  #labels-table-wrap {
+    overflow: auto;
+    max-height: calc(100vh - 118px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  table.labels {
+    width: 100%;
+    min-width: 960px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+    table-layout: fixed;
+  }
+  table.labels th, table.labels td {
+    border-bottom: 1px solid var(--line);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.labels th {
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: break-word;
+  }
+  table.labels th.col-trace,
+  table.labels td.col-trace {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--panel);
+    width: 108px;
+    min-width: 108px;
+    max-width: 108px;
+    box-shadow: 1px 0 0 var(--line);
+  }
+  table.labels th.col-trace { z-index: 3; background: var(--bg); }
+  table.labels th.col-mode { width: calc((100% - 108px) / var(--mode-cols, 6)); }
+  table.labels th.col-mode .mode-name { display: block; font-weight: 600; }
+  table.labels th.col-mode .mode-hint {
+    display: block;
+    margin-top: 2px;
+    font-weight: 400;
+    font-size: 9px;
+    line-height: 1.2;
+    color: var(--muted);
+  }
+  table.labels .mono { font-size: 10px; line-height: 1.3; word-break: break-all; }
+  table.labels select {
+    font: inherit;
+    font-size: 12px;
+    padding: 3px 4px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    width: 100%;
+    max-width: 72px;
+  }
+  table.labels tr.missing td { background: #fff7ed; }
+  table.labels tr.missing td.col-trace { background: #fff7ed; }
+  .label-tools { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .label-tools button { border: 1px solid var(--line); background: var(--bg); padding: 6px 12px; border-radius: 6px; cursor: pointer; font: inherit; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cartwheel <span class="dim">HW4 review</span></h1>
+  <div class="views">
+    <button data-view="conversation" class="active">Conversation</button>
+    <button data-view="map">Map</button>
+    <button data-view="progress">Progress</button>
+    <button data-view="labels">Labels</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="nav" id="conv-nav">
+    <button id="prev">&larr;</button>
+    <span class="pos" id="pos">0 / 0</span>
+    <button id="next">&rarr;</button>
+  </div>
+  <div class="counts" id="counts"></div>
+</header>
+
+<div id="conversation-view" class="view active">
+  <div class="trace-header" id="trace-header"></div>
+  <div class="trace-body-wrap">
+    <div class="trace-body" id="trace-body"></div>
+    <div class="margin-col" id="margin-col"></div>
+  </div>
+</div>
+
+<div id="map-view" class="view"><canvas id="map"></canvas></div>
+
+<div id="progress-view" class="view">
+  <div class="stat-grid" id="stats"></div>
+  <div class="section-title">Failure modes</div>
+  <div id="treemap"></div>
+  <div class="section-title">Agent suggestions</div>
+  <div id="sugg-queue"></div>
+</div>
+
+<div id="labels-view" class="view">
+  <div class="label-tools">
+    <button id="sync-labels">Sync all labels to Langfuse</button>
+    <label><input type="checkbox" id="show-incomplete" /> Show incomplete only</label>
+  </div>
+  <div id="labels-table-wrap"></div>
+</div>
+
+<div id="open-code-bar">
+  <input id="open-code-input" placeholder="Open code: first failure in your own words, or &quot;no failure observed&quot;" />
+  <button id="save-open-code">Save &amp; next</button>
+  <div class="hint">Open coding stops at the first failure. Span notes (select text) capture evidence. Focus trace: <span id="focus-trace" class="mono"></span></div>
+</div>
+
+<div id="popover"><input id="note-input" placeholder="Evidence note (Enter to save)" /></div>
+<div id="toast"></div>
+
+<script>
+const state = {
+  samples: [],
+  conversations: [],
+  annotations: [],
+  suggestions: [],
+  patterns: {},
+  graph: {nodes: [], clusters: []},
+  labels: {modes: [], judgments: {}, sample_trace_ids: []},
+  cur: 0,
+  focusTraceId: null,
+  storeError: null,
+  loadingConversations: false,
+};
+
+const api = {
+  async get(path) { const r = await fetch(path); return r.json(); },
+  async post(path, body) {
+    const r = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if (!r.ok) { const err = await r.json().catch(() => ({})); throw new Error(err.error || r.statusText); }
+    return r.json();
+  },
+};
+
+function asAnnotationList(a) {
+  if (Array.isArray(a)) return a;
+  if (a && Array.isArray(a.annotations)) return a.annotations;
+  return [];
+}
+
+function curConv() { return state.conversations[state.cur]; }
+
+function sampleTraceIds() {
+  const ids = new Set();
+  state.conversations.forEach(c => (c.turns || []).forEach(t => { if (t.in_sample) ids.add(t.trace_id); }));
+  return ids;
+}
+
+function reviewedTraceIds() {
+  const ids = new Set();
+  state.annotations.forEach(a => {
+    if (a.type === 'open_code') ids.add(a.trace_id);
+  });
+  return ids;
+}
+
+function openCodeFor(traceId) {
+  const hit = state.annotations.find(a => a.trace_id === traceId && a.type === 'open_code');
+  return hit ? hit.note : '';
+}
+
+function pickNum(...values) {
+  for (const value of values) {
+    if (value !== null && value !== undefined && !Number.isNaN(Number(value))) return Number(value);
+  }
+  return null;
+}
+
+function toolStatsFromTrace(trace) {
+  const tools = new Set();
+  let count = 0;
+  (trace || []).forEach(msg => {
+    if (msg.role === 'tool_call') {
+      count += 1;
+      if (msg.name) tools.add(msg.name);
+    }
+  });
+  return { tool_calls: count, distinct_tools: tools.size };
+}
+
+function statsFromTurn(turn) {
+  const fromTrace = toolStatsFromTrace(turn.trace);
+  const f = turn.features || {};
+  const s = (turn.stats && typeof turn.stats === 'object') ? turn.stats : {};
+  const tool_calls = pickNum(s.tool_calls, f.tool_call_count, fromTrace.tool_calls);
+  const distinct_tools = pickNum(s.distinct_tools, f.distinct_tools, fromTrace.distinct_tools);
+  return {
+    latency_s: pickNum(s.latency_s),
+    tool_calls,
+    distinct_tools,
+    tokens_input: pickNum(s.tokens_input),
+    tokens_output: pickNum(s.tokens_output),
+    tokens_total: pickNum(s.tokens_total, f.tokens),
+    model: s.model || null,
+  };
+}
+
+function formatStats(stats, { alwaysShow = false } = {}) {
+  if (!stats) return [];
+  const bits = [];
+  const latency = stats.latency_s != null ? `${stats.latency_s}s latency` : (alwaysShow ? 'latency —' : null);
+  if (latency) bits.push(latency);
+
+  let tools = null;
+  if (stats.tool_calls != null) {
+    tools = `${stats.tool_calls} tool call${stats.tool_calls === 1 ? '' : 's'}`;
+    if (stats.distinct_tools != null) tools += ` (${stats.distinct_tools} distinct)`;
+  } else if (alwaysShow) {
+    tools = 'tool calls —';
+  }
+  if (tools) bits.push(tools);
+
+  let tokens = null;
+  if (stats.tokens_total != null) {
+    tokens = `${stats.tokens_total.toLocaleString()} tokens`;
+    if (stats.tokens_input != null && stats.tokens_output != null) {
+      tokens += ` (${stats.tokens_input.toLocaleString()} in / ${stats.tokens_output.toLocaleString()} out)`;
+    }
+  } else if (alwaysShow) {
+    tokens = 'tokens —';
+  }
+  if (tokens) bits.push(tokens);
+
+  if (stats.model) bits.push(stats.model);
+  return bits;
+}
+
+function conversationStats(conv) {
+  const totals = {
+    latency_s: 0,
+    tool_calls: 0,
+    tokens_total: 0,
+    has_latency: false,
+    has_tools: false,
+    has_tokens: false,
+  };
+  (conv.turns || []).forEach(turn => {
+    const st = statsFromTurn(turn);
+    if (st.latency_s != null) {
+      totals.latency_s += st.latency_s;
+      totals.has_latency = true;
+    }
+    if (st.tool_calls != null) {
+      totals.tool_calls += st.tool_calls;
+      totals.has_tools = true;
+    }
+    if (st.tokens_total != null) {
+      totals.tokens_total += st.tokens_total;
+      totals.has_tokens = true;
+    }
+  });
+  return {
+    latency_s: totals.has_latency ? Math.round(totals.latency_s * 100) / 100 : null,
+    tool_calls: totals.has_tools ? totals.tool_calls : null,
+    tokens_total: totals.has_tokens ? totals.tokens_total : null,
+  };
+}
+
+function renderStatsChips(stats, opts = {}) {
+  const bits = formatStats(stats, opts);
+  if (!bits.length) return '';
+  return `<div class="trace-stats">${bits.map(b => `<span class="stat-chip">${escape(b)}</span>`).join('')}</div>`;
+}
+
+function samplesAsConversations(samples) {
+  return (samples || []).map(s => ({
+    conversation_id: s.trace_id,
+    focus_trace_id: s.trace_id,
+    turns: [{
+      trace_id: s.trace_id,
+      timestamp: s.timestamp,
+      trace: s.trace || [],
+      meta: s.meta || {},
+      features: s.features || {},
+      stats: s.stats || {},
+      reason: s.reason,
+      flags: s.flags || [],
+      in_sample: true,
+    }],
+    meta: s.meta || {},
+    reason: s.reason,
+  }));
+}
+
+async function loadFast() {
+  const [samples, annotations, suggestions, patterns, graph, labels] = await Promise.all([
+    api.get('/api/samples'), api.get('/api/annotations'),
+    api.get('/api/suggestions'), api.get('/api/patterns'), api.get('/api/graph'), api.get('/api/labels'),
+  ]);
+  state.samples = Array.isArray(samples) ? samples : [];
+  state.conversations = samplesAsConversations(state.samples);
+  state.annotations = asAnnotationList(annotations);
+  state.suggestions = Array.isArray(suggestions) ? suggestions : [];
+  state.patterns = patterns && typeof patterns === 'object' ? patterns : {};
+  state.graph = graph && graph.nodes ? graph : {nodes: [], clusters: []};
+  state.labels = labels || state.labels;
+  if (!state.focusTraceId && curConv()) state.focusTraceId = curConv().focus_trace_id;
+}
+
+async function loadConversations() {
+  state.loadingConversations = true;
+  renderHeader();
+  try {
+    const convPayload = await api.get('/api/conversations');
+    if (Array.isArray(convPayload.conversations) && convPayload.conversations.length) {
+      state.conversations = convPayload.conversations;
+      state.storeError = convPayload.store_error || null;
+      if (!state.focusTraceId && curConv()) state.focusTraceId = curConv().focus_trace_id;
+      renderHeader(); renderConversation(); updatePos(); updateCounts();
+      toast('Grouped conversations loaded from Langfuse');
+    }
+  } catch (e) {
+    state.storeError = String(e.message || e);
+    renderHeader();
+  } finally {
+    state.loadingConversations = false;
+    renderHeader();
+  }
+}
+
+function renderHeader() {
+  const c = curConv();
+  const h = document.getElementById('trace-header');
+  if (!c) { h.innerHTML = '<span class="meta">No samples loaded. Run select_traces from Langfuse.</span>'; return; }
+  const m = c.meta || {};
+  const bits = [];
+  if (state.loadingConversations) bits.push('<span class="meta">Loading grouped conversations from Langfuse…</span>');
+  bits.push(`<span class="tid">${escape(c.focus_trace_id)}</span>`);
+  if (m.scenario_id) bits.push(`<span class="meta">scenario: ${escape(m.scenario_id)}</span>`);
+  if (m.role) bits.push(`<span class="meta">role: ${escape(m.role)}</span>`);
+  if (m.prompt_version) bits.push(`<span class="meta">prompt: ${escape(m.prompt_version)}</span>`);
+  if (c.reason) bits.push(`<span class="meta">pick: ${escape(c.reason)}</span>`);
+  bits.push(`<a href="http://localhost:3000/project/cartwheel-dev/traces/${escape(c.focus_trace_id)}" target="_blank">Langfuse ↗</a>`);
+  if (state.storeError) bits.push(`<span class="meta">store: ${escape(state.storeError)}</span>`);
+  if ((c.turns || []).length > 1) bits.push(`<span class="meta">${c.turns.length} turns grouped</span>`);
+  h.innerHTML = bits.join(' ') + renderStatsChips(conversationStats(c), { alwaysShow: true });
+  document.getElementById('focus-trace').textContent = state.focusTraceId || c.focus_trace_id;
+  document.getElementById('open-code-input').value = openCodeFor(state.focusTraceId || c.focus_trace_id);
+}
+
+function detailKey(traceId, idx, kind) {
+  return `${traceId}:${idx}:${kind}`;
+}
+
+function captureOpenDetails() {
+  const open = new Set();
+  document.querySelectorAll('#trace-body details[open]').forEach(el => {
+    if (el.dataset.detailKey) open.add(el.dataset.detailKey);
+  });
+  return open;
+}
+
+function restoreOpenDetails(open) {
+  if (!open || !open.size) return;
+  document.querySelectorAll('#trace-body details').forEach(el => {
+    if (el.dataset.detailKey && open.has(el.dataset.detailKey)) el.open = true;
+  });
+}
+
+function renderMsg(m, idx, traceId) {
+  const role = m.role || 'assistant';
+  const label = (m.label || role).replace(/_/g, ' ');
+  let inner = '';
+  if (role === 'tool_call') {
+    inner = `<div class="fn">${escape(m.name || 'tool')}()</div>`;
+    if (m.arguments !== undefined) {
+      const dk = detailKey(traceId, idx, 'args');
+      inner += `<details class="args" data-detail-key="${dk}"><summary>arguments</summary><pre class="json">${escape(pretty(m.arguments))}</pre></details>`;
+    }
+  } else if (role === 'tool_result') {
+    const full = pretty(m.content !== undefined ? m.content : m.text);
+    const dk = detailKey(traceId, idx, 'result');
+    inner = full.length > 240
+      ? `<details class="args" data-detail-key="${dk}"><summary>result (${full.length} chars)</summary><pre class="json annotatable" data-idx="${idx}" data-trace="${traceId}">${escape(full)}</pre></details>`
+      : `<pre class="json annotatable" data-idx="${idx}" data-trace="${traceId}">${escape(full)}</pre>`;
+  } else {
+    const text = m.text !== undefined ? m.text : pretty(m.content);
+    inner = `<div class="text annotatable" data-idx="${idx}" data-trace="${traceId}">${md(text)}</div>`;
+  }
+  return `<div class="msg" data-role="${role}" data-idx="${idx}"><div class="role">${escape(label)}</div>${inner}</div>`;
+}
+
+function renderConversation() {
+  const c = curConv();
+  const body = document.getElementById('trace-body');
+  if (!c) { body.innerHTML = ''; return; }
+  const openDetails = captureOpenDetails();
+  if (!state.focusTraceId) state.focusTraceId = c.focus_trace_id;
+  const html = [];
+  (c.turns || []).forEach((turn, ti) => {
+    const active = turn.trace_id === state.focusTraceId ? ' active' : '';
+    const sample = turn.in_sample ? ' in-sample' : '';
+    const turnStats = renderStatsChips(statsFromTurn(turn));
+    html.push(`<div class="turn-header${active}${sample}" data-trace="${turn.trace_id}">` +
+      `<strong>Turn ${ti + 1}</strong>` +
+      `<span class="mono">${escape(turn.trace_id.slice(0, 8))}…</span>` +
+      (turn.in_sample ? `<span class="badge sample">in sample</span>` : '') +
+      (openCodeFor(turn.trace_id) ? `<span class="badge">reviewed</span>` : '') +
+      turnStats +
+      `</div>`);
+    const msgs = turn.trace || [];
+    let i = 0;
+    while (i < msgs.length) {
+      const m = msgs[i];
+      if (m.role === 'tool_call') {
+        const parts = [renderMsg(m, i, turn.trace_id)];
+        if (i + 1 < msgs.length && msgs[i + 1].role === 'tool_result') { parts.push(renderMsg(msgs[i + 1], i + 1, turn.trace_id)); i++; }
+        html.push(`<div class="step">${parts.join('')}</div>`);
+      } else {
+        html.push(`<div class="step">${renderMsg(m, i, turn.trace_id)}</div>`);
+      }
+      i++;
+    }
+  });
+  body.innerHTML = html.join('');
+  restoreOpenDetails(openDetails);
+  body.querySelectorAll('.turn-header').forEach(el => {
+    el.onclick = () => { state.focusTraceId = el.dataset.trace; renderHeader(); renderConversation(); applyHighlights(); layoutMargin(); };
+  });
+  applyHighlights();
+  layoutMargin();
+}
+
+function itemsForView() {
+  const ids = new Set();
+  const c = curConv();
+  if (c) (c.turns || []).forEach(t => ids.add(t.trace_id));
+  const anns = state.annotations.filter(a => ids.has(a.trace_id) && a.type !== 'open_code').map(a => ({...a, kind: 'human'}));
+  const sugg = state.suggestions.filter(s => ids.has(s.trace_id)).map(s => ({...s, kind: 'sugg'}));
+  return [...anns, ...sugg];
+}
+
+function applyHighlights() {
+  const items = itemsForView();
+  document.querySelectorAll('.annotatable').forEach(el => {
+    const idx = parseInt(el.dataset.idx, 10);
+    const traceId = el.dataset.trace;
+    const mine = items.filter(it => it.trace_id === traceId && (it.idx === idx || it.idx === undefined));
+    if (!mine.length) return;
+    let text = el.textContent;
+    const ranges = [];
+    mine.forEach(it => {
+      if (!it.quote) return;
+      const pos = text.indexOf(it.quote);
+      if (pos >= 0) ranges.push([pos, pos + it.quote.length, it]);
+    });
+    if (!ranges.length) return;
+    ranges.sort((a, b) => a[0] - b[0]);
+    let out = '', cursor = 0;
+    ranges.forEach(([s, e, it]) => {
+      if (s < cursor) return;
+      out += escape(text.slice(cursor, s));
+      out += `<span class="${it.kind === 'sugg' ? 'hl sugg' : 'hl'}" data-item="${it.id}">${escape(text.slice(s, e))}</span>`;
+      cursor = e;
+    });
+    out += escape(text.slice(cursor));
+    el.innerHTML = out;
+  });
+}
+
+function layoutMargin() {
+  const col = document.getElementById('margin-col');
+  col.innerHTML = '';
+  const items = itemsForView();
+  if (!items.length) return;
+  const colRect = col.getBoundingClientRect();
+  let lastBottom = 0;
+  const withPos = items.map(it => {
+    const hl = document.querySelector(`.hl[data-item="${it.id}"]`);
+    const top = hl ? hl.getBoundingClientRect().top - colRect.top : lastBottom;
+    return {it, top, hl};
+  }).sort((a, b) => a.top - b.top);
+  withPos.forEach(({it, top, hl}) => {
+    const note = document.createElement('div');
+    note.className = 'mnote ' + (it.kind === 'sugg' ? 'sugg' : 'human');
+    note.innerHTML = (it.quote ? `<div class="quote">"${escape(clip(it.quote, 80))}"</div>` : '') +
+      `<div>${escape(it.note || '')}</div>` +
+      (it.kind === 'sugg' ? `<div class="acts"><button data-accept="${it.id}">accept</button><button data-reject="${it.id}">dismiss</button></div>` : '');
+    const y = Math.max(top, lastBottom);
+    note.style.top = y + 'px';
+    note.style.position = 'absolute';
+    col.appendChild(note);
+    lastBottom = y + note.offsetHeight + 8;
+    if (hl) {
+      note.onmouseenter = () => hl.classList.add('outline');
+      note.onmouseleave = () => hl.classList.remove('outline');
+    }
+    note.querySelector('[data-accept]')?.addEventListener('click', () => acceptSuggestion(it.id));
+    note.querySelector('[data-reject]')?.addEventListener('click', () => dismissSuggestion(it.id));
+  });
+}
+
+let pendingRange = null, pendingCtx = null;
+
+document.getElementById('trace-body').addEventListener('mouseup', () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const text = sel.toString().trim();
+  if (!text) return;
+  const anchor = sel.anchorNode?.parentElement?.closest('.annotatable');
+  if (!anchor) return;
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.className = 'hl pending-highlight';
+  try { range.surroundContents(span); } catch (e) { return; }
+  pendingRange = span;
+  pendingCtx = { trace_id: anchor.dataset.trace, quote: text, idx: parseInt(anchor.dataset.idx, 10) };
+  sel.removeAllRanges();
+  const rect = span.getBoundingClientRect();
+  const pop = document.getElementById('popover');
+  pop.style.display = 'block';
+  pop.style.left = (window.scrollX + rect.left) + 'px';
+  pop.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+  document.getElementById('note-input').value = '';
+  document.getElementById('note-input').focus();
+});
+
+document.getElementById('note-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') commitSpanNote();
+  if (e.key === 'Escape') cancelSpanNote();
+});
+
+function clearPending() {
+  if (pendingRange?.parentNode) {
+    const p = pendingRange.parentNode;
+    while (pendingRange.firstChild) p.insertBefore(pendingRange.firstChild, pendingRange);
+    p.removeChild(pendingRange);
+    p.normalize();
+  }
+  pendingRange = null; pendingCtx = null;
+  document.getElementById('popover').style.display = 'none';
+}
+function cancelSpanNote() { clearPending(); renderConversation(); }
+
+async function saveAnnotations() {
+  await api.post('/api/annotations', state.annotations);
+  try { localStorage.setItem('hw4_annotations', JSON.stringify(state.annotations)); } catch (e) {}
+}
+
+async function commitSpanNote() {
+  const note = document.getElementById('note-input').value.trim();
+  if (!note || !pendingCtx) { clearPending(); return; }
+  state.annotations.push({
+    id: 'a' + Date.now(), trace_id: pendingCtx.trace_id, quote: pendingCtx.quote,
+    idx: pendingCtx.idx, note, ts: new Date().toISOString(),
+  });
+  clearPending();
+  await saveAnnotations();
+  renderConversation();
+  renderProgress();
+}
+
+async function saveOpenCode(advance) {
+  const c = curConv();
+  if (!c) return;
+  const traceId = state.focusTraceId || c.focus_trace_id;
+  const note = document.getElementById('open-code-input').value.trim();
+  if (!note) { toast('Write an open code or "no failure observed"'); return; }
+  state.annotations = state.annotations.filter(a => !(a.trace_id === traceId && a.type === 'open_code'));
+  state.annotations.push({ id: 'oc' + Date.now(), trace_id: traceId, type: 'open_code', note, ts: new Date().toISOString() });
+  await saveAnnotations();
+  toast('open code saved');
+  renderConversation();
+  renderProgress();
+  if (advance && state.cur < state.conversations.length - 1) {
+    state.cur++;
+    state.focusTraceId = curConv().focus_trace_id;
+    renderHeader(); renderConversation(); updatePos();
+  }
+}
+
+document.getElementById('save-open-code').onclick = () => saveOpenCode(true);
+document.getElementById('open-code-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveOpenCode(true);
+});
+
+async function acceptSuggestion(id) {
+  const s = state.suggestions.find(x => x.id === id);
+  if (!s) return;
+  state.annotations.push({
+    id: 'a' + Date.now(), trace_id: s.trace_id, quote: s.quote, idx: s.idx,
+    note: s.mode ? `[${s.mode}]` : '(accepted)', source: 'accepted_suggestion', mode: s.mode, ts: new Date().toISOString(),
+  });
+  state.suggestions = state.suggestions.filter(x => x.id !== id);
+  await saveAnnotations();
+  await api.post('/api/suggestions', state.suggestions);
+  renderConversation(); renderProgress();
+}
+async function dismissSuggestion(id) {
+  state.suggestions = state.suggestions.filter(x => x.id !== id);
+  await api.post('/api/suggestions', state.suggestions);
+  renderConversation(); renderProgress();
+}
+
+function normalizePatterns(p) {
+  if (!p || typeof p !== 'object') return [];
+  if (Array.isArray(p.modes)) return p.modes.filter(m => m && m.name);
+  return Object.entries(p).map(([name, m]) => ({name, ...(m || {})}));
+}
+
+function renderProgress() {
+  const sampleIds = sampleTraceIds();
+  const reviewed = [...sampleTraceIds()].filter(id => reviewedTraceIds().has(id));
+  document.getElementById('stats').innerHTML =
+    `<div class="stat"><div class="num">${reviewed.length}</div><div class="lbl">traces reviewed</div></div>` +
+    `<div class="stat"><div class="num">${sampleIds.size}</div><div class="lbl">in sample</div></div>` +
+    `<div class="stat"><div class="num">${normalizePatterns(state.patterns).length}</div><div class="lbl">candidate modes</div></div>` +
+    `<div class="stat"><div class="num">${state.suggestions.length}</div><div class="lbl">suggestions pending</div></div>`;
+
+  const el = document.getElementById('treemap');
+  const modes = normalizePatterns(state.patterns);
+  if (!modes.length) { el.innerHTML = '<div class="empty">No modes yet. Open codes accumulate here after axial coding.</div>'; return; }
+  el.innerHTML = modes.map(m =>
+    `<div class="mode-block"><h3>${escape(m.name)}</h3><div>${escape(m.definition || '')}</div></div>`
+  ).join('');
+
+  const q = document.getElementById('sugg-queue');
+  if (!state.suggestions.length) { q.innerHTML = '<div class="empty">No pending suggestions.</div>'; return; }
+  q.innerHTML = state.suggestions.map(s =>
+    `<div class="sugg-row"><span class="mono">${escape(s.mode || '')}</span><span>${escape(clip(s.quote || '', 100))}</span></div>`
+  ).join('');
+}
+
+const MODE_SHORT = {
+  excessive_policy_exposition: 'policy',
+  insufficient_order_context: 'order_ctx',
+  customer_unfriendly_formatting: 'formatting',
+  duplicate_escalation_ticket: 'dup_ticket',
+  permission_mechanism_overshare: 'perm',
+  abrupt_no_next_step: 'next_step',
+};
+const MODE_HINT = {
+  excessive_policy_exposition: 'internal ids, policy dump',
+  insufficient_order_context: 'missing link or details',
+  customer_unfriendly_formatting: 'bare ids, not readable',
+  duplicate_escalation_ticket: 'new ticket, no check',
+  permission_mechanism_overshare: 'auth/store internals',
+  abrupt_no_next_step: 'no ask or escalate',
+};
+
+function modeHeader(mode) {
+  const short = MODE_SHORT[mode] || mode.replace(/_/g, ' ');
+  const hint = MODE_HINT[mode] || '';
+  return `<th class="col-mode" title="${escape(mode)}"><span class="mode-name">${escape(short)}</span>` +
+    (hint ? `<span class="mode-hint">${escape(hint)}</span>` : '') + `</th>`;
+}
+
+function renderLabels() {
+  const modes = state.labels.modes || [];
+  const ids = state.labels.sample_trace_ids || [];
+  const judgments = state.labels.judgments || {};
+  const incompleteOnly = document.getElementById('show-incomplete').checked;
+  if (!modes.length) {
+    document.getElementById('labels-table-wrap').innerHTML =
+      '<div class="empty" style="padding:16px">No final modes in patterns.json yet. Complete axial coding first.</div>';
+    return;
+  }
+  let rows = ids.map(tid => {
+    const missing = modes.some(m => judgments[tid]?.[m] === undefined);
+    return {tid, missing};
+  });
+  if (incompleteOnly) rows = rows.filter(r => r.missing);
+  const head = `<tr><th class="col-trace">trace</th>${modes.map(m => modeHeader(m)).join('')}</tr>`;
+  const body = rows.map(({tid, missing}) => {
+    const cells = modes.map(m => {
+      const val = judgments[tid]?.[m];
+      const sel = val === 0 ? '<option value="0" selected>Pass</option><option value="1">Fail</option>'
+        : val === 1 ? '<option value="0">Pass</option><option value="1" selected>Fail</option>'
+        : '<option value="">—</option><option value="0">Pass</option><option value="1">Fail</option>';
+      return `<td><select data-trace="${escape(tid)}" data-mode="${escape(m)}">${sel}</select></td>`;
+    }).join('');
+    return `<tr class="${missing ? 'missing' : ''}"><td class="mono col-trace" title="${escape(tid)}">${escape(tid.slice(0, 10))}…</td>${cells}</tr>`;
+  }).join('');
+  document.getElementById('labels-table-wrap').innerHTML =
+    `<table class="labels" style="--mode-cols:${modes.length}"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  document.querySelectorAll('table.labels select').forEach(sel => {
+    sel.onchange = async () => {
+      if (sel.value === '') return;
+      try {
+        await api.post('/api/labels', { trace_id: sel.dataset.trace, mode: sel.dataset.mode, label: parseInt(sel.value, 10) });
+        state.labels.judgments[sel.dataset.trace] = state.labels.judgments[sel.dataset.trace] || {};
+        state.labels.judgments[sel.dataset.trace][sel.dataset.mode] = parseInt(sel.value, 10);
+        toast('label saved to Langfuse');
+      } catch (e) { toast(String(e.message || e)); }
+    };
+  });
+}
+
+document.getElementById('sync-labels').onclick = async () => {
+  try {
+    const res = await api.post('/api/labels/sync', {});
+    toast(`synced ${res.langfuse_scores_written || 0} scores`);
+  } catch (e) { toast(String(e.message || e)); }
+};
+document.getElementById('show-incomplete').onchange = renderLabels;
+
+function renderMap() {
+  const canvas = document.getElementById('map');
+  const nodes = state.graph.nodes || [];
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth || 980, h = 620;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  if (!nodes.length) {
+    ctx.fillStyle = '#9ca3af'; ctx.font = '13px sans-serif';
+    ctx.fillText('No projection yet (/api/graph is empty).', 20, 30);
+    return;
+  }
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 30;
+  const sx = v => pad + (v - minX) / ((maxX - minX) || 1) * (w - 2 * pad);
+  const sy = v => pad + (v - minY) / ((maxY - minY) || 1) * (h - 2 * pad);
+  const sampleIds = sampleTraceIds();
+  const annIds = reviewedTraceIds();
+  nodes.forEach(n => {
+    const sampled = sampleIds.has(n.trace_id);
+    ctx.beginPath();
+    ctx.arc(sx(n.x), sy(n.y), sampled ? 6 : 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = annIds.has(n.trace_id) ? '#f97316' : '#94a3b8';
+    ctx.fill();
+    if (sampled) { ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5; ctx.stroke(); }
+  });
+}
+
+function switchView(name) {
+  document.querySelectorAll('.views button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name + '-view').classList.add('active');
+  document.getElementById('conv-nav').style.display = name === 'conversation' ? 'flex' : 'none';
+  document.getElementById('open-code-bar').style.display = name === 'conversation' ? 'flex' : 'none';
+  if (name === 'map') renderMap();
+  if (name === 'progress') renderProgress();
+  if (name === 'labels') renderLabels();
+}
+document.querySelectorAll('.views button').forEach(b => b.onclick = () => switchView(b.dataset.view));
+
+function updatePos() {
+  document.getElementById('pos').textContent = state.conversations.length ? `${state.cur + 1} / ${state.conversations.length}` : '0 / 0';
+}
+document.getElementById('prev').onclick = () => {
+  if (state.cur > 0) { state.cur--; state.focusTraceId = curConv().focus_trace_id; renderHeader(); renderConversation(); updatePos(); }
+};
+document.getElementById('next').onclick = () => {
+  if (state.cur < state.conversations.length - 1) { state.cur++; state.focusTraceId = curConv().focus_trace_id; renderHeader(); renderConversation(); updatePos(); }
+};
+
+function updateCounts() {
+  document.getElementById('counts').textContent =
+    `${state.conversations.length} samples · ${state.annotations.length} notes · ${normalizePatterns(state.patterns).length} modes`;
+}
+
+function escape(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function md(s) {
+  return escape(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+function pretty(v) { return typeof v === 'string' ? v : JSON.stringify(v, null, 2); }
+function clip(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n) + '…' : s; }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+let lastPollSig = '';
+
+async function poll() {
+  try {
+    const [annotations, suggestions, patterns] = await Promise.all([
+      api.get('/api/annotations'), api.get('/api/suggestions'), api.get('/api/patterns'),
+    ]);
+    const nextAnnotations = asAnnotationList(annotations);
+    const nextSuggestions = Array.isArray(suggestions) ? suggestions : state.suggestions;
+    const nextPatterns = patterns || state.patterns;
+    const sig = JSON.stringify([
+      nextAnnotations.length,
+      nextSuggestions.length,
+      normalizePatterns(nextPatterns).length,
+      nextAnnotations.map(a => a.id).join('|'),
+      nextSuggestions.map(s => s.id).join('|'),
+    ]);
+    if (sig === lastPollSig) return;
+    lastPollSig = sig;
+
+    state.annotations = nextAnnotations;
+    state.suggestions = nextSuggestions;
+    state.patterns = nextPatterns;
+    renderHeader();
+    applyHighlights();
+    layoutMargin();
+    renderProgress();
+    updateCounts();
+  } catch (e) {}
+}
+
+(async function boot() {
+  await loadFast();
+  renderHeader(); renderConversation(); renderProgress(); renderLabels(); updatePos(); updateCounts();
+  loadConversations();
+  setInterval(poll, 2000);
+})();
+</script>
+</body>
+</html>
