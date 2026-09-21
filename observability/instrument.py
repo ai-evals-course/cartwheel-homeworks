@@ -101,12 +101,49 @@ def setup_tracing() -> bool:
 
     get_client()  # registers the OTel tracer provider from LANGFUSE_* env vars
     instrument_genai(trace.get_tracer_provider())
+    setup_workshop()  # needs the provider that get_client() just registered
     # Preserve processor replacement for callers such as the server, which
     # ignore our return value. A missing secret makes Langfuse a no-op client;
     # returning before replacement would leave hosted OpenAI export active.
     if not os.environ.get("LANGFUSE_SECRET_KEY"):
         return False
     log.info("tracing enabled; spans go to %s", os.environ.get("LANGFUSE_HOST"))
+    return True
+
+
+_workshop_enabled = False
+
+
+def setup_workshop() -> bool:
+    """Mirror the Langfuse span stream to a local Raindrop Workshop.
+
+    Opt in by setting RAINDROP_LOCAL_DEBUGGER (normally
+    http://localhost:5899/v1/); return False when it is unset. Workshop
+    ingests OTLP at /v1/traces, so this adds one more span processor to the
+    tracer provider Langfuse already registered. Langfuse keeps receiving
+    every span, and no second provider or SDK pipeline is created. The
+    supported raindrop-openai-agents integration was tried first, but in
+    local-only mode (no cloud write key) raindrop-ai 0.0.68 drops tool spans,
+    which Homework 4 Part C needs.
+    """
+    global _workshop_enabled
+    if _workshop_enabled:
+        return True
+    url = os.environ.get("RAINDROP_LOCAL_DEBUGGER", "").strip()
+    if not url:
+        return False
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+    provider = trace.get_tracer_provider()
+    add_processor = getattr(provider, "add_span_processor", None)
+    if add_processor is None:
+        log.warning("no SDK tracer provider is registered; Workshop mirroring is off")
+        return False
+    endpoint = url.rstrip("/") + "/traces"
+    add_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
+    _workshop_enabled = True
+    log.info("Workshop mirroring enabled; spans also go to %s", endpoint)
     return True
 
 

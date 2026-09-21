@@ -1,1 +1,1190 @@
-{"modes": []}
+{
+  "modes": [
+    {
+      "name": "write_without_confirmation",
+      "status": "final",
+      "definition": "issue_refund or cancel_order is called without a prior turn in which the agent showed the matched order (product title, store, price, status) and the user confirmed it by selecting the order widget or stating that order's number. Applies to every role, whether or not the user supplied an order identifier in the request. A bare yes, a product name, or a description does not count as confirmation.",
+      "boundary": "Nearest: assumes_instead_of_asking. That mode is about ambiguity of the request; this one fires on any write that lacks the confirmation turn, even when the request was unambiguous and the order id was given. Absent: agent shows the order, user replies with that order number (or selects the widget), agent writes. Also absent: agent shows the order and asks, and no write follows (0124, 0020, 0082, 0011 t0). Asking for a product name instead of the order number is a weaker ask (0191, 0029) but still not this mode while no write happens. Tightened 2026-09-21 from 'explicit yes' to 'order number or widget'.",
+      "spec_source": "RESP-6 (new 2026-09-19, widened 2026-09-20, confirmation form tightened 2026-09-21): show the order, confirm by widget or order number, then write",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu7mmgcxyoyy9",
+        "mu8slrzj34cou",
+        "mu8zkwthu47tq",
+        "muaivwk1dz7j2",
+        "muaj0d0f1z65r",
+        "muaoiy1mpkr64",
+        "muaoop8gmjwct",
+        "muaj10tldudgw",
+        "mu7njhfguqodv",
+        "mu7nmj66v7m6i",
+        "muaqepg297p7k",
+        "muapyhm0ii3ek",
+        "muatbdmr9nkwq",
+        "muatklapldhqz",
+        "muatlbythmhke",
+        "muau5b0jh0w9w",
+        "muau28i9tjckw",
+        "muau603mn9fdb",
+        "muau7iu73mg8u",
+        "muau76xnp5w8j",
+        "muau9y4ph6odm",
+        "muau8ngz1skj3",
+        "muauaiv6iwnvo",
+        "muau0sr7y4bbx",
+        "muauce7axu9ie",
+        "muau8dccaogkp"
+      ],
+      "positive_scenario_ids": [
+        "support-0011",
+        "support-0021",
+        "support-0033",
+        "support-0035",
+        "support-0053",
+        "support-0066",
+        "support-0087",
+        "support-0134",
+        "support-0158",
+        "support-0167",
+        "support-0176",
+        "support-0202",
+        "support-0003",
+        "support-0030",
+        "support-0118",
+        "support-0120",
+        "support-0132",
+        "support-0151",
+        "support-0192",
+        "support-0200",
+        "support-0222",
+        "support-0155",
+        "support-0243",
+        "support-0078",
+        "support-0140",
+        "support-0097"
+      ],
+      "positive_trace_ids": [
+        "23a9eb1fee7a0c5015b719476455b59a",
+        "d9316f4f0b7b95498afa976dedf230df",
+        "4c81b37b334a1935ccd51ddd43f7c017",
+        "5d6e74bd0f2c3712ef553e1b3e6a348d",
+        "891be4deb9dc6edd8ba871ee3d54500a",
+        "8a4b8393c3fc0c2ea633bfe6577cb462",
+        "b437803d98806f0766484854007212f2",
+        "d8169bd01d0b78672c986bd74a59fb46",
+        "e197344ac6c0e5f811a4f3492c2b0239",
+        "f1dfad5e6c236ee85a99e7ff9c79fff9",
+        "f2d254cb404b7581fc46e2de40d8b8d9",
+        "fa015c4d50cc0ef5aedd2358b3704a6b",
+        "caab0dca46524e2ed44bd7364846a7d1",
+        "75e94a7296cff8edc447060132ea8d09",
+        "c89578e38c4b96f863924e674a641410",
+        "f702858acda398cdee32ebd1031651f7",
+        "e8b29aebeba277d2188c44b7b06fa857",
+        "985896bc93ebb76b863326ab874ee8c7",
+        "9f364d7dd24fe1ee44a91039aefa4c18",
+        "5485477131c42b6134a971a91d937ae6",
+        "39ea9fe80e643bd559810cbdbb43a6a3",
+        "389ac9eb16d6ad5bd5fb5c28710231fd",
+        "7117832e7d57b89b4bb95c7c60ff52d9",
+        "03b558ec15b21a7723b7526c4a5305d9",
+        "40d0f6aacf480458663c499339224483",
+        "a92060ed0ad9b9a5a153163471f7deb7"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0124",
+        "support-0020",
+        "support-0082",
+        "support-0191",
+        "support-0011"
+      ],
+      "close_negative_trace_ids": [
+        "2a5c75bc6169be8e3f18e9ba3e3eafbc",
+        "95236a75300dcabe92b5b881cce01a41",
+        "88505dac77b4e36668ae7b717314f70d",
+        "792984d41057c768af34d3b413b95102",
+        "d63587734a8ed48b3fcec20764296e3c"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: 4/4 retrieved positives and 2/2 close negatives confirmed; 0035 (cancel after fuzzy match) added"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0087"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: RESP-6 widened to all roles and id-supplied requests after 0167 and 0176; 0011 t2 added; former id-supplied close negatives now expected positives; new close negatives must show an explicit confirmation turn (none found yet)"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search (all 313 traces: every issue_refund/cancel_order call, checked for a prior ask-then-yes exchange; 51 writes, 0 confirmed). Reviewer accepted 9 positives inside the review set (support-0003, support-0030, support-0118, support-0120, support-0132, support-0151, support-0192, support-0200, support-0222) and 5 close negatives of the form 'showed the order, asked, did not write' (support-0124, support-0020, support-0082, support-0191, support-0011); the strict ask-yes-write form does not occur in the data. 0011 appears in both lists at trace level: turn 0 close negative, turn 1 positive. Rejected 0029 as a close negative: 'still need a confirmation, which needs the person to mention the order number they want refunded, or click the order widget'. 25 out-of-set hits withdrawn unreviewed to analysis/state/hw5_candidates/."
+        },
+        {
+          "at": "2026-09-21T01:20:00Z",
+          "change": "five former close negatives moved to positives under the widened RESP-6: support-0155, support-0243, support-0078, support-0140, support-0097. Positives now 26."
+        },
+        {
+          "at": "2026-09-21T07:00:00Z",
+          "change": "human open code muaubkcmnv59k on close negative 0191: an acceptable confirmation names the order number or uses the order widget, not the product name (same reading as the 0029 rejection). Close-negative status unchanged (no write happened); candidate wording for RESP-6."
+        },
+        {
+          "at": "2026-09-21T07:30:00Z",
+          "change": "definition tightened: confirmation means the user selects the shown order widget or states the shown order's number; a bare yes or a product name no longer counts (0191 note muaubkcmnv59k, 0029 rejection, 0011 t1). Search repeated, see searches[]."
+        },
+        {
+          "at": "2026-09-21T08:00:00Z",
+          "change": "support-0035 positive trace id corrected to the turn that holds cancel_order (d9316f4f...), was the turn-1 trace."
+        }
+      ],
+      "former_close_negatives": {
+        "scenario_ids": [
+          "support-0155",
+          "support-0243",
+          "support-0078",
+          "support-0140",
+          "support-0097"
+        ],
+        "note": "id-supplied writes by merchant/support/shopper; were close negatives under the first RESP-6 wording, become positives under the widened rule; to be labeled Fail in Part E Moved into the positive lists on 2026-09-21 at the reviewer's direction: support-0155 (merchant, cancel_order t0), support-0243 (support, cancel_order t0), support-0078 (merchant, issue_refund t0), support-0140 (merchant, issue_refund t0), support-0097 (support, issue_refund t0).",
+        "moved_to_positives_at": "2026-09-21T01:20:00Z"
+      }
+    },
+    {
+      "name": "assumes_instead_of_asking",
+      "status": "final",
+      "definition": "The request or the lookup result is ambiguous (several plausible orders, unclear complaint) and the reply proceeds on one interpretation instead of asking the user which one.",
+      "boundary": "Nearest: write_without_confirmation and unwarranted_escalation. 'Proceeds' means any action on one interpretation: a reply, a lookup fan-out, a ticket, or a write. A write on a single unambiguous match is write_without_confirmation only; when the action is a ticket, label both. Asking the user which one (0011, 0120) is absent.",
+      "spec_source": "RESP-3",
+      "evaluator": "llm_judge",
+      "origin_annotation_ids": [
+        "mu7mm2z7kjx3g",
+        "mu900drew8zht",
+        "mu7my7zimfkzv",
+        "muaoh484rabaa",
+        "muaosjqp5oau6",
+        "muao8osaldc89",
+        "muaj5j4bvisas",
+        "muao6dh2oih7e",
+        "muatwsbxa2d6g",
+        "muau0tz41wwca",
+        "muatzmdtdhmyz"
+      ],
+      "positive_scenario_ids": [
+        "support-0053",
+        "support-0068",
+        "support-0103",
+        "support-0118",
+        "support-0151",
+        "support-0178",
+        "support-0222",
+        "support-0248"
+      ],
+      "positive_trace_ids": [
+        "1c303c23853df10222595fe6ecd94979",
+        "39ea9fe80e643bd559810cbdbb43a6a3",
+        "4c81b37b334a1935ccd51ddd43f7c017",
+        "63d661ee55a9e72220cc400fc772903a",
+        "71dd82e225587efb0b96091501b7f9f0",
+        "b6cf93a3d5198d44b87aea2b6cc34be2",
+        "be82314ab3de0411c5ad5188721cdc5a",
+        "d04387e79b9f57814a99093aa307e731"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0011",
+        "support-0120",
+        "support-0029",
+        "support-0082",
+        "support-0109"
+      ],
+      "close_negative_trace_ids": [
+        "d63587734a8ed48b3fcec20764296e3c",
+        "168a15f8b84afda8f86b4a50f1b84eed",
+        "90f1733bef8a9d29291efe649d28d482",
+        "88505dac77b4e36668ae7b717314f70d",
+        "64e99c8488f1aef56bdee6a882ffb41d"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: 0068, 0103 confirmed; 0120 (agent asked) confirmed as close negative; 0151, 0222, 0118 added"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search for close negatives; reviewer accepted 3: support-0029, support-0082, support-0109."
+        }
+      ]
+    },
+    {
+      "name": "unwarranted_escalation",
+      "status": "final",
+      "definition": "escalate_to_human is called (a) before the target order or the complaint details have been confirmed with the user, (b) when the request was already resolved by a successful tool result, (c) when the refund is already queued_for_approval, which is itself the human review, or (d) for a required escalation, without first gathering the details the ticket needs to be resolved.",
+      "boundary": "Nearest: unsolicited_next_steps (an offer in text vs. a ticket actually created) and assumes_instead_of_asking (the ticket is the action taken on an unconfirmed interpretation; label both when both apply). Escalations the situation requires are absent: inconsistent record (0017, ESC-3), past-window exception a merchant asks for (0042, 0015, ESC-4). Records that are internally inconsistent (reversed dates 0152, 0230; store mismatch 0017, 0169) require escalation under ESC-3; for those, only clause (d) can apply.",
+      "spec_source": "ESC-3, ESC-4 (escalation is for what the agent cannot resolve)",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu901fpcsxzxi",
+        "muaoeh703kro9",
+        "muaol8qy4gmvs",
+        "muaomv6l2hj28",
+        "muaosjqp5oau6",
+        "muao9fwhjbrg2",
+        "mu7nneaq856cs",
+        "muaqhywbm1dp6",
+        "muaqdpbof5p8f",
+        "muata41kvp6oz"
+      ],
+      "positive_scenario_ids": [
+        "support-0118",
+        "support-0132",
+        "support-0161",
+        "support-0168",
+        "support-0169",
+        "support-0184",
+        "support-0200",
+        "support-0222",
+        "support-0245",
+        "support-0052"
+      ],
+      "positive_trace_ids": [
+        "39ea9fe80e643bd559810cbdbb43a6a3",
+        "472ce4e000300d855e31b5622bb42c51",
+        "682678d4f391ccee11e351119321f4e2",
+        "be629428cc3b148066befa3fcda0967f",
+        "d04387e79b9f57814a99093aa307e731",
+        "de8abc2e3e7681dfa47f847be0c58cd4",
+        "e8b29aebeba277d2188c44b7b06fa857",
+        "eae67e4e85d1616e00cf1c7e1e572b6e",
+        "f47303d80a62b6ffdaccc490ebe77db8",
+        "df4706f3e65f2e33e7266254d9d11517"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0017",
+        "support-0042",
+        "support-0015",
+        "support-0152",
+        "support-0230"
+      ],
+      "close_negative_trace_ids": [
+        "bd7424e5441eb7bc2ef9333eb82f83e0",
+        "8d9b7ca383decc606861ae9405a7b3c3",
+        "26be5d0ecf9ef929076758825f818a1d",
+        "bbcb26c2f1c272cfcc84223cf45f73ff",
+        "3a50b2ad0f5ab100dd094d375b3d41b6"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: renamed from unnecessary_escalation and merged with the 'ticket before confirmation' observations (0161, 0168, 0222, 0118) and the double escalation in 0132; one escalation gate fixes all three cases"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0184"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: 0152 recorded as close negative (ESC-3 requires escalating an inconsistent record); clause (d) added for a required escalation opened without the needed details (0169); 0245 added"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "Workshop suggestion W4 accepted: support-0052 turn 0 (ticket opened for an order months past the window; ESC-3 not met)."
+        },
+        {
+          "at": "2026-09-21T07:00:00Z",
+          "change": "human open code muau73ij7w4k8 (support-0200 turn 1, ticket opened to speed up a payout for a refund already issued) linked as an origin annotation; the trace was already a positive. Count unchanged at 10."
+        }
+      ]
+    },
+    {
+      "name": "redundant_policy_lookup",
+      "status": "final",
+      "definition": "The agent calls get_policy for a policy identifier that search_help_center already returned in the same conversation, or fetches the same policy more than once, or searches for a fixed platform policy (cw-returns, cw-refunds) whose identifier is known.",
+      "boundary": "Nearest: none in the reply layer; this is a tool-use mode. A search for a store policy whose id is unknown, or a single get_policy of a known id, is absent. find_order returning too little (0053) is tool design, parked. Counts even when search ranking caused the second lookup (0230, re-decided 2026-09-21): the label records the symptom; the product change is that search_help_center returns the full policy text.",
+      "spec_source": "TOOL-1/TOOL-2 contracts; SPEC revision 2026-09-21: search_help_center returns full policy text so a follow-up get_policy is unnecessary",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu8rsbcljmlr6",
+        "mu8sj89lyr5lz",
+        "mu7n9chyyctv7",
+        "muait7v98f7rm",
+        "muaona5nhxpdy",
+        "muaok2of2a930",
+        "muaolw0v5isku",
+        "muao6uvhvoi8g",
+        "muaohwemi9lrq",
+        "muaoiaegmu52r",
+        "mu7nhqlh5jkll",
+        "mu7npmyhu6ixu",
+        "muapvjekclvuw",
+        "muats0pnri2bq",
+        "muattao9lp4oa",
+        "muatsv9laqhbx",
+        "muatjgrnhtx02",
+        "mubw0230rpl01"
+      ],
+      "positive_scenario_ids": [
+        "support-0008",
+        "support-0011",
+        "support-0017",
+        "support-0040",
+        "support-0064",
+        "support-0103",
+        "support-0158",
+        "support-0161",
+        "support-0168",
+        "support-0177",
+        "support-0226",
+        "support-0235",
+        "support-0230"
+      ],
+      "positive_trace_ids": [
+        "04881b1188a69405e63c0cd38c97f2e1",
+        "1c303c23853df10222595fe6ecd94979",
+        "42a23e53ffa5dc970f4f30f056f5ddcb",
+        "4e30bf240e5c8d570799ff61a60c8a15",
+        "5679b45d6e47d3900d2653280d6f878d",
+        "682678d4f391ccee11e351119321f4e2",
+        "7c87c38a7bdc1f30c83906cb105d5140",
+        "aec73e9746f1386f167fe1fc24af0e3f",
+        "bd7424e5441eb7bc2ef9333eb82f83e0",
+        "d63587734a8ed48b3fcec20764296e3c",
+        "eae67e4e85d1616e00cf1c7e1e572b6e",
+        "f605f22e4372b9d0ec4cdc4bf4afb23b",
+        "3a50b2ad0f5ab100dd094d375b3d41b6"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0047",
+        "support-0069",
+        "support-0111",
+        "support-0229"
+      ],
+      "close_negative_trace_ids": [
+        "1b8fec97e5b3f21c7180f8ee900a3695",
+        "51171155d947caeb0b3797a848e3a529",
+        "fc8d189e31fd5f5951a11f951fd17142",
+        "09e041255205edf98327b4c343c50b63"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: 0008, 0177 confirmed; 0161, 0168, 0103, 0158 added from other signals; definition tightened to what was consistently flagged (get_policy after a search that returned it)"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0040, support-0226"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: 0011 added"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search for close negatives; reviewer accepted 4: support-0047, support-0069, support-0111, support-0229. Workshop suggestion W2 (0230, retrieval-caused repeats) rejected: 'cw-returns was ranked first, it was just retrieved again to get the full text, which is a separate mode'. OPEN: this reading conflicts with definition clause 1 (get_policy for an id the search already returned); reviewer to reconcile, then repeat the search."
+        },
+        {
+          "at": "2026-09-21T01:00:00Z",
+          "change": "reviewer kept definition clause 1 after the W2 conflict: a get_policy for an id the search already returned is the failure regardless of ranking; 0230 re-decided as positive (13). Two product changes recorded: search returns full text; agent stops re-fetching. No definition change, so no repeat search required."
+        }
+      ]
+    },
+    {
+      "name": "irrelevant_policy_nuance",
+      "status": "final",
+      "definition": "For a shopper or merchant caller, the reply mentions a store override, restocking fee, or 'same window as Cartwheel' for a store whose get_store_policy result has has_override=false and restocking_fee_opt_in=false. Not applied to support-role callers, for whom internal policy terms are appropriate.",
+      "boundary": "Nearest: verbose_reply. Fires only on the specific override/restocking mention when the tool says none applies, and only for shopper/merchant callers. When an override or restocking fee really exists (0232, 0116, 0151, 0222) mentioning it is correct. Support-role callers (0204) are out of scope.",
+      "spec_source": "RESP-5 (explain the relevant decision); candidate SPEC revision: do not describe inapplicable store policies",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu7m0nfqp38sh",
+        "mu7mnc0cts20t",
+        "mu8skh5ac7xz0",
+        "mu8zxccgo9tz1",
+        "mu902zt255hcw",
+        "mu7na0rmqfrio",
+        "muaor7qj9kzc5",
+        "muaqgu6s0ph54"
+      ],
+      "positive_scenario_ids": [
+        "support-0001",
+        "support-0053",
+        "support-0064",
+        "support-0173",
+        "support-0212",
+        "support-0217",
+        "support-0230",
+        "support-0235"
+      ],
+      "positive_trace_ids": [
+        "04881b1188a69405e63c0cd38c97f2e1",
+        "1d64910a303986a1ecc4e7f95fb341aa",
+        "281b031bad676fb84b647bfd8a96169d",
+        "3a50b2ad0f5ab100dd094d375b3d41b6",
+        "4c81b37b334a1935ccd51ddd43f7c017",
+        "5679b45d6e47d3900d2653280d6f878d",
+        "67ca5956e4cfc57aa0cdc669cfab234a",
+        "9bf584cc287fefdf7e0695d722782d01"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0232",
+        "support-0116",
+        "support-0151",
+        "support-0222",
+        "support-0204",
+        "support-0054"
+      ],
+      "close_negative_trace_ids": [
+        "6342d3a0b67f74b505956dcfc58c4f75",
+        "0882d44696b71af0c20abb7decb3de68",
+        "63d661ee55a9e72220cc400fc772903a",
+        "39ea9fe80e643bd559810cbdbb43a6a3",
+        "ccb9ac73056c94dcb5bb2b7149a3652b",
+        "7c5ce7600c15a075e4ecc586d498785e"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: scoped to shopper/merchant callers after 0204 (support role) was marked no-failure; 0212 added; 0161/0168 carry the pattern but were stopped earlier (first-failure rule), to be labeled in Part E"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: 0230 added (Harbor Knits, no override); 0054 close negative (Northwind override exists)"
+        }
+      ],
+      "latent_positive_scenario_ids": [
+        "support-0161",
+        "support-0168"
+      ]
+    },
+    {
+      "name": "unsolicited_next_steps",
+      "status": "final",
+      "definition": "After answering, the reply offers an additional action, path, or follow-up (open a ticket, check another order, 'tell me if...') that the user did not ask for.",
+      "boundary": "Nearest: unnecessary_escalation. This mode is an offer in text; unnecessary_escalation is a ticket actually created. An escalation that the scenario requires (inconsistent record, past-window exception) is neither.",
+      "spec_source": "RESP-5; candidate SPEC revision: answer the question asked and stop",
+      "evaluator": "llm_judge",
+      "origin_annotation_ids": [
+        "mu7nvlkpesr85",
+        "mu8sku7a1ubxb",
+        "mu8zf56o72pi8",
+        "mu7n5l2l8s1k0",
+        "mu7msvhaavyhb",
+        "mu7ndz196uk0u",
+        "mu7np5tjdrrn2",
+        "mu7nqe1thv9q0",
+        "muapxdomfjvyw",
+        "muaq2wxp41cm1",
+        "muatsfozvn163",
+        "muatx4iau2ibu",
+        "muatncek2w32z",
+        "muatmhogs82uu"
+      ],
+      "positive_scenario_ids": [
+        "support-0006",
+        "support-0011",
+        "support-0037",
+        "support-0052",
+        "support-0064",
+        "support-0069",
+        "support-0083",
+        "support-0137",
+        "support-0195",
+        "support-0229"
+      ],
+      "positive_trace_ids": [
+        "019bc026ff85fbf1663025c248b241b0",
+        "09e041255205edf98327b4c343c50b63",
+        "4b4432d8386450d8ebbb7c1e24fda011",
+        "51171155d947caeb0b3797a848e3a529",
+        "5409b3cfa7c03957cccebf4361316979",
+        "5679b45d6e47d3900d2653280d6f878d",
+        "ae4dd475b14325494a30f8dcd19307e0",
+        "bb03f099869d2a3072396a1661caca89",
+        "d02b5b8c9813b199e6512d5dea2ce8f4",
+        "d63587734a8ed48b3fcec20764296e3c"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0003",
+        "support-0005",
+        "support-0015",
+        "support-0030"
+      ],
+      "close_negative_trace_ids": [
+        "caab0dca46524e2ed44bd7364846a7d1",
+        "9c550c45be48d652083d481879f65520",
+        "26be5d0ecf9ef929076758825f818a1d",
+        "75e94a7296cff8edc447060132ea8d09"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0037, support-0195, support-0229"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: 0011, 0052 added"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search for close negatives; reviewer accepted 4: support-0003, support-0005, support-0015, support-0030."
+        }
+      ]
+    },
+    {
+      "name": "verbose_reply",
+      "status": "final",
+      "definition": "The reply either (1) states the same fact or instruction more than once in one turn, or (2) includes policy mechanics, caveats, or background the user did not ask about and that are not needed to answer the question (beyond the answer, one citation, and one sentence of context).",
+      "boundary": "Nearest: unsolicited_next_steps (offers of further action) and irrelevant_policy_nuance (the specific override mention). verbose_reply covers repetition and unrequested explanation, not offers of action and not the override sentence alone.",
+      "spec_source": "RESP-5",
+      "evaluator": "llm_judge",
+      "origin_annotation_ids": [
+        "mu8s0kvrnx2ne",
+        "mu8si2dvh45y3",
+        "mu8zh3h8gwtv3",
+        "mu8zhov4mmewo",
+        "mu7ms8xe7dbzo",
+        "mu7mwdosatv01",
+        "mu7n7x8cebrwu",
+        "mu7na0rmqfrio",
+        "mu7n6eeknbb61",
+        "mu8zjipyb0c4e",
+        "mu8zjxrsslmwh",
+        "mu7n76ab0t4j9",
+        "muaj2xwpxtywz",
+        "muaooa6rks6f2",
+        "muaoaba9cpbbg",
+        "mu7nlc389wp1i",
+        "mu7nk83w1nu5m",
+        "muaq4l7391llg",
+        "muaq6aupw5vmb",
+        "muaqif9c5ofts",
+        "muatmc4cz687a",
+        "muatn1cgqf1cq",
+        "muatnliyp11gr"
+      ],
+      "positive_scenario_ids": [
+        "support-0038",
+        "support-0047",
+        "support-0052",
+        "support-0054",
+        "support-0059",
+        "support-0083",
+        "support-0092",
+        "support-0100",
+        "support-0108",
+        "support-0111",
+        "support-0116",
+        "support-0120",
+        "support-0125",
+        "support-0137",
+        "support-0177",
+        "support-0215",
+        "support-0232",
+        "support-0235",
+        "support-0245"
+      ],
+      "positive_trace_ids": [
+        "04314ac3d3fc06b14cae105c8aa17d2a",
+        "04881b1188a69405e63c0cd38c97f2e1",
+        "0882d44696b71af0c20abb7decb3de68",
+        "168a15f8b84afda8f86b4a50f1b84eed",
+        "1b8fec97e5b3f21c7180f8ee900a3695",
+        "1be27ffb6218b5096ef6cb5023dc23c8",
+        "20a17db1c717dc4499b614fb9aa629c0",
+        "37c8aa38ce99878aeba5f74634b28eed",
+        "3ca881a3a021c7e131b8e4e80cdf5998",
+        "6342d3a0b67f74b505956dcfc58c4f75",
+        "7c5ce7600c15a075e4ecc586d498785e",
+        "8d5c01b47a868c879b66e72f7acfdaa1",
+        "90e99ad5eb496f2e1ca2d8d952c25dc0",
+        "92b0e2ed929edd7671202a6974559541",
+        "98d84c1c4e7a4cabe568cc81636cf4f1",
+        "aec73e9746f1386f167fe1fc24af0e3f",
+        "d02b5b8c9813b199e6512d5dea2ce8f4",
+        "fc8d189e31fd5f5951a11f951fd17142",
+        "fe28adae055380767589059de73d029e"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0030",
+        "support-0015",
+        "support-0021"
+      ],
+      "close_negative_trace_ids": [
+        "75e94a7296cff8edc447060132ea8d09",
+        "26be5d0ecf9ef929076758825f818a1d",
+        "f1dfad5e6c236ee85a99e7ff9c79fff9"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": null,
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: restates_itself folded back in as criterion (1) to stay within 8 modes; 0038, 0177, 0120 added"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0100, support-0108"
+        },
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "axial pass 4: 0052, 0054, 0245 added"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search for close negatives; reviewer accepted 3: support-0030, support-0015, support-0021. Rejected 0035: short reply that still says 'cancelled' twice, so length is not the boundary; repetition is."
+        }
+      ]
+    },
+    {
+      "name": "first_person_framing",
+      "status": "final",
+      "definition": "The reply frames a system rule or outcome as the agent's personal decision or ability in the first person ('I can't cancel it', 'I found', 'I'm not authorized') where the rule, the record, or the policy is the actual reason.",
+      "boundary": "Nearest: verbose_reply. This mode is about the framing of one sentence, not its length. 'I opened a ticket' for an action the agent actually took is absent; 'I can't refund this' for a policy outcome is present. Empathy or casual-judgement notes (0001, 0104) are not this mode and stay parked.",
+      "spec_source": "RESP-5; candidate SPEC guidance: state rules and outcomes impersonally",
+      "evaluator": "llm_judge",
+      "origin_annotation_ids": [
+        "mu8rw5ry9dhs4",
+        "mu7ncvc5uksnz",
+        "mu7niofp8vf7m",
+        "muatp92fb0tz1",
+        "muatqq0617815",
+        "muau9aiudv2le"
+      ],
+      "positive_scenario_ids": [
+        "support-0020",
+        "support-0037",
+        "support-0086"
+      ],
+      "positive_trace_ids": [
+        "019bc026ff85fbf1663025c248b241b0",
+        "3ff2729da5b3d80a9de9ee1945a41057",
+        "95236a75300dcabe92b5b881cce01a41"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0056",
+        "support-0066",
+        "support-0132"
+      ],
+      "close_negative_trace_ids": [
+        "c7c6dfc2258d37d9e29f607f76399dc6",
+        "fa015c4d50cc0ef5aedd2358b3704a6b",
+        "e8b29aebeba277d2188c44b7b06fa857"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": "2 positives at finalization; third expected from the search step or Batch 4",
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:00:00Z",
+          "change": "axial pass 3: narrowed from tone_mismatch to first-person framing (0020, 0037); other tone notes parked"
+        },
+        {
+          "at": "2026-09-20T18:10:00Z",
+          "change": "took the 8th slot"
+        },
+        {
+          "at": "2026-09-20T19:00:00Z",
+          "change": "batch1_clusters annotations folded in (missed in axial passes 2 and 3): support-0086"
+        },
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "agent search for close negatives; reviewer accepted 3: support-0056, support-0066, support-0132. Rejected 0064: 'I checked...' earlier in the reply is the framing; candidate positive, not yet confirmed."
+        }
+      ]
+    },
+    {
+      "name": "no_reference_date",
+      "status": "final",
+      "definition": "The reply asserts a date-based conclusion (a return or refund deadline has passed or not passed, or a time span the user described does or does not match an order) that contradicts or explains away a tool result or the order record, such as refund_eligible or ordered_at. Root cause found in HW4: the prompt gives the agent no current date, so it guesses today.",
+      "boundary": "Nearest: assumes_instead_of_asking (the agent resolves an ambiguity by guessing; here the guessed value is today's date, and the guess overrides a tool field rather than the user's intent). Absent: a deadline computed and stated as a date with no claim about whether it has passed; a past/future claim that agrees with the tool's eligibility flag; a mismatch claim the user later confirms.",
+      "spec_source": "RESP-7 (new, 2026-09-21): the agent receives the current date and makes every date claim relative to it; RESP-3 covered the invented value meanwhile",
+      "evaluator": "llm_judge",
+      "positive_scenario_ids": [
+        "support-0054",
+        "support-0230",
+        "support-0245",
+        "support-0216",
+        "support-0103",
+        "support-0109"
+      ],
+      "positive_trace_ids": [
+        "7c5ce7600c15a075e4ecc586d498785e",
+        "3a50b2ad0f5ab100dd094d375b3d41b6",
+        "fe28adae055380767589059de73d029e",
+        "82892f7bbc217c02ce51cfafa4de058f",
+        "1c303c23853df10222595fe6ecd94979",
+        "dbf21fb25dbbefcfbe8211fa08727826"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0064",
+        "support-0137",
+        "support-0151",
+        "support-0217",
+        "support-0173",
+        "support-0183"
+      ],
+      "close_negative_trace_ids": [
+        "5679b45d6e47d3900d2653280d6f878d",
+        "d02b5b8c9813b199e6512d5dea2ce8f4",
+        "63d661ee55a9e72220cc400fc772903a",
+        "1d64910a303986a1ecc4e7f95fb341aa",
+        "281b031bad676fb84b647bfd8a96169d",
+        "b0dfb8375799e4889ae99afdec9d1beb"
+      ],
+      "origin_annotation_ids": [
+        "muat4ln8zme38",
+        "muat6waaziwzz",
+        "muat8yknal4y1",
+        "muaunp2nnnaud",
+        "muauozz3bcka0",
+        "muaupjynog7yz",
+        "muauqja2wg712",
+        "muaur6e883tue",
+        "muaurhh50msa5",
+        "muaurvkkzgwxa",
+        "muausay7sx5q2",
+        "muatzbixwna58"
+      ],
+      "created_at": "2026-09-21T00:30:00Z",
+      "notes": "Promoted to final on 2026-09-21 (ninth mode, above the handout's 5 to 8 range by reviewer decision). From Workshop Part C, W1.",
+      "history": [
+        {
+          "at": "2026-09-21T00:30:00Z",
+          "change": "created as candidate from three accepted Workshop suggestions (0054, 0230, 0245 turn 1); prompt has no date, world is as of 2026-07-01"
+        },
+        {
+          "at": "2026-09-21T01:00:00Z",
+          "change": "promoted to final by the reviewer; symptom-based definition per the AgentDebug comparison; RESP-7 added to SPEC.md"
+        },
+        {
+          "at": "2026-09-21T07:00:00Z",
+          "change": "search (deadline statements vs. world date and refund_eligible): reviewer accepted positives support-0216, support-0103, support-0109 t1 (human open code); close negatives support-0064, support-0137, support-0151, support-0217, support-0173, support-0183. Positives 6, close negatives 6."
+        }
+      ]
+    },
+    {
+      "name": "incomplete_outcome_report",
+      "status": "final",
+      "definition": "A reply that reports the result of issue_refund or cancel_order, or answers an order status question, omits one or more of the required fields: the order (number, product, store), the amount or status, what happens next (auto-approved, queued for human review, cancelled), and the expected timing. Applies whether or not the user asked for a short answer.",
+      "boundary": "Nearest: verbose_reply (too much) and first_person_framing (how the outcome is phrased). This mode is about too little: the required facts are missing, however short or long the reply. A short reply that contains all required fields is absent (0021). All four positives so far follow a 'short plain answer' request, so the boundary with 'the user asked for brevity' matters: brevity removes filler, not the required fields.",
+      "spec_source": "RESP-8 (new, 2026-09-21): required fields in outcome and status replies; ESC-1 (the agent explains the result)",
+      "evaluator": "llm_judge",
+      "positive_scenario_ids": [
+        "support-0097",
+        "support-0140",
+        "support-0066",
+        "support-0056"
+      ],
+      "positive_trace_ids": [
+        "a92060ed0ad9b9a5a153163471f7deb7",
+        "40d0f6aacf480458663c499339224483",
+        "fa015c4d50cc0ef5aedd2358b3704a6b",
+        "c7c6dfc2258d37d9e29f607f76399dc6"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0021"
+      ],
+      "close_negative_trace_ids": [
+        "f1dfad5e6c236ee85a99e7ff9c79fff9"
+      ],
+      "origin_annotation_ids": [
+        "muaq7890a3n0s",
+        "muaofr28xbm7o",
+        "muatrin1wtt1v",
+        "muatq1lopvwep",
+        "muatos5lbk8g6"
+      ],
+      "created_at": "2026-09-21T08:00:00Z",
+      "notes": "Promoted from backup mode incomplete_write_outcome on 2026-09-21 (tenth mode, above the handout's 5 to 8 range by reviewer decision). Widened from write confirmations to status replies after 0056.",
+      "history": [
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "recorded as backup after the Batch 4 stability check"
+        },
+        {
+          "at": "2026-09-21T08:00:00Z",
+          "change": "promoted to final and renamed from incomplete_write_outcome; positives 0097, 0140, 0066, 0056; close negative 0021; two more close negatives still to be found."
+        }
+      ]
+    }
+  ],
+  "parked": {
+    "widgets_and_links": {
+      "note": "12 open codes ask for order/product/ticket/policy widgets or links. Product backlog, not a failure mode: absent from every trace so it cannot be judged or measured.",
+      "annotation_ids": [
+        "mu7n41m0vdo3u",
+        "mu7mobjkxw4mb",
+        "mu7n5apj1ly2x",
+        "mu7ms8xe7dbzo",
+        "mu7mv3drdn0x9",
+        "mu7mwdosatv01",
+        "mu7my7zimfkzv",
+        "mu7mm2z7kjx3g",
+        "mu8zg1718e945",
+        "mu8zlzxu01v9j",
+        "mu8zxmdgdr82v",
+        "mu901s3t3i28a",
+        "mu7nc8rh7voxu",
+        "mu7nd8pkf1evf",
+        "mu7nia5j93649",
+        "mu7no1dlwi3q4",
+        "mu7nofm9dbhef",
+        "mu7nmj66v7m6i",
+        "muaq8vpjrbvo8"
+      ]
+    },
+    "tool_design": {
+      "note": "find_order returns order ids without product title or store name, so the agent calls get_order on every match just to identify the item (6 observations). Fix is a tool change (TOOL-6 contract), not agent behavior; backlog, not a mode. Also: search_help_center returns snippets, so the agent fetches the full policy afterwards (0052). 2026-09-21: 0109 (muatyu217ix20) asks list_my_orders to return product title and store name; same item.",
+      "annotation_ids": [
+        "mu7mk4oyw7746",
+        "mu7mx5kub01aa",
+        "muaipwbzsmbyz",
+        "muaoc3rf3gmpe",
+        "muao8osaldc89",
+        "muaoh484rabaa",
+        "muaix8dn5cgy7",
+        "mu7nften2mne7",
+        "muaq1x8wsli41",
+        "muatyu217ix20"
+      ]
+    },
+    "singletons": {
+      "note": "one observation each; revisit after Batch 3 2026-09-21: 0137 (muauqgoyggv6w) deadline stated as 'around June 30' instead of an exact date; one observation.",
+      "annotation_ids": [
+        "mu905ffzue1ry",
+        "mu7mutfz0jyhm",
+        "mu7mt2ce0ygz6",
+        "mu7mtzwc1sjf1",
+        "muauqgoyggv6w"
+      ]
+    },
+    "reasoning_blocks_not_user_visible": {
+      "note": "Thinking blocks are intermediate model text; server returns final_output only. Notes kept as cost observations.",
+      "annotation_ids": [
+        "mu7lucx9rvl9e",
+        "mu7mrdbwizfbr"
+      ]
+    },
+    "spec_questions": {
+      "note": "Surfaced in Batch 3, no mode: who maintains catalog data, merchant portal vs. ticket (0028, 0067); what a queued refund reply should say about timing (0140); whether to offer the queue before escalating an above-threshold refund (0222).",
+      "annotation_ids": [
+        "muaiypvqf853h",
+        "muaj4hgbn9kik",
+        "muaofr28xbm7o",
+        "muaosjqp5oau6"
+      ]
+    },
+    "tone_other": {
+      "note": "casual judgement (0001), missing empathy (0104), over-familiar (0230); three notes, no shared definition yet",
+      "annotation_ids": [
+        "mu7lznsmly7vh",
+        "mu7mqlcrftded",
+        "muaqgcza0y3ox"
+      ]
+    },
+    "product_requirements": {
+      "note": "Flag agitated interactions for internal review (sentiment signal on user turns). A monitoring feature, not an agent failure against a requirement.",
+      "annotation_ids": [
+        "muaq42bw7ff5m"
+      ]
+    }
+  },
+  "revisions": [
+    {
+      "at": "2026-09-19T20:00:00Z",
+      "change": "axial pass 2: 10 candidates + 1 held; split verbose into restates_itself + verbose_reply; merged 0066/0134 into write_without_confirmation after checking find_order returned one match"
+    },
+    {
+      "at": "2026-09-20T18:00:00Z",
+      "change": "axial pass 3 over 85 conversations: 7 modes final; restates_itself folded into verbose_reply; unnecessary_escalation merged with premature-escalation observations as unwarranted_escalation; irrelevant_policy_nuance scoped to shopper/merchant; raw_policy_id_in_prose demoted to systematic; tone narrowed to first_person_framing; find_order fan-out parked as tool design"
+    },
+    {
+      "at": "2026-09-20T18:10:00Z",
+      "change": "final taxonomy: 8 modes; product_search_in_chat dropped in favour of first_person_framing and kept as the SCOPE-1 revision"
+    },
+    {
+      "at": "2026-09-20T19:00:00Z",
+      "change": "batch1_clusters (18 annotations) reviewed for axial coding; no new mode; 9 origins added across 6 modes; first_person_framing reaches 3 positives"
+    },
+    {
+      "at": "2026-09-20T21:00:00Z",
+      "change": "axial pass 4 (batch4_uniform, 15 conv): 1 previously unseen consequential mode (incomplete_write_outcome) recorded as backup; taxonomy stays at 8; RESP-6 widened to all roles; 0152 close negative under ESC-3"
+    },
+    {
+      "at": "2026-09-21T01:00:00Z",
+      "change": "ninth mode no_reference_date added from Workshop W1 (0054, 0230, 0245 turn 1); redundant_policy_lookup boundary clarified after the 0230 conflict (ranking-caused repeats count); SPEC: RESP-7 new, TOOL-1 search returns full text."
+    },
+    {
+      "at": "2026-09-21T07:00:00Z",
+      "change": "no_reference_date: 6 positives / 6 close negatives after search and one human open code (0109 t1); unwarranted_escalation +0200 t1; incomplete_write_outcome backup now has 4 positives and 1 close negative (decision pending)."
+    },
+    {
+      "at": "2026-09-21T08:00:00Z",
+      "change": "tenth mode incomplete_outcome_report promoted from backup; RESP-8 added; RESP-6 confirmation form tightened and write search repeated (51 writes, 0 confirmed, positives unchanged)."
+    }
+  ],
+  "merged": [
+    {
+      "at": "2026-09-20T18:00:00Z",
+      "from": "restates_itself",
+      "into": "verbose_reply",
+      "reason": "8-mode cap; repetition is a sub-case of the same concision fix",
+      "origin_annotation_ids": [
+        "mu7n6eeknbb61",
+        "mu8zjipyb0c4e",
+        "mu8zjxrsslmwh",
+        "mu7n76ab0t4j9"
+      ]
+    }
+  ],
+  "demoted": [
+    {
+      "name": "raw_policy_id_in_prose",
+      "status": "systematic",
+      "definition": "The reply prints a policy identifier such as cw-returns or store-cascade-audio-policy in its prose instead of citing the policy by title with a link.",
+      "boundary": "Nearest: verbose_reply. This mode is only about the form of the citation. A reply that cites by title and link but is long is verbose_reply only. A reply with no citation at all is a RESP-1 miss, not this mode.",
+      "spec_source": "RESP-1 (revised): cite by title and link, not by raw identifier",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu7m18md4qomu",
+        "mu7n5apj1ly2x",
+        "mu8rw5ry9dhs4",
+        "mu8zhvu8nvzx5",
+        "mu8zxccgo9tz1"
+      ],
+      "positive_scenario_ids": [
+        "support-0001",
+        "support-0020",
+        "support-0083",
+        "support-0111",
+        "support-0173"
+      ],
+      "positive_trace_ids": [
+        "281b031bad676fb84b647bfd8a96169d",
+        "95236a75300dcabe92b5b881cce01a41",
+        "9bf584cc287fefdf7e0695d722782d01",
+        "bb03f099869d2a3072396a1661caca89",
+        "fc8d189e31fd5f5951a11f951fd17142"
+      ],
+      "close_negative_scenario_ids": [],
+      "close_negative_trace_ids": [],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": "Present in essentially every reply because the current system prompt requires the identifier. Addressed by the RESP-1 revision and a prompt change; not carried as a judged mode (no close negatives possible in this data).",
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        }
+      ]
+    },
+    {
+      "name": "product_search_in_chat",
+      "status": "scope_rule",
+      "definition": "The agent performs general product browsing for a shopper (options, recommendations, 'what do you have') in chat instead of directing them to the Cartwheel app.",
+      "boundary": "Nearest: none. A lookup of one specific listing for a merchant or support user (0079, 0170) remains supported and is absent.",
+      "spec_source": "SCOPE-1 (revised): general shopping and browsing go to the app",
+      "evaluator": "code_check",
+      "origin_annotation_ids": [
+        "mu8rx0lmpmwl7",
+        "mu8s17z1vvh37"
+      ],
+      "positive_scenario_ids": [
+        "support-0036",
+        "support-0050"
+      ],
+      "positive_trace_ids": [
+        "3ea0b3e13ac5d04540b99b32ab7899c1",
+        "6afdc8abc9a9bde0160f1bef8b0413d1"
+      ],
+      "close_negative_scenario_ids": [
+        "support-0170",
+        "support-0079"
+      ],
+      "close_negative_trace_ids": [
+        "b69c6ff17c92f3fc74ce7658c0727e25",
+        "214a9664bbe02ff28addbc7a31c7b36b"
+      ],
+      "created_at": "2026-09-19T20:00:00Z",
+      "notes": "Kept as the SCOPE-1 revision in SPEC.md (general shopping goes to the app), not as a judged mode: within the product_search intent it would be present on nearly every shopper trace, and the 8-mode cap went to first_person_framing.",
+      "history": [
+        {
+          "at": "2026-09-19T20:00:00Z",
+          "change": "created from axial pass 2 over batch1_uniform + batch2_intent (45 conversations)"
+        },
+        {
+          "at": "2026-09-20T18:10:00Z",
+          "change": "dropped from the final set; recorded as a SPEC revision"
+        }
+      ]
+    }
+  ],
+  "backup_modes": [
+    {
+      "name": "incomplete_write_outcome",
+      "status": "promoted",
+      "definition": "After issue_refund or cancel_order, the reply does not state the resulting status and what happens next (approval step, expected timing), or does not point to the refund policy.",
+      "spec_source": "ESC-1 (the agent explains the result); candidate SPEC guidance on post-write replies",
+      "evaluator": "llm_judge",
+      "origin_annotation_ids": [
+        "muaofr28xbm7o",
+        "muaq7890a3n0s"
+      ],
+      "positive_scenario_ids": [
+        "support-0140",
+        "support-0097"
+      ],
+      "note": "The one previously unseen consequential mode found in batch4_uniform (foreshadowed by 0140 in batch 3). Held out of the final 8 by the cap; kept for future review or as a replacement.",
+      "history": [
+        {
+          "at": "2026-09-20T21:00:00Z",
+          "change": "recorded as backup after the Batch 4 stability check"
+        }
+      ],
+      "additional_evidence": [
+        {
+          "annotation_id": "muatrin1wtt1v",
+          "scenario_id": "support-0066",
+          "note": "refund confirmation lacks order number, product, store, status"
+        },
+        {
+          "annotation_id": "muatq1lopvwep",
+          "scenario_id": "support-0056",
+          "note": "status reply omits the standard order fields even for a short-answer request; widens the pattern from writes to status replies"
+        },
+        {
+          "annotation_id": "muatos5lbk8g6",
+          "scenario_id": "support-0021",
+          "note": "close negative: refund confirmation with order, amount, status and timing"
+        }
+      ],
+      "note_2026_09_21": "Now 4 candidate positives (0097, 0140, 0066, 0056) and 1 close negative (0021). Reviewer decision pending: promote as 'incomplete_outcome_report' (a tenth mode) or keep as backup.",
+      "promoted_as": "incomplete_outcome_report",
+      "promoted_at": "2026-09-21T08:00:00Z"
+    }
+  ],
+  "stability_check": {
+    "batch": "batch4_uniform",
+    "conversations": 15,
+    "no_failure": 5,
+    "annotations": 22,
+    "flagged_new_by_reviewer": 5,
+    "previously_unseen_consequential_modes": 1,
+    "which": [
+      "incomplete_write_outcome"
+    ],
+    "other_flags": {
+      "tool_design": [
+        "muaq1x8wsli41"
+      ],
+      "product_requirement": [
+        "muaq42bw7ff5m"
+      ],
+      "covered_by_existing": [
+        "muaqdpbof5p8f"
+      ],
+      "parked_tone_other": [
+        "muaqgcza0y3ox"
+      ]
+    },
+    "decision": "taxonomy stable; no fifth batch"
+  },
+  "searches": [
+    {
+      "at": "2026-09-21T00:30:00Z",
+      "mode": "write_without_confirmation",
+      "kind": "deterministic",
+      "signal": "every issue_refund/cancel_order call in the 313 traces; previous assistant turn checked for a confirmation question and the triggering user message for a plain yes",
+      "returned": {
+        "writes": 51,
+        "confirmed": 0,
+        "new_positive_candidates": 34,
+        "close_negative_candidates": 6
+      },
+      "reviewed": {
+        "positives_accepted": 9,
+        "close_negatives_accepted": 5,
+        "rejected": [
+          "support-0029"
+        ],
+        "withdrawn_unreviewed_out_of_set": 25
+      },
+      "repeat_after_revision": "not required yet: definition unchanged; rerun if the 0029 reading (order number or widget click required) is written into the definition"
+    },
+    {
+      "at": "2026-09-21T00:30:00Z",
+      "mode": "close negatives for six modes",
+      "kind": "deterministic per-mode signals (see method field on each suggestion)",
+      "reviewed": {
+        "redundant_policy_lookup": 4,
+        "unsolicited_next_steps": 4,
+        "verbose_reply": 3,
+        "first_person_framing": 3,
+        "assumes_instead_of_asking": 3
+      },
+      "rejected": [
+        "support-0035 (verbose_reply)",
+        "support-0064 (first_person_framing)"
+      ]
+    }
+  ],
+  "labeling_scope": {
+    "modes": [
+      "write_without_confirmation",
+      "verbose_reply",
+      "redundant_policy_lookup",
+      "unwarranted_escalation",
+      "unsolicited_next_steps"
+    ],
+    "set_at": "2026-09-21T09:00:00Z",
+    "reason": "Reviewer chose to label the five modes with the most confirmed positives first (HW5 needs 30 Fail labels per judged mode). The other five final modes stay in the taxonomy; their provisional labels remain unconfirmed until scope is widened.",
+    "exceptions": [
+      {
+        "scenario_id": "support-0192",
+        "note": "20-turn conversation (batch1_clusters); reviewer confirmed 2 turns and left the other 18 provisional by decision on 2026-09-21. Reported as partially labeled in review_summary.md."
+      }
+    ]
+  }
+}

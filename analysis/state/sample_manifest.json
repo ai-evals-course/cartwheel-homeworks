@@ -1,0 +1,754 @@
+{
+  "population": {
+    "source": "langfuse",
+    "trace_ids_from": "traces/support_traces.json",
+    "exported_at": "2026-09-15T04:49:18.868616+00:00",
+    "trace_count": 313,
+    "conversation_count": 250,
+    "unit": "conversation (traces grouped by cartwheel.scenario_id, ordered by timestamp)",
+    "note": "Langfuse also holds 48 pilot/dev traces from 2026-09-12 and 09-14; excluded from the review population."
+  },
+  "batches": [
+    {
+      "name": "batch1_uniform",
+      "method": "11 conversations reviewed while trying the interface (opened without any selection signal) plus 4 drawn with random.Random(20260918).sample over the 239 remaining conversations",
+      "reason": "breadth: uniform draw, no structural or outcome signal influences selection",
+      "created_at": "2026-09-18",
+      "hand_reviewed_first": [
+        "support-0001",
+        "support-0003",
+        "support-0053",
+        "support-0081",
+        "support-0104",
+        "support-0137",
+        "support-0172",
+        "support-0203",
+        "support-0215",
+        "support-0248",
+        "support-0250"
+      ],
+      "random_added": [
+        "support-0042",
+        "support-0083",
+        "support-0232",
+        "support-0235"
+      ],
+      "scenario_ids": [
+        "support-0001",
+        "support-0003",
+        "support-0042",
+        "support-0053",
+        "support-0081",
+        "support-0083",
+        "support-0104",
+        "support-0137",
+        "support-0172",
+        "support-0203",
+        "support-0215",
+        "support-0232",
+        "support-0235",
+        "support-0248",
+        "support-0250"
+      ],
+      "trace_ids": [
+        "9bf584cc287fefdf7e0695d722782d01",
+        "caab0dca46524e2ed44bd7364846a7d1",
+        "8d9b7ca383decc606861ae9405a7b3c3",
+        "4c81b37b334a1935ccd51ddd43f7c017",
+        "7d39703c00359e1ece85dd29d1fb02b7",
+        "bb03f099869d2a3072396a1661caca89",
+        "98d84c1c4e7a4cabe568cc81636cf4f1",
+        "9866e2d06822061c27b69381595caef3",
+        "d02b5b8c9813b199e6512d5dea2ce8f4",
+        "61bc4731a02edf2386259eabdef1747f",
+        "af83dfdaaa89b9bfd51d75b9b0f8c8d2",
+        "90e99ad5eb496f2e1ca2d8d952c25dc0",
+        "6342d3a0b67f74b505956dcfc58c4f75",
+        "04881b1188a69405e63c0cd38c97f2e1",
+        "e91e85f8e265682dfc3f0362eb8b64c3",
+        "55725bdf6633f93e0bd266407c3b9e56",
+        "b6cf93a3d5198d44b87aea2b6cc34be2",
+        "e7cec92d6e2a72b0e19b082a972b5e8e"
+      ]
+    },
+    {
+      "name": "batch1_clusters",
+      "method": "k-means (analysis.helpers.selection._kmeans, k=8, seed=7) over standardized tool_calls, turns, log(reply_chars) and a 0.6-weighted intent one-hot; 1 to 2 conversations nearest each centroid, skipping ones already in a batch",
+      "reason": "breadth: cover every structural corner of the collection, not only the dense middle a uniform draw favours",
+      "created_at": "2026-09-18",
+      "clusters": [
+        {
+          "cluster": 0,
+          "size": 24,
+          "median_tool_calls": 4,
+          "median_turns": 2,
+          "median_reply_chars": 1625,
+          "top_intents": [
+            [
+              "refund",
+              6
+            ],
+            [
+              "order_status",
+              6
+            ],
+            [
+              "cancellation",
+              4
+            ]
+          ],
+          "picked": [
+            "support-0195",
+            "support-0229"
+          ]
+        },
+        {
+          "cluster": 1,
+          "size": 10,
+          "median_tool_calls": 2,
+          "median_turns": 1,
+          "median_reply_chars": 168,
+          "top_intents": [
+            [
+              "cancellation",
+              10
+            ]
+          ],
+          "picked": [
+            "support-0030",
+            "support-0087"
+          ]
+        },
+        {
+          "cluster": 2,
+          "size": 71,
+          "median_tool_calls": 2,
+          "median_turns": 1,
+          "median_reply_chars": 530,
+          "top_intents": [
+            [
+              "refund",
+              20
+            ],
+            [
+              "policy_question",
+              17
+            ],
+            [
+              "product_search",
+              11
+            ]
+          ],
+          "picked": [
+            "support-0037",
+            "support-0108"
+          ]
+        },
+        {
+          "cluster": 3,
+          "size": 50,
+          "median_tool_calls": 6,
+          "median_turns": 1,
+          "median_reply_chars": 917,
+          "top_intents": [
+            [
+              "refund",
+              32
+            ],
+            [
+              "return_deadline",
+              12
+            ],
+            [
+              "dispute",
+              3
+            ]
+          ],
+          "picked": [
+            "support-0040",
+            "support-0226"
+          ]
+        },
+        {
+          "cluster": 4,
+          "size": 11,
+          "median_tool_calls": 2,
+          "median_turns": 1,
+          "median_reply_chars": 93,
+          "top_intents": [
+            [
+              "refund",
+              8
+            ],
+            [
+              "dispute",
+              1
+            ],
+            [
+              "policy_question",
+              1
+            ]
+          ],
+          "picked": [
+            "support-0167",
+            "support-0184"
+          ]
+        },
+        {
+          "cluster": 5,
+          "size": 72,
+          "median_tool_calls": 1,
+          "median_turns": 1,
+          "median_reply_chars": 267,
+          "top_intents": [
+            [
+              "order_status",
+              34
+            ],
+            [
+              "product_search",
+              15
+            ],
+            [
+              "refund",
+              13
+            ]
+          ],
+          "picked": [
+            "support-0100",
+            "support-0194"
+          ]
+        },
+        {
+          "cluster": 6,
+          "size": 1,
+          "median_tool_calls": 35,
+          "median_turns": 20,
+          "median_reply_chars": 7982,
+          "top_intents": [
+            [
+              "refund",
+              1
+            ]
+          ],
+          "picked": [
+            "support-0192"
+          ]
+        },
+        {
+          "cluster": 7,
+          "size": 11,
+          "median_tool_calls": 1,
+          "median_turns": 1,
+          "median_reply_chars": 42,
+          "top_intents": [
+            [
+              "cancellation",
+              6
+            ],
+            [
+              "order_status",
+              4
+            ],
+            [
+              "product_search",
+              1
+            ]
+          ],
+          "picked": [
+            "support-0086",
+            "support-0056"
+          ]
+        }
+      ],
+      "scenario_ids": [
+        "support-0030",
+        "support-0037",
+        "support-0040",
+        "support-0056",
+        "support-0086",
+        "support-0087",
+        "support-0100",
+        "support-0108",
+        "support-0167",
+        "support-0184",
+        "support-0192",
+        "support-0194",
+        "support-0195",
+        "support-0226",
+        "support-0229"
+      ],
+      "trace_ids": [
+        "75e94a7296cff8edc447060132ea8d09",
+        "019bc026ff85fbf1663025c248b241b0",
+        "f605f22e4372b9d0ec4cdc4bf4afb23b",
+        "c7c6dfc2258d37d9e29f607f76399dc6",
+        "3ff2729da5b3d80a9de9ee1945a41057",
+        "891be4deb9dc6edd8ba871ee3d54500a",
+        "8d5c01b47a868c879b66e72f7acfdaa1",
+        "1be27ffb6218b5096ef6cb5023dc23c8",
+        "f2d254cb404b7581fc46e2de40d8b8d9",
+        "de8abc2e3e7681dfa47f847be0c58cd4",
+        "aefe16b7fe123643ae47c050bfc6ee88",
+        "b3d5e2d954fa41ec4ddce0c0d60b08c4",
+        "138dd7997dfe646afd29a638319802e7",
+        "964a18e14bd455d02dfb09eeab7da358",
+        "dcacbbd369df719c2da36d5b62f1cd44",
+        "fc4a2e0b9aa1213caabc2a1c2981ed89",
+        "dc7721a83af0c0db939f19edce8dca2d",
+        "2c35152baf35fa127b8b8de4896a17fa",
+        "bf2541906aa3b91e6e270b68053387f3",
+        "e52786c0d7db36ce7d0cab85f31a947a",
+        "971c1041f11482c570b9469c5048948f",
+        "e4fa00811635444dd1d6c02612cf7123",
+        "9d727a555acfcc9d3102e0cf36e79eff",
+        "b2016e548e2e5121e80eb78c51936910",
+        "0aee6151690167b20677f3330418f30f",
+        "d269ac73c9eeed360e5c3ff15e1379ae",
+        "67d7276ccd9a0079943654029adf2759",
+        "58886c2172add4f9de2f7426a9e1e4a8",
+        "361b6aa75a7a7162790d75c6a3e29e0d",
+        "9f364d7dd24fe1ee44a91039aefa4c18",
+        "dabe65f6482e93bce5a1c2f2847f5374",
+        "4b4432d8386450d8ebbb7c1e24fda011",
+        "f6a40d16f1db82535fed2666dd4b9678",
+        "7c87c38a7bdc1f30c83906cb105d5140",
+        "09e041255205edf98327b4c343c50b63",
+        "f3dd0cc0250e005e551762780c888874"
+      ]
+    },
+    {
+      "name": "batch2_intent",
+      "dimension": "intent",
+      "method": "stratified by scenario tuple intent, chosen before looking at outcomes; equal-ish quotas (4 for the six common intents, 2 for the three rare ones) drawn with random.Random(20260918) within each intent, skipping conversations already in a batch",
+      "reason": "coverage of a product dimension by design; rare intents (out_of_scope, dispute, account_change) are almost invisible to a uniform draw",
+      "created_at": "2026-09-18",
+      "strata": {
+        "refund": {
+          "population": 80,
+          "available": 67,
+          "quota": 4,
+          "picked": [
+            "support-0017",
+            "support-0066",
+            "support-0134",
+            "support-0200"
+          ]
+        },
+        "order_status": {
+          "population": 54,
+          "available": 49,
+          "quota": 4,
+          "picked": [
+            "support-0125",
+            "support-0128",
+            "support-0211",
+            "support-0219"
+          ]
+        },
+        "product_search": {
+          "population": 28,
+          "available": 26,
+          "quota": 4,
+          "picked": [
+            "support-0036",
+            "support-0050",
+            "support-0079",
+            "support-0170"
+          ]
+        },
+        "return_deadline": {
+          "population": 25,
+          "available": 25,
+          "quota": 4,
+          "picked": [
+            "support-0064",
+            "support-0173",
+            "support-0216",
+            "support-0217"
+          ]
+        },
+        "cancellation": {
+          "population": 24,
+          "available": 18,
+          "quota": 4,
+          "picked": [
+            "support-0020",
+            "support-0069",
+            "support-0155",
+            "support-0243"
+          ]
+        },
+        "policy_question": {
+          "population": 22,
+          "available": 21,
+          "quota": 4,
+          "picked": [
+            "support-0047",
+            "support-0092",
+            "support-0111",
+            "support-0116"
+          ]
+        },
+        "out_of_scope": {
+          "population": 7,
+          "available": 6,
+          "quota": 2,
+          "picked": [
+            "support-0059",
+            "support-0174"
+          ]
+        },
+        "dispute": {
+          "population": 6,
+          "available": 5,
+          "quota": 2,
+          "picked": [
+            "support-0178",
+            "support-0237"
+          ]
+        },
+        "account_change": {
+          "population": 4,
+          "available": 3,
+          "quota": 2,
+          "picked": [
+            "support-0006",
+            "support-0115"
+          ]
+        }
+      },
+      "scenario_ids": [
+        "support-0006",
+        "support-0017",
+        "support-0020",
+        "support-0036",
+        "support-0047",
+        "support-0050",
+        "support-0059",
+        "support-0064",
+        "support-0066",
+        "support-0069",
+        "support-0079",
+        "support-0092",
+        "support-0111",
+        "support-0115",
+        "support-0116",
+        "support-0125",
+        "support-0128",
+        "support-0134",
+        "support-0155",
+        "support-0170",
+        "support-0173",
+        "support-0174",
+        "support-0178",
+        "support-0200",
+        "support-0211",
+        "support-0216",
+        "support-0217",
+        "support-0219",
+        "support-0237",
+        "support-0243"
+      ],
+      "trace_ids": [
+        "5409b3cfa7c03957cccebf4361316979",
+        "bd7424e5441eb7bc2ef9333eb82f83e0",
+        "95236a75300dcabe92b5b881cce01a41",
+        "6afdc8abc9a9bde0160f1bef8b0413d1",
+        "1b8fec97e5b3f21c7180f8ee900a3695",
+        "3ea0b3e13ac5d04540b99b32ab7899c1",
+        "04314ac3d3fc06b14cae105c8aa17d2a",
+        "5679b45d6e47d3900d2653280d6f878d",
+        "fa015c4d50cc0ef5aedd2358b3704a6b",
+        "51171155d947caeb0b3797a848e3a529",
+        "214a9664bbe02ff28addbc7a31c7b36b",
+        "20a17db1c717dc4499b614fb9aa629c0",
+        "fc8d189e31fd5f5951a11f951fd17142",
+        "c8028783f8a9ef8b275855fa5e1125c9",
+        "0882d44696b71af0c20abb7decb3de68",
+        "92b0e2ed929edd7671202a6974559541",
+        "b59621050e1595c98d01686bb54d30d4",
+        "20cfb34964e90b24a7ffca0dd827aa5c",
+        "d8169bd01d0b78672c986bd74a59fb46",
+        "389ac9eb16d6ad5bd5fb5c28710231fd",
+        "b69c6ff17c92f3fc74ce7658c0727e25",
+        "281b031bad676fb84b647bfd8a96169d",
+        "6e1176c923472c7dfd512ef36097b020",
+        "71dd82e225587efb0b96091501b7f9f0",
+        "5485477131c42b6134a971a91d937ae6",
+        "be629428cc3b148066befa3fcda0967f",
+        "5720eab03782edf4c38e8a3242f4f582",
+        "82892f7bbc217c02ce51cfafa4de058f",
+        "1d64910a303986a1ecc4e7f95fb341aa",
+        "d2c00ee7f6ceaba26dfc3927accf68b0",
+        "173c7634991214ea6016d17d3a3fa865",
+        "7117832e7d57b89b4bb95c7c60ff52d9"
+      ]
+    },
+    {
+      "name": "batch3_depth",
+      "method": "deterministic retrieval signals over tool results and reply text for the code-checkable candidates (irrelevant_policy_nuance, write_without_confirmation, redundant_policy_lookup, unnecessary_escalation, assumes_instead_of_asking), each with candidate positives and close negatives; random.Random(20260919) within each signal; conversations not in any batch",
+      "reason": "depth: sharpen definitions with positives and close negatives; a signal is a retrieval hint, not a label",
+      "created_at": "2026-09-19",
+      "signal_hit_counts": {
+        "1_neg": 18,
+        "7_pos": 50,
+        "3b_neg": 17,
+        "4_pos": 21,
+        "1_pos": 26,
+        "3b_pos": 22,
+        "5_pos": 11,
+        "5_neg": 27,
+        "4_neg": 3,
+        "7_neg": 0
+      },
+      "picks": [
+        {
+          "scenario_id": "support-0212",
+          "signal": "1_pos",
+          "why": "no override, reply mentions override/restocking"
+        },
+        {
+          "scenario_id": "support-0204",
+          "signal": "1_pos",
+          "why": "no override, reply mentions override/restocking"
+        },
+        {
+          "scenario_id": "support-0168",
+          "signal": "1_pos",
+          "why": "no override, reply mentions override/restocking"
+        },
+        {
+          "scenario_id": "support-0161",
+          "signal": "1_pos",
+          "why": "no override, reply mentions override/restocking"
+        },
+        {
+          "scenario_id": "support-0151",
+          "signal": "1_neg",
+          "why": "override=True restocking=False, mentioned"
+        },
+        {
+          "scenario_id": "support-0222",
+          "signal": "1_neg",
+          "why": "override=True restocking=False, mentioned"
+        },
+        {
+          "scenario_id": "support-0021",
+          "signal": "5_pos",
+          "why": "write after find_order, no order id in user text"
+        },
+        {
+          "scenario_id": "support-0158",
+          "signal": "5_pos",
+          "why": "write after find_order, no order id in user text"
+        },
+        {
+          "scenario_id": "support-0033",
+          "signal": "5_pos",
+          "why": "write after find_order, no order id in user text"
+        },
+        {
+          "scenario_id": "support-0202",
+          "signal": "5_pos",
+          "why": "write after find_order, no order id in user text"
+        },
+        {
+          "scenario_id": "support-0140",
+          "signal": "5_neg",
+          "why": "write with order id supplied"
+        },
+        {
+          "scenario_id": "support-0078",
+          "signal": "5_neg",
+          "why": "write with order id supplied"
+        },
+        {
+          "scenario_id": "support-0177",
+          "signal": "7_pos",
+          "why": "search_help_center then get_policy(cw-returns)"
+        },
+        {
+          "scenario_id": "support-0008",
+          "signal": "7_pos",
+          "why": "search_help_center then get_policy(cw-returns)"
+        },
+        {
+          "scenario_id": "support-0038",
+          "signal": "7_pos",
+          "why": "search_help_center then get_policy(cw-returns)"
+        },
+        {
+          "scenario_id": "support-0028",
+          "signal": "3b_pos",
+          "why": "escalated; expected outcome does not involve a human"
+        },
+        {
+          "scenario_id": "support-0118",
+          "signal": "3b_pos",
+          "why": "escalated; expected outcome does not involve a human"
+        },
+        {
+          "scenario_id": "support-0067",
+          "signal": "3b_pos",
+          "why": "escalated; expected outcome does not involve a human"
+        },
+        {
+          "scenario_id": "support-0132",
+          "signal": "3b_neg",
+          "why": "escalated; expected outcome involves a human"
+        },
+        {
+          "scenario_id": "support-0068",
+          "signal": "4_pos",
+          "why": "find_order returned 3 matches, reply asks no question"
+        },
+        {
+          "scenario_id": "support-0103",
+          "signal": "4_pos",
+          "why": "find_order returned 2 matches, reply asks no question"
+        },
+        {
+          "scenario_id": "support-0035",
+          "signal": "4_pos",
+          "why": "find_order returned 2 matches, reply asks no question"
+        },
+        {
+          "scenario_id": "support-0120",
+          "signal": "4_neg",
+          "why": "find_order returned 2 matches, reply asks a question"
+        },
+        {
+          "scenario_id": "support-0005",
+          "signal": "4_pos+",
+          "why": "find_order returned 2 matches, reply asks no question"
+        },
+        {
+          "scenario_id": "support-0015",
+          "signal": "3b_pos+",
+          "why": "escalated; expected outcome does not involve a human"
+        }
+      ],
+      "scenario_ids": [
+        "support-0005",
+        "support-0008",
+        "support-0015",
+        "support-0021",
+        "support-0028",
+        "support-0033",
+        "support-0035",
+        "support-0038",
+        "support-0067",
+        "support-0068",
+        "support-0078",
+        "support-0103",
+        "support-0118",
+        "support-0120",
+        "support-0132",
+        "support-0140",
+        "support-0151",
+        "support-0158",
+        "support-0161",
+        "support-0168",
+        "support-0177",
+        "support-0202",
+        "support-0204",
+        "support-0212",
+        "support-0222"
+      ],
+      "trace_ids": [
+        "98d586266acf8c7557d8273dfa44e7dd",
+        "9c550c45be48d652083d481879f65520",
+        "4e30bf240e5c8d570799ff61a60c8a15",
+        "26be5d0ecf9ef929076758825f818a1d",
+        "f1dfad5e6c236ee85a99e7ff9c79fff9",
+        "2ef8a2a1c8e8e40b12af387014c5a0af",
+        "23a9eb1fee7a0c5015b719476455b59a",
+        "d9316f4f0b7b95498afa976dedf230df",
+        "286855650ab4bac13a20394023c19cb5",
+        "3ca881a3a021c7e131b8e4e80cdf5998",
+        "31bbeebf621c96bc306dc5c79706bd54",
+        "8acb0e73d7f8f64161ec44620d567d62",
+        "be82314ab3de0411c5ad5188721cdc5a",
+        "283e5e53dc518598a6dfedd6c9700364",
+        "03b558ec15b21a7723b7526c4a5305d9",
+        "b91b19c5af698bb46951dc512135371e",
+        "1c303c23853df10222595fe6ecd94979",
+        "d04387e79b9f57814a99093aa307e731",
+        "c89578e38c4b96f863924e674a641410",
+        "168a15f8b84afda8f86b4a50f1b84eed",
+        "f702858acda398cdee32ebd1031651f7",
+        "e8b29aebeba277d2188c44b7b06fa857",
+        "40d0f6aacf480458663c499339224483",
+        "63d661ee55a9e72220cc400fc772903a",
+        "985896bc93ebb76b863326ab874ee8c7",
+        "42a23e53ffa5dc970f4f30f056f5ddcb",
+        "5d6e74bd0f2c3712ef553e1b3e6a348d",
+        "682678d4f391ccee11e351119321f4e2",
+        "eae67e4e85d1616e00cf1c7e1e572b6e",
+        "788877743730d2d7bd837bf4dcae31e9",
+        "3ab3db94f9fbd20c5b0c22197a9a42de",
+        "aec73e9746f1386f167fe1fc24af0e3f",
+        "8a4b8393c3fc0c2ea633bfe6577cb462",
+        "ccb9ac73056c94dcb5bb2b7149a3652b",
+        "67ca5956e4cfc57aa0cdc669cfab234a",
+        "39ea9fe80e643bd559810cbdbb43a6a3"
+      ]
+    },
+    {
+      "name": "batch4_uniform",
+      "method": "random.Random(20260920).sample over the 165 conversations not in any earlier batch; no signal of any kind",
+      "reason": "stability check after drafting the taxonomy: count how many of the 15 produce a previously unseen consequential mode",
+      "created_at": "2026-09-20",
+      "taxonomy_at_draw": [
+        "write_without_confirmation",
+        "assumes_instead_of_asking",
+        "unwarranted_escalation",
+        "redundant_policy_lookup",
+        "irrelevant_policy_nuance",
+        "unsolicited_next_steps",
+        "verbose_reply",
+        "first_person_framing"
+      ],
+      "scenario_ids": [
+        "support-0011",
+        "support-0052",
+        "support-0054",
+        "support-0097",
+        "support-0112",
+        "support-0117",
+        "support-0138",
+        "support-0152",
+        "support-0157",
+        "support-0169",
+        "support-0176",
+        "support-0183",
+        "support-0197",
+        "support-0230",
+        "support-0245"
+      ],
+      "trace_ids": [
+        "d63587734a8ed48b3fcec20764296e3c",
+        "b437803d98806f0766484854007212f2",
+        "df4706f3e65f2e33e7266254d9d11517",
+        "ae4dd475b14325494a30f8dcd19307e0",
+        "37c8aa38ce99878aeba5f74634b28eed",
+        "7c5ce7600c15a075e4ecc586d498785e",
+        "a92060ed0ad9b9a5a153163471f7deb7",
+        "ee63b464493a6669fb23da2b87c199ed",
+        "ffe3857a020e5c55ea953479e7157963",
+        "f241cce1c5036e643899d4dbc5cadcc4",
+        "bbcb26c2f1c272cfcc84223cf45f73ff",
+        "b6e6c26d8e41cd5a3900565e6500c6cd",
+        "f47303d80a62b6ffdaccc490ebe77db8",
+        "e197344ac6c0e5f811a4f3492c2b0239",
+        "b0dfb8375799e4889ae99afdec9d1beb",
+        "72c22852c63a4347dad88c260ddc54cd",
+        "3a50b2ad0f5ab100dd094d375b3d41b6",
+        "472ce4e000300d855e31b5622bb42c51",
+        "fe28adae055380767589059de73d029e",
+        "7d643bcbcfcfee52a1a34620a8f403ef"
+      ]
+    }
+  ]
+}

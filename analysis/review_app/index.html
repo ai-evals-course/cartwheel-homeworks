@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cartwheel trace review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e2e2dd;
+    --user: #2f6fd6; --reasoning: #8a6d1f; --tool: #5b5b56; --reply: #2a8a4a; --error: #c93a3a;
+    --shopper: #2f6fd6; --merchant: #b3560f; --support: #6c3fb5;
+    --challenge: #c2410c; --annot: #e8a100; --sugg: #8b5cf6; --ok: #2a8a4a;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: var(--ink); background: var(--bg); }
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 4px 10px; color: var(--ink); }
+  button:hover { border-color: #bbb; }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+  button.small { padding: 2px 7px; font-size: 12px; }
+  button.fail.active { background: var(--error); color: #fff; border-color: var(--error); }
+  button.pass.active { background: var(--ok); color: #fff; border-color: var(--ok); }
+  button.fail.provisional { background: #fff; color: var(--error); border: 1px dashed var(--error); }
+  button.pass.provisional { background: #fff; color: var(--ok); border: 1px dashed var(--ok); }
+  input, textarea, select { font: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; width: 100%; background: #fff; }
+  textarea { resize: vertical; min-height: 56px; }
+  kbd { font: 11px var(--mono); background: #eee; border: 1px solid #ccc; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); font-size: 12.5px; }
+
+  /* top bar */
+  #top { position: sticky; top: 0; z-index: 30; background: var(--panel); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 8px 16px; flex-wrap: wrap; }
+  #top .tabs button { border: none; background: none; padding: 6px 10px; border-radius: 6px; color: var(--muted); }
+  #top .tabs button.active { background: #eeeeea; color: var(--ink); font-weight: 600; }
+  #top .spacer { flex: 1; }
+  #progress-strip { font-size: 13px; color: var(--muted); }
+  #progress-strip b { color: var(--ink); }
+  #toast { position: fixed; bottom: 18px; right: 18px; background: var(--ink); color: #fff; padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; z-index: 50; pointer-events: none; }
+  #toast.show { opacity: 1; }
+
+  /* layout */
+  .view { display: none; }
+  .view.active { display: block; }
+  #review { display: none; grid-template-columns: 250px 1fr; min-height: calc(100vh - 50px); }
+  #review.active { display: grid; }
+  #queue { border-right: 1px solid var(--line); background: var(--panel); overflow-y: auto; height: calc(100vh - 50px); position: sticky; top: 50px; }
+  #queue .q-head { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  #queue .q-item { padding: 7px 12px; border-bottom: 1px solid #f0f0ec; cursor: pointer; font-size: 12.5px; display: grid; grid-template-columns: 14px 1fr auto; gap: 6px; align-items: baseline; }
+  #queue .q-item:hover { background: #f4f4f0; }
+  #queue .q-item.current { background: #ecebe5; }
+  #queue .q-item .dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #bbb; display: inline-block; }
+  #queue .q-item.reviewed .dot { background: var(--user); border-color: var(--user); }
+  #queue .q-item.nofail .dot { background: var(--ok); border-color: var(--ok); }
+  #queue .q-item .sid { font-family: var(--mono); font-size: 11.5px; }
+  #queue .q-item .open { color: var(--muted); grid-column: 2 / 4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  #main { padding: 16px 24px 80px; }
+  #conv { display: grid; grid-template-columns: minmax(0, 780px) 270px; gap: 20px; align-items: start; }
+  .column { min-width: 0; }
+  #margin { position: relative; min-height: 200px; }
+
+  /* header */
+  .hdr { position: sticky; top: 50px; z-index: 20; background: #eef2f7; border: 1px solid #c7d3e2; border-radius: 10px; padding: 10px 14px; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(30,50,80,.08); }
+  .hdr .flag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #fff; border: 1px solid #c7d3e2; color: #3b5273; }
+  .hdr .line { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+  .badge.role-shopper { background: #e6eefb; color: var(--shopper); }
+  .badge.role-merchant { background: #fbeee2; color: var(--merchant); }
+  .badge.role-support { background: #efe8fb; color: var(--support); }
+  .badge.challenge { background: #fde8dc; color: var(--challenge); }
+  .badge.coverage { background: #eeeeea; color: var(--muted); }
+  .chip { font-size: 12px; color: var(--muted); }
+  .chip b { color: var(--ink); font-weight: 500; }
+  .expected { margin-top: 8px; padding: 8px 10px; border-left: 3px solid #2b7a78; background: #e8f3f2; border-radius: 4px; font-size: 13px; }
+  .expected .k { color: #1f5f5d; font-weight: 600; margin-right: 6px; }
+  .hdr .links { margin-top: 6px; font-size: 12px; }
+  .hdr .links a { color: var(--muted); margin-right: 12px; }
+
+  /* timeline */
+  .turn-rule { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; color: var(--muted); font-size: 12px; }
+  .turn-rule:before, .turn-rule:after { content: ""; flex: 1; border-top: 1px dashed var(--line); }
+  .msg { background: var(--panel); border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+  .msg .lbl { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; }
+  .msg.user { border-left-color: var(--user); } .msg.user .lbl { color: var(--user); }
+  .msg.reply { border-left-color: var(--reply); } .msg.reply .lbl { color: var(--reply); }
+  .msg.reply .body { white-space: normal; }
+  .step { background: #f3f3ef; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+  .step .lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .msg.thinking { border-left-color: #e07b00; padding: 6px 12px; } .msg.thinking .lbl { color: #e07b00; }
+  .step .msg { margin: 6px 0; }
+  .call { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; margin: 6px 0; }
+  .call .call-head { display: flex; gap: 8px; align-items: baseline; padding: 5px 10px; cursor: pointer; flex-wrap: wrap; }
+  .call .call-head .name { font-family: var(--mono); font-weight: 700; color: var(--tool); white-space: nowrap; }
+  .call .call-head .args { font-family: var(--mono); font-size: 12px; color: #444; word-break: break-all; }
+  .call .call-head .sum { font-family: var(--mono); font-size: 12px; color: #1d4d2b; word-break: break-word; }
+  .call .call-head .lat { margin-left: auto; font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .call .call-head .tri { color: var(--muted); font-size: 10px; }
+  .call.err { border-left: 3px solid var(--error); } .call.err .sum { color: var(--error); }
+  .call.write .sum { font-weight: 700; }
+  .call .detail { display: none; border-top: 1px dashed var(--line); padding: 6px 10px; }
+  .call.open .detail { display: block; }
+  .call .detail pre { margin: 0; font: 12px/1.45 var(--mono); white-space: pre-wrap; word-break: break-word; background: #fafaf7; padding: 8px; border-radius: 4px; max-height: 420px; overflow: auto; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: 12.5px; margin-top: 4px; }
+  .kv .k { color: var(--muted); }
+  .retr { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12.5px; }
+  .retr li { padding: 3px 0; border-top: 1px solid #f0f0ec; }
+  .retr .pid { font-family: var(--mono); font-weight: 600; }
+  .retr .sc { color: var(--muted); font-size: 11px; margin-left: 6px; }
+  .retr .snip { color: #444; display: block; white-space: pre-wrap; }
+  .body { white-space: pre-wrap; word-break: break-word; }
+  .body p { margin: 0 0 8px; } .body ul, .body ol { margin: 0 0 8px 20px; padding: 0; } .body h1, .body h2, .body h3 { font-size: 14px; margin: 8px 0 4px; }
+  .body code { font-family: var(--mono); font-size: 12.5px; background: #f0f0ec; padding: 0 3px; border-radius: 3px; }
+  .body table.mdt { width: auto; margin: 4px 0 8px; font-size: 13px; } .body table.mdt th, .body table.mdt td { border: 1px solid var(--line); padding: 3px 8px; }
+  .sysprompt { display: none; } .sysprompt.open { display: block; }
+
+  /* annotations */
+  mark.ann { background: #fff1c2; border-bottom: 2px solid var(--annot); padding: 0; cursor: pointer; }
+  mark.ann.hl { outline: 2px solid var(--annot); }
+  mark.sug { background: #efe9ff; border-bottom: 2px dashed var(--sugg); padding: 0; }
+  mark.sug.hl { outline: 2px solid var(--sugg); }
+  mark.pending { background: #ffe08a; }
+  .note { position: absolute; left: 0; width: 100%; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--annot); border-radius: 6px; padding: 6px 8px; font-size: 12.5px; transition: top .15s; }
+  .note.sug { border-left-color: var(--sugg); }
+  .note .q { color: var(--muted); font-style: italic; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note .tag { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--sugg); font-weight: 700; }
+  .note .txt { margin-top: 2px; white-space: pre-wrap; }
+  .note .acts { margin-top: 4px; display: flex; gap: 4px; }
+  .note.ann .acts { visibility: hidden; } .note.ann:hover .acts { visibility: visible; }
+  .note.hl { outline: 2px solid var(--annot); } .note.sug.hl { outline-color: var(--sugg); }
+  #popover { position: absolute; z-index: 40; background: var(--panel); border: 1px solid #bbb; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.15); padding: 8px; width: 320px; display: none; }
+  #popover textarea { min-height: 48px; }
+  #popover .row { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; }
+
+  /* footer */
+  .footer { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-top: 16px; }
+  .footer .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  .footer .conv-notes { margin-top: 8px; }
+  .footer .conv-notes .cn { padding: 4px 8px; border-left: 3px solid var(--annot); background: #fffaf0; margin-top: 4px; font-size: 13px; display: flex; gap: 8px; }
+  .footer .cn .txt { flex: 1; white-space: pre-wrap; }
+  .status-pill { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: #eee; }
+  .status-pill.reviewed { background: #e6eefb; color: var(--user); }
+  .status-pill.nofail { background: #dff3e6; color: var(--ok); }
+
+  /* other views */
+  .page { max-width: 1100px; margin: 0 auto; padding: 18px 24px 60px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  .bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--ok); }
+  .field { margin-bottom: 8px; } .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .linkish { color: var(--user); cursor: pointer; text-decoration: underline; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  #help { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; z-index: 60; align-items: center; justify-content: center; }
+  #help.show { display: flex; }
+  #help .box { background: var(--panel); border-radius: 12px; padding: 18px 22px; width: 440px; }
+  #help table td { border: none; padding: 3px 8px; }
+
+  /* labeling */
+  .label-grid { display: grid; gap: 8px; }
+  .label-row { display: grid; grid-template-columns: 180px 1fr; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+  .label-row.focus { outline: 2px solid var(--ink); }
+  .label-row .modes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .label-row .mode { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; font-size: 12.5px; background: #fafaf7; }
+  .label-row .mode .n { font-family: var(--mono); color: var(--muted); }
+  .lab-head { position: sticky; top: 0; z-index: 5; display: flex; gap: 12px; align-items: center; background: var(--bg); padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .lab-card { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+  .lab-card.focus { outline: 2px solid var(--ink); }
+  .lab-user { color: var(--user); font-weight: 600; margin-bottom: 6px; white-space: pre-wrap; }
+  .lab-tool { font-family: var(--mono); font-size: 11.5px; color: var(--tool); padding: 1px 0 1px 8px; border-left: 2px solid var(--line); }
+  .lab-tool.write { border-left-color: var(--error); color: var(--ink); }
+  .lab-reply { margin-top: 8px; font-size: 13.5px; line-height: 1.45; max-height: 340px; overflow: auto; padding-right: 6px; }
+  .lab-notes { margin-top: 8px; padding: 6px 8px; background: #fff8e1; border-left: 3px solid var(--annot); font-size: 12.5px; }
+  .lab-modes { display: flex; flex-direction: column; gap: 4px; align-self: start; position: sticky; top: 52px; }
+  .lab-pill { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 6px; text-align: left; padding: 4px 8px; font-size: 12.5px; border-radius: 6px; }
+  .lab-pill .n { font-family: var(--mono); color: var(--muted); font-size: 11px; }
+  .lab-pill .v { font-family: var(--mono); font-size: 11px; }
+  .lab-pill.pass { background: #fafaf7; color: var(--muted); }
+  .lab-pill.pass .v { color: var(--ok); }
+  .lab-pill.fail { background: var(--error); color: #fff; border-color: var(--error); }
+  .lab-pill.fail .n, .lab-pill.fail .v { color: #fff; }
+  .lab-pill.prov { border-style: dashed; border-color: #9a9a94; border-width: 1.5px; }
+  .lab-pill.pass.done { border-color: var(--ok); }
+  .lab-pill.fail.prov { background: #fff; color: var(--error); }
+  .lab-pill.fail.prov .n, .lab-pill.fail.prov .v { color: var(--error); }
+  .lab-pill:hover { filter: brightness(0.96); }
+  .lf { font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="top">
+  <strong>Cartwheel review</strong>
+  <span class="tabs">
+    <button data-view="review" class="active">Review</button>
+    <button data-view="annotations">Annotations</button>
+    <button data-view="taxonomy">Taxonomy</button>
+    <button data-view="labeling">Labeling</button>
+    <button data-view="progress">Progress</button>
+    <button data-view="suggestions">Suggestions <span id="sugg-count"></span></button>
+  </span>
+  <span class="spacer"></span>
+  <span id="progress-strip"></span>
+  <select id="batch-select" style="width:auto"></select>
+  <button class="small" id="help-btn">? keys</button>
+  <span id="source" class="muted" style="font-size:12px"></span>
+</div>
+
+<!-- REVIEW -->
+<div id="review" class="view active">
+  <div id="queue">
+    <div class="q-head">
+      <input id="q-filter" placeholder="filter: id, role, intent, tool, text">
+      <div class="muted" style="font-size:12px;margin-top:4px" id="q-summary"></div>
+    </div>
+    <div id="q-list"></div>
+  </div>
+  <div id="main">
+    <div id="conv">
+      <div class="column" id="conv-col"></div>
+      <div id="margin"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ANNOTATIONS -->
+<div id="annotations" class="view"><div class="page" id="annotations-page"></div></div>
+
+<!-- TAXONOMY -->
+<div id="taxonomy" class="view"><div class="page" id="taxonomy-page"></div></div>
+
+<!-- LABELING -->
+<div id="labeling" class="view"><div class="page" id="labeling-page"></div></div>
+
+<!-- PROGRESS -->
+<div id="progress" class="view"><div class="page" id="progress-page"></div></div>
+
+<!-- SUGGESTIONS -->
+<div id="suggestions" class="view"><div class="page" id="suggestions-page"></div></div>
+
+<div id="popover">
+  <div class="muted" style="font-size:11.5px" id="pop-quote"></div>
+  <textarea id="pop-text" placeholder="What did you observe? Plain words, one failure."></textarea>
+  <label style="font-size:12px;display:flex;gap:6px;align-items:center;margin-top:4px"><input type="checkbox" id="pop-novel" style="width:auto;margin:0"> not covered by the current modes</label>
+  <div class="row"><button class="small" id="pop-cancel">Cancel</button><button class="small primary" id="pop-save">Save (Enter)</button></div>
+</div>
+
+<div id="help"><div class="box">
+  <h3 style="margin-top:0">Keys</h3>
+  <table>
+    <tr><td><kbd>j</kbd> / <kbd>k</kbd></td><td>next / previous conversation in the queue</td></tr>
+    <tr><td><kbd>n</kbd></td><td>mark "no failure observed" and advance</td></tr>
+    <tr><td><kbd>a</kbd></td><td>focus the conversation-level open code box</td></tr>
+    <tr><td><kbd>e</kbd></td><td>expand / collapse all tool results</td></tr>
+    <tr><td><kbd>s</kbd></td><td>toggle the system prompt</td></tr>
+    <tr><td><kbd>r</kbd></td><td>mark reviewed (first failure noted) and advance</td></tr>
+    <tr><td><kbd>1</kbd>..<kbd>8</kbd></td><td>labeling view: toggle Fail / Pass for mode N on the focused trace</td></tr>
+    <tr><td><kbd>Tab</kbd></td><td>labeling view: move focus to the next trace</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>close popover / help</td></tr>
+  </table>
+  <p class="muted" style="font-size:12px">Select any text in the conversation to annotate it.</p>
+  <button id="help-close">Close</button>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+// ---------------------------------------------------------------------------
+// state
+// ---------------------------------------------------------------------------
+const S = {
+  status: null, list: [], convs: {}, manifest: {batches: []}, annotations: [], patterns: {modes: []},
+  suggestions: [], labels: {}, batch: 'all', queue: [], current: null, view: 'review', spec: '',
+  labelFocus: 0, expandAll: false,
+};
+const $ = (sel, el = document) => el.querySelector(sel);
+const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const now = () => new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800); }
+
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  if (!r.ok) throw new Error(path + ' ' + r.status);
+  return r.json();
+}
+const saveTimers = {};
+function saveState(key) {
+  const payload = key === 'annotations' ? {annotations: S.annotations} : key === 'patterns' ? S.patterns : key === 'suggestions' ? S.suggestions : S.manifest;
+  try { localStorage.setItem('cw-' + key, JSON.stringify(payload)); } catch (e) {}
+  clearTimeout(saveTimers[key]);
+  saveTimers[key] = setTimeout(async () => {
+    try { await api('/api/' + key, payload); } catch (e) { toast('save failed: ' + key); }
+  }, 250);
+}
+
+// ---------------------------------------------------------------------------
+// derived
+// ---------------------------------------------------------------------------
+function annsFor(sid) { return S.annotations.filter(a => a.scenario_id === sid); }
+function reviewState(sid) {
+  const a = annsFor(sid);
+  if (a.some(x => x.kind === 'no_failure')) return 'nofail';
+  if (a.some(x => x.kind === 'open_code' || x.kind === 'accepted_suggestion')) return 'reviewed';
+  return 'unreviewed';
+}
+function batchOf(sid) { for (const b of S.manifest.batches || []) if ((b.scenario_ids || []).includes(sid)) return b.name; return null; }
+function buildQueue() {
+  const ids = S.batch === 'all' ? S.list.map(c => c.scenario_id)
+    : S.batch === 'unbatched' ? S.list.map(c => c.scenario_id).filter(s => !batchOf(s))
+    : ((S.manifest.batches || []).find(b => b.name === S.batch) || {}).scenario_ids || [];
+  const f = ($('#q-filter').value || '').trim().toLowerCase();
+  S.queue = ids.filter(sid => {
+    const c = S.list.find(x => x.scenario_id === sid); if (!c) return false;
+    if (!f) return true;
+    const hay = [sid, c.role, c.intent, c.record_state, c.difficulty, c.user_style, c.group, c.tools_used.join(' '), c.opening].join(' ').toLowerCase();
+    return f.split(/\s+/).every(w => hay.includes(w));
+  });
+}
+function finalModes() { const m = S.patterns.modes || []; const fin = m.filter(x => x.status === 'final'); return fin.length ? fin : m; }
+// Labeling can be scoped to a subset of final modes (patterns.json labeling_scope.modes); 'show all' overrides it for the session.
+function labelingModes() { const all = finalModes(); const sc = (S.patterns.labeling_scope || {}).modes; if (!sc || !sc.length || S.labelAllModes) return all; const set = new Set(sc); return all.filter(m => set.has(m.name)); }
+function labelFor(mode, traceId) { return (S.labels[mode] || []).find(r => r.trace_id === traceId); }
+
+// ---------------------------------------------------------------------------
+// markdown-lite for replies
+// ---------------------------------------------------------------------------
+function md(text) {
+  const lines = esc(text).split('\n'); const out = []; let list = null;
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/g, '<i>$1</i>');
+  const closeList = () => { if (list) { out.push(`</${list}>`); list = null; } };
+  const cells = l => l.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i].replace(/\s+$/, '');
+    let m;
+    // pipe table: header row, separator row, body rows
+    if (/^\s*\|.*\|\s*$/.test(l) && i + 1 < lines.length && /^\s*\|?\s*:?-{2,}/.test(lines[i + 1])) {
+      closeList();
+      const head = cells(l); const body = [];
+      let j = i + 2;
+      while (j < lines.length && /^\s*\|.*\|\s*$/.test(lines[j])) { body.push(cells(lines[j])); j++; }
+      out.push(`<table class="mdt"><tr>${head.map(c => `<th>${inline(c)}</th>`).join('')}</tr>${body.map(r => `<tr>${r.map(c => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</table>`);
+      i = j - 1; continue;
+    }
+    if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { if (list !== 'ul') { closeList(); out.push('<ul>'); list = 'ul'; } out.push(`<li>${inline(m[1])}</li>`); continue; }
+    if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== 'ol') { closeList(); out.push('<ol>'); list = 'ol'; } out.push(`<li>${inline(m[1])}</li>`); continue; }
+    closeList();
+    if ((m = l.match(/^#{1,3}\s+(.*)/))) { out.push(`<h3>${inline(m[1])}</h3>`); continue; }
+    if (l.trim() === '') { out.push('<p></p>'); continue; }
+    out.push(`<p>${inline(l)}</p>`);
+  }
+  closeList();
+  return out.join('').replace(/(<p><\/p>)+/g, '');
+}
+
+// ---------------------------------------------------------------------------
+// review view
+// ---------------------------------------------------------------------------
+function renderQueue() {
+  buildQueue();
+  const cur = S.current;
+  const rows = S.queue.map(sid => {
+    const c = S.list.find(x => x.scenario_id === sid); const st = reviewState(sid);
+    return `<div class="q-item ${st} ${sid === cur ? 'current' : ''}" data-sid="${sid}">
+      <span class="dot"></span><span class="sid">${sid}</span><span class="muted">${c.role[0].toUpperCase()}${c.turns > 1 ? ' ·' + c.turns + 't' : ''}${c.group === 'challenge' ? ' ·C' : ''}</span>
+      <span class="open">${esc(c.opening)}</span></div>`;
+  });
+  $('#q-list').innerHTML = rows.join('');
+  const rev = S.queue.filter(s => reviewState(s) !== 'unreviewed').length;
+  $('#q-summary').textContent = `${S.queue.length} in queue · ${rev} reviewed`;
+  $$('#q-list .q-item').forEach(el => el.onclick = () => openConv(el.dataset.sid));
+  renderStrip();
+}
+function renderStrip() {
+  const total = S.queue.length; const rev = S.queue.filter(s => reviewState(s) !== 'unreviewed').length;
+  const nf = S.queue.filter(s => reviewState(s) === 'nofail').length;
+  $('#progress-strip').innerHTML = `<b>${S.batch}</b> · ${rev}/${total} reviewed · ${nf} no-failure · ${S.annotations.filter(a => a.kind !== 'no_failure').length} open codes`;
+}
+async function openConv(sid) {
+  if (!sid) return;
+  if (!S.convs[sid]) S.convs[sid] = await api('/api/conversation/' + sid);
+  S.current = sid; S.labelFocus = 0;
+  try { localStorage.setItem('cw-current', sid); } catch (e) {}
+  renderConv(); renderQueue();
+  if (S.view === 'labeling') renderLabeling();
+  const el = $(`#q-list .q-item[data-sid="${sid}"]`); if (el) el.scrollIntoView({block: 'nearest'});
+  window.scrollTo({top: 0});
+}
+function callClass(c) { const write = ['issue_refund', 'cancel_order', 'escalate_to_human'].includes(c.name); return `call ${c.ok === false ? 'err' : ''} ${write ? 'write' : ''} ${S.expandAll ? 'open' : ''}`; }
+function resultDetail(c) {
+  const r = c.result;
+  if (r && typeof r === 'object') {
+    if (c.name === 'get_order' && r.order) return `<div class="kv">${Object.entries(r.order).map(([k, v]) => `<span class="k">${esc(k)}</span><span>${esc(JSON.stringify(v))}</span>`).join('')}</div>`;
+    if (c.name === 'search_help_center' && r.results) return `<ul class="retr">${r.results.map(x => `<li><span class="pid">${esc(x.policy_id)}</span> ${esc(x.title)}<span class="sc">score ${x.score}</span><span class="snip">${esc(x.snippet)}</span></li>`).join('')}</ul>`;
+    if (c.name === 'get_policy' && r.body) return `<div class="mono muted">${esc(r.policy_id)} · ${esc(r.title)} · audience: ${esc(r.audience)}</div><pre>${esc(r.body)}</pre>`;
+    if ((c.name === 'find_order' || c.name === 'list_my_orders') && r.orders) return `<table>${r.orders.map(o => `<tr><td class="mono">#${o.order_id}</td><td>${esc(o.status)}</td><td>delivered ${esc(o.delivered_at)}</td><td>eligible ${esc(o.refund_eligible)}</td><td>$${o.total_usd}</td><td>store ${o.store_id}</td></tr>`).join('')}</table>`;
+  }
+  return `<pre>${esc(JSON.stringify(r, null, 2))}</pre>`;
+}
+function renderConv() {
+  const c = S.convs[S.current]; if (!c) { $('#conv-col').innerHTML = '<p class="muted">Pick a conversation from the queue.</p>'; return; }
+  const t = c.tuple || {}, ex = c.expected || {};
+  const anns = annsFor(c.scenario_id);
+  const st = reviewState(c.scenario_id);
+  const chips = ['intent', 'record_state', 'difficulty', 'user_style', 'applicable_policy', 'order_id', 'tools_needed'].filter(k => t[k] !== undefined && t[k] !== null)
+    .map(k => `<span class="chip">${k}: <b>${esc(t[k])}</b></span>`).join('');
+  let html = `<div class="hdr">
+    <div class="line"><span class="mono" style="font-weight:700">${c.scenario_id}</span>
+      <span class="badge role-${c.role}">${c.role}</span>
+      <span class="badge ${c.group}">${c.group}</span>
+      <span class="chip">${c.turns.length} turn${c.turns.length > 1 ? 's' : ''} · ${c.tool_call_count} tool calls</span>
+      <span class="status-pill ${st}">${st === 'reviewed' ? 'annotated' : st === 'nofail' ? 'reviewed · no failure observed' : 'unreviewed'}</span>
+      ${batchOf(c.scenario_id) ? `<span class="chip">batch: <b>${esc(batchOf(c.scenario_id))}</b></span>` : ''}
+    </div>
+    <div class="line" style="margin-top:4px">${chips}</div>
+    ${(c.flags || []).length ? `<div class="line" style="margin-top:6px">${c.flags.map(f => `<span class="flag">${esc(f.text)}</span>`).join('')}</div>` : ''}
+    <div class="expected">
+      ${ex.outcome ? `<div><span class="k">expected outcome</span>${esc(ex.outcome)}</div>` : ''}
+      ${ex.criterion ? `<div><span class="k">criterion</span>${esc(ex.criterion)}</div>` : ''}
+      ${ex.reason ? `<div><span class="k">reason</span>${esc(ex.reason)}</div>` : ''}
+      ${ex.source ? `<div><span class="k">source</span><span class="mono">${esc(ex.source.type)}: ${esc(ex.source.reference)}</span></div>` : ''}
+    </div>
+    <div class="links"><a href="#" id="sys-toggle">system prompt</a><a href="#" id="expand-toggle">${S.expandAll ? 'collapse' : 'expand'} all results</a>
+      ${c.turns.map(tr => tr.permalink ? `<a href="${esc(S.status.langfuse_base || '')}${esc(tr.permalink)}" target="_blank">trace ${tr.index + 1} in Langfuse</a>` : '').join('')}</div>
+    <div class="sysprompt mono muted" id="sysprompt"><pre style="white-space:pre-wrap;margin:6px 0 0">${esc(c.system_prompt || '(none captured)')}</pre></div>
+  </div>`;
+
+  c.turns.forEach(tr => {
+    const T = tr.index;
+    if (c.turns.length > 1) html += `<div class="turn-rule">turn ${T + 1} · trace <span class="mono">${tr.trace_id.slice(0, 10)}…</span> · ${tr.timestamp ? tr.timestamp.slice(11, 19) : ''}</div>`;
+    html += `<div class="msg user"><div class="lbl">User</div><div class="body annot" data-trace="${tr.trace_id}" data-turn="${T}" data-seg="user">${esc(tr.user)}</div></div>`;
+    tr.steps.forEach(stp => {
+      if (!stp.reasoning.length && !stp.calls.length) return;
+      html += `<div class="step"><div class="lbl">step ${stp.index + 1}${stp.latency_ms != null ? ` · ${(stp.latency_ms / 1000).toFixed(1)}s` : ''}</div>`;
+      stp.reasoning.forEach((r, i) => html += `<div class="msg thinking"><div class="lbl">Thinking</div><div class="body annot" data-trace="${tr.trace_id}" data-turn="${T}" data-step="${stp.index}" data-seg="reasoning${i}">${esc(r)}</div></div>`);
+      stp.calls.forEach((cl, ci) => {
+        html += `<div class="${callClass(cl)}">
+          <div class="call-head"><span class="tri">▶</span><span class="name">${esc(cl.name)}</span><span class="args annot" data-trace="${tr.trace_id}" data-turn="${T}" data-step="${stp.index}" data-seg="call${ci}">${esc(JSON.stringify(cl.args))}</span><span class="sum annot" data-trace="${tr.trace_id}" data-turn="${T}" data-step="${stp.index}" data-seg="result${ci}">→ ${esc(cl.summary)}</span><span class="lat">${cl.latency_ms != null ? cl.latency_ms + ' ms' : ''}${cl.permission_denied ? ' · permission_denied' : ''}</span></div>
+          <div class="detail">${resultDetail(cl)}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    if (tr.orphan_tools.length) html += `<div class="msg" style="border-left-color:var(--error)"><div class="lbl">unpaired tool results</div><pre class="mono">${esc(JSON.stringify(tr.orphan_tools, null, 1))}</pre></div>`;
+    html += `<div class="msg reply"><div class="lbl">Reply <a href="#" class="raw-toggle" style="font-weight:400;text-transform:none;letter-spacing:0;margin-left:8px;color:var(--muted)">raw</a></div><div class="body annot" data-trace="${tr.trace_id}" data-turn="${T}" data-seg="reply" data-raw="${esc(tr.reply)}">${md(tr.reply)}</div></div>`;
+  });
+
+  const convNotes = anns.filter(a => !a.quote);
+  html += `<div class="footer">
+    <div class="muted" style="font-size:12px">Open coding: read until the first failure, describe it in plain words, then move on. Select text above to attach a note to it, or write a conversation-level note here.</div>
+    <textarea id="conv-note" placeholder="Open code for this conversation (not tied to a span)"></textarea>
+    <div class="row">
+      <button class="small primary" id="conv-note-save">Save note</button>
+      <label style="font-size:12px;display:flex;gap:6px;align-items:center"><input type="checkbox" id="conv-novel" style="width:auto;margin:0"> not covered by the current modes</label>
+      <button class="small" id="no-failure">No failure observed <kbd>n</kbd></button>
+      <button class="small" id="mark-reviewed">Reviewed, next <kbd>r</kbd></button>
+      <span class="muted" style="font-size:12px">${anns.length} annotation(s) on this conversation</span>
+    </div>
+    <div class="conv-notes">${convNotes.map(a => `<div class="cn"><span class="txt">${a.novel ? '<b style="color:var(--challenge)">new? </b>' : ''}${a.kind === 'no_failure' ? '<i>no failure observed</i>' : esc(a.note)}</span><span class="muted" style="font-size:11px">${esc(a.source || 'human')}</span><button class="small" data-del="${a.id}">✕</button></div>`).join('')}</div>
+  </div>`;
+  $('#conv-col').innerHTML = html;
+
+  $('#sys-toggle').onclick = e => { e.preventDefault(); $('#sysprompt').classList.toggle('open'); };
+  $$('.raw-toggle').forEach(a => a.onclick = e => { e.preventDefault(); const b = a.closest('.msg').querySelector('.body'); const raw = b.dataset.rawOn === '1'; b.innerHTML = raw ? md(b.dataset.raw) : `<pre style="white-space:pre-wrap;margin:0;font:12.5px/1.5 var(--mono)">${esc(b.dataset.raw)}</pre>`; b.dataset.rawOn = raw ? '0' : '1'; a.textContent = raw ? 'raw' : 'rendered'; applyHighlights(); });
+  $('#expand-toggle').onclick = e => { e.preventDefault(); S.expandAll = !S.expandAll; renderConv(); };
+  $$('.call-head').forEach(h => h.onclick = e => { if (window.getSelection().toString()) return; h.parentElement.classList.toggle('open'); layoutNotes(); });
+  $('#conv-note-save').onclick = () => saveConvNote();
+  $('#conv-note').onkeydown = e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveConvNote(); e.stopPropagation(); };
+  $('#no-failure').onclick = () => markNoFailure();
+  $('#mark-reviewed').onclick = () => nextConv();
+  $$('.footer [data-del]').forEach(b => b.onclick = () => deleteAnnotation(b.dataset.del));
+  applyHighlights();
+}
+function saveConvNote() {
+  const txt = $('#conv-note').value.trim(); if (!txt) return;
+  const c = S.convs[S.current];
+  S.annotations.push({id: uid(), scenario_id: S.current, trace_id: c.turns[0].trace_id, turn: null, step: null, seg: null, quote: null, note: txt, kind: 'open_code', source: 'human', batch: batchOf(S.current), novel: $('#conv-novel').checked || undefined, created_at: now()});
+  saveState('annotations'); renderConv(); renderQueue(); toast('note saved');
+}
+function markNoFailure() {
+  if (!S.current) return;
+  const has = annsFor(S.current).some(a => a.kind !== 'no_failure');
+  if (has && !confirm('This conversation already has an open code. Mark "no failure observed" anyway?')) return;
+  S.annotations = S.annotations.filter(a => !(a.scenario_id === S.current && a.kind === 'no_failure'));
+  const c = S.convs[S.current];
+  S.annotations.push({id: uid(), scenario_id: S.current, trace_id: c.turns[0].trace_id, turn: null, step: null, seg: null, quote: null, note: 'no failure observed', kind: 'no_failure', source: 'human', batch: batchOf(S.current), created_at: now()});
+  saveState('annotations'); toast('no failure observed'); nextConv();
+}
+function deleteAnnotation(id) { S.annotations = S.annotations.filter(a => a.id !== id); saveState('annotations'); renderConv(); renderQueue(); }
+function nextConv(delta = 1) {
+  const i = S.queue.indexOf(S.current); const j = Math.min(Math.max(i + delta, 0), S.queue.length - 1);
+  if (S.queue.length && (i === -1 || j !== i)) openConv(S.queue[i === -1 ? 0 : j]);
+  else { toast(delta > 0 ? `end of the "${S.batch}" queue. Pick another batch.` : `start of the "${S.batch}" queue`); renderQueue(); }
+}
+
+// ---- text selection -> annotation ----------------------------------------
+let pending = null;
+document.addEventListener('mouseup', e => {
+  if (S.view !== 'review' || $('#popover').contains(e.target)) return;
+  const sel = window.getSelection(); const text = sel ? sel.toString().trim() : '';
+  if (!text || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const seg = (range.commonAncestorContainer.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement).closest('.annot');
+  if (!seg) return;
+  // wrap the selection so it stays visible while the input has focus
+  const mark = document.createElement('mark'); mark.className = 'pending';
+  try { range.surroundContents(mark); } catch (err) { mark.remove(); }
+  pending = {seg, quote: text, mark};
+  sel.removeAllRanges();
+  const pop = $('#popover'); const r = (mark.isConnected ? mark : seg).getBoundingClientRect();
+  pop.style.display = 'block'; pop.style.top = (window.scrollY + r.bottom + 6) + 'px'; pop.style.left = Math.min(window.scrollX + r.left, window.innerWidth - 340) + 'px';
+  $('#pop-quote').textContent = '“' + text.slice(0, 140) + (text.length > 140 ? '…' : '') + '”';
+  $('#pop-text').value = ''; $('#pop-novel').checked = false; $('#pop-text').focus();
+});
+function closePopover() {
+  $('#popover').style.display = 'none';
+  if (pending && pending.mark && pending.mark.isConnected) { const m = pending.mark; m.replaceWith(...m.childNodes); }
+  pending = null;
+}
+$('#pop-cancel').onclick = closePopover;
+$('#pop-save').onclick = () => savePopover();
+$('#pop-text').onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); savePopover(); } if (e.key === 'Escape') closePopover(); };
+document.addEventListener('mousedown', e => { if ($('#popover').style.display === 'block' && !$('#popover').contains(e.target) && !e.target.closest('mark.pending')) closePopover(); });
+function savePopover() {
+  const note = $('#pop-text').value.trim(); if (!note || !pending) return;
+  const d = pending.seg.dataset;
+  S.annotations.push({id: uid(), scenario_id: S.current, trace_id: d.trace, turn: +d.turn, step: d.step != null ? +d.step : null, seg: d.seg, quote: pending.quote, note, kind: 'open_code', source: 'human', batch: batchOf(S.current), novel: $('#pop-novel').checked || undefined, created_at: now()});
+  saveState('annotations'); closePopover(); renderConv(); renderQueue(); toast('annotation saved');
+}
+
+// ---- highlights + margin notes -------------------------------------------
+function highlightText(el, quote, cls, id) {
+  // Find `quote` in the element's text (across nodes) and wrap it in <mark>s.
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); const nodes = []; let full = '';
+  while (walker.nextNode()) { nodes.push({n: walker.currentNode, start: full.length}); full += walker.currentNode.nodeValue; }
+  const norm = s => s.replace(/\s+/g, ' ');
+  let idx = full.indexOf(quote);
+  if (idx < 0) { // whitespace-insensitive fallback
+    const map = []; let nf = ''; for (let i = 0; i < full.length; i++) { const ch = full[i]; if (/\s/.test(ch)) { if (nf.endsWith(' ')) continue; nf += ' '; } else nf += ch; map.push(i); }
+    const k = nf.indexOf(norm(quote)); if (k < 0) return null; idx = map[k]; var endIdx = map[k + norm(quote).length - 1] + 1;
+  } else var endIdx = idx + quote.length;
+  let first = null;
+  for (const {n, start} of nodes) {
+    const s = Math.max(idx, start), e = Math.min(endIdx, start + n.nodeValue.length);
+    if (s >= e) continue;
+    const r = document.createRange(); r.setStart(n, s - start); r.setEnd(n, e - start);
+    const m = document.createElement('mark'); m.className = cls; m.dataset.ann = id; r.surroundContents(m);
+    if (!first) first = m;
+  }
+  return first;
+}
+function applyHighlights() {
+  const sid = S.current; const marginEl = $('#margin'); marginEl.innerHTML = '';
+  const items = [];
+  for (const a of annsFor(sid)) if (a.quote) {
+    const seg = $(`.annot[data-trace="${a.trace_id}"][data-seg="${a.seg}"]${a.step != null ? `[data-step="${a.step}"]` : ''}`);
+    const m = seg ? highlightText(seg, a.quote, 'ann', a.id) : null;
+    items.push({id: a.id, kind: 'ann', mark: m, a, anchor: m || seg});
+  }
+  for (const s of S.suggestions) if (s.scenario_id === sid && s.status === 'pending') {
+    const seg = s.trace_id && s.seg ? $(`.annot[data-trace="${s.trace_id}"][data-seg="${s.seg}"]${s.step != null ? `[data-step="${s.step}"]` : ''}`) : null;
+    const m = seg && s.quote ? highlightText(seg, s.quote, 'sug', s.id) : null;
+    items.push({id: s.id, kind: 'sug', mark: m, s, anchor: m || seg || $('.hdr')});
+  }
+  for (const it of items) {
+    const div = document.createElement('div'); div.className = 'note ' + it.kind; div.dataset.ann = it.id;
+    if (it.kind === 'ann') div.innerHTML = `<div class="q">“${esc(it.a.quote)}”</div>${it.a.novel ? '<div class="tag" style="color:var(--challenge)">new?</div>' : ''}<div class="txt">${esc(it.a.note)}</div><div class="acts"><button class="small" data-edit>edit</button><button class="small" data-del>delete</button></div>`;
+    else div.innerHTML = `<div class="tag">agent suggestion · ${esc(it.s.mode || '')}</div>${it.s.quote ? `<div class="q">“${esc(it.s.quote)}”</div>` : ''}<div class="txt">${esc(it.s.rationale || it.s.note || '')}</div><div class="acts"><button class="small primary" data-acc>accept</button><button class="small" data-rej>reject</button></div>`;
+    marginEl.appendChild(div); it.el = div;
+    div.onmouseenter = () => { div.classList.add('hl'); $$(`mark[data-ann="${it.id}"]`).forEach(m => m.classList.add('hl')); };
+    div.onmouseleave = () => { div.classList.remove('hl'); $$(`mark[data-ann="${it.id}"]`).forEach(m => m.classList.remove('hl')); };
+    $$(`mark[data-ann="${it.id}"]`).forEach(m => { m.onmouseenter = div.onmouseenter; m.onmouseleave = div.onmouseleave; });
+    if (it.kind === 'ann') {
+      $('[data-del]', div).onclick = () => deleteAnnotation(it.id);
+      $('[data-edit]', div).onclick = () => { const v = prompt('Edit note', it.a.note); if (v != null && v.trim()) { it.a.note = v.trim(); it.a.edited_at = now(); saveState('annotations'); renderConv(); } };
+    } else {
+      $('[data-acc]', div).onclick = () => decideSuggestion(it.id, 'accepted');
+      $('[data-rej]', div).onclick = () => decideSuggestion(it.id, 'rejected');
+    }
+  }
+  S._noteItems = items; layoutNotes();
+}
+function layoutNotes() {
+  const items = S._noteItems || []; const marginEl = $('#margin'); if (!marginEl) return;
+  const base = marginEl.getBoundingClientRect().top; let last = -Infinity;
+  items.sort((a, b) => (a.anchor ? a.anchor.getBoundingClientRect().top : 0) - (b.anchor ? b.anchor.getBoundingClientRect().top : 0));
+  for (const it of items) {
+    let top = it.anchor ? it.anchor.getBoundingClientRect().top - base : 0;
+    if (top < last + 8) top = last + 8;
+    it.el.style.top = top + 'px'; last = top + it.el.offsetHeight;
+  }
+  marginEl.style.minHeight = (last + 40) + 'px';
+}
+window.addEventListener('resize', layoutNotes);
+
+// ---------------------------------------------------------------------------
+// suggestions
+// ---------------------------------------------------------------------------
+function decideSuggestion(id, status) {
+  const s = S.suggestions.find(x => x.id === id); if (!s) return;
+  let note = null;
+  if (status === 'rejected') { note = prompt('Why reject? (what boundary excludes it)', ''); if (note === null) return; }
+  s.status = status; s.decided_at = now(); s.decision_note = note || null;
+  if (status === 'accepted') {
+    S.annotations.push({id: uid(), scenario_id: s.scenario_id, trace_id: s.trace_id, turn: s.turn ?? null, step: s.step ?? null, seg: s.seg || null, quote: s.quote || null, note: s.rationale || s.note || `(accepted suggestion for ${s.mode})`, kind: 'accepted_suggestion', source: 'agent_suggestion', suggestion_id: s.id, mode_hint: s.mode || null, batch: batchOf(s.scenario_id), created_at: now()});
+    saveState('annotations');
+  }
+  saveState('suggestions'); toast('suggestion ' + status);
+  if (S.view === 'review') { renderConv(); renderQueue(); } else renderSuggestions();
+  $('#sugg-count').textContent = pendingCount();
+  if (S.view === 'review' && S.current === s.scenario_id) advanceToNextPending();
+}
+// After the last pending suggestion in a conversation is decided, open the next
+// conversation that still has one (list order, wrapping), so review needs fewer clicks.
+function advanceToNextPending() {
+  const hasPending = sid => S.suggestions.some(x => x.scenario_id === sid && x.status === 'pending');
+  if (hasPending(S.current)) return;
+  const order = S.list.map(c => c.scenario_id); const i = order.indexOf(S.current);
+  const rotated = order.slice(i + 1).concat(order.slice(0, i + 1));
+  const next = rotated.find(hasPending);
+  if (next) openConv(next); else toast('no pending suggestions left');
+}
+function pendingCount() { const n = S.suggestions.filter(s => s.status === 'pending').length; return n ? `(${n})` : ''; }
+function renderSuggestions() {
+  const groups = {pending: [], accepted: [], rejected: []};
+  for (const s of S.suggestions) (groups[s.status] || groups.pending).push(s);
+  const row = s => `<tr><td class="mono">${esc(s.mode || '')}</td><td><span class="linkish" data-go="${esc(s.scenario_id)}">${esc(s.scenario_id)}</span><div class="muted mono" style="font-size:11px">${esc((s.trace_id || '').slice(0, 10))}</div></td><td>${s.quote ? `<i>“${esc(s.quote)}”</i><br>` : ''}${esc(s.rationale || s.note || '')}${s.retrieval ? `<div class="muted" style="font-size:11px">signal: ${esc(s.retrieval)}</div>` : ''}</td><td>${s.status === 'pending' ? `<button class="small primary" data-acc="${s.id}">accept</button> <button class="small" data-rej="${s.id}">reject</button>` : `${s.status}${s.decision_note ? `<div class="muted" style="font-size:11px">${esc(s.decision_note)}</div>` : ''}`}</td></tr>`;
+  const tbl = (title, rows) => `<div class="card"><h3>${title} (${rows.length})</h3>${rows.length ? `<table><tr><th>mode</th><th>conversation</th><th>suggestion</th><th>decision</th></tr>${rows.map(row).join('')}</table>` : '<p class="muted">none</p>'}</div>`;
+  $('#suggestions-page').innerHTML = `<p class="muted">Agent suggestions are retrieval signals, not labels. Open each conversation, read the evidence, then accept (becomes an annotation) or reject (kept on disk with your reason).</p>` + tbl('Pending', groups.pending) + tbl('Accepted', groups.accepted) + tbl('Rejected', groups.rejected);
+  $$('#suggestions-page [data-go]').forEach(el => el.onclick = () => { showView('review'); openConv(el.dataset.go); });
+  $$('#suggestions-page [data-acc]').forEach(b => b.onclick = () => decideSuggestion(b.dataset.acc, 'accepted'));
+  $$('#suggestions-page [data-rej]').forEach(b => b.onclick = () => decideSuggestion(b.dataset.rej, 'rejected'));
+}
+
+// ---------------------------------------------------------------------------
+// annotations tab
+// ---------------------------------------------------------------------------
+function renderAnnotations() {
+  const f = (S._annFilter || '').toLowerCase();
+  const rows = [...S.annotations].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || '')).filter(a => {
+    if (!f) return true; const c = S.list.find(x => x.scenario_id === a.scenario_id) || {};
+    return [a.scenario_id, a.note, a.quote, a.kind, a.batch, c.role, c.intent].join(' ').toLowerCase().includes(f);
+  });
+  const open = rows.filter(a => a.kind !== 'no_failure').length, nf = rows.filter(a => a.kind === 'no_failure').length;
+  $('#annotations-page').innerHTML = `<div style="display:flex;gap:10px;align-items:baseline"><h2 style="margin:0">Annotations</h2><span class="muted">${open} open code(s) · ${nf} no-failure mark(s) · ${new Set(rows.map(a => a.scenario_id)).size} conversation(s)</span></div>
+    <input id="ann-filter" placeholder="filter: scenario, note text, role, intent, batch, kind" value="${esc(S._annFilter || '')}" style="margin:10px 0">
+    <div class="card" style="padding:0"><table><tr><th>when</th><th>conversation</th><th>batch</th><th>where</th><th>quote</th><th>open code</th><th></th></tr>
+    ${rows.map(a => { const c = S.list.find(x => x.scenario_id === a.scenario_id) || {}; return `<tr>
+      <td class="muted mono" style="font-size:11px;white-space:nowrap">${esc((a.created_at || '').slice(5, 16).replace('T', ' '))}</td>
+      <td><span class="linkish mono" data-go="${esc(a.scenario_id)}">${esc(a.scenario_id)}</span><div class="muted" style="font-size:11px">${esc(c.role || '')} · ${esc(c.intent || '')}${c.group === 'challenge' ? ' · challenge' : ''}</div></td>
+      <td class="muted" style="font-size:12px">${esc(a.batch || '')}</td>
+      <td class="mono muted" style="font-size:11px">${a.quote ? `t${(a.turn ?? 0) + 1}${a.step != null ? ' s' + (a.step + 1) : ''} ${esc(a.seg || '')}` : 'conversation'}</td>
+      <td style="font-size:12.5px;max-width:260px"><i>${esc(a.quote || '')}</i></td>
+      <td style="max-width:320px">${a.novel ? '<b style="color:var(--challenge)">new? </b>' : ''}${a.kind === 'no_failure' ? '<span class="muted">no failure observed</span>' : esc(a.note)}${a.source && a.source !== 'human' ? `<div class="muted" style="font-size:11px">${esc(a.source)}</div>` : ''}</td>
+      <td><button class="small" data-del="${a.id}">✕</button></td></tr>`; }).join('') || '<tr><td colspan="7" class="muted">no annotations yet</td></tr>'}</table></div>`;
+  $('#ann-filter').oninput = e => { S._annFilter = e.target.value; renderAnnotations(); const el = $('#ann-filter'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); };
+  $('#ann-filter').onkeydown = e => e.stopPropagation();
+  $$('#annotations-page [data-go]').forEach(el => el.onclick = () => { showView('review'); openConv(el.dataset.go); });
+  $$('#annotations-page [data-del]').forEach(b => b.onclick = () => { if (confirm('Delete this annotation?')) { deleteAnnotation(b.dataset.del); renderAnnotations(); } });
+}
+
+// ---------------------------------------------------------------------------
+// taxonomy
+// ---------------------------------------------------------------------------
+function renderTaxonomy() {
+  const modes = S.patterns.modes || [];
+  const annById = Object.fromEntries(S.annotations.map(a => [a.id, a]));
+  const specIds = [...S.spec.matchAll(/\*\*([A-Z]+-\d+)\.\*\*/g)].map(m => m[1]);
+  const modeCard = (m, i) => `<div class="card" data-mode="${esc(m.name)}">
+    <div style="display:flex;gap:10px;align-items:baseline"><h3 class="mono">${esc(m.name)}</h3><span class="badge ${m.status === 'final' ? 'coverage' : 'challenge'}">${esc(m.status || 'candidate')}</span><span class="spacer" style="flex:1"></span><button class="small" data-edit="${i}">edit</button><button class="small" data-remove="${i}">remove</button></div>
+    <div><b>Definition:</b> ${esc(m.definition || '')}</div>
+    ${m.boundary ? `<div><b>Boundary:</b> ${esc(m.boundary)}</div>` : ''}
+    <div class="muted" style="font-size:12.5px">source: <span class="mono">${esc(m.spec_source || '?')}</span> · evaluator: ${esc(m.evaluator || '?')} · positives: ${(m.positive_trace_ids || []).length} · close negatives: ${(m.close_negative_trace_ids || []).length}</div>
+    ${(m.origin_annotation_ids || []).length ? `<details><summary>${m.origin_annotation_ids.length} originating annotation(s)</summary><ul>${m.origin_annotation_ids.map(id => { const a = annById[id]; return a ? `<li><span class="linkish" data-go="${esc(a.scenario_id)}">${esc(a.scenario_id)}</span>: ${a.quote ? `<i>“${esc(a.quote.slice(0, 80))}”</i> ` : ''}${esc(a.note)}</li>` : `<li class="muted">${esc(id)} (missing)</li>`; }).join('')}</ul></details>` : ''}
+    ${(m.history || []).length ? `<details><summary>${m.history.length} revision(s)</summary><ul>${m.history.map(h => `<li><span class="muted">${esc(h.at || '')}</span> ${esc(h.change || '')}</li>`).join('')}</ul></details>` : ''}
+  </div>`;
+  $('#taxonomy-page').innerHTML = `<div style="display:flex;align-items:baseline;gap:10px"><h2 style="margin:0">Taxonomy</h2><span class="muted">${modes.length} mode(s), ${modes.filter(m => m.status === 'final').length} final · SPEC ids: ${specIds.join(', ')}</span><span style="flex:1"></span><button class="small primary" id="add-mode">Add mode</button></div>
+    <p class="muted" style="font-size:12.5px">Modes are built from annotations you wrote or accepted. Each final mode needs a binary definition, a boundary to its nearest neighbour, a SPEC source (or recorded SPEC revision), an evaluator type, 3+ positives and 3+ close negatives.</p>
+    <div id="mode-form"></div>
+    ${modes.map(modeCard).join('') || '<p class="muted">No modes yet. Open codes accumulate first; modes come from axial coding.</p>'}`;
+  $('#add-mode').onclick = () => modeForm(null);
+  $$('#taxonomy-page [data-edit]').forEach(b => b.onclick = () => modeForm(+b.dataset.edit));
+  $$('#taxonomy-page [data-remove]').forEach(b => b.onclick = () => { if (confirm('Remove this mode from patterns.json? (labels files are kept)')) { S.patterns.modes.splice(+b.dataset.remove, 1); saveState('patterns'); renderTaxonomy(); } });
+  $$('#taxonomy-page [data-go]').forEach(el => el.onclick = () => { showView('review'); openConv(el.dataset.go); });
+}
+function modeForm(i) {
+  const m = i == null ? {name: '', definition: '', boundary: '', spec_source: '', evaluator: 'llm_judge', status: 'candidate', origin_annotation_ids: [], positive_trace_ids: [], close_negative_trace_ids: [], history: []} : S.patterns.modes[i];
+  const f = k => `<div class="field"><label>${k.replace('_', ' ')}</label>${k === 'definition' || k === 'boundary' ? `<textarea id="mf-${k}">${esc(m[k] || '')}</textarea>` : k === 'evaluator' ? `<select id="mf-${k}"><option ${m[k] === 'code_check' ? 'selected' : ''}>code_check</option><option ${m[k] === 'llm_judge' ? 'selected' : ''}>llm_judge</option></select>` : k === 'status' ? `<select id="mf-${k}"><option ${m[k] === 'candidate' ? 'selected' : ''}>candidate</option><option ${m[k] === 'final' ? 'selected' : ''}>final</option><option ${m[k] === 'rejected' ? 'selected' : ''}>rejected</option></select>` : `<input id="mf-${k}" value="${esc(m[k] || '')}">`}</div>`;
+  $('#mode-form').innerHTML = `<div class="card"><h3>${i == null ? 'New mode' : 'Edit ' + esc(m.name)}</h3><div class="grid2"><div>${f('name')}${f('spec_source')}${f('evaluator')}${f('status')}</div><div>${f('definition')}${f('boundary')}<div class="field"><label>change note (kept in history)</label><input id="mf-change" placeholder="why this edit"></div></div></div>
+    <button class="small primary" id="mf-save">Save</button> <button class="small" id="mf-cancel">Cancel</button></div>`;
+  $('#mf-cancel').onclick = () => { $('#mode-form').innerHTML = ''; };
+  $('#mf-save').onclick = () => {
+    const name = $('#mf-name').value.trim().replace(/\s+/g, '_'); if (!name) return;
+    const upd = {name, definition: $('#mf-definition').value.trim(), boundary: $('#mf-boundary').value.trim(), spec_source: $('#mf-spec_source').value.trim(), evaluator: $('#mf-evaluator').value, status: $('#mf-status').value};
+    const change = $('#mf-change').value.trim();
+    if (i == null) { S.patterns.modes.push({...m, ...upd, created_at: now(), history: change ? [{at: now(), change}] : []}); }
+    else { Object.assign(m, upd); (m.history = m.history || []).push({at: now(), change: change || 'edited in the review app'}); }
+    saveState('patterns'); renderTaxonomy();
+  };
+}
+
+// ---------------------------------------------------------------------------
+// labeling
+// ---------------------------------------------------------------------------
+function renderLabeling() {
+  const modes = labelingModes(); const allCount = finalModes().length;
+  const c = S.convs[S.current];
+  if (!modes.length) { $('#labeling-page').innerHTML = '<p class="muted">No modes in the taxonomy yet.</p>'; return; }
+  if (!c) { $('#labeling-page').innerHTML = '<p class="muted">Open a conversation in the Review view first.</p>'; return; }
+  const pairState = (m, tid) => { const l = labelFor(m.name, tid); return !l ? 'none' : (isProvisional(l) ? 'prov' : 'done'); };
+  const unj = c.turns.reduce((n, tr) => n + modes.filter(m => pairState(m, tr.trace_id) !== 'done').length, 0);
+  const inQueue = S.queue.length ? S.queue : S.list.map(x => x.scenario_id);
+  const doneConvs = inQueue.filter(sid => { const cv = S.list.find(x => x.scenario_id === sid); return cv && (S.convs[sid] ? S.convs[sid].turns : []).length && S.convs[sid].turns.every(tr => modes.every(m => pairState(m, tr.trace_id) === 'done')); }).length;
+  const toolLine = call => {
+    const args = Object.entries(call.args || {}).filter(([, v]) => v !== null && v !== '').map(([k, v]) => `${k}=${typeof v === 'string' ? v : JSON.stringify(v)}`).join(', ');
+    const r = call.result || {}; let out = '';
+    if (r.error) out = `error: ${r.error}`;
+    else if (Array.isArray(r.orders)) out = `${r.orders.length} order(s)` + (r.orders.length && r.orders.length <= 3 ? ': ' + r.orders.map(o => `#${o.order_id} $${o.total_usd} ${o.status}${o.refund_eligible ? ' eligible' : ''}`).join('; ') : '');
+    else if (r.order) out = `#${r.order.order_id} ${r.order.store_name || ''} $${r.order.total_usd} ${r.order.status}, delivered ${r.order.delivered_at || '-'}, ${r.order.refund_eligible ? 'eligible' : 'not eligible'}`;
+    else if (Array.isArray(r.results)) out = r.results.slice(0, 3).map(x => x.policy_id).join(', ') + (r.results.length > 3 ? ', …' : '');
+    else if (r.policy_id && r.body) out = `${r.policy_id} (${r.body.length} chars)`;
+    else if (r.return_window_days !== undefined) out = `${r.store_name || ''}: ${r.return_window_days} days${r.has_override ? ' (override)' : ''}`;
+    else if (Array.isArray(r.products)) out = `${r.products.length} product(s)`;
+    else if (r.status || r.ticket_id) out = [r.status, r.ticket_id ? `ticket ${r.ticket_id}` : null, r.refund_id ? `refund ${r.refund_id}` : null, r.amount_usd ? `$${r.amount_usd}` : null].filter(Boolean).join(' · ');
+    else out = JSON.stringify(r).slice(0, 90);
+    const isWrite = ['issue_refund', 'cancel_order', 'escalate_to_human'].includes(call.name);
+    return `<div class="lab-tool ${isWrite ? 'write' : ''}"><b>${esc(call.name)}</b>(${esc(args.slice(0, 80))}) <span class="muted">→ ${esc(out)}</span></div>`;
+  };
+  const notes = tr => annsFor(c.scenario_id).filter(a => a.trace_id === tr.trace_id && a.kind !== 'no_failure');
+  const cards = c.turns.map((tr, ti) => `<div class="lab-card ${ti === S.labelFocus ? 'focus' : ''}" data-ti="${ti}">
+    <div class="lab-conv">
+      <div class="lab-user">${esc(tr.user)}</div>
+      ${(tr.steps || []).flatMap(st => st.calls || []).map(toolLine).join('')}
+      <div class="lab-reply">${md(tr.reply || '')}</div>
+      ${notes(tr).length ? `<div class="lab-notes">${notes(tr).map(a => `<div>${a.quote ? `<i>“${esc(a.quote.slice(0, 90))}”</i> ` : ''}${esc(a.note)}</div>`).join('')}</div>` : ''}
+    </div>
+    <div class="lab-modes">
+      <div class="muted" style="font-size:11.5px;margin-bottom:4px">turn ${ti + 1} of ${c.turns.length}</div>
+      ${modes.map((m, mi) => { const l = labelFor(m.name, tr.trace_id); const fail = l && l.label === 1; const st = pairState(m, tr.trace_id);
+        return `<button class="lab-pill ${fail ? 'fail' : 'pass'} ${st}" data-ti="${ti}" data-m="${esc(m.name)}" data-l="${fail ? 0 : 1}" title="${esc(m.definition || '')}"><span class="n">${(mi + 1) % 10}</span><span class="nm">${esc(m.name.replace(/_/g, ' '))}</span><span class="v">${fail ? 'FAIL' : 'pass'}</span></button>`; }).join('')}
+    </div>
+  </div>`).join('');
+  const t = c.tuple || {};
+  $('#labeling-page').innerHTML = `<div class="lab-head">
+      <div><b class="mono">${esc(c.scenario_id)}</b> <span class="muted">· ${esc(c.role || '')} · ${esc(t.intent || '')} · ${esc(batchOf(c.scenario_id) || 'unbatched')}</span></div>
+      <div class="muted">${doneConvs}/${inQueue.length} conversations confirmed · ${unj} pair(s) open here · ${modes.length < allCount ? `<span class="linkish" id="lab-scope">${modes.length} of ${allCount} modes (show all)</span>` : (S.labelAllModes ? `<span class="linkish" id="lab-scope">all ${allCount} modes (back to scope)</span>` : `${allCount} modes`)}</div>
+      <span style="flex:1"></span>
+      <select id="lab-batch" class="small" style="width:auto"></select>
+      <button class="small" id="lab-prev">← prev</button>
+      <button class="primary" id="lab-confirm" ${unj ? '' : 'disabled'}>${unj ? `Confirm all ${unj} & next` : 'All confirmed'} <kbd>c</kbd></button>
+      <button class="small" id="lab-next">next →</button>
+    </div>
+    <p class="muted" style="font-size:12px;margin:6px 0 10px">Click a pill to flip it. Dashed = not yet confirmed (FAILs come from your notes, passes mean nothing flagged it yet). Confirm saves every dashed pill as shown. Keys: <kbd>1</kbd>..<kbd>9</kbd>,<kbd>0</kbd> flip mode N on the outlined turn · <kbd>Tab</kbd> next turn · <kbd>c</kbd> confirm and advance · <kbd>j</kbd>/<kbd>k</kbd> skip. Hover a pill for the definition.</p>
+    ${cards}
+    <div id="lab-log" class="lf"></div>`;
+  $$('#labeling-page button[data-m]').forEach(b => b.onclick = e => { e.stopPropagation(); setLabel(+b.dataset.ti, b.dataset.m, +b.dataset.l); });
+  $$('#labeling-page .lab-card').forEach(r => r.onclick = () => { S.labelFocus = +r.dataset.ti; $$('.lab-card').forEach(x => x.classList.toggle('focus', +x.dataset.ti === S.labelFocus)); });
+  $('#lab-prev').onclick = () => nextConv(-1); $('#lab-next').onclick = () => nextConv(1);
+  $('#lab-confirm').onclick = () => confirmConversation();
+  const sc = $('#lab-scope'); if (sc) sc.onclick = () => { S.labelAllModes = !S.labelAllModes; renderLabeling(); };
+  const lb = $('#lab-batch'); const src = $('#batch-select'); if (lb && src) { lb.innerHTML = src.innerHTML; lb.value = S.batch; lb.onchange = () => { src.value = lb.value; src.dispatchEvent(new Event('change')); nextUnconfirmed(); }; }
+}
+function isProvisional(l) { return !!l && l.source !== 'human'; }
+// Re-save every provisional pair on the current conversation as a human label (writes the
+// Langfuse score), keeping whatever value is shown, then move to the next conversation.
+async function confirmConversation() {
+  const c = S.convs[S.current]; if (!c) return; const modes = labelingModes(); let n = 0, failed = 0;
+  for (const tr of c.turns) for (const m of modes) {
+    const l = labelFor(m.name, tr.trace_id); if (l && !isProvisional(l)) continue;
+    const label = l ? l.label : 0;
+    const note = annsFor(c.scenario_id).filter(a => a.trace_id === tr.trace_id && a.kind !== 'no_failure').map(a => a.note).join(' | ') || null;
+    try { const res = await api('/api/labels', {trace_id: tr.trace_id, scenario_id: c.scenario_id, mode: m.name, label, source: 'human', note}); S.labels[m.name] = (S.labels[m.name] || []).filter(r => r.trace_id !== tr.trace_id).concat([res.row]); n++; }
+    catch (e) { failed++; }
+  }
+  toast(`confirmed ${n} pair(s)${failed ? `, ${failed} failed` : ''}`); renderLabeling();
+  if (!failed) nextUnconfirmed();
+}
+// Next conversation in the current queue with at least one unconfirmed pair (wraps around).
+async function nextUnconfirmed() {
+  const modes = labelingModes(); const q = S.queue.length ? S.queue : S.list.map(x => x.scenario_id);
+  const i = q.indexOf(S.current); const order = q.slice(i + 1).concat(q.slice(0, i + 1));
+  for (const sid of order) {
+    if (!S.convs[sid]) S.convs[sid] = await api('/api/conversation/' + sid);
+    const open = S.convs[sid].turns.some(tr => modes.some(m => { const l = labelFor(m.name, tr.trace_id); return !l || isProvisional(l); }));
+    if (open) { openConv(sid); return; }
+  }
+  toast(`every conversation in "${S.batch}" is confirmed for these modes. Pick another batch.`);
+  renderLabeling();
+}
+async function setLabel(ti, mode, label) {
+  const c = S.convs[S.current]; const tr = c.turns[ti];
+  const existing = labelFor(mode, tr.trace_id);
+  if (existing && existing.label === label && !isProvisional(existing)) return;
+  const note = annsFor(c.scenario_id).filter(a => a.trace_id === tr.trace_id && a.kind !== 'no_failure').map(a => a.note).join(' | ') || null;
+  try {
+    const res = await api('/api/labels', {trace_id: tr.trace_id, scenario_id: c.scenario_id, mode, label, source: 'human', note});
+    S.labels[mode] = (S.labels[mode] || []).filter(r => r.trace_id !== tr.trace_id).concat([res.row]);
+    toast(`${mode}: ${label ? 'Fail' : 'Pass'} · Langfuse ${res.langfuse}`);
+    const log = $('#lab-log'); if (log) log.textContent = `${now()} ${mode}=${label} on ${tr.trace_id.slice(0, 10)} · Langfuse: ${res.langfuse}`;
+  } catch (e) { toast('label save failed'); }
+  renderLabeling();
+}
+
+// ---------------------------------------------------------------------------
+// progress
+// ---------------------------------------------------------------------------
+function renderProgress() {
+  const batches = S.manifest.batches || [];
+  const allIds = S.list.map(c => c.scenario_id);
+  const inBatches = new Set(batches.flatMap(b => b.scenario_ids || []));
+  const reviewedIds = allIds.filter(s => reviewState(s) !== 'unreviewed');
+  const tracesOf = ids => ids.reduce((n, s) => n + ((S.list.find(c => c.scenario_id === s) || {turns: 0}).turns), 0);
+  const bRow = (name, ids, method) => { const r = ids.filter(s => reviewState(s) !== 'unreviewed').length; const nf = ids.filter(s => reviewState(s) === 'nofail').length; return `<tr><td>${esc(name)}</td><td class="muted" style="font-size:12px">${esc(method || '')}</td><td>${ids.length} conv / ${tracesOf(ids)} traces</td><td>${r}</td><td>${nf}</td><td style="width:160px"><div class="bar"><i style="width:${ids.length ? 100 * r / ids.length : 0}%"></i></div></td></tr>`; };
+  const dim = k => { const m = {}; for (const c of S.list) { const v = c[k] || '?'; m[v] = m[v] || {n: 0, r: 0}; m[v].n++; if (reviewState(c.scenario_id) !== 'unreviewed') m[v].r++; } return Object.entries(m).sort((a, b) => b[1].n - a[1].n).map(([v, x]) => `<tr><td>${esc(v)}</td><td>${x.r} / ${x.n}</td></tr>`).join(''); };
+  const modes = finalModes();
+  const reviewedTraces = reviewedIds.flatMap(s => (S.list.find(c => c.scenario_id === s) || {trace_ids: []}).trace_ids);
+  const modeRows = modes.map(m => { const rows = S.labels[m.name] || []; const judged = rows.filter(r => reviewedTraces.includes(r.trace_id)); const fails = judged.filter(r => r.label === 1).length; return `<tr><td class="mono">${esc(m.name)}</td><td>${judged.length} / ${reviewedTraces.length}</td><td>${fails} (${judged.length ? (100 * fails / judged.length).toFixed(0) : 0}% of judged)</td><td>${judged.length - fails}</td><td>${reviewedTraces.length - judged.length}</td></tr>`; }).join('');
+  const incomplete = reviewedIds.filter(s => { const c = S.list.find(x => x.scenario_id === s); return modes.some(m => c.trace_ids.some(t => !labelFor(m.name, t))); });
+  $('#progress-page').innerHTML = `<h2 style="margin-top:0">Progress</h2>
+    <div class="card"><h3>Review batches</h3><table><tr><th>batch</th><th>method</th><th>size</th><th>reviewed</th><th>no failure</th><th></th></tr>
+      ${batches.map(b => bRow(b.name, b.scenario_ids || [], b.method)).join('')}${bRow('unbatched', allIds.filter(s => !inBatches.has(s)), '')}${bRow('all', allIds, '')}</table>
+      <div class="muted" style="margin-top:6px;font-size:12.5px">Distinct reviewed: <b>${reviewedIds.length}</b> conversations, <b>${tracesOf(reviewedIds)}</b> traces (handout minimum: 100 traces). Open codes: ${S.annotations.filter(a => a.kind !== 'no_failure').length}.</div></div>
+    <div class="grid2">
+      <div class="card"><h3>Reviewed by role</h3><table>${dim('role')}</table><h3 style="margin-top:10px">by group</h3><table>${dim('group')}</table></div>
+      <div class="card"><h3>Reviewed by intent</h3><table>${dim('intent')}</table></div>
+    </div>
+    <div class="card"><h3>Structured labels (final modes × reviewed traces)</h3>${modes.length ? `<table><tr><th>mode</th><th>judged</th><th>Fail (sample fraction)</th><th>Pass</th><th>missing</th></tr>${modeRows}</table>` : '<p class="muted">no modes yet</p>'}
+      ${incomplete.length ? `<details style="margin-top:8px"><summary>${incomplete.length} reviewed conversation(s) with incomplete judgments</summary>${incomplete.map(s => `<span class="linkish mono" data-go="${s}" style="margin-right:8px">${s}</span>`).join('')}</details>` : ''}</div>`;
+  $$('#progress-page [data-go]').forEach(el => el.onclick = () => { showView('review'); openConv(el.dataset.go); });
+}
+
+// ---------------------------------------------------------------------------
+// views, batches, keys, boot
+// ---------------------------------------------------------------------------
+function showView(v) {
+  S.view = v; $$('#top .tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  $$('.view').forEach(el => el.classList.toggle('active', el.id === v));
+  if (v === 'annotations') renderAnnotations(); if (v === 'taxonomy') renderTaxonomy(); if (v === 'labeling') renderLabeling(); if (v === 'progress') renderProgress(); if (v === 'suggestions') renderSuggestions();
+  if (v === 'review') { renderQueue(); layoutNotes(); }
+}
+$$('#top .tabs button').forEach(b => b.onclick = () => showView(b.dataset.view));
+function renderBatchSelect() {
+  const sel = $('#batch-select'); const opts = [['all', 'all conversations'], ['unbatched', 'unbatched']].concat((S.manifest.batches || []).map(b => [b.name, `${b.name} (${(b.scenario_ids || []).length})`]));
+  sel.innerHTML = opts.map(([v, l]) => `<option value="${esc(v)}" ${v === S.batch ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  sel.onchange = () => { S.batch = sel.value; try { localStorage.setItem('cw-batch', S.batch); } catch (e) {} renderQueue(); };
+}
+$('#q-filter').oninput = () => renderQueue();
+$('#q-filter').onkeydown = e => e.stopPropagation();
+$('#help-btn').onclick = () => $('#help').classList.add('show'); $('#help-close').onclick = () => $('#help').classList.remove('show');
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'Escape') { $('#help').classList.remove('show'); closePopover(); return; }
+  if (e.key === '?') { $('#help').classList.toggle('show'); return; }
+  if (e.key === 'j') nextConv(1); else if (e.key === 'k') nextConv(-1);
+  else if (S.view === 'review') {
+    if (e.key === 'n') markNoFailure(); else if (e.key === 'r') nextConv(1);
+    else if (e.key === 'a') { const t = $('#conv-note'); if (t) { t.focus(); e.preventDefault(); } }
+    else if (e.key === 'e') { S.expandAll = !S.expandAll; renderConv(); }
+    else if (e.key === 's') { const p = $('#sysprompt'); if (p) p.classList.toggle('open'); }
+  } else if (S.view === 'labeling') {
+    const modes = labelingModes(); const c = S.convs[S.current]; if (!c) return;
+    if (e.key === 'Tab') { e.preventDefault(); S.labelFocus = (S.labelFocus + 1) % c.turns.length; renderLabeling(); return; }
+    if (e.key === 'c') { confirmConversation(); return; }
+    const n = e.key === '0' ? 10 : parseInt(e.key, 10);
+    if (n >= 1 && n <= Math.min(modes.length, 10)) { const m = modes[n - 1].name; const tr = c.turns[S.labelFocus]; const cur = labelFor(m, tr.trace_id); setLabel(S.labelFocus, m, cur && cur.label === 1 ? 0 : 1); }
+  }
+});
+
+async function poll() {
+  try {
+    const [sugg, pat, man] = await Promise.all([api('/api/suggestions'), api('/api/patterns'), api('/api/manifest')]);
+    const before = pendingCount();
+    if (JSON.stringify(sugg) !== JSON.stringify(S.suggestions)) { S.suggestions = sugg; $('#sugg-count').textContent = pendingCount(); if (pendingCount() !== before) toast('new agent suggestions arrived'); if (S.view === 'review') applyHighlights(); if (S.view === 'suggestions') renderSuggestions(); }
+    if (JSON.stringify(pat) !== JSON.stringify(S.patterns)) { S.patterns = pat; if (S.view === 'taxonomy') renderTaxonomy(); if (S.view === 'labeling') renderLabeling(); }
+    if (JSON.stringify(man) !== JSON.stringify(S.manifest)) { S.manifest = man; renderBatchSelect(); renderQueue(); toast('sample manifest updated'); }
+  } catch (e) {}
+}
+
+async function boot() {
+  S.status = await api('/api/status');
+  $('#source').textContent = `${S.status.source} · ${S.status.trace_count} traces / ${S.status.conversation_count} conversations`;
+  const [list, man, ann, pat, sugg, labels, spec] = await Promise.all([api('/api/conversations'), api('/api/manifest'), api('/api/annotations'), api('/api/patterns'), api('/api/suggestions'), api('/api/labels'), api('/api/spec')]);
+  S.list = list; S.manifest = man; S.annotations = ann.annotations || []; S.patterns = pat.modes ? pat : {modes: []}; S.suggestions = Array.isArray(sugg) ? sugg : []; S.labels = labels; S.spec = spec.text || '';
+  // Deep link: ?batch=<batch name>&conv=<scenario id>&view=<review|labeling|taxonomy|...>
+  // e.g. http://localhost:8030/?batch=batch4_uniform&conv=support-0097
+  const qs = new URLSearchParams(location.search);
+  try { S.batch = qs.get('batch') || localStorage.getItem('cw-batch') || 'all'; } catch (e) { S.batch = qs.get('batch') || 'all'; }
+  if (S.batch !== 'all' && S.batch !== 'unbatched' && !(S.manifest.batches || []).some(b => b.name === S.batch)) S.batch = 'all';
+  try { localStorage.setItem('cw-batch', S.batch); } catch (e) {}
+  renderBatchSelect(); renderQueue(); $('#sugg-count').textContent = pendingCount();
+  let start = qs.get('conv'); if (!start) { try { start = localStorage.getItem('cw-current'); } catch (e) {} }
+  if (start && S.list.some(c => c.scenario_id === start)) await openConv(start); else if (S.queue.length) await openConv(S.queue[0]);
+  const view = qs.get('view'); if (view && $$('#top .tabs button').some(b => b.dataset.view === view)) showView(view);
+  setInterval(poll, 4000);
+}
+boot();
+</script>
+</body>
+</html>
