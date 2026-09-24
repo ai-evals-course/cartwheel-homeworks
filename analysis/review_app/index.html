@@ -228,8 +228,21 @@
   }
   table.labels tr.missing td { background: #fff7ed; }
   table.labels tr.missing td.col-trace { background: #fff7ed; }
-  .label-tools { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  table.labels tr.disagree td { background: #fef2f2; }
+  table.labels tr.disagree td.col-trace { background: #fef2f2; }
+  table.labels th.col-judge, table.labels td.col-judge { width: 64px; min-width: 64px; text-align: center; }
+  table.labels th.col-split, table.labels td.col-split { width: 52px; min-width: 52px; text-align: center; font-size: 10px; text-transform: uppercase; color: var(--muted); }
+  table.labels th.col-critique, table.labels td.col-critique {
+    width: 280px; min-width: 220px; max-width: 360px;
+    font-size: 11px; line-height: 1.35; white-space: normal; vertical-align: top;
+  }
+  .verdict-pass { color: #059669; font-weight: 700; }
+  .verdict-fail { color: #dc2626; font-weight: 700; }
+  .critique-snip { color: var(--ink); cursor: help; }
+  .label-tools { display: flex; gap: 8px 14px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
   .label-tools button { border: 1px solid var(--line); background: var(--bg); padding: 6px 12px; border-radius: 6px; cursor: pointer; font: inherit; }
+  .label-tools label { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+  .label-tools select { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -272,6 +285,19 @@
   <div class="label-tools">
     <button id="sync-labels">Sync all labels to Langfuse</button>
     <label><input type="checkbox" id="show-incomplete" /> Show incomplete only</label>
+    <label>Judge mode
+      <select id="judge-mode"><option value="">— none —</option></select>
+    </label>
+    <label>Split
+      <select id="judge-split">
+        <option value="all">all scored</option>
+        <option value="train">train</option>
+        <option value="dev">dev</option>
+        <option value="test">test</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="show-disagreements" /> Disagreements only</label>
+    <span id="judge-meta" class="empty" style="padding:0"></span>
   </div>
   <div id="labels-table-wrap"></div>
 </div>
@@ -294,6 +320,8 @@ const state = {
   patterns: {},
   graph: {nodes: [], clusters: []},
   labels: {modes: [], judgments: {}, sample_trace_ids: []},
+  judges: {judges: [], by_mode: {}},
+  judgeUi: {mode: '', split: 'all', disagreementsOnly: false},
   cur: 0,
   focusTraceId: null,
   storeError: null,
@@ -301,7 +329,12 @@ const state = {
 };
 
 const api = {
-  async get(path) { const r = await fetch(path); return r.json(); },
+  async get(path) {
+    const r = await fetch(path);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || r.statusText);
+    return data;
+  },
   async post(path, body) {
     const r = await fetch(path, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
     if (!r.ok) { const err = await r.json().catch(() => ({})); throw new Error(err.error || r.statusText); }
@@ -464,6 +497,12 @@ async function loadFast() {
     api.get('/api/samples'), api.get('/api/annotations'),
     api.get('/api/suggestions'), api.get('/api/patterns'), api.get('/api/graph'), api.get('/api/labels'),
   ]);
+  let judges = {judges: [], by_mode: {}};
+  try {
+    judges = await api.get('/api/judges');
+  } catch (e) {
+    console.warn('judges API unavailable:', e);
+  }
   state.samples = Array.isArray(samples) ? samples : [];
   state.conversations = samplesAsConversations(state.samples);
   state.annotations = asAnnotationList(annotations);
@@ -471,7 +510,42 @@ async function loadFast() {
   state.patterns = patterns && typeof patterns === 'object' ? patterns : {};
   state.graph = graph && graph.nodes ? graph : {nodes: [], clusters: []};
   state.labels = labels || state.labels;
+  state.judges = judges && typeof judges === 'object' ? judges : {judges: [], by_mode: {}};
+  populateJudgeModeSelect();
+  if (!Object.keys(state.judges.by_mode || {}).length) {
+    document.getElementById('judge-meta').textContent = 'No judges loaded — restart the review server after code updates.';
+    document.getElementById('judge-meta').className = 'counts';
+  }
   if (!state.focusTraceId && curConv()) state.focusTraceId = curConv().focus_trace_id;
+}
+
+function populateJudgeModeSelect() {
+  const sel = document.getElementById('judge-mode');
+  const modes = Object.keys(state.judges.by_mode || {}).sort();
+  const prev = state.judgeUi.mode || sel.value;
+  sel.innerHTML = '<option value="">— none —</option>' +
+    modes.map(m => {
+      const j = state.judges.by_mode[m];
+      const tag = j.status === 'frozen' ? ' (frozen)' : '';
+      return `<option value="${escape(m)}">${escape(m)}${tag}</option>`;
+    }).join('');
+  if (prev && modes.includes(prev)) sel.value = prev;
+  else if (modes.includes('excessive_policy_exposition')) sel.value = 'excessive_policy_exposition';
+  state.judgeUi.mode = sel.value;
+}
+
+function humanPass(val) { return val === 0; }
+function judgePass(pred) { return pred === 1; }
+function labelDisagrees(humanVal, judgePred) {
+  if (humanVal !== 0 && humanVal !== 1) return false;
+  if (judgePred !== 0 && judgePred !== 1) return false;
+  return humanPass(humanVal) !== judgePass(judgePred);
+}
+function verdictHtml(pred) {
+  if (pred !== 0 && pred !== 1) return '—';
+  return pred === 1
+    ? '<span class="verdict-pass">Pass</span>'
+    : '<span class="verdict-fail">Fail</span>';
 }
 
 async function loadConversations() {
@@ -827,6 +901,22 @@ function renderLabels() {
   const ids = state.labels.sample_trace_ids || [];
   const judgments = state.labels.judgments || {};
   const incompleteOnly = document.getElementById('show-incomplete').checked;
+  const judgeMode = document.getElementById('judge-mode').value;
+  const splitFilter = document.getElementById('judge-split').value;
+  const disagreementsOnly = document.getElementById('show-disagreements').checked;
+  state.judgeUi = {mode: judgeMode, split: splitFilter, disagreementsOnly};
+
+  const judgeBundle = judgeMode ? (state.judges.by_mode || {})[judgeMode] : null;
+  const judgeTraces = judgeBundle?.by_trace || {};
+  const metaEl = document.getElementById('judge-meta');
+  if (judgeBundle) {
+    metaEl.textContent = `${judgeBundle.judge_id} · ${judgeBundle.model || 'model?'} · ${judgeBundle.scored_count} scored`;
+    metaEl.className = 'counts';
+  } else {
+    metaEl.textContent = '';
+    metaEl.className = 'empty';
+  }
+
   if (!modes.length) {
     document.getElementById('labels-table-wrap').innerHTML =
       '<div class="empty" style="padding:16px">No final modes in patterns.json yet. Complete axial coding first.</div>';
@@ -834,22 +924,48 @@ function renderLabels() {
   }
   let rows = ids.map(tid => {
     const missing = modes.some(m => judgments[tid]?.[m] === undefined);
-    return {tid, missing};
+    const humanVal = judgeMode ? judgments[tid]?.[judgeMode] : undefined;
+    const scored = judgeTraces[tid];
+    const disagree = judgeMode && labelDisagrees(humanVal, scored?.pred);
+    return {tid, missing, humanVal, scored, disagree};
   });
   if (incompleteOnly) rows = rows.filter(r => r.missing);
-  const head = `<tr><th class="col-trace">trace</th>${modes.map(m => modeHeader(m)).join('')}</tr>`;
-  const body = rows.map(({tid, missing}) => {
+  if (judgeMode && splitFilter !== 'all') {
+    rows = rows.filter(r => r.scored && r.scored.split === splitFilter);
+  }
+  if (judgeMode && disagreementsOnly) {
+    rows = rows.filter(r => r.disagree);
+  }
+
+  const judgeCols = judgeMode
+    ? '<th class="col-judge">judge</th><th class="col-split">split</th><th class="col-critique">critique</th>'
+    : '';
+  const head = `<tr><th class="col-trace">trace</th>${modes.map(m => modeHeader(m)).join('')}${judgeCols}</tr>`;
+  const body = rows.map(({tid, missing, humanVal, scored, disagree}) => {
     const cells = modes.map(m => {
       const val = judgments[tid]?.[m];
       const sel = val === 0 ? '<option value="0" selected>Pass</option><option value="1">Fail</option>'
         : val === 1 ? '<option value="0">Pass</option><option value="1" selected>Fail</option>'
         : '<option value="">—</option><option value="0">Pass</option><option value="1">Fail</option>';
-      return `<td><select data-trace="${escape(tid)}" data-mode="${escape(m)}">${sel}</select></td>`;
+      const hl = judgeMode === m && disagree ? ' style="outline:2px solid #dc2626"' : '';
+      return `<td${hl}><select data-trace="${escape(tid)}" data-mode="${escape(m)}">${sel}</select></td>`;
     }).join('');
-    return `<tr class="${missing ? 'missing' : ''}"><td class="mono col-trace" title="${escape(tid)}">${escape(tid.slice(0, 10))}…</td>${cells}</tr>`;
+    let judgeCells = '';
+    if (judgeMode) {
+      const critique = scored?.critique ? escape(scored.critique) : '';
+      const critiqueTitle = scored?.critique ? escape(scored.critique) : '';
+      judgeCells = `<td class="col-judge">${scored ? verdictHtml(scored.pred) : '—'}</td>` +
+        `<td class="col-split">${escape(scored?.split || '')}</td>` +
+        `<td class="col-critique">${critique
+          ? `<span class="critique-snip" title="${critiqueTitle}">${clip(scored.critique, 220)}</span>`
+          : '<span class="empty">—</span>'}</td>`;
+    }
+    const rowClass = [missing ? 'missing' : '', disagree ? 'disagree' : ''].filter(Boolean).join(' ');
+    return `<tr class="${rowClass}"><td class="mono col-trace" title="${escape(tid)}">${escape(tid.slice(0, 10))}…</td>${cells}${judgeCells}</tr>`;
   }).join('');
+  const extraCols = judgeMode ? 3 : 0;
   document.getElementById('labels-table-wrap').innerHTML =
-    `<table class="labels" style="--mode-cols:${modes.length}"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+    `<table class="labels" style="--mode-cols:${modes.length + extraCols}"><thead>${head}</thead><tbody>${body || '<tr><td colspan="99" class="empty">No rows match filters.</td></tr>'}</tbody></table>`;
   document.querySelectorAll('table.labels select').forEach(sel => {
     sel.onchange = async () => {
       if (sel.value === '') return;
@@ -858,6 +974,7 @@ function renderLabels() {
         state.labels.judgments[sel.dataset.trace] = state.labels.judgments[sel.dataset.trace] || {};
         state.labels.judgments[sel.dataset.trace][sel.dataset.mode] = parseInt(sel.value, 10);
         toast('label saved to Langfuse');
+        renderLabels();
       } catch (e) { toast(String(e.message || e)); }
     };
   });
@@ -870,6 +987,9 @@ document.getElementById('sync-labels').onclick = async () => {
   } catch (e) { toast(String(e.message || e)); }
 };
 document.getElementById('show-incomplete').onchange = renderLabels;
+document.getElementById('judge-mode').onchange = renderLabels;
+document.getElementById('judge-split').onchange = renderLabels;
+document.getElementById('show-disagreements').onchange = renderLabels;
 
 function renderMap() {
   const canvas = document.getElementById('map');

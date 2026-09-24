@@ -1,0 +1,23 @@
+{
+  "judge_id": "excessive_policy_exposition-v1",
+  "split": "dev",
+  "tpr": 0.963,
+  "tnr": 1.0,
+  "tpr_interval": [
+    0.8172,
+    0.9934
+  ],
+  "tnr_interval": [
+    0.7719,
+    1.0
+  ],
+  "agreement": 0.975,
+  "tp": 26,
+  "fn": 1,
+  "tn": 13,
+  "fp": 0,
+  "n": 40,
+  "disagreements": [
+    "1e281cb3b1209f88452584b0ff2b4b87"
+  ]
+}

@@ -158,6 +158,71 @@ def _effective_labels(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return latest
 
 
+def _judges_dir() -> Path:
+    return STATE_DIR / "judges"
+
+
+def _trace_splits(mode: str) -> dict[str, str]:
+    """Map trace_id -> train|dev|test for ``mode``."""
+    splits = _read_json(STATE_DIR / "splits.json", default={})
+    assignment = splits.get(mode, {})
+    out: dict[str, str] = {}
+    for split_name in ("train", "dev", "test"):
+        for trace_id in assignment.get(split_name, []):
+            out[str(trace_id)] = split_name
+    return out
+
+
+def _judges_payload() -> dict[str, Any]:
+    """Return registered judges and per-trace predictions for the review UI."""
+    judges_dir = _judges_dir()
+    if not judges_dir.exists():
+        return {"judges": [], "by_mode": {}}
+
+    judges: list[dict[str, Any]] = []
+    by_mode: dict[str, Any] = {}
+
+    for path in sorted(judges_dir.glob("*.json")):
+        if path.name.startswith("_history_"):
+            continue
+        record = _read_json(path, default=None)
+        if not isinstance(record, dict) or not record.get("judge_id"):
+            continue
+        mode = str(record.get("mode", ""))
+        judge_id = str(record["judge_id"])
+        prompt_hash = record.get("prompt_hash")
+        preds_raw = (record.get("predictions") or {}).get(prompt_hash, {})
+        critiques_raw = (record.get("critiques") or {}).get(prompt_hash, {})
+        pass_positive = record.get("label_convention") == "pass_positive"
+        by_trace: dict[str, dict[str, Any]] = {}
+        splits = _trace_splits(mode)
+        for trace_id, raw_pred in preds_raw.items():
+            pred = int(raw_pred)
+            if not pass_positive:
+                pred = 1 - pred
+            by_trace[str(trace_id)] = {
+                "pred": pred,
+                "critique": critiques_raw.get(trace_id),
+                "split": splits.get(str(trace_id)),
+            }
+        summary = {
+            "judge_id": judge_id,
+            "mode": mode,
+            "status": record.get("status", "draft"),
+            "model": record.get("model"),
+            "version": record.get("version"),
+            "created_at": record.get("created_at"),
+            "scored_count": len(by_trace),
+        }
+        judges.append(summary)
+        existing = by_mode.get(mode)
+        if existing is None or int(record.get("version", -1)) >= int(existing.get("version", -1)):
+            by_mode[mode] = {**summary, "by_trace": by_trace}
+
+    judges.sort(key=lambda row: (row.get("mode", ""), row.get("version", 0)))
+    return {"judges": judges, "by_mode": by_mode}
+
+
 def _labels_payload() -> dict[str, Any]:
     patterns = _read_json(API_FILES["/api/patterns"], API_DEFAULTS["/api/patterns"])
     modes = _normalize_patterns(patterns)
@@ -259,6 +324,10 @@ class ReviewHandler(BaseHTTPRequestHandler):
 
         if path == "/api/labels":
             self._send_json(_labels_payload())
+            return
+
+        if path == "/api/judges":
+            self._send_json(_judges_payload())
             return
 
         if path in API_FILES:

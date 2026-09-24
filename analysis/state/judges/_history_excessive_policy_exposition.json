@@ -1,0 +1,12 @@
+{
+  "versions": [
+    {
+      "judge_id": "excessive_policy_exposition-v0",
+      "prompt_hash": "303c7d4a25c0"
+    },
+    {
+      "judge_id": "excessive_policy_exposition-v1",
+      "prompt_hash": "70c4669cd399"
+    }
+  ]
+}
