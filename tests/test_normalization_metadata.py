@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from analysis.helpers.normalization import _metadata
+from analysis.helpers.normalization import _metadata, normalize_trace
 
 
 def test_metadata_merges_nested_langfuse_attributes() -> None:
@@ -29,3 +29,16 @@ def test_metadata_keeps_flat_keys_authoritative() -> None:
         }
     }
     assert _metadata(record)["cartwheel.scenario_id"] == "flat"
+
+
+def test_normalized_trace_keeps_cartwheel_session_id() -> None:
+    trace = normalize_trace(
+        {
+            "id": "trace-1",
+            "text": "hello",
+            "metadata": {
+                "attributes": {"cartwheel.session_id": "session-1"},
+            },
+        }
+    )
+    assert trace["meta"]["session_id"] == "session-1"

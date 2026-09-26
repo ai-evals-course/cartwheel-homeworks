@@ -252,6 +252,8 @@ def normalize_trace(value: Any) -> dict[str, Any]:
         "scenario_id": raw.get("cartwheel_scenario_id")
         or metadata.get("cartwheel.scenario_id")
         or metadata.get("scenario_id"),
+        "session_id": metadata.get("cartwheel.session_id")
+        or metadata.get("session_id"),
     }
     supplied_segments = raw.get("segments")
     segments = dict(supplied_segments) if isinstance(supplied_segments, dict) else {}
