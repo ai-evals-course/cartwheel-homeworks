@@ -14,3 +14,8 @@ Assignments are released incrementally. More will appear here as the course prog
 
 - [Homework 4](module-2/hw4.md): Review traces and define failure modes.
 - [Homework 5](module-2/hw5.md): Develop and test one LLM judge. Build two more as optional extensions.
+
+## Module 3
+
+- [Homework 6](module-3/hw6.md): Build continuous integration for the Cartwheel support agent.
+- [Homework 7](module-3/hw7.md): Monitor one failure mode after deployment.

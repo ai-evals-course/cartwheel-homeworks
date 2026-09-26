@@ -7,6 +7,7 @@ Homework 4 asks you to read Cartwheel traces, find the failures, and organize th
 Homework 4 uses the traces from Homework 3. If you did not complete Homework 3, apply the reference trace bundle:
 
 ```bash
+git lfs pull
 git apply homework/module-2/hw3-reference.patch
 ```
 
@@ -104,9 +105,11 @@ The following example shows all three stages for one observation.
 
 After each review batch, begin axial coding by comparing the open codes and grouping observations under a possible shared binary decision rule. Revisit an earlier trace when a proposed group changes how you interpret its evidence. Keep the original open code in the saved history, because the sequence from observation to category must remain inspectable.
 
-## Part C, inspect runs with Raindrop Workshop
+## Part C (optional), inspect runs with Raindrop Workshop
 
-After open coding, use Raindrop Workshop to inspect 5 to 10 fresh or replayed Cartwheel runs. Workshop is a local trace debugger whose coding agent integration can inspect model activity and tool calls. The goal is to discover failure modes your open coding may have missed.
+This part is optional. If you skip it, omit `analysis/report/workshop_notes.md` from your submission and remove the Workshop suggestion from the video requirements.
+
+After open coding, you can use Raindrop Workshop to inspect 5 to 10 fresh or replayed Cartwheel runs. Workshop is a local trace debugger whose coding agent integration can inspect model activity and tool calls. The goal is to discover failure modes your open coding may have missed.
 
 Follow the current installation instructions in the Workshop repository, then ask your coding agent to run `/instrument-agent`. Preserve the existing OpenTelemetry and Langfuse instrumentation. A local Workshop installation is sufficient.
 
@@ -169,7 +172,7 @@ Commit:
 - `analysis/state/suggestions.json`.
 - One label file per final mode under `analysis/state/labels/`.
 - `analysis/report/review_summary.md`.
-- `analysis/report/workshop_notes.md`.
+- `analysis/report/workshop_notes.md` (if you completed Part C).
 - `analysis/report/interface_comparison.md`.
 - Any revision to `SPEC.md`, with the motivating annotation identified in the review summary.
 
@@ -182,7 +185,7 @@ Submit one continuous screen recording of no more than 5 minutes. Drive your rev
 Explain:
 
 - One interface decision made after inspecting the traces.
-- One Workshop suggestion and your decision to accept, revise, or reject it.
+- (If you completed Part C) One Workshop suggestion and your decision to accept, revise, or reject it.
 - Two failure modes and one supporting trace for each mode.
 - One taxonomy revision or rejected group.
 - One rejected search suggestion and the boundary excluding it.

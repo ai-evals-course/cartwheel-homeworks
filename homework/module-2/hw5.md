@@ -10,6 +10,17 @@ Paste the following prompt once. Continue in the same conversation for Parts A t
 
 > Guide me through Homework 5 in `homework/module-2/hw5.md`, one part at a time. Read `AGENTS.md`, the handout, and `SPEC.md`. Use `write-judge-prompt` and `validate-evaluator`. Help me install them if needed. First help me choose a failure mode and check its boundary. Reuse my Homework 4 interface and labels. Use `validate-evaluator` to split the labels before choosing prompt examples. Use `write-judge-prompt` for the draft, with training examples only. Return to `validate-evaluator` for development review and the final test. Explain each step before we start. Compute TPR, TNR, and confidence intervals. Do not require minimum scores. Follow the handout if the skills differ on label counts or evaluation requirements. Use the Cartwheel helpers for DocETL batches and statistics. Save my prompts, labels, and evaluation results as we go. Leave labels and final decisions to me. Before a paid batch, show me the model and trace count. Wait for my approval. Do not show me test predictions before I freeze the judge. Leave the video to me.
 
+## Preparation
+
+Homework 5 uses the failure modes and labels from Homework 4. If you did not complete Homework 4, apply the reference bundle:
+
+```bash
+git lfs pull
+git apply homework/module-2/hw4-reference.patch
+```
+
+The bundle provides one reviewed failure mode, 100 labels, and a review summary. If you completed Homework 4, keep your own work and do not apply the patch.
+
 ## Skills
 
 Install the two skills from the course repository:

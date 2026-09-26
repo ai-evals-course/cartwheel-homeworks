@@ -1,6 +1,6 @@
-"""Assemble the real replay: `uv run python -m replay e-001 --n 100`.
+"""Assemble a replay: `uv run python -m replay e-001 --n 100`.
 
-Instructor-provided. Wires your :func:`replay.harness.replay_case` and
+Instructor-provided. Wires :func:`replay.harness.replay_case` and
 :func:`replay.harness.summarize_rollouts` to the real agent and the real
 world reset, exactly as the docstrings describe:
 
@@ -12,7 +12,7 @@ world reset, exactly as the docstrings describe:
     :class:`replay.harness.ReplayInfraError` so only infrastructure gets
     retried, never a verdict.
 
-Needs an API key for the agent's model (and the judge's, if the case names
+Needs an API key for the agent's model and the judge's, if the case names
 judges). Writes one JSON record per rollout to replay/results/<case>.jsonl
 and prints the summary.
 """
