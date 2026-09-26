@@ -15,8 +15,9 @@ def select_traces(
 
     The returned plan keeps two kinds of traces separate:
 
-      1. **Random sample.** Draw ``round(random_rate * len(traces))`` traces
-         uniformly at random without replacement, using
+      1. **Random sample.** Draw
+         ``max(1, round(random_rate * len(traces)))`` traces uniformly at
+         random without replacement, using
          ``random.Random(seed).sample`` on the traces in their given order.
          Only this sample may be used to estimate the failure rate.
       2. **Risk groups.** For each group in ``risk_groups``, include every
@@ -48,15 +49,11 @@ def select_traces(
 
 # Each function identifies one risk group in the Cartwheel traces.
 DEFAULT_RISK_GROUPS: dict[str, Callable[[dict[str, Any]], bool]] = {
-    "override_policy_question": lambda t: bool(
-        t.get("segments", {}).get("store_override_topic")
+    "policy_lookup": lambda t: bool(
+        {"get_policy", "search_help_center"} & set(t.get("tools", []))
     ),
-    "above_threshold_refund": lambda t: bool(
-        t.get("segments", {}).get("above_threshold_refund")
+    "write_action": lambda t: bool(
+        {"issue_refund", "cancel_order"} & set(t.get("tools", []))
     ),
-    "negative_signal": lambda t: bool(
-        t.get("signals", {}).get("thumbs_down")
-        or t.get("signals", {}).get("re_ask")
-        or t.get("signals", {}).get("escalated")
-    ),
+    "multi_turn": lambda t: int(t.get("turn_count", 0)) > 1,
 }

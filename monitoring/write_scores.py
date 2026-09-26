@@ -21,22 +21,27 @@ def _stable_id(*parts: str) -> str:
 
 def build_score_records(
     mode: str,
-    verdicts: dict[str, int],
+    random_verdicts: dict[str, int],
+    risk_verdicts: dict[str, int],
     estimate: dict[str, Any],
     batch_label: str,
 ) -> list[dict[str, Any]]:
     """Build repeatable Langfuse score records for one monitoring run.
 
-    The function creates two kinds of scores. Both use stable identifiers so
+    The function creates three kinds of scores. They use stable identifiers so
     a repeated run updates existing scores instead of creating duplicates:
 
-      1. **Per-trace verdicts.** One record per trace in ``verdicts``:
+      1. **Random-sample verdicts.** One record per trace in
+         ``random_verdicts``:
          ``name`` is ``f"{mode}_verdict"``, ``value`` is the 0/1 verdict as
          a float, ``data_type`` is "NUMERIC", ``trace_id`` is the trace's
          id, and ``score_id`` is ``_stable_id(mode, "verdict", trace_id)``.
-         A trace keeps the same score identifier when monitoring periods
-         overlap.
-      2. **The corrected prevalence,** one record attached to the batch
+      2. **Risk-group verdicts.** One record per trace in ``risk_verdicts``:
+         ``name`` is ``f"{mode}_risk_verdict"`` and ``score_id`` is
+         ``_stable_id(mode, "risk_verdict", trace_id)``. The other fields
+         match the random-sample verdict records. A trace in both samples
+         receives both scores.
+      3. **The corrected prevalence,** one record attached to the batch
          rather than a trace: ``name`` is ``f"{mode}_corrected_prevalence"``,
          ``value`` is ``estimate["corrected"]``, ``data_type`` is "NUMERIC",
          ``trace_id`` is None, ``comment`` carries the interval as
@@ -44,8 +49,8 @@ def build_score_records(
          estimate's fields verbatim), and ``score_id`` is
          ``_stable_id(mode, "prevalence", batch_label)``.
 
-    Ordering: the per-trace records first (in ``verdicts`` insertion order),
-    followed by the prevalence record.
+    Ordering: the random records, the risk records, then the prevalence
+    record. Preserve each verdict dictionary's insertion order.
 
     Calling the function twice with the same arguments must return records
     with identical ``score_id`` values. The Scores API treats a repeated
@@ -53,7 +58,8 @@ def build_score_records(
 
     Args:
         mode: the failure mode, e.g. "unsupported_policy_claim".
-        verdicts: trace_id -> 0/1 judge verdict for the judged sample.
+        random_verdicts: trace_id -> 0/1 verdict for the random sample.
+        risk_verdicts: trace_id -> 0/1 verdict for the risk groups.
         estimate: the dict returned by
             :func:`monitoring.correct.corrected_mode_prevalence`.
         batch_label: names the batch, e.g. "2026-W28". The label is part of

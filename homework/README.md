@@ -18,3 +18,4 @@ Assignments are released incrementally. More will appear here as the course prog
 ## Module 3
 
 - [Homework 6](module-3/hw6.md): Build continuous integration for the Cartwheel support agent.
+- [Homework 7](module-3/hw7.md): Monitor one failure mode after deployment.
