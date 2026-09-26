@@ -1,0 +1,18 @@
+{"scenario_id": "support-0002", "decision": "accept", "reason": "Ordinary order-status request, grounded in a real order; correctly computed status/eligibility from the orders table.", "change": null}
+{"scenario_id": "support-0038", "decision": "accept", "reason": "Refund under the $100 threshold, grounded in a real eligible order; expected outcome computed via the eligibility function and facts.yaml threshold.", "change": null}
+{"scenario_id": "support-0082", "decision": "accept", "reason": "Cancellation of a still-'placed' order; expected outcome grounded in real order status.", "change": null}
+{"scenario_id": "support-0101", "decision": "accept", "reason": "Platform return-window policy question; expected outcome cites cw-returns and matches facts.yaml.", "change": null}
+{"scenario_id": "support-0126", "decision": "accept", "reason": "Product-search request grounded in a product title confirmed unique across the whole catalog (fixes the pilot-0009 lesson).", "change": null}
+{"scenario_id": "support-0152", "decision": "accept", "reason": "Dispute request; expected outcome correctly requires ESC-3 escalation regardless of role.", "change": null}
+{"scenario_id": "support-0159", "decision": "accept", "reason": "Account-change request; expected outcome correctly requires ESC-2 escalation.", "change": null}
+{"scenario_id": "support-0166", "decision": "accept", "reason": "Out-of-scope request; expected outcome cites SCOPE-2/RESP-4.", "change": null}
+{"scenario_id": "support-0001", "decision": "accept", "reason": "Merchant order-status coverage; role/user_id correctly reflect the store the order belongs to.", "change": null}
+{"scenario_id": "support-0036", "decision": "accept", "reason": "Support-role refund request added after the initial review to broaden support-role coverage beyond order_status; expected outcome unaffected by caller role.", "change": null}
+{"scenario_id": "support-0081", "decision": "accept", "reason": "Support-role cancellation request added for the same reason; grounded in a real 'placed' order.", "change": null}
+{"scenario_id": "support-0151", "decision": "accept", "reason": "Support-role dispute request added for the same reason; still requires ESC-3 regardless of who raised it.", "change": null}
+{"scenario_id": "support-0181", "decision": "accept", "reason": "Data-quality case dq-order-reversed-dates; expected outcome taken directly from the data_quality_cases table.", "change": null}
+{"scenario_id": "support-0191", "decision": "accept", "reason": "Data-quality case dq-product-duplicate-title; expected outcome taken directly from the data_quality_cases table.", "change": null}
+{"scenario_id": "support-0206", "decision": "accept", "reason": "Store-override boundary: order past the store's stricter window but within the platform default; expected outcome grounded in the eligibility function plus the store's policy doc.", "change": null}
+{"scenario_id": "support-0219", "decision": "accept", "reason": "Authorization boundary: merchant denied access to another store's order (AUTH-1).", "change": null}
+{"scenario_id": "support-0216", "decision": "accept", "reason": "Authorization boundary contrast case: support role must succeed on the same kind of cross-store request that denies a merchant (AUTH-1's 'support: any order' row).", "change": null}
+{"scenario_id": "support-0236", "decision": "accept", "reason": "Correction-across-turns: the shopper corrects which item they meant in a followup; expected outcome requires following the correction (RESP-3).", "change": null}

@@ -1,0 +1,128 @@
+{
+  "source": "langfuse",
+  "k": 30,
+  "strategy": "diversity",
+  "selected_at": "2026-09-17T04:50:12.152178+00:00",
+  "picks": [
+    {
+      "trace_id": "0234525e72b78418765775fa7ccf55c5",
+      "reason": "cluster 0 representative"
+    },
+    {
+      "trace_id": "0388019828e0e118597859232b184af8",
+      "reason": "cluster 1 representative"
+    },
+    {
+      "trace_id": "04c16fe6ef9167e9d0413bff3d93eddb",
+      "reason": "cluster 3 representative"
+    },
+    {
+      "trace_id": "121f35899a46d40dfd734968143d81f3",
+      "reason": "cluster 4 representative"
+    },
+    {
+      "trace_id": "0f2e5fc9d73c27e015b4f67697d5e9af",
+      "reason": "cluster 5 representative"
+    },
+    {
+      "trace_id": "07025a9da0e849a436a3807a9f816468",
+      "reason": "cluster 6 representative"
+    },
+    {
+      "trace_id": "0dcbfe4daaa214581f8b12863a83fb84",
+      "reason": "cluster 7 representative"
+    },
+    {
+      "trace_id": "00584a2112f7f68c312f63af6a2421a2",
+      "reason": "cluster 9 representative"
+    },
+    {
+      "trace_id": "02feebc8efdec80bafacfec5f3f687d9",
+      "reason": "cluster 0 representative"
+    },
+    {
+      "trace_id": "0e0a3fa8e22108006e8a4ce25768588c",
+      "reason": "cluster 1 representative"
+    },
+    {
+      "trace_id": "072a3ce845734da73169f490d3591490",
+      "reason": "cluster 3 representative"
+    },
+    {
+      "trace_id": "1eccd5e1046af403839ec542e265fe34",
+      "reason": "cluster 4 representative"
+    },
+    {
+      "trace_id": "12b23cbdbae03c39e3e8c94b0741a4b7",
+      "reason": "cluster 5 representative"
+    },
+    {
+      "trace_id": "28e56695ec9002599641df671a509e40",
+      "reason": "cluster 6 representative"
+    },
+    {
+      "trace_id": "0f26977b49825a671b021d8867fd6420",
+      "reason": "cluster 7 representative"
+    },
+    {
+      "trace_id": "013c6d72a4d1cfdc5357a66c1ff180b7",
+      "reason": "cluster 9 representative"
+    },
+    {
+      "trace_id": "1a0828f5234138502c253fc869a11043",
+      "reason": "cluster 0 representative"
+    },
+    {
+      "trace_id": "155773c06c798100d4892e9eae4aafb8",
+      "reason": "cluster 1 representative"
+    },
+    {
+      "trace_id": "08363c3f08e64fd2f2c373efea339b94",
+      "reason": "cluster 3 representative"
+    },
+    {
+      "trace_id": "2ea90fd940e580168e6593f4eac2785f",
+      "reason": "cluster 4 representative"
+    },
+    {
+      "trace_id": "87ae1d34de030b5b73d55c8f844cd2b7",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "c0eaf174392acf141d97d766abfd4f1c",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "fb0714abf47810595617799c4a6196fb",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "63a3e9c396b27e47c98b1cd771604af4",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "5cc47f885eb10768078d614766401271",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "f69a9bc335e92e9bdb34d7ef83bc32b8",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "0b7591395a2ff917552d538ab36635a9",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "eb84ca79e633407120fba2b902d50557",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "f11421c375b363357c55562fbca0b0e3",
+      "reason": "random pick"
+    },
+    {
+      "trace_id": "7a1ac48ce5b8005cff4c7dc4fe8f348e",
+      "reason": "random pick"
+    }
+  ]
+}

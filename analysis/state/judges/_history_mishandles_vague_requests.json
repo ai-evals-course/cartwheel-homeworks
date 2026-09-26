@@ -1,0 +1,32 @@
+{
+  "versions": [
+    {
+      "judge_id": "mishandles_vague_requests-v0",
+      "prompt_hash": "1d5310492b78"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v1",
+      "prompt_hash": "1d5310492b78"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v2",
+      "prompt_hash": "db79096bceb4"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v3",
+      "prompt_hash": "db79096bceb4"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v4",
+      "prompt_hash": "db79096bceb4"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v5",
+      "prompt_hash": "726d4eb0bc4e"
+    },
+    {
+      "judge_id": "mishandles_vague_requests-v6",
+      "prompt_hash": "feb82abd627c"
+    }
+  ]
+}

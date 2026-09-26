@@ -59,7 +59,13 @@ def pass_at_k(n: int, c: int, k: int) -> float:
                                     a success)
     """
     ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement pass_at_k")
+    if n < 1:
+        raise ValueError(f"n must be >= 1, got {n}")
+    if not (0 <= c <= n):
+        raise ValueError(f"c must be in [0, {n}], got {c}")
+    if not (1 <= k <= n):
+        raise ValueError(f"k must be in [1, {n}], got {k}")
+    return 1 - comb(n - c, k) / comb(n, k)
 
 
 def pass_hat_k(n: int, c: int, k: int) -> float:
@@ -91,7 +97,13 @@ def pass_hat_k(n: int, c: int, k: int) -> float:
         pass_hat_k(8, 6, 8) == 0.0  (not all 8 succeeded)
     """
     ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement pass_hat_k")
+    if n < 1:
+        raise ValueError(f"n must be >= 1, got {n}")
+    if not (0 <= c <= n):
+        raise ValueError(f"c must be in [0, {n}], got {c}")
+    if not (1 <= k <= n):
+        raise ValueError(f"k must be in [1, {n}], got {k}")
+    return comb(c, k) / comb(n, k)
 
 
 def case_passes(
@@ -141,4 +153,26 @@ def case_passes(
         case_passes("capability", 1, 5, 0.6)     -> pass  (never blocks)
     """
     ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement case_passes")
+    if kind not in {"regression", "capability"}:
+        raise ValueError(f"kind must be 'regression' or 'capability', got {kind!r}")
+    if not (0 <= passes <= n):
+        raise ValueError(f"passes must be in [0, {n}], got {passes}")
+
+    if kind == "regression":
+        if passes == n:
+            return {"decision": "pass", "reason": f"regression case passed all {n} runs"}
+        failed = n - passes
+        return {
+            "decision": "block",
+            "reason": f"regression case failed {failed} of {n} runs",
+        }
+
+    baseline_note = (
+        f", baseline {baseline_pass_rate}" if baseline_pass_rate is not None else ""
+    )
+    return {
+        "decision": "pass",
+        "reason": (
+            f"capability case passed {passes} of {n}{baseline_note}, not blocking"
+        ),
+    }

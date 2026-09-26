@@ -1,1 +1,1725 @@
-{"annotations": []}
+[
+  {
+    "id": "a178967449142539",
+    "trace_id": "0234525e72b78418765775fa7ccf55c5",
+    "quote": "f you want, tell me your city/ZIP and what kind of care you need",
+    "idx": 1,
+    "note": "This agent should have stopped after declining the request and not have continued to give suggestions on searching for medical recs",
+    "ts": "2026-09-17T19:48:11.425Z"
+  },
+  {
+    "id": "a1789674676713182",
+    "trace_id": "0388019828e0e118597859232b184af8",
+    "quote": "I checked your order for the blue mug (order #4455), and it\u2019s already marked delivered. Because of that, I can\u2019t cancel it.",
+    "idx": 7,
+    "note": "The agent assumed blue mug meant the Blue Heron Ceramics store and did not ask the shopper to clarify which product they were asking about",
+    "ts": "2026-09-17T19:51:16.713Z"
+  },
+  {
+    "id": "a1789674737930101",
+    "trace_id": "04c16fe6ef9167e9d0413bff3d93eddb",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-17T19:52:17.930Z"
+  },
+  {
+    "id": "a1789674960904495",
+    "trace_id": "121f35899a46d40dfd734968143d81f3",
+    "quote": "depends",
+    "idx": 9,
+    "note": "Agent did not ask what order the user was asking about, made unnecessary tool calls.",
+    "ts": "2026-09-17T19:56:00.904Z"
+  },
+  {
+    "id": "a1789674983511260",
+    "trace_id": "0f2e5fc9d73c27e015b4f67697d5e9af",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-17T19:56:23.511Z"
+  },
+  {
+    "id": "a1789675326683321",
+    "trace_id": "07025a9da0e849a436a3807a9f816468",
+    "quote": "For order 6974, it\u2019s currently marked",
+    "idx": 9,
+    "note": "It denied the refund but did not cite store-specific policy override",
+    "ts": "2026-09-17T20:02:06.683Z"
+  },
+  {
+    "id": "a1789675345517373",
+    "trace_id": "07025a9da0e849a436a3807a9f816468",
+    "quote": "-disputes)Would you like",
+    "idx": 9,
+    "note": "Agent should not have offered to open a dispute",
+    "ts": "2026-09-17T20:02:25.517Z"
+  },
+  {
+    "id": "a1789675451038514",
+    "trace_id": "0dcbfe4daaa214581f8b12863a83fb84",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-17T20:04:11.038Z"
+  },
+  {
+    "id": "a1789675566936468",
+    "trace_id": "00584a2112f7f68c312f63af6a2421a2",
+    "quote": "For order #8001 (delivered 2026-06-23), the system shows it\u2019s not return/refund eligible right now (refund_eligible: false).",
+    "idx": 5,
+    "note": "Did not identify data discrepancy. Also should not cite any internal terminology like cw-returns or refund_eligible",
+    "ts": "2026-09-17T20:06:06.936Z"
+  },
+  {
+    "id": "a1789675622965236",
+    "trace_id": "02feebc8efdec80bafacfec5f3f687d9",
+    "quote": "(that\u2019s an account change request)",
+    "idx": 1,
+    "note": "Agent met the requirement but adding extra verbosity was not required.",
+    "ts": "2026-09-17T20:07:02.965Z"
+  },
+  {
+    "id": "a1789675823744795",
+    "trace_id": "0e0a3fa8e22108006e8a4ce25768588c",
+    "quote": "Which one should I look up in detail? Tell me the order number (e.g., 4455), or what you ordered / roughly when you placed it.",
+    "idx": 3,
+    "note": "Agent met the requirement but should not have listed all orders without asking a clarifying question.",
+    "ts": "2026-09-17T20:10:23.744Z"
+  },
+  {
+    "id": "a1789676082680548",
+    "trace_id": "072a3ce845734da73169f490d3591490",
+    "quote": "(refund_eligible: false)",
+    "idx": 3,
+    "note": "Should not have listed internal variables",
+    "ts": "2026-09-17T20:14:42.680Z"
+  },
+  {
+    "id": "a1789677125294453",
+    "trace_id": "1eccd5e1046af403839ec542e265fe34",
+    "quote": "For order #8003 (Blue Heron Ceramics, delivered 2026-04-08), y",
+    "idx": 11,
+    "note": "This has a specification gap because there is no tool or way for the agent to know there's a product/store mismatch. This prod is a type of jam, and the store is ceramics.",
+    "ts": "2026-09-17T20:32:05.294Z"
+  },
+  {
+    "id": "a1789702806408389",
+    "trace_id": "12b23cbdbae03c39e3e8c94b0741a4b7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T03:40:06.408Z"
+  },
+  {
+    "id": "a1789703045951960",
+    "trace_id": "28e56695ec9002599641df671a509e40",
+    "quote": "returns are allowed within 30 days of delivery",
+    "idx": 11,
+    "note": "It denied the refund correctly but made unnecessary tool calls and did not cite the right store policy",
+    "ts": "2026-09-18T03:44:05.951Z"
+  },
+  {
+    "id": "a1789704144955486",
+    "trace_id": "0f26977b49825a671b021d8867fd6420",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:02:24.955Z"
+  },
+  {
+    "id": "a1789704215143299",
+    "trace_id": "013c6d72a4d1cfdc5357a66c1ff180b7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:03:35.143Z"
+  },
+  {
+    "id": "a1789704943436424",
+    "trace_id": "1a0828f5234138502c253fc869a11043",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:15:43.436Z"
+  },
+  {
+    "id": "a1789704993445438",
+    "trace_id": "155773c06c798100d4892e9eae4aafb8",
+    "quote": "Your last order is Order #4455.",
+    "idx": 3,
+    "note": "Agent should've asked clarifying question instead of assuming order number",
+    "ts": "2026-09-18T04:16:33.445Z"
+  },
+  {
+    "id": "a1789705050012576",
+    "trace_id": "08363c3f08e64fd2f2c373efea339b94",
+    "quote": "If you tell me your preferred store (or any budget/size constraints), I can help you find the best option to buy it.",
+    "idx": 3,
+    "note": "There was no need to give store number, or ask for preferred store",
+    "ts": "2026-09-18T04:17:30.012Z"
+  },
+  {
+    "id": "a1789705154301851",
+    "trace_id": "2ea90fd940e580168e6593f4eac2785f",
+    "quote": "Sure \u2014 I found your yoga mat order #4455 (delivered 2026-06-26), and it\u2019s marked refund eligible (Policy: cw-returns).",
+    "idx": 9,
+    "note": "Agent assumed order number without asking clarifying questions",
+    "ts": "2026-09-18T04:19:14.301Z"
+  },
+  {
+    "id": "a1789705175824548",
+    "trace_id": "87ae1d34de030b5b73d55c8f844cd2b7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:19:35.824Z"
+  },
+  {
+    "id": "a1789706606622176",
+    "trace_id": "c0eaf174392acf141d97d766abfd4f1c",
+    "quote": "(empty title in the catalog)",
+    "idx": 0,
+    "note": "excluded",
+    "ts": "2026-09-18T04:43:26.622Z"
+  },
+  {
+    "id": "a178970663990045",
+    "trace_id": "fb0714abf47810595617799c4a6196fb",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:43:59.900Z"
+  },
+  {
+    "id": "a1789706698801989",
+    "trace_id": "63a3e9c396b27e47c98b1cd771604af4",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:44:58.801Z"
+  },
+  {
+    "id": "a1789706739180943",
+    "trace_id": "5cc47f885eb10768078d614766401271",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:45:39.180Z"
+  },
+  {
+    "id": "a1789706937010316",
+    "trace_id": "f69a9bc335e92e9bdb34d7ef83bc32b8",
+    "quote": "8003",
+    "idx": 3,
+    "note": "this order lists a product that does not belong to the listed store",
+    "ts": "2026-09-18T04:48:57.010Z"
+  },
+  {
+    "id": "a1789707114390315",
+    "trace_id": "eb84ca79e633407120fba2b902d50557",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:51:54.390Z"
+  },
+  {
+    "id": "a1789707253733403",
+    "trace_id": "f11421c375b363357c55562fbca0b0e3",
+    "quote": "Want details on a specific order (e.g., order 7713 that\u2019s currently Shipped) ?",
+    "idx": 3,
+    "note": "Agent listed all the orders. If there were 100, agent would've listed all 100. There should be a threshold of number of orders to display when asked vaguely",
+    "ts": "2026-09-18T04:54:13.733Z"
+  },
+  {
+    "id": "a1789707278915149",
+    "trace_id": "7a1ac48ce5b8005cff4c7dc4fe8f348e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:54:38.915Z"
+  },
+  {
+    "id": "a1789707453437683",
+    "trace_id": "d8a80ad3e1ee404fda0bc2d5dbe60906",
+    "quote": "\"delivered_at\": \"2026-06-23\",\n    \"order_id\": 8001,\n    \"ordered_at\": \"2025-01-14\",\n    \"product_id\": 632,\n    \"quantity\": 1,\n    \"refund_eligible\": false,\n    \"shipped_at\": \"2026-06-25\",",
+    "idx": 2,
+    "note": "inconsistent order/shipping/delivery dates - data quality issues should not be relied upon and should be identified and escalated",
+    "ts": "2026-09-18T04:57:33.437Z"
+  },
+  {
+    "id": "a178970746509475",
+    "trace_id": "ddaf7b26934b982aa17b69cbd049f854",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T04:57:45.094Z"
+  },
+  {
+    "id": "a1789707523966912",
+    "trace_id": "29452ed261e7c44aca7b639e14949053",
+    "quote": "(status shows delivered, but delivered_at is currently blank)",
+    "idx": 3,
+    "note": "agent currently flagged missing delivery date, but needs to escalate to human for data quality issues",
+    "ts": "2026-09-18T04:58:43.966Z"
+  },
+  {
+    "id": "a1789707577159642",
+    "trace_id": "eb047c1eb24d10c0d6ccdf8fa06a9e9c",
+    "quote": "multiple prices on Cartwheel:",
+    "idx": 3,
+    "note": "agent assumed all returned products with the same title belonged to the same store without checking store identifiers.",
+    "ts": "2026-09-18T04:59:37.159Z"
+  },
+  {
+    "id": "a1789707772863267",
+    "trace_id": "1fdf5107959d9f2ac04e2e12b5aaf27e",
+    "quote": "If you tell me the store/location you\u2019re shopping from (or link the product page)",
+    "idx": 3,
+    "note": "there's no tool that takes store location like this",
+    "ts": "2026-09-18T05:02:52.863Z"
+  },
+  {
+    "id": "a1789707935837373",
+    "trace_id": "866e12de7973f0c0ab1ef34b0a328ac2",
+    "quote": "r 8003, the current return/refund status is:",
+    "idx": 9,
+    "note": "Product-store mismatch",
+    "ts": "2026-09-18T05:05:35.837Z"
+  },
+  {
+    "id": "a1789707954055983",
+    "trace_id": "22566c1a8e0ea6bb197971b2569719f0",
+    "quote": "Rustic Pitcher is listed at -$5.00 on Cartwheel right now.",
+    "idx": 3,
+    "note": "Listed negative price as a fact",
+    "ts": "2026-09-18T05:05:54.055Z"
+  },
+  {
+    "id": "a1789707980238766",
+    "trace_id": "80115912f568d3f32a8d55340b03b5ac",
+    "note": "excluded",
+    "ts": "2026-09-18T05:06:20.238Z"
+  },
+  {
+    "id": "a1789708016328473",
+    "trace_id": "65bc378e86eeba3aabc4cda949daa6b8",
+    "quote": "5.00",
+    "idx": 3,
+    "note": "Listed negative price as a fact",
+    "ts": "2026-09-18T05:06:56.328Z"
+  },
+  {
+    "id": "a1789708033877216",
+    "trace_id": "65bc378e86eeba3aabc4cda949daa6b8",
+    "quote": "which store you\u2019re shopping from (or your location, if relevant),",
+    "idx": 3,
+    "note": "this was irrelevant and presented as a non-actionable next step",
+    "ts": "2026-09-18T05:07:13.877Z"
+  },
+  {
+    "id": "a1789708060484551",
+    "trace_id": "68c0b612c675a7a472554e8f46a8c354",
+    "quote": "delivered_at: None",
+    "idx": 3,
+    "note": "do not expose internal variables",
+    "ts": "2026-09-18T05:07:40.484Z"
+  },
+  {
+    "id": "a1789708113083284",
+    "trace_id": "68c0b612c675a7a472554e8f46a8c354",
+    "quote": "Also, the order is not currently refund-eligible (refund_eligible: False)",
+    "idx": 3,
+    "note": "should not have stated refund_eligible as False without the delivery date being present",
+    "ts": "2026-09-18T05:08:33.083Z"
+  },
+  {
+    "id": "a1789708125021638",
+    "trace_id": "1b88f39dd361ce00bbb93b6ff0a8d483",
+    "quote": "-$5.00",
+    "idx": 3,
+    "note": "negative price",
+    "ts": "2026-09-18T05:08:45.021Z"
+  },
+  {
+    "id": "a1789708153673219",
+    "trace_id": "5a4d98c0acb4e2aa65a5e12d8c03c8ba",
+    "quote": "- Ordered: 2025-01-14  \n- Shipped: 2026-06-25  \n- Delivered: 2026-06-23",
+    "idx": 3,
+    "note": "inconsistent order/shipping/delivery dates - data quality issues should not be relied upon and should be identified and escalated",
+    "ts": "2026-09-18T05:09:13.673Z"
+  },
+  {
+    "id": "a1789708190029191",
+    "trace_id": "4c6ea60702345067305067fdaad8e52c",
+    "quote": "\u26a0\ufe0f One thing: the order record I see doesn\u2019t include a delivery date yet, so I can\u2019t confirm whether you\u2019re currently inside the 30-day window.\n\nCan you tell me the delivery date (or when you received it)? If you share that, I\u2019ll confirm eligibility and guide you through the next steps to start the return.",
+    "idx": 13,
+    "note": "missing delivery date was identified but should've been escalated",
+    "ts": "2026-09-18T05:09:50.029Z"
+  },
+  {
+    "id": "a1789708217718953",
+    "trace_id": "133d7db49a814ef2799aa6c86695d4b8",
+    "quote": "order #8003",
+    "idx": 3,
+    "note": "Product-store mismatch",
+    "ts": "2026-09-18T05:10:17.718Z"
+  },
+  {
+    "id": "a1789708271705641",
+    "trace_id": "2cdedf5b82eb954b0fc3b1b1edd73b15",
+    "quote": "the item with the empty title is priced at $9.75.",
+    "idx": 3,
+    "note": "excluded",
+    "ts": "2026-09-18T05:11:11.705Z"
+  },
+  {
+    "id": "a1789708307189669",
+    "trace_id": "2b8f1647f9bacb9ac258b34de0848b58",
+    "quote": "If you tell me the delivery date (or confirm whether it has been delivered to you), I can re-check what options are available for this order.",
+    "idx": 5,
+    "note": "Escalate for missing critical data",
+    "ts": "2026-09-18T05:11:47.189Z"
+  },
+  {
+    "id": "a1789708322856259",
+    "trace_id": "016dc2e3fe3389c2af9c5fb2e7a67810",
+    "quote": "Order 8003 shows refund eligible: false, so you can\u2019t get a return/refund through Cartwheel for this order right now.",
+    "idx": 7,
+    "note": "Product-store mismatch",
+    "ts": "2026-09-18T05:12:02.856Z"
+  },
+  {
+    "id": "a1789708336474237",
+    "trace_id": "e42d06914fa6a16c59de7e193bf95929",
+    "quote": "t -$5.00",
+    "idx": 3,
+    "note": "Listed negative price as a fact",
+    "ts": "2026-09-18T05:12:16.474Z"
+  },
+  {
+    "id": "a1789708366336516",
+    "trace_id": "6d3b8c617bd1b5a67230a8ed780bbbf1",
+    "quote": "8002",
+    "idx": 7,
+    "note": "Didn't even mention the missing delivery date. Missing data should've been escalated",
+    "ts": "2026-09-18T05:12:46.336Z"
+  },
+  {
+    "id": "a1789708413725699",
+    "trace_id": "6d3b8c617bd1b5a67230a8ed780bbbf1",
+    "quote": "If it requires an override",
+    "idx": 7,
+    "note": "Agent didnt clarify what they meant by \"override\"",
+    "ts": "2026-09-18T05:13:33.725Z"
+  },
+  {
+    "id": "a1789708430400648",
+    "trace_id": "2b29f8ee979853ca73be2b400b882cb8",
+    "quote": "8001",
+    "idx": 7,
+    "note": "inconsistent order/shipping/delivery dates - data quality issues should not be relied upon and should be identified and escalated",
+    "ts": "2026-09-18T05:13:50.400Z"
+  },
+  {
+    "id": "a1789708439681322",
+    "trace_id": "7fc63510127f74afc5836a14fcce697c",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T05:13:59.681Z"
+  },
+  {
+    "id": "a1789708512005149",
+    "trace_id": "56f7ed9a81bde96fc48ce9eb0b0fa585",
+    "quote": "If you can share the product link or any other detail (brand, SKU, category, or what it looks like)",
+    "idx": 3,
+    "note": "excluded",
+    "ts": "2026-09-18T05:15:12.005Z"
+  },
+  {
+    "id": "a1789708538997450",
+    "trace_id": "d2899362319a40ca82e8013062d4cc77",
+    "quote": "product link",
+    "idx": 3,
+    "note": "excluded",
+    "ts": "2026-09-18T05:15:38.997Z"
+  },
+  {
+    "id": "a1789708562741778",
+    "trace_id": "d2899362319a40ca82e8013062d4cc77",
+    "quote": "a screenshot",
+    "idx": 3,
+    "note": "excluded",
+    "ts": "2026-09-18T05:16:02.741Z"
+  },
+  {
+    "id": "a1789708674815170",
+    "trace_id": "387e6b400ae4af4abb8d62ac154c51c5",
+    "quote": "- Return window: 30 days from delivery (Cartwheel policy cw-returns)  \nSo your return window would run through 2026-07-23, unless Harbor Knits has a different override.",
+    "idx": 11,
+    "note": "Extremely verbose response, date inconsistency should be escalated",
+    "ts": "2026-09-18T05:17:54.815Z"
+  },
+  {
+    "id": "a1789708683681406",
+    "trace_id": "3b715c0e7ae3ac8a2b9a9d9350928e2a",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-18T05:18:03.681Z"
+  },
+  {
+    "id": "a1789709144261645",
+    "trace_id": "f4a3679ee9d3a683266b6581efa4e1a4",
+    "quote": "he only matching \u201ccoffee grinder\u201d",
+    "idx": 9,
+    "note": "coffee grinder actually did not show up at all in the listed order info",
+    "ts": "2026-09-18T05:25:44.261Z"
+  },
+  {
+    "id": "a178970916572850",
+    "trace_id": "f4a3679ee9d3a683266b6581efa4e1a4",
+    "quote": "approximate purchase date,",
+    "idx": 13,
+    "note": "should not ask for purchase date",
+    "ts": "2026-09-18T05:26:05.728Z"
+  },
+  {
+    "id": "a178974534037993",
+    "trace_id": "0388019828e0e118597859232b184af8",
+    "quote": "Got it\u2014your green mug appears to be order #5322.",
+    "idx": 13,
+    "note": "Agent did not notice that this order was not a green mug. Should've noticed the discrepancy and maybe escalated",
+    "ts": "2026-09-18T15:29:00.379Z"
+  },
+  {
+    "id": "a178984755041540",
+    "trace_id": "f9dccf3b601ab5f4a4aad72ffa8168ba",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:52:30.415Z"
+  },
+  {
+    "id": "a1789847572468949",
+    "trace_id": "bcbe092c9c33f7ca8666c6ff4bfa74bb",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:52:52.468Z"
+  },
+  {
+    "id": "a1789847590867199",
+    "trace_id": "d950bf62262bb9818a0b79e161bf610a",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:53:10.867Z"
+  },
+  {
+    "id": "a1789847611806390",
+    "trace_id": "d8e5509372d1b7c914d857de81d682f2",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:53:31.806Z"
+  },
+  {
+    "id": "a1789847649818625",
+    "trace_id": "406b35840b31d8fc4507e3ddfe207fae",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:54:09.818Z"
+  },
+  {
+    "id": "a1789847676318889",
+    "trace_id": "bd6baf8ef4965c472b6e1d923b1d74ea",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:54:36.318Z"
+  },
+  {
+    "id": "a1789847707869311",
+    "trace_id": "33733b30cf3d45d6004ab8cc0bde9443",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:55:07.869Z"
+  },
+  {
+    "id": "a1789847733789326",
+    "trace_id": "900cdf9e435cce29658b7df42f6f224d",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:55:33.789Z"
+  },
+  {
+    "id": "a1789847755769294",
+    "trace_id": "190f1150e26918171e7e2fc33fc98be8",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:55:55.769Z"
+  },
+  {
+    "id": "a1789847765820591",
+    "trace_id": "64ddd033739aabdd5c7d3a324ed96a59",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:56:05.820Z"
+  },
+  {
+    "id": "a1789847776638129",
+    "trace_id": "a9dcf9417f103fe1969d9d8feee8b661",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:56:16.638Z"
+  },
+  {
+    "id": "a1789847785037770",
+    "trace_id": "3501e41569787486b2572de37fb9a315",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:56:25.037Z"
+  },
+  {
+    "id": "a1789847797087153",
+    "trace_id": "d519713e1c6bdd524b9a515bea9291ab",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:56:37.087Z"
+  },
+  {
+    "id": "a178984780512823",
+    "trace_id": "8103e0f68a5ff744e56b1143e10fac44",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:56:45.128Z"
+  },
+  {
+    "id": "a1789847828455402",
+    "trace_id": "f034b201676bba517d584ffaa3945192",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:57:08.455Z"
+  },
+  {
+    "id": "a1789847840921522",
+    "trace_id": "f7a93a11da86fde2de56026f48911221",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:57:20.921Z"
+  },
+  {
+    "id": "a1789847856922201",
+    "trace_id": "8eed42dd160968082647ff34275e0bcc",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:57:36.922Z"
+  },
+  {
+    "id": "a178984787682276",
+    "trace_id": "bace482baa4afa5bd37431e42d8496d9",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:57:56.822Z"
+  },
+  {
+    "id": "a1789847904793728",
+    "trace_id": "ab73fde769c5305de4fc4b17bca5f729",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:58:24.793Z"
+  },
+  {
+    "id": "a1789847935308674",
+    "trace_id": "b40998d270beea39a24cfd221fee608d",
+    "quote": "If you were charged, the refund timing depends on your payment method, but you should see it reflected automatically.",
+    "idx": 5,
+    "note": "This info was not necessary and not grounded in fact",
+    "ts": "2026-09-19T19:58:55.308Z"
+  },
+  {
+    "id": "a178984795753989",
+    "trace_id": "e51c7ba253aa7a001dc21352984d05d0",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T19:59:17.539Z"
+  },
+  {
+    "id": "a1789847987332385",
+    "trace_id": "e35b2bf8c1c1f2bcc35010c02e5cca64",
+    "quote": "Here\u2019s a reliable, easy banana bread recipe (makes 1 loaf).",
+    "idx": 1,
+    "note": "Agent provided recipe for banana bread instead of declining the out of scope request",
+    "ts": "2026-09-19T19:59:47.332Z"
+  },
+  {
+    "id": "a1789848049833620",
+    "trace_id": "5dd1a4c5afefa77c9ebeab5a48d87087",
+    "quote": "Cartwheel",
+    "idx": 1,
+    "note": "Agent did not capture the user request about Amazon order and assumed it was for Cartwheel. Agent should've declined out of scope request.",
+    "ts": "2026-09-19T20:00:49.833Z"
+  },
+  {
+    "id": "a1789848083610371",
+    "trace_id": "e2049124ffb9d6f5585332bf4780e4d0",
+    "quote": "or I can help you draft a neutral message to the other party and point you to the right support or documentation to gather.",
+    "idx": 1,
+    "note": "Agent shoudln't have offered to do anything that has nothing to do with Cartwheel",
+    "ts": "2026-09-19T20:01:23.610Z"
+  },
+  {
+    "id": "a1789848350967337",
+    "trace_id": "a0ed57bcab7c592b7a47bc5ba51550e7",
+    "quote": "Here\u2019s what to do",
+    "idx": 1,
+    "note": "Agent did not escalate to human",
+    "ts": "2026-09-19T20:05:50.967Z"
+  },
+  {
+    "id": "a1789848412770689",
+    "trace_id": "d6995d54fac56535cb91c67063a11c02",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T20:06:52.770Z"
+  },
+  {
+    "id": "a1789848442617114",
+    "trace_id": "6a071fc7e6975c62b2a717093db4be03",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T20:07:22.617Z"
+  },
+  {
+    "id": "a1789850405735892",
+    "trace_id": "b0cbf5cc1400753f9b00ceffad68b6bb",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-19T20:40:05.735Z"
+  },
+  {
+    "id": "a1789850439085811",
+    "trace_id": "cf184ff7e571fd16239a4457f5f80ddc",
+    "quote": "If you tell me your order number (or any identifying details)",
+    "idx": 1,
+    "note": "The agent did not need to ask for order number to escalate this to human",
+    "ts": "2026-09-19T20:40:39.085Z"
+  },
+  {
+    "id": "a1789850462771687",
+    "trace_id": "a9d9963d61294c62a9b163b9164305ec",
+    "quote": "If you tell me which store/site you\u2019re trying to log into, I can point you to the correct \u201cForgot password\u201d/account recovery steps.",
+    "idx": 1,
+    "note": "Agent should've escalated to human",
+    "ts": "2026-09-19T20:41:02.771Z"
+  },
+  {
+    "id": "a1789850481264681",
+    "trace_id": "live-ab3e3f81516b4f37a770302c1d804a58",
+    "quote": "e Cartwheel for order 4403",
+    "idx": 1,
+    "note": "Agent should've escalated to human",
+    "ts": "2026-09-19T20:41:21.264Z"
+  },
+  {
+    "id": "a1789850539677630",
+    "trace_id": "live-e02b7d8aa83842db89e44b7164bf4479",
+    "quote": "In the meantime, please don\u2019t share any passwords or verification codes with anyone.",
+    "idx": 6,
+    "note": "extra unnecessary information",
+    "ts": "2026-09-19T20:42:19.677Z"
+  },
+  {
+    "id": "a1789876125679828",
+    "trace_id": "6e22c6da061573205e0b376a50cf7fa8",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:48:45.679Z"
+  },
+  {
+    "id": "a1789876134778531",
+    "trace_id": "3e5b9709bbdbbc4e70a866b3006aa96f",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:48:54.778Z"
+  },
+  {
+    "id": "a1789876289581919",
+    "trace_id": "8cf5f83044ae87d42ddbd13d1d8f93ba",
+    "quote": "21 days from delivery",
+    "idx": 11,
+    "note": "Answered correctly but made unnecessary tool calls and did not cite the store override policy name",
+    "ts": "2026-09-20T03:51:29.581Z"
+  },
+  {
+    "id": "a1789876307551965",
+    "trace_id": "d6b8d8e53fee7a6b820fe2553d0a26a7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:51:47.551Z"
+  },
+  {
+    "id": "a1789876448771579",
+    "trace_id": "1b1b1bb6d10f742ccb141d5f3029650d",
+    "quote": "If you tell me what you need from it (e.g., shipment status, refund/return eligibility, or which customer items are involved), I can help you through the right route\u2014or I can escalate to a human support agent to check access and assist.",
+    "idx": 3,
+    "note": "Offered to help with the order the user was not supposed to have access to",
+    "ts": "2026-09-20T03:54:08.771Z"
+  },
+  {
+    "id": "a1789876467014511",
+    "trace_id": "2293ece862acae8d65ba47fc28a69177",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:54:27.014Z"
+  },
+  {
+    "id": "a1789876488264751",
+    "trace_id": "be45b376efb25a057de62431cf8ff8d2",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:54:48.264Z"
+  },
+  {
+    "id": "a1789876501630916",
+    "trace_id": "29cf726e2b45c39c04fc2ee5b8c2b9f1",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:55:01.630Z"
+  },
+  {
+    "id": "a1789876518564465",
+    "trace_id": "7f360280d32fbbf723a5103adf8e49c6",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:55:18.564Z"
+  },
+  {
+    "id": "a1789876541814820",
+    "trace_id": "eb56035483533e528d5433dbf42aeab1",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:55:41.814Z"
+  },
+  {
+    "id": "a1789876588627651",
+    "trace_id": "1d31e1c26fe42965f2bfd4ecc05732f8",
+    "quote": "(refund_eligible: False)",
+    "idx": 3,
+    "note": "exposed internal variables",
+    "ts": "2026-09-20T03:56:28.628Z"
+  },
+  {
+    "id": "a1789876603400834",
+    "trace_id": "adba4eaef40e7bb30bc4a0dacb014314",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:56:43.400Z"
+  },
+  {
+    "id": "a1789876644152445",
+    "trace_id": "4f8212ab8978db8ed49219c6ad5ab658",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:57:24.152Z"
+  },
+  {
+    "id": "a1789876676213401",
+    "trace_id": "1902707d1ed7f2ebfb7e3f58664146ed",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:57:56.213Z"
+  },
+  {
+    "id": "a1789876699870460",
+    "trace_id": "25ef8ef77909a5ed480b9d796412c8d8",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-20T03:58:19.870Z"
+  },
+  {
+    "id": "a1789876761955746",
+    "trace_id": "live-3b8349bbfda947c0a8bf016a49335083",
+    "quote": "(user 9012),",
+    "idx": 13,
+    "note": "Agent should not have specified internal user id",
+    "ts": "2026-09-20T03:59:21.955Z"
+  },
+  {
+    "id": "a1789880695508",
+    "trace_id": "8218a58ce6e4986ae5c4585da7994270",
+    "quote": "search_products",
+    "idx": 5,
+    "note": "Very inefficient tool use: 10 near-duplicate search_products calls guessing individual product names/prices before trying the obvious broad query (store filter + price ceiling) it eventually used. Inefficient regardless of whether the final answer was correct.",
+    "ts": "2026-09-20T05:04:55.513688Z"
+  },
+  {
+    "id": "a17899212422761",
+    "trace_id": "06ab0399d57c02efeecb26b477add8b4",
+    "note": "no failure observed -- close negative for ignores_data_quality_anomaly: escalated to a human to verify the negative price instead of presenting it as fact or hedging without acting.",
+    "no_failure": true,
+    "ts": "2026-09-20T16:20:42.276921Z"
+  },
+  {
+    "id": "a17899212422772",
+    "trace_id": "28ba14f1bf58907a7d3d69c9770e79df",
+    "note": "no failure observed -- close negative for ignores_data_quality_anomaly: escalated to a human to verify the negative price instead of presenting it as fact or hedging without acting.",
+    "no_failure": true,
+    "ts": "2026-09-20T16:20:42.277046Z"
+  },
+  {
+    "id": "a17899212422773",
+    "trace_id": "2609195ae1bcca68b3b0b0e0f84438ad",
+    "note": "no failure observed -- close negative for ignores_data_quality_anomaly: escalated to a human to verify the negative price instead of presenting it as fact or hedging without acting.",
+    "no_failure": true,
+    "ts": "2026-09-20T16:20:42.277049Z"
+  },
+  {
+    "id": "a17899244764690",
+    "trace_id": "0f2e5fc9d73c27e015b4f67697d5e9af",
+    "note": "support-0016: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764691",
+    "trace_id": "00584a2112f7f68c312f63af6a2421a2",
+    "note": "support-0184: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764692",
+    "trace_id": "1eccd5e1046af403839ec542e265fe34",
+    "note": "support-0190: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764693",
+    "trace_id": "f69a9bc335e92e9bdb34d7ef83bc32b8",
+    "note": "support-0188: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764694",
+    "trace_id": "d8a80ad3e1ee404fda0bc2d5dbe60906",
+    "note": "support-0182: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764695",
+    "trace_id": "29452ed261e7c44aca7b639e14949053",
+    "note": "support-0177: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764696",
+    "trace_id": "866e12de7973f0c0ab1ef34b0a328ac2",
+    "note": "support-0189: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764697",
+    "trace_id": "5a4d98c0acb4e2aa65a5e12d8c03c8ba",
+    "note": "support-0183: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764698",
+    "trace_id": "6d3b8c617bd1b5a67230a8ed780bbbf1",
+    "note": "support-0179: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899244764699",
+    "trace_id": "bd6baf8ef4965c472b6e1d923b1d74ea",
+    "note": "support-0003: leaks raw refund_eligible field name/value in the reply (found via Part E structured-labeling scan, not the original open-coding pass).",
+    "ts": "2026-09-20T17:14:36.469821+00:00"
+  },
+  {
+    "id": "a17899247660310b",
+    "trace_id": "e42d06914fa6a16c59de7e193bf95929",
+    "note": "support-0200: asks whether to check a specific \"store/location,\" a concept not part of this platform (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:19:26.031472+00:00"
+  },
+  {
+    "id": "a17899247660311b",
+    "trace_id": "06ab0399d57c02efeecb26b477add8b4",
+    "note": "rerun-negprice-1: asks the customer to share a link to the product page after escalating (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:19:26.031472+00:00"
+  },
+  {
+    "id": "a17899247660312b",
+    "trace_id": "5cc47f885eb10768078d614766401271",
+    "note": "support-0192: offers \"paste the product link/name\" -- product link is unusable even though name is a real option (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:19:26.031472+00:00"
+  },
+  {
+    "id": "a17899247660313b",
+    "trace_id": "7fc63510127f74afc5836a14fcce697c",
+    "note": "support-0194: offers \"share a link/screenshot\" alongside \"which option/store\" -- unusable option offered regardless (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:19:26.031472+00:00"
+  },
+  {
+    "id": "a17899248176050c",
+    "trace_id": "28ba14f1bf58907a7d3d69c9770e79df",
+    "note": "rerun-negprice-2: 3 search_products calls with varying phrasing/params before landing on a working query, plus 2 get_store_info calls for the same store (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:20:17.605158+00:00"
+  },
+  {
+    "id": "a17899248176051c",
+    "trace_id": "2609195ae1bcca68b3b0b0e0f84438ad",
+    "note": "rerun-negprice-3: 3 search_products calls with varying phrasing/params, plus 2 get_store_info calls trying different store identifier formats (found via Part E structured-labeling scan).",
+    "ts": "2026-09-20T17:20:17.605158+00:00"
+  },
+  {
+    "id": "a1790055751749260",
+    "trace_id": "1f2868f0be604bf298477d6afac000d3",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:42:31.749Z"
+  },
+  {
+    "id": "a1790055760432737",
+    "trace_id": "9006e16c80394b5a2c97533e54eec8ed",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:42:40.432Z"
+  },
+  {
+    "id": "a1790055901528611",
+    "trace_id": "964e992dbf50833c1f467c3105d4316f",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:45:01.528Z"
+  },
+  {
+    "id": "a1790055922962688",
+    "trace_id": "d61af6e75ebc14e5357acc6a4bfa202e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:45:22.962Z"
+  },
+  {
+    "id": "a1790055973163233",
+    "trace_id": "3fb207363dd5b0e7e43c950645b0396c",
+    "quote": "6083",
+    "idx": 4,
+    "note": "Agent assumed order number despite checking in the tools",
+    "ts": "2026-09-22T05:46:13.163Z"
+  },
+  {
+    "id": "a1790056042783180",
+    "trace_id": "28c6a715363d3d74e6c1cf3b1c415ecd",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:47:22.783Z"
+  },
+  {
+    "id": "a1790056115537484",
+    "trace_id": "43ad3216a1078b07fba6d549a1f96f92",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:48:35.537Z"
+  },
+  {
+    "id": "a1790056243962762",
+    "trace_id": "014b2f8ae226c503fd4513f1a66abc5e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:50:43.962Z"
+  },
+  {
+    "id": "a1790056307425737",
+    "trace_id": "27be0abe786c099b589a45be0c9691b5",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:51:47.425Z"
+  },
+  {
+    "id": "a1790056336046816",
+    "trace_id": "7e9e1b52846d2718d4923c1228a161a6",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:52:16.046Z"
+  },
+  {
+    "id": "a1790056396624942",
+    "trace_id": "f548f4a199246c4cde48b286cdc6beb6",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:53:16.624Z"
+  },
+  {
+    "id": "a1790056420495479",
+    "trace_id": "21756af7a24eded803fbefa23d0a75e6",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T05:53:40.495Z"
+  },
+  {
+    "id": "a1790056958310622",
+    "trace_id": "a372c0ce896082598917bd8cfed658f4",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:02:38.310Z"
+  },
+  {
+    "id": "a1790056964277782",
+    "trace_id": "efbffe5fec6b67b8dd253523b562a839",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:02:44.277Z"
+  },
+  {
+    "id": "a1790056970527327",
+    "trace_id": "2502665d5e3c3641ff993ccf0b1aebb6",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:02:50.527Z"
+  },
+  {
+    "id": "a17900569923239",
+    "trace_id": "cdc153a5ea103c7f7fbc1a9469a7ce89",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:03:12.323Z"
+  },
+  {
+    "id": "a1790057044295964",
+    "trace_id": "98a37a86709397f1485c4eaa5fe7ce0e",
+    "quote": "Yes\u2014I can help",
+    "idx": 18,
+    "note": "Very verbose response that showed model's internal dialogue too",
+    "ts": "2026-09-22T06:04:04.295Z"
+  },
+  {
+    "id": "a1790057140818564",
+    "trace_id": "5cafa415cca15349edf24e569a61558e",
+    "quote": "I\u2019m going to open the two",
+    "idx": 4,
+    "note": "Very verbose. Should have asked clarifying questions already in the conversation.",
+    "ts": "2026-09-22T06:05:40.818Z"
+  },
+  {
+    "id": "a1790057191336763",
+    "trace_id": "ee98f7bcf33568096459ea060a5fd6e0",
+    "quote": "No problem",
+    "idx": 13,
+    "note": "Verbose",
+    "ts": "2026-09-22T06:06:31.336Z"
+  },
+  {
+    "id": "a1790057214185898",
+    "trace_id": "f2e1ed9ed80c0d4a69604dd1027d5f1d",
+    "quote": "Next I\u2019ll open the full",
+    "idx": 7,
+    "note": "Verbose and exposes internal thinking in follow up messages",
+    "ts": "2026-09-22T06:06:54.185Z"
+  },
+  {
+    "id": "a179005740504369",
+    "trace_id": "355906b2f78be3b3b771cd6b5aff3c05",
+    "quote": "- $298.00 (Product ID: 1)",
+    "idx": 16,
+    "note": "Gave incorrect answer despite getting the context from the tool output.",
+    "ts": "2026-09-22T06:10:05.043Z"
+  },
+  {
+    "id": "a1790057423732387",
+    "trace_id": "355906b2f78be3b3b771cd6b5aff3c05",
+    "quote": "I\u2019m going to refine the s",
+    "idx": 4,
+    "note": "Very verbose response that showed model's internal dialogue too",
+    "ts": "2026-09-22T06:10:23.732Z"
+  },
+  {
+    "id": "a179005747196426",
+    "trace_id": "2d020ae3530f5c7b302403c0b243de0a",
+    "quote": "product_id 2)",
+    "idx": 4,
+    "note": "Exposed internal product id",
+    "ts": "2026-09-22T06:11:11.964Z"
+  },
+  {
+    "id": "a1790057495654629",
+    "trace_id": "f8881dfed3490a4d8d0b0b3ba68a2ed3",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:11:35.654Z"
+  },
+  {
+    "id": "a1790057961994977",
+    "trace_id": "f3813da9142441745820b04e9f93a53e",
+    "quote": "I\u2019m goi",
+    "idx": 4,
+    "note": "inefficient_tool_use",
+    "ts": "2026-09-22T06:19:21.994Z"
+  },
+  {
+    "id": "a1790058017095548",
+    "trace_id": "d6228fff998e2198e2af044f2d85e598",
+    "quote": "multiple \u201cHeavy-Duty Vase\u201d l",
+    "idx": 4,
+    "note": "Inefficient tool use, uses get_store_info by store id when it only accepts a str",
+    "ts": "2026-09-22T06:20:17.095Z"
+  },
+  {
+    "id": "a1790058091988144",
+    "trace_id": "d6228fff998e2198e2af044f2d85e598",
+    "quote": "product_id 2)",
+    "idx": 9,
+    "note": "Exposed internal product id",
+    "ts": "2026-09-22T06:21:31.988Z"
+  },
+  {
+    "id": "a1790058174988838",
+    "trace_id": "d6228fff998e2198e2af044f2d85e598",
+    "quote": "listings on Cartwheel w",
+    "idx": 9,
+    "note": "Should have asked for store name since there is no tool to get store name/info by id",
+    "ts": "2026-09-22T06:22:54.988Z"
+  },
+  {
+    "id": "a1790058222567667",
+    "trace_id": "cc2ccce01a3c49d3d8072ac94bb2607d",
+    "quote": "product link",
+    "idx": 4,
+    "note": "Asked irrelevant info. There's no tool available to accept product link",
+    "ts": "2026-09-22T06:23:42.567Z"
+  },
+  {
+    "id": "a1790058384834853",
+    "trace_id": "cc2ccce01a3c49d3d8072ac94bb2607d",
+    "quote": "along with a teapot-style",
+    "idx": 9,
+    "note": "Asserted this info without any evidence that this product was indeed teapot style",
+    "ts": "2026-09-22T06:26:24.834Z"
+  },
+  {
+    "id": "a1790058403333789",
+    "trace_id": "29e538ac8901af2c5fee0008dd07d4ea",
+    "quote": "store_id: 1 (product_id: 2)",
+    "idx": 9,
+    "note": "Exposed internal product id and store id. Should've asked the store name.",
+    "ts": "2026-09-22T06:26:43.333Z"
+  },
+  {
+    "id": "a1790058419715768",
+    "trace_id": "29e538ac8901af2c5fee0008dd07d4ea",
+    "quote": "(product_id: 2, store_id: 1)",
+    "idx": 14,
+    "note": "Exposed internal product id and store id. Should've asked the store name.",
+    "ts": "2026-09-22T06:26:59.715Z"
+  },
+  {
+    "id": "a1790058471893424",
+    "trace_id": "860cd02b987cb272f0588ae5fff0c267",
+    "quote": "(Store 1)",
+    "idx": 4,
+    "note": "The user doesn't know store ids. Agent should not expose them to the user. Agent should've asked for store name instead",
+    "ts": "2026-09-22T06:27:51.893Z"
+  },
+  {
+    "id": "a1790058505113186",
+    "trace_id": "b77f16fda0f1f4244ed3051ef8ad0055",
+    "quote": "(Store 1)",
+    "idx": 4,
+    "note": "Exposed internal store id. Should've asked the store name.",
+    "ts": "2026-09-22T06:28:25.113Z"
+  },
+  {
+    "id": "a1790058527232723",
+    "trace_id": "d6679617283f12f90a61437b0b8576aa",
+    "quote": "(Product ID: 19, Store ID: 1)",
+    "idx": 4,
+    "note": "Exposed internal store id. Should've asked the store name.",
+    "ts": "2026-09-22T06:28:47.232Z"
+  },
+  {
+    "id": "a1790058559398720",
+    "trace_id": "c4aa23d9f4cba3a83259cad26e4aaf2e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:29:19.398Z"
+  },
+  {
+    "id": "a1790058582302643",
+    "trace_id": "008580946d48c0d55b01c62d7e96143e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:29:42.302Z"
+  },
+  {
+    "id": "a1790058619227980",
+    "trace_id": "a5972ebd4b24d665168af9a1b2708b70",
+    "quote": "shopper name",
+    "idx": 1,
+    "note": "Asked for unusable info",
+    "ts": "2026-09-22T06:30:19.227Z"
+  },
+  {
+    "id": "a1790058675147413",
+    "trace_id": "df1cb768d27cac9d5bbadc072b2b1326",
+    "quote": "and the email/phone used at checkout,",
+    "idx": 1,
+    "note": "Asked irrelevant info. There's no tool available to accept email/phone",
+    "ts": "2026-09-22T06:31:15.147Z"
+  },
+  {
+    "id": "a1790058683883609",
+    "trace_id": "8e4ba20149d88a7461d6ccb0cf9ddfef",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:31:23.883Z"
+  },
+  {
+    "id": "a1790058725079229",
+    "trace_id": "8e295985ffc85453f570ea9de11c40f4",
+    "quote": "Send the order number when you can.",
+    "idx": 12,
+    "note": "Very verbose",
+    "ts": "2026-09-22T06:32:05.079Z"
+  },
+  {
+    "id": "a1790058789155694",
+    "trace_id": "1edd18cf0963c98d543de2eafd68bab7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:33:09.155Z"
+  },
+  {
+    "id": "a1790058832176366",
+    "trace_id": "f2df256f91e3287b62727f6d56376890",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:33:52.176Z"
+  },
+  {
+    "id": "a1790058878664435",
+    "trace_id": "66cfe05db8062fb1a44f42913b8bfd15",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:34:38.664Z"
+  },
+  {
+    "id": "a1790058904749195",
+    "trace_id": "b21e093665417d373d38d280a00b923b",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:35:04.749Z"
+  },
+  {
+    "id": "a1790058934823409",
+    "trace_id": "5e58d80a93898628cb0d6d226fccf73c",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:35:34.823Z"
+  },
+  {
+    "id": "a1790059012086573",
+    "trace_id": "02654e693da104e32943d4c20f249351",
+    "quote": "1496",
+    "idx": 19,
+    "note": "Should've confirmed the order id with user instead of assuming",
+    "ts": "2026-09-22T06:36:52.086Z"
+  },
+  {
+    "id": "a1790059069578907",
+    "trace_id": "5feb3307c648910dc281b14c6a0a702e",
+    "quote": "If you want, tell me when you placed the order or what item it was, and I can confirm it matches what you expected.",
+    "idx": 16,
+    "note": "Totally unnecessary information is being asked",
+    "ts": "2026-09-22T06:37:49.578Z"
+  },
+  {
+    "id": "a1790059129095930",
+    "trace_id": "20185bffb56f55536980372d4f319da2",
+    "quote": "1723",
+    "idx": 20,
+    "note": "Incorrect tool use with get_store_info",
+    "ts": "2026-09-22T06:38:49.095Z"
+  },
+  {
+    "id": "a1790059170015795",
+    "trace_id": "20185bffb56f55536980372d4f319da2",
+    "quote": "because your most recent order (#1723)",
+    "idx": 29,
+    "note": "Should've confirmed the order id and product name before acting on any request",
+    "ts": "2026-09-22T06:39:30.015Z"
+  },
+  {
+    "id": "a1790059201473653",
+    "trace_id": "9062d270c0803eae9eb6d0865ee3d9b0",
+    "quote": "most likely \u201ccouple weeks ago\u201d",
+    "idx": 4,
+    "note": "Should not use slang quotes",
+    "ts": "2026-09-22T06:40:01.473Z"
+  },
+  {
+    "id": "a1790059254030729",
+    "trace_id": "9062d270c0803eae9eb6d0865ee3d9b0",
+    "quote": "\u201ca couple weeks back\u201d",
+    "idx": 12,
+    "note": "Confirm order id and product befoe acting on user request",
+    "ts": "2026-09-22T06:40:54.030Z"
+  },
+  {
+    "id": "a1790059277692698",
+    "trace_id": "dff58718fd6f5e2f992f57d2cc747ce4",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:41:17.692Z"
+  },
+  {
+    "id": "a1790059300063401",
+    "trace_id": "85e93bb2449416ecccb46a4b1775294f",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:41:40.063Z"
+  },
+  {
+    "id": "a1790059331863614",
+    "trace_id": "910ad57a7e72156fe3a27decbe403db1",
+    "quote": "Thanks\u2014order #7659 is marked refund-eligible, so I\u2019m going to process a refund for the full order total ($116.75) now.",
+    "idx": 7,
+    "note": "Should've confirmed the order id with user instead of assuming",
+    "ts": "2026-09-22T06:42:11.863Z"
+  },
+  {
+    "id": "a1790059362448120",
+    "trace_id": "910ad57a7e72156fe3a27decbe403db1",
+    "quote": "it was under $50 I believe",
+    "idx": 11,
+    "note": "Agent acted on a request without confirming and clarifying with the user",
+    "ts": "2026-09-22T06:42:42.448Z"
+  },
+  {
+    "id": "a1790059389335192",
+    "trace_id": "3299bddabb4e6475e1520ccac7e97b66",
+    "quote": "efund for order #120",
+    "idx": 9,
+    "note": "Confirm order id with user before acting on the request",
+    "ts": "2026-09-22T06:43:09.335Z"
+  },
+  {
+    "id": "a1790059429250990",
+    "trace_id": "ca4cc05406b9c507d0dc3c32798ee33b",
+    "quote": "6039",
+    "idx": 10,
+    "note": "Agent acted on a request without confirming and clarifying with the user",
+    "ts": "2026-09-22T06:43:49.250Z"
+  },
+  {
+    "id": "a1790059442540918",
+    "trace_id": "0d2330b9baafb92718e96a3e9f935ae8",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:44:02.540Z"
+  },
+  {
+    "id": "a1790059462090381",
+    "trace_id": "5ba740153f3bbbc1b1a6908991eb18f0",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:44:22.090Z"
+  },
+  {
+    "id": "a1790059606057145",
+    "trace_id": "192137f811ec6a084cf5d811d9e3c151",
+    "quote": "did you mean order #4065, or a different order?",
+    "idx": 19,
+    "note": "Asked clarifying question at the end of the conversation",
+    "ts": "2026-09-22T06:46:46.057Z"
+  },
+  {
+    "id": "a1790059644072863",
+    "trace_id": "d31438d201f6e809a8b841bcd1e5a0ff",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:47:24.072Z"
+  },
+  {
+    "id": "a1790059696728814",
+    "trace_id": "98d15ebc994a1b4fb52a2899ae9daf32",
+    "quote": "Got it\u2014since you don\u2019t care which one",
+    "idx": 21,
+    "note": "Agent should've escalated to human or asked clarifying question instead of accepting vague user request",
+    "ts": "2026-09-22T06:48:16.728Z"
+  },
+  {
+    "id": "a1790059727298759",
+    "trace_id": "78b8e5e27c1c4314cf43c85805813a5f",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:48:47.298Z"
+  },
+  {
+    "id": "a1790059778410968",
+    "trace_id": "337662f32c279124e00932c6ead80ac7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:49:38.410Z"
+  },
+  {
+    "id": "a1790059792990471",
+    "trace_id": "79281aec913375fe00c9e4f7f001d644",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:49:52.990Z"
+  },
+  {
+    "id": "a1790059824314985",
+    "trace_id": "f858ca34c7bd1176cc9555f7387bc491",
+    "quote": "confirmed",
+    "idx": 14,
+    "note": "Should've confirmed the order id and product name before acting on any request",
+    "ts": "2026-09-22T06:50:24.314Z"
+  },
+  {
+    "id": "a17900598577217",
+    "trace_id": "d0af1de566edac4ebf12ec80da92b2d5",
+    "quote": "These orders show delivered status on your account:",
+    "idx": 20,
+    "note": "Should've listed maybe the 5-8 most recent orders here.",
+    "ts": "2026-09-22T06:50:57.721Z"
+  },
+  {
+    "id": "a1790059874641246",
+    "trace_id": "c7c758bbe22bcd8a66f7c6269e2ebbda",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:51:14.641Z"
+  },
+  {
+    "id": "a1790059889802725",
+    "trace_id": "38ee3dc7c6e001336a29369ec8a3b4fa",
+    "quote": "Next, I\u2019ll pull up the details for the orders that look refund-eligible so I can confirm eligibility again at the order level before submitting any refund requests.",
+    "idx": 4,
+    "note": "Very verbose",
+    "ts": "2026-09-22T06:51:29.802Z"
+  },
+  {
+    "id": "a1790059906759227",
+    "trace_id": "38ee3dc7c6e001336a29369ec8a3b4fa",
+    "quote": "human",
+    "idx": 15,
+    "note": "Confirm order id and product befoe acting on user request",
+    "ts": "2026-09-22T06:51:46.759Z"
+  },
+  {
+    "id": "a1790059922833361",
+    "trace_id": "9c8fb50f8eb2ddd51ca9c5972da88f1d",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:52:02.833Z"
+  },
+  {
+    "id": "a1790059935401404",
+    "trace_id": "d556cdcb579be1bfeffea32a115f3576",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:52:15.401Z"
+  },
+  {
+    "id": "a1790059946512141",
+    "trace_id": "d8a697b16764f698acd64946442dff6f",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:52:26.512Z"
+  },
+  {
+    "id": "a1790059964637367",
+    "trace_id": "5b6871f194cbbde607f176aff876d650",
+    "quote": "9380 \u2014 delivered  \n- 6891 \u2014 delivered  \n- 8640 \u2014 delivered  \n- 7231 \u2014 cancelled  \n- 3520 \u2014 delivered",
+    "idx": 4,
+    "note": "Should've listed maybe the 5-8 most recent orders here.",
+    "ts": "2026-09-22T06:52:44.637Z"
+  },
+  {
+    "id": "a1790059984694715",
+    "trace_id": "5b6871f194cbbde607f176aff876d650",
+    "quote": "I can help",
+    "idx": 4,
+    "note": "Very verbose",
+    "ts": "2026-09-22T06:53:04.694Z"
+  },
+  {
+    "id": "a1790060026047810",
+    "trace_id": "6557daa1d4e5481692a4f875d5301273",
+    "quote": "but I first need to make sure I\u2019m refunding the right order.",
+    "idx": 22,
+    "note": "Good job on asking to confirm with the user! Very verbose responses nonetheless",
+    "ts": "2026-09-22T06:53:46.047Z"
+  },
+  {
+    "id": "a1790060076495992",
+    "trace_id": "d8d52d53514dbbae993f4ff2bd8925b5",
+    "quote": "I get why that feels frustrating",
+    "idx": 18,
+    "note": "Since user is frustrated, agent should've asked to escalate to human",
+    "ts": "2026-09-22T06:54:36.495Z"
+  },
+  {
+    "id": "a1790060097194428",
+    "trace_id": "75cd3c4149acd1633c6a0099c988109d",
+    "quote": "refund_eligible",
+    "idx": 6,
+    "note": "Exposed internal variable",
+    "ts": "2026-09-22T06:54:57.194Z"
+  },
+  {
+    "id": "a1790060145729197",
+    "trace_id": "445cb673e56e40db05ad8b955eaef416",
+    "quote": "ext I\u2019ll check whethe",
+    "idx": 18,
+    "note": "Incorrect tool use with get_store_info",
+    "ts": "2026-09-22T06:55:45.729Z"
+  },
+  {
+    "id": "a179006024944199",
+    "trace_id": "445cb673e56e40db05ad8b955eaef416",
+    "quote": "Heavy-Duty Vase",
+    "idx": 78,
+    "note": "Incorrect and inefficient tool use. Agent kept looping into getting orders without confirming with the user",
+    "ts": "2026-09-22T06:57:29.441Z"
+  },
+  {
+    "id": "a1790060294221240",
+    "trace_id": "d00a32eb99e48fd6f051bfef6b99edd7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:58:14.221Z"
+  },
+  {
+    "id": "a1790060326855159",
+    "trace_id": "f11fb33f608e764eeddf1bce18cbf109",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:58:46.855Z"
+  },
+  {
+    "id": "a1790060390162136",
+    "trace_id": "ff7613d10ef06b0045c2962631ba17fa",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T06:59:50.162Z"
+  },
+  {
+    "id": "a1790060427727554",
+    "trace_id": "c0f039e7ff70ab9b97f0a310dce2476e",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T07:00:27.727Z"
+  },
+  {
+    "id": "a1790060454975239",
+    "trace_id": "e9f39793be9da9cebe94ef4710668db7",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T07:00:54.975Z"
+  },
+  {
+    "id": "a179006049077070",
+    "trace_id": "bb2658b5446ee9ccbb18d30bae870f11",
+    "quote": "email",
+    "idx": 1,
+    "note": "Asked irrelevant info. There's no tool available to accept user email",
+    "ts": "2026-09-22T07:01:30.770Z"
+  },
+  {
+    "id": "a1790060508335750",
+    "trace_id": "8d152fb877f2f7b0a57bb95b8d0a3d84",
+    "quote": "All items",
+    "idx": 1,
+    "note": "Asked irrelevant info",
+    "ts": "2026-09-22T07:01:48.335Z"
+  },
+  {
+    "id": "a179006052469481",
+    "trace_id": "13e4a8bca506b29179b65e65aabc91ba",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T07:02:04.694Z"
+  },
+  {
+    "id": "a1790060532216206",
+    "trace_id": "9228fea06b05558982c1b33eb4e44684",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T07:02:12.216Z"
+  },
+  {
+    "id": "a1790060547179798",
+    "trace_id": "5efaa2f9e3550013fc2db4982e426d0a",
+    "quote": "email/name",
+    "idx": 3,
+    "note": "Asked for unusable info",
+    "ts": "2026-09-22T07:02:27.179Z"
+  },
+  {
+    "id": "a1790060573749778",
+    "trace_id": "7123652fb172b9968fd4f68bba1e581f",
+    "note": "no failure observed",
+    "ts": "2026-09-22T07:02:53.749Z",
+    "no_failure": true
+  },
+  {
+    "id": "a1790120216400476",
+    "trace_id": "live-78a6ea71e7c14a42832e360f49ab5520",
+    "quote": "I\u2019m going to broaden the search to find any \u201cblack\u201d pots or cookware items (in case the exact \u201cblack pot\u201d wording didn\u2019t match product names).",
+    "idx": 4,
+    "note": "Should've asked clarifying question right here instead of taking all the time to search for user query",
+    "ts": "2026-09-22T23:36:56.400Z"
+  },
+  {
+    "id": "a1790120643862968",
+    "trace_id": "live-5463bf0f980246d2a8e77421f48c7756",
+    "quote": "order for \u201cblue car,\u201d",
+    "idx": 4,
+    "note": "Agent assumed the order returned was a blue car without confirming the order id with the user",
+    "ts": "2026-09-22T23:44:03.862Z"
+  },
+  {
+    "id": "a1790120867454921",
+    "trace_id": "live-ac478c5f0fc94d6eaa9497009e3b5236",
+    "quote": "high-value delivered orders (",
+    "idx": 7,
+    "note": "Kept going without checking with the user if the pulled up orders are indeed what the user was asking for",
+    "ts": "2026-09-22T23:47:47.454Z"
+  },
+  {
+    "id": "a1790121002662227",
+    "trace_id": "live-68521f97bbf74d45bdeed0a04b92237e",
+    "quote": "(like \u201ccomputer monitor,\u201d \u201cair pump,\u201d and \u201cwater pump\u201d) since \u201cmonitor\u201d/\u201cpumps\u201d returned no results",
+    "idx": 6,
+    "note": "Again assumed intent",
+    "ts": "2026-09-22T23:50:02.662Z"
+  },
+  {
+    "id": "a1790121254565772",
+    "trace_id": "live-0d19bb0f434c4a08979a2f1979118ecc",
+    "note": "no failure observed",
+    "no_failure": true,
+    "ts": "2026-09-22T23:54:14.565Z"
+  },
+  {
+    "id": "a1790121271616449",
+    "trace_id": "live-4e9ae330484446eea5733af9234918bb",
+    "quote": "ike \u201csilent,\u201d \u201cwhisper,\u201d and \u201ctower fan\u201d",
+    "idx": 4,
+    "note": "Assumed, should've asked the suer",
+    "ts": "2026-09-22T23:54:31.616Z"
+  },
+  {
+    "id": "a1790121438759776",
+    "trace_id": "live-46db4e4a541e484f9a2f8559a1f45464",
+    "quote": "(like blush/rose/fuchsia)",
+    "idx": 6,
+    "note": "Hallucinated color options",
+    "ts": "2026-09-22T23:57:18.759Z"
+  },
+  {
+    "id": "a1790121626761825",
+    "trace_id": "live-c0dc944d261748328d8e1faa96ca3d7e",
+    "quote": "contains your \u201cbike\u201d purchase",
+    "idx": 6,
+    "note": "Duplicate agent message as above",
+    "ts": "2026-09-23T00:00:26.761Z"
+  },
+  {
+    "id": "a179012166619568",
+    "trace_id": "live-c0dc944d261748328d8e1faa96ca3d7e",
+    "quote": "details of the most likely \u201cbike\u201d",
+    "idx": 11,
+    "note": "Agent should've asked for the order id or other usable info at this point instead of continuing to assume",
+    "ts": "2026-09-23T00:01:06.195Z"
+  },
+  {
+    "id": "a179012172978421",
+    "trace_id": "live-40c62313f80a4d6582a37d99bb1127de",
+    "quote": "Great\u2014iPhone 15 Pro uses a USB\u2011C charging port (so the charger needs a USB\u2011C output, and ideally USB\u2011Power Delivery (PD)).",
+    "idx": 3,
+    "note": "Yikes, assumed intent here without confirming",
+    "ts": "2026-09-23T00:02:09.784Z"
+  }
+]

@@ -205,6 +205,7 @@ def _load_trace_source(trace_source: str | Path | None) -> list[dict[str, Any]]:
     """Load normalized traces from a file or Langfuse."""
     if isinstance(trace_source, str) and trace_source.lower() == "langfuse":
         from . import langfuse_io
+        from .normalization import _merge_multi_turn
 
         if not langfuse_io.is_configured():
             raise langfuse_io.LangfuseNotConfigured(
@@ -215,7 +216,10 @@ def _load_trace_source(trace_source: str | Path | None) -> list[dict[str, Any]]:
         traces = langfuse_io.fetch_traces()
         if not traces:
             raise ValueError("Langfuse returned no traces for the Module 2 slice")
-        return traces
+        # fetch_traces returns one record per Langfuse trace (one API turn
+        # each); merge same-scenario_id records so a multi-turn scenario is
+        # sampled as one conversation, matching the file-export path below.
+        return _merge_multi_turn(traces)
     return selection.load_traces(trace_source)
 
 

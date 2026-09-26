@@ -136,6 +136,8 @@ services:
       retries: 10
 
   minio:
+    # docker.io/minio/minio stopped receiving updates and now denies pulls;
+    # the Red Hat-hosted Quay mirror still serves the image.
     image: quay.io/minio/minio:latest
     restart: always
     entrypoint: sh

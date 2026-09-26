@@ -198,31 +198,15 @@ def _classify_docetl(
     return _run_docetl_map(prompt_text, trace_ids, model)
 
 
-def _run_docetl_map(  # pragma: no cover - requires the docetl extra + a live key
-    prompt_text: str, trace_ids: list[str], model: str
-) -> dict[str, int]:
-    """One DocETL ``map`` operation classifying each trace as 0/1.
-
-    Writes the trace slice to a temp JSON dataset, builds a Pipeline with a
-    single map op whose prompt wraps the frozen judge prompt, runs it, and
-    reads the per-trace answers back. Uses DocETL's declarative Python API
-    (``Dataset``, ``MapOp``, ``PipelineStep``, ``PipelineOutput``,
-    ``Pipeline``).
-    """
+def _docetl_map_pass(
+    prompt_text: str, trace_ids: list[str], model: str, store: dict[str, Any], *, bypass_cache: bool = False
+) -> list[dict[str, Any]]:
+    """One DocETL map-operation pass, returning the raw produced rows."""
     import tempfile
 
-    from docetl.api import (
-        Dataset,
-        MapOp,
-        Pipeline,
-        PipelineOutput,
-        PipelineStep,
-    )
+    from docetl.api import Dataset, MapOp, Pipeline, PipelineOutput, PipelineStep
 
-    store = {trace["trace_id"]: trace for trace in load_store_traces()}
-    rows = [
-        {"trace_id": tid, "content": _trace_text(tid, store)} for tid in trace_ids
-    ]
+    rows = [{"trace_id": tid, "content": _trace_text(tid, store)} for tid in trace_ids]
     tmpdir = Path(tempfile.mkdtemp(prefix="cartwheel-docetl-"))
     in_path = tmpdir / "traces.json"
     out_path = tmpdir / "out.json"
@@ -246,6 +230,7 @@ def _run_docetl_map(  # pragma: no cover - requires the docetl extra + a live ke
                 "result": "string",
             }
         },
+        bypass_cache=bypass_cache,
     )
     pipeline = Pipeline(
         name="cartwheel_judge_batch",
@@ -257,7 +242,44 @@ def _run_docetl_map(  # pragma: no cover - requires the docetl extra + a live ke
         output=PipelineOutput(type="file", path=str(out_path), intermediate_dir=str(tmpdir)),
     )
     pipeline.run()
+    return json.loads(out_path.read_text(encoding="utf-8"))
 
-    produced = json.loads(out_path.read_text(encoding="utf-8"))
+
+def _run_docetl_map(  # pragma: no cover - requires the docetl extra + a live key
+    prompt_text: str, trace_ids: list[str], model: str
+) -> dict[str, int]:
+    """One DocETL ``map`` operation classifying each trace as 0/1.
+
+    Writes the trace slice to a temp JSON dataset, builds a Pipeline with a
+    single map op whose prompt wraps the frozen judge prompt, runs it, and
+    reads the per-trace answers back. Uses DocETL's declarative Python API
+    (``Dataset``, ``MapOp``, ``PipelineStep``, ``PipelineOutput``,
+    ``Pipeline``).
+
+    Occasionally the model returns a result outside {"Pass", "Fail"} (e.g.
+    "Not found") for one trace in a batch, usually on an unusually long
+    trace. DocETL's own completion cache then serves that same invalid
+    response on every naive retry (same prompt + content -> same cache key),
+    so a plain retry never recovers. One bypass-cache retry, scoped to only
+    the offending trace ids, is enough to get a fresh classification without
+    re-paying for the traces that already came back valid.
+    """
+    store = {trace["trace_id"]: trace for trace in load_store_traces()}
+    produced = _docetl_map_pass(prompt_text, trace_ids, model, store)
+
+    invalid_ids = {
+        str(row.get("trace_id", ""))
+        for row in produced
+        if row.get("result") not in ("Pass", "Fail")
+    }
+    if invalid_ids:
+        retried = _docetl_map_pass(
+            prompt_text, sorted(invalid_ids), model, store, bypass_cache=True
+        )
+        retried_by_id = {str(row["trace_id"]): row for row in retried}
+        produced = [
+            retried_by_id.get(str(row.get("trace_id", "")), row) for row in produced
+        ]
+
     # HW5 labels and public predictions use Pass=1, Fail=0.
     return _decode_judge_rows(produced, trace_ids)

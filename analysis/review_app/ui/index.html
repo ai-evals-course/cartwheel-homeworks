@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<!--
+  Our HW4 review interface, adapted from the course reference
+  (analysis/ui/index.html). Kept: the overall Gestalt encoding (color hue =
+  role, opacity = boilerplate, spacing = step hierarchy, shared container =
+  tool call + result), the popover/margin-note annotation mechanics, and the
+  server API contract.
+
+  Adapted after inspecting our own traces:
+    1. Turn dividers. normalize_traces() already merges same-scenario_id
+       traces into one flat message list, but nothing marked where one HTTP
+       turn ends and the next begins -- a real reviewer could not tell a
+       multi-turn conversation from one long single turn. Every `user`
+       message starts a new turn (each original API call begins with
+       exactly one user message), so we use that to render a labeled
+       divider between turns.
+    2. "No failure observed" control. Open coding needs a way to mark a
+       trace reviewed-and-clean, distinct from not-yet-reviewed -- the
+       reference had no such affordance, only inline highlight annotation.
+    3. Real extra-metadata panel. The reference read exp.order /
+       exp.store_override / exp.data_error, fields that do not exist in our
+       actual scenario schema (tuple / expected / data_quality_case_id) --
+       dead code left over from an earlier trace shape. We fetch our real
+       scenario_id -> {tuple, expected} lookup instead.
+    4. A fourth "Labels" view for structured labeling (Part D/E): one row
+       per reviewed trace, one present/absent toggle per confirmed mode.
+       The reference only had three views; hw4.md requires this fourth one.
+
+  Remaining limitation: turn/session grouping relies on cartwheel.scenario_id
+  (via the shared normalize_traces helper), not cartwheel.session_id as the
+  handout literally names. For every HW3 scenario trace these are
+  equivalent (one session per scenario run), but an ad-hoc multi-turn
+  conversation with no scenario_id (e.g. manual CLI testing from HW1/HW2)
+  would not be merged by this pipeline. See interface_comparison.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cartwheel error analysis</title>
+<style>
+  :root {
+    /* role hues (Gestalt similarity: one hue per role, full saturation) */
+    --role-user: #2563eb;
+    --role-assistant: #059669;
+    --role-tool-call: #b45309;
+    --role-tool-result: #7c3aed;
+    --role-system: #6b7280;
+    --role-retrieval: #0891b2;
+
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --ink: #1a1a1a;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --hl: #fde68a;             /* human annotation highlight */
+    --hl-pending: #fef08a;     /* mid-annotation, before save */
+    --sugg: #ddd6fe;           /* agent suggestion highlight tint */
+    --sugg-border: #7c3aed;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  code, pre, .mono { font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace; }
+
+  header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 18px; background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; }
+  header h1 .dim { color: var(--muted); font-weight: 400; }
+  .views { display: flex; gap: 4px; }
+  .views button {
+    border: 1px solid var(--line); background: var(--bg);
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font: inherit;
+  }
+  .views button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .spacer { flex: 1; }
+  .counts { color: var(--muted); font-size: 13px; }
+  .nav { display: flex; gap: 4px; align-items: center; }
+  .nav button {
+    border: 1px solid var(--line); background: var(--bg);
+    width: 30px; height: 30px; border-radius: 6px; cursor: pointer; font: inherit;
+  }
+  .nav .pos { color: var(--muted); font-size: 13px; min-width: 74px; text-align: center; }
+  #no-failure-btn {
+    border: 1px solid var(--role-assistant); color: var(--role-assistant);
+    background: var(--bg); font: inherit; font-size: 12.5px;
+    padding: 5px 14px; border-radius: 6px; cursor: pointer;
+    flex-shrink: 0; white-space: nowrap; margin-right: 8px; min-width: 170px;
+  }
+  #no-failure-btn.marked { background: var(--role-assistant); color: #fff; }
+
+  #toast {
+    position: fixed; right: 18px; bottom: 18px; z-index: 100;
+    background: var(--ink); color: #fff; padding: 10px 16px;
+    border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none;
+    transition: opacity .2s; max-width: 320px;
+  }
+  #toast.show { opacity: 1; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  #trace-view { padding: 20px 18px 120px; }
+  .trace-header {
+    display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline;
+    max-width: 980px; margin: 0 auto 4px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .trace-header .tid { font-weight: 700; }
+  .trace-header .meta { color: var(--muted); font-size: 13px; }
+  .trace-header .flag {
+    font-size: 11px; background: #fef3c7; color: #92400e;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .meta-panel {
+    max-width: 980px; margin: 10px auto 14px; padding: 8px 12px;
+    background: rgba(0,0,0,0.03); border-radius: 6px; font-size: 12.5px; color: var(--muted);
+  }
+  .meta-panel strong { color: var(--ink); }
+  .trace-body-wrap {
+    display: flex; gap: 24px; max-width: 980px; margin: 0 auto;
+    align-items: flex-start; position: relative;
+  }
+  .trace-body { flex: 1; max-width: 720px; }
+  .margin-col { width: 240px; position: relative; flex-shrink: 0; }
+
+  /* turn divider: large spacing = major section boundary (Gestalt) */
+  .turn-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 32px 0 16px; color: var(--muted); font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  }
+  .turn-divider:first-child { margin-top: 0; }
+  .turn-divider::before, .turn-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .step {
+    border: 1px solid var(--line); border-radius: 8px;
+    margin-bottom: 20px; overflow: hidden; background: var(--panel);
+  }
+  .step.tight { margin-bottom: 8px; }
+
+  .msg { padding: 10px 14px; border-left: 4px solid var(--line); }
+  .msg + .msg { border-top: 1px solid var(--line); }
+  .msg .role {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 5px;
+  }
+  .msg[data-role="user"]        { border-left-color: var(--role-user); }
+  .msg[data-role="user"] .role        { color: var(--role-user); }
+  .msg[data-role="assistant"]   { border-left-color: var(--role-assistant); }
+  .msg[data-role="assistant"] .role   { color: var(--role-assistant); }
+  .msg[data-role="tool_call"]   { border-left-color: var(--role-tool-call); }
+  .msg[data-role="tool_call"] .role   { color: var(--role-tool-call); }
+  .msg[data-role="tool_result"] { border-left-color: var(--role-tool-result); }
+  .msg[data-role="tool_result"] .role { color: var(--role-tool-result); }
+  .msg[data-role="system"]      { border-left-color: var(--role-system); opacity: .55; }
+  .msg[data-role="system"] .role      { color: var(--role-system); }
+  .msg[data-role="retrieval"]   { border-left-color: var(--role-retrieval); }
+  .msg[data-role="retrieval"] .role   { color: var(--role-retrieval); }
+  .msg.boiler { opacity: .5; }
+
+  .msg .text { white-space: pre-wrap; word-wrap: break-word; }
+  .fn { font-weight: 700; }
+  details.args { margin-top: 6px; }
+  details.args summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  pre.json {
+    background: #f3f4f6; border-radius: 6px; padding: 8px 10px; margin: 6px 0 0;
+    font-size: 12.5px; overflow-x: auto; white-space: pre;
+  }
+  .result-summary { color: var(--muted); font-size: 13px; }
+
+  .hl { background: var(--hl); border-radius: 2px; cursor: pointer; }
+  .hl.pending-highlight { background: var(--hl-pending); }
+  .hl.sugg { background: var(--sugg); border-bottom: 2px dashed var(--sugg-border); }
+  .hl.outline { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  .mnote {
+    position: absolute; left: 0; width: 100%;
+    background: var(--panel); border-left: 3px solid var(--hl);
+    border-radius: 4px; padding: 7px 9px; font-size: 12.5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .mnote.sugg { border-left-color: var(--sugg-border); background: #faf5ff; }
+  .mnote.outline { box-shadow: 0 0 0 2px var(--ink); }
+  .mnote .quote { color: var(--muted); font-style: italic; margin-bottom: 3px; }
+  .mnote .body { white-space: pre-wrap; }
+  .mnote .tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    color: var(--sugg-border); text-transform: uppercase; margin-bottom: 3px;
+  }
+  .mnote .acts { margin-top: 5px; display: flex; gap: 6px; }
+  .mnote .acts button {
+    border: 1px solid var(--line); background: var(--bg); font: inherit;
+    font-size: 11px; padding: 2px 8px; border-radius: 5px; cursor: pointer;
+  }
+  .mnote .acts .accept { border-color: var(--role-assistant); color: var(--role-assistant); }
+  .mnote .acts .reject { border-color: #dc2626; color: #dc2626; }
+  .mnote.human .acts { visibility: hidden; }
+  .mnote.human:hover .acts { visibility: visible; }
+
+  #popover {
+    position: absolute; z-index: 200; display: none;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.16); padding: 8px;
+  }
+  #popover input {
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px;
+    font: inherit; width: 280px;
+  }
+  #popover .hint { color: var(--muted); font-size: 11px; margin-top: 4px; }
+
+  #map-view { padding: 18px; }
+  #map-wrap { max-width: 980px; margin: 0 auto; }
+  #map { width: 100%; height: 620px; background: var(--panel);
+         border: 1px solid var(--line); border-radius: 8px; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+
+  #progress-view { padding: 18px; max-width: 980px; margin: 0 auto; }
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: .04em; color: var(--muted); margin: 18px 0 10px; }
+  #treemap { display: flex; flex-wrap: wrap; gap: 10px; }
+  .mode-block {
+    border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+    background: var(--panel); min-width: 210px; flex: 1 1 210px;
+  }
+  .mode-block h3 { margin: 0 0 4px; font-size: 14px; font-family: ui-monospace, monospace; }
+  .mode-block .count { float: right; color: var(--muted); font-weight: 400; }
+  .mode-block .def { color: var(--muted); font-size: 12.5px; margin: 4px 0 8px; }
+  .mode-block .notes { list-style: none; margin: 0; padding: 0; }
+  .mode-block .notes li { font-size: 12.5px; padding: 3px 0; border-top: 1px dashed var(--line); cursor: pointer; }
+  .mode-block .notes li:hover { color: var(--role-user); }
+  .mode-block .status {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    padding: 1px 6px; border-radius: 8px; margin-left: 6px;
+  }
+  .status.candidate { background: #fef3c7; color: #92400e; }
+  .status.confirmed { background: #d1fae5; color: #065f46; }
+  .status.frozen    { background: #e0e7ff; color: #3730a3; }
+
+  #sugg-queue { background: var(--panel); border: 1px solid var(--line);
+                border-radius: 8px; padding: 12px; }
+  .queue-tools { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .queue-tools button {
+    border: 1px solid var(--line); background: var(--bg); font: inherit;
+    font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  }
+  .queue-tools .accept { border-color: var(--role-assistant); color: var(--role-assistant); }
+  .queue-tools .dismiss { border-color: #dc2626; color: #dc2626; }
+  .sugg-row { display: flex; gap: 8px; align-items: flex-start; padding: 7px 0;
+              border-top: 1px solid var(--line); font-size: 13px; }
+  .sugg-row .mode { font-family: ui-monospace, monospace; font-size: 12px;
+                    color: var(--sugg-border); min-width: 170px; }
+  .sugg-row .quote { flex: 1; cursor: pointer; }
+  .sugg-row .quote:hover { color: var(--role-user); }
+  .empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+
+  /* ---- sidebar: jump to any sample, see reviewed status ---- */
+  #app-layout { display: flex; align-items: flex-start; }
+  #sidebar {
+    width: 230px; flex-shrink: 0; height: calc(100vh - 51px);
+    overflow-y: auto; border-right: 1px solid var(--line); background: var(--panel);
+    position: sticky; top: 51px;
+  }
+  #sidebar-list { list-style: none; margin: 0; padding: 6px 0; }
+  #sidebar-list li {
+    display: flex; align-items: center; gap: 8px; padding: 7px 12px;
+    cursor: pointer; font-size: 12.5px; border-left: 3px solid transparent;
+  }
+  #sidebar-list li:hover { background: var(--bg); }
+  #sidebar-list li.active { background: var(--bg); border-left-color: var(--role-user); font-weight: 700; }
+  #sidebar-list .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--line); }
+  #sidebar-list .dot.reviewed { background: var(--role-assistant); }
+  #sidebar-list .dot.no-failure { background: #60a5fa; }
+  #sidebar-list .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #sidebar-list .idx { color: var(--muted); min-width: 20px; }
+  #content-col { flex: 1; min-width: 0; }
+
+  /* ---- labels view (structured labeling, Part D/E) ---- */
+  #labels-view { padding: 18px; max-width: 1100px; margin: 0 auto; }
+  #labels-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  #labels-table th, #labels-table td { border: 1px solid var(--line); padding: 6px 9px; text-align: left; }
+  #labels-table th { background: var(--panel); position: sticky; top: 47px; }
+  #labels-table td.tid { font-family: ui-monospace, monospace; font-size: 12px; cursor: pointer; color: var(--role-user); }
+  .label-cell { text-align: center; cursor: pointer; user-select: none; font-weight: 700; }
+  .label-cell.unset { color: var(--line); }
+  .label-cell.present { color: #dc2626; }
+  .label-cell.absent { color: var(--role-assistant); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Cartwheel <span class="dim">error analysis</span></h1>
+  <div class="views">
+    <button data-view="trace" class="active">Trace</button>
+    <button data-view="map">Map</button>
+    <button data-view="progress">Progress</button>
+    <button data-view="labels">Labels</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="nav" id="trace-nav">
+    <button id="no-failure-btn" title="Mark this trace reviewed with no failure found">No failure observed</button>
+    <button id="prev">&larr;</button>
+    <span class="pos" id="pos">0 / 0</span>
+    <button id="next">&rarr;</button>
+  </div>
+  <div class="counts" id="counts"></div>
+</header>
+
+<div id="app-layout">
+  <div id="sidebar"><ul id="sidebar-list"></ul></div>
+  <div id="content-col">
+
+    <div id="trace-view" class="view active">
+      <div class="trace-header" id="trace-header"></div>
+      <div class="meta-panel" id="meta-panel"></div>
+      <div class="trace-body-wrap">
+        <div class="trace-body" id="trace-body"></div>
+        <div class="margin-col" id="margin-col"></div>
+      </div>
+    </div>
+
+    <div id="map-view" class="view">
+      <div id="map-wrap">
+        <div class="legend">
+          <span><span class="dot" style="background:#94a3b8"></span> trace</span>
+          <span><span class="dot" style="background:#1a1a1a"></span> in sample</span>
+          <span><span class="dot" style="background:#f97316"></span> annotated</span>
+        </div>
+        <canvas id="map"></canvas>
+      </div>
+    </div>
+
+    <div id="progress-view" class="view">
+      <div class="section-title">Failure modes</div>
+      <div id="treemap"></div>
+      <div class="section-title">Agent suggestions to review</div>
+      <div id="sugg-queue"></div>
+    </div>
+
+    <div id="labels-view" class="view">
+      <div class="section-title">Structured labeling — one row per reviewed trace, one column per final mode</div>
+      <div id="labels-table-wrap"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="popover"><input id="note-input" placeholder="what went wrong? (Enter to save)" /><div class="hint">first failure only, in your own words</div></div>
+<div id="toast"></div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ * State + API                                                         *
+ * ------------------------------------------------------------------ */
+const state = {
+  samples: [],
+  annotations: [],
+  suggestions: [],
+  patterns: {},
+  graph: {nodes: [], clusters: []},
+  scenarioLookup: {},   // scenario_id -> {tuple, expected, scenario_group, data_quality_case_id}
+  labelsByMode: {},      // mode -> {trace_id: 0/1}
+  cur: 0,
+};
+
+const api = {
+  async get(path) { const r = await fetch(path); return r.json(); },
+  async post(path, body) {
+    await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json'},
+                       body: JSON.stringify(body)});
+  },
+};
+
+function asAnnotationList(a) {
+  if (Array.isArray(a)) return a;
+  if (a && Array.isArray(a.annotations)) return a.annotations;
+  return [];
+}
+
+async function loadAll() {
+  const [samples, annotations, suggestions, patterns, graph, scenarioLookup] = await Promise.all([
+    api.get('/api/samples'), api.get('/api/annotations'),
+    api.get('/api/suggestions'), api.get('/api/patterns'), api.get('/api/graph'),
+    api.get('/api/scenario_lookup'),
+  ]);
+  state.samples = Array.isArray(samples) ? samples : [];
+  state.annotations = asAnnotationList(annotations);
+  state.suggestions = Array.isArray(suggestions) ? suggestions : [];
+  state.patterns = patterns && typeof patterns === 'object' ? patterns : {};
+  state.graph = graph && graph.nodes ? graph : {nodes: [], clusters: []};
+  state.scenarioLookup = scenarioLookup && typeof scenarioLookup === 'object' ? scenarioLookup : {};
+}
+
+function backupAnnotations() {
+  try { localStorage.setItem('cartwheel_annotations', JSON.stringify(state.annotations)); }
+  catch (e) {}
+}
+async function saveAnnotations() {
+  backupAnnotations();
+  await api.post('/api/annotations', state.annotations);
+}
+
+/* ------------------------------------------------------------------ *
+ * Rendering: the trace view                                          *
+ * ------------------------------------------------------------------ */
+function curTrace() { return state.samples[state.cur]; }
+
+function renderHeader() {
+  const s = curTrace();
+  const h = document.getElementById('trace-header');
+  const mp = document.getElementById('meta-panel');
+  if (!s) { h.innerHTML = '<span class="meta">no samples yet</span>'; mp.innerHTML = ''; return; }
+  const m = s.meta || {};
+  const bits = [];
+  bits.push(`<span class="tid">${escape(s.trace_id)}</span>`);
+  if (m.role)  bits.push(`<span class="meta">role: ${escape(m.role)}</span>`);
+  if (m.store) bits.push(`<span class="meta">store: ${escape(m.store)}</span>`);
+  if (m.prompt_version) bits.push(`<span class="meta">prompt: ${escape(m.prompt_version)}</span>`);
+  (s.flags || []).forEach(f => bits.push(`<span class="flag">${escape(f)}</span>`));
+  h.innerHTML = bits.join(' ');
+
+  // Real extra-metadata panel, joined from our scenario files by scenario_id
+  // (replaces the reference's dead exp.order/exp.store_override fields).
+  const scenarioId = m.scenario_id;
+  const sc = scenarioId ? state.scenarioLookup[scenarioId] : null;
+  if (!sc) { mp.innerHTML = scenarioId ? `<em>no scenario record for ${escape(scenarioId)}</em>` : ''; return; }
+  const t = sc.tuple || {};
+  const exp = sc.expected || {};
+  const parts = [];
+  parts.push(`group: ${escape(sc.scenario_group || '')}`);
+  if (t.intent) parts.push(`intent: ${escape(t.intent)}`);
+  if (t.order_id !== undefined) parts.push(`order: ${escape(t.order_id)}`);
+  if (t.product_id !== undefined) parts.push(`product: ${escape(t.product_id)}`);
+  if (t.applicable_policy && t.applicable_policy !== 'none') parts.push(`policy: ${escape(t.applicable_policy)}`);
+  if (t.difficulty) parts.push(`difficulty: ${escape(t.difficulty)}`);
+  if (sc.data_quality_case_id) parts.push(`⚠ data quality: ${escape(sc.data_quality_case_id)}`);
+  const verdict = exp.outcome || exp.criterion || '';
+  mp.innerHTML =
+    `<div><strong>Scenario ${escape(scenarioId)}</strong> — ${parts.join(' · ')}</div>` +
+    (verdict ? `<div style="margin-top:4px"><strong>Expected:</strong> ${escape(verdict)}` +
+      (exp.source ? ` <span style="opacity:.8">(${escape(exp.source.type || '')}: ${escape(exp.source.reference || '')})</span>` : '') +
+      `</div>` : '');
+}
+
+/* Render one trace as a sequence of steps, with a labeled divider inserted
+   before every `user` message (each marks the start of a new HTTP turn --
+   see the file header comment for why this is safe to infer). */
+function renderTrace() {
+  const s = curTrace();
+  const body = document.getElementById('trace-body');
+  if (!s || !Array.isArray(s.trace)) { body.innerHTML = ''; return; }
+  const html = [];
+  let i = 0, turn = 0;
+  const msgs = s.trace;
+  while (i < msgs.length) {
+    const m = msgs[i];
+    if (m.role === 'user') {
+      turn++;
+      html.push(`<div class="turn-divider">Turn ${turn}</div>`);
+    }
+    if (m.role === 'tool_call') {
+      const parts = [renderMsg(m, i)];
+      if (i + 1 < msgs.length && msgs[i + 1].role === 'tool_result') {
+        parts.push(renderMsg(msgs[i + 1], i + 1));
+        i++;
+      }
+      html.push(`<div class="step">${parts.join('')}</div>`);
+    } else {
+      html.push(`<div class="step">${renderMsg(m, i)}</div>`);
+    }
+    i++;
+  }
+  body.innerHTML = html.join('');
+  applyHighlights();
+  layoutMargin();
+  updateNoFailureButton();
+}
+
+function renderMsg(m, idx) {
+  const role = m.role || 'assistant';
+  const label = (m.label || role).replace(/_/g, ' ');
+  const boiler = m.boilerplate ? ' boiler' : '';
+  let inner = '';
+  if (role === 'tool_call') {
+    inner = `<div class="fn">${escape(m.name || 'tool')}()</div>`;
+    if (m.arguments !== undefined) {
+      inner += `<details class="args"><summary>arguments</summary>` +
+               `<pre class="json">${escape(pretty(m.arguments))}</pre></details>`;
+    }
+  } else if (role === 'tool_result') {
+    const full = pretty(m.content !== undefined ? m.content : m.text);
+    const long = full.length > 240;
+    if (long) {
+      inner = `<details class="args"><summary class="result-summary">result (${full.length} chars)</summary>` +
+              `<pre class="json annotatable" data-idx="${idx}">${escape(full)}</pre></details>`;
+    } else {
+      inner = `<pre class="json annotatable" data-idx="${idx}">${escape(full)}</pre>`;
+    }
+  } else {
+    const text = m.text !== undefined ? m.text : pretty(m.content);
+    inner = `<div class="text annotatable" data-idx="${idx}">${md(text)}</div>`;
+  }
+  return `<div class="msg${boiler}" data-role="${role}" data-idx="${idx}">` +
+         `<div class="role">${escape(label)}</div>${inner}</div>`;
+}
+
+/* ------------------------------------------------------------------ *
+ * Highlights + margin notes                                          *
+ * ------------------------------------------------------------------ */
+function itemsForTrace() {
+  const tid = curTrace() ? curTrace().trace_id : null;
+  const anns = state.annotations.filter(a => a.trace_id === tid && !a.no_failure).map(a => ({...a, kind: 'human'}));
+  const sugg = state.suggestions.filter(s => s.trace_id === tid).map(s => ({...s, kind: 'sugg'}));
+  return [...anns, ...sugg];
+}
+
+function applyHighlights() {
+  const items = itemsForTrace();
+  document.querySelectorAll('.annotatable').forEach(el => {
+    const idx = parseInt(el.dataset.idx, 10);
+    const mine = items.filter(it => it.idx === idx || it.idx === undefined);
+    if (!mine.length) return;
+    let text = el.textContent;
+    const ranges = [];
+    mine.forEach(it => {
+      if (!it.quote) return;
+      const pos = text.indexOf(it.quote);
+      if (pos >= 0) ranges.push([pos, pos + it.quote.length, it]);
+    });
+    if (!ranges.length) return;
+    ranges.sort((a, b) => a[0] - b[0]);
+    let out = '', cursor = 0;
+    ranges.forEach(([s, e, it]) => {
+      if (s < cursor) return;
+      out += escape(text.slice(cursor, s));
+      const cls = it.kind === 'sugg' ? 'hl sugg' : 'hl';
+      out += `<span class="${cls}" data-item="${it.id}">${escape(text.slice(s, e))}</span>`;
+      cursor = e;
+    });
+    out += escape(text.slice(cursor));
+    el.innerHTML = out;
+  });
+}
+
+function layoutMargin() {
+  const col = document.getElementById('margin-col');
+  col.innerHTML = '';
+  const items = itemsForTrace();
+  if (!items.length) return;
+  const colRect = col.getBoundingClientRect();
+  let lastBottom = 0;
+  const withPos = items.map(it => {
+    const hl = document.querySelector(`.hl[data-item="${it.id}"]`);
+    const top = hl ? (hl.getBoundingClientRect().top - colRect.top) : 0;
+    return {it, top, hl};
+  }).sort((a, b) => a.top - b.top);
+
+  withPos.forEach(({it, top, hl}) => {
+    const note = document.createElement('div');
+    note.className = 'mnote ' + (it.kind === 'sugg' ? 'sugg' : 'human');
+    note.dataset.item = it.id;
+    let html = '';
+    if (it.kind === 'sugg') html += `<div class="tag">agent · ${escape(it.mode || '')}</div>`;
+    if (it.quote) html += `<div class="quote">"${escape(clip(it.quote, 80))}"</div>`;
+    html += `<div class="body">${escape(it.note || (it.kind === 'sugg' ? '(suggested instance)' : ''))}</div>`;
+    if (it.kind === 'sugg') {
+      html += `<div class="acts"><button class="accept" data-accept="${it.id}">accept</button>` +
+              `<button class="reject" data-reject="${it.id}">dismiss</button></div>`;
+    } else {
+      html += `<div class="acts"><button data-del="${it.id}">delete</button></div>`;
+    }
+    note.innerHTML = html;
+    const y = Math.max(top, lastBottom);
+    note.style.top = y + 'px';
+    col.appendChild(note);
+    lastBottom = y + note.offsetHeight + 8;
+
+    if (hl) {
+      note.addEventListener('mouseenter', () => hl.classList.add('outline'));
+      note.addEventListener('mouseleave', () => hl.classList.remove('outline'));
+      hl.addEventListener('mouseenter', () => note.classList.add('outline'));
+      hl.addEventListener('mouseleave', () => note.classList.remove('outline'));
+    }
+  });
+
+  col.querySelectorAll('[data-accept]').forEach(b =>
+    b.onclick = () => acceptSuggestion(b.dataset.accept));
+  col.querySelectorAll('[data-reject]').forEach(b =>
+    b.onclick = () => dismissSuggestion(b.dataset.reject));
+  col.querySelectorAll('[data-del]').forEach(b =>
+    b.onclick = () => deleteAnnotation(b.dataset.del));
+}
+
+/* ------------------------------------------------------------------ *
+ * In-place annotation                                                *
+ * ------------------------------------------------------------------ */
+let pendingRange = null;
+let pendingCtx = null;
+
+document.getElementById('trace-body').addEventListener('mouseup', () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const text = sel.toString().trim();
+  if (!text) return;
+  const anchor = sel.anchorNode && sel.anchorNode.parentElement
+    ? sel.anchorNode.parentElement.closest('.annotatable') : null;
+  if (!anchor) return;
+
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.className = 'hl pending-highlight';
+  try { range.surroundContents(span); } catch (e) { return; }
+  pendingRange = span;
+  pendingCtx = {
+    trace_id: curTrace().trace_id,
+    quote: text,
+    idx: parseInt(anchor.dataset.idx, 10),
+  };
+  sel.removeAllRanges();
+
+  const rect = span.getBoundingClientRect();
+  const pop = document.getElementById('popover');
+  pop.style.display = 'block';
+  pop.style.left = (window.scrollX + rect.left) + 'px';
+  pop.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+  const input = document.getElementById('note-input');
+  input.value = '';
+  input.focus();
+});
+
+document.getElementById('note-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { commitAnnotation(); }
+  else if (e.key === 'Escape') { cancelAnnotation(); }
+});
+document.addEventListener('mousedown', (e) => {
+  const pop = document.getElementById('popover');
+  if (pop.style.display === 'block' && !pop.contains(e.target)) cancelAnnotation();
+});
+
+function clearPending() {
+  if (pendingRange && pendingRange.parentNode) {
+    const parent = pendingRange.parentNode;
+    while (pendingRange.firstChild) parent.insertBefore(pendingRange.firstChild, pendingRange);
+    parent.removeChild(pendingRange);
+    parent.normalize();
+  }
+  pendingRange = null; pendingCtx = null;
+  document.getElementById('popover').style.display = 'none';
+}
+function cancelAnnotation() { clearPending(); renderTrace(); }
+
+async function commitAnnotation() {
+  const note = document.getElementById('note-input').value.trim();
+  if (!note || !pendingCtx) { clearPending(); return; }
+  // A real failure note supersedes any earlier "no failure observed" mark
+  // on this trace (the human found something on a later pass).
+  const tid = pendingCtx.trace_id;
+  state.annotations = state.annotations.filter(a => !(a.trace_id === tid && a.no_failure));
+  state.annotations.push({
+    id: 'a' + Date.now() + Math.floor(Math.random() * 1000),
+    trace_id: tid,
+    quote: pendingCtx.quote,
+    idx: pendingCtx.idx,
+    note, ts: new Date().toISOString(),
+  });
+  clearPending();
+  await saveAnnotations();
+  renderTrace();
+  renderProgress();
+  renderSidebar();
+  toast('saved · the agent is grouping your notes');
+}
+
+async function deleteAnnotation(id) {
+  state.annotations = state.annotations.filter(a => a.id !== id);
+  await saveAnnotations();
+  renderTrace(); renderProgress(); renderSidebar();
+}
+
+async function acceptSuggestion(id) {
+  const s = state.suggestions.find(x => x.id === id);
+  if (!s) return;
+  state.annotations.push({
+    id: 'a' + Date.now() + Math.floor(Math.random() * 1000),
+    trace_id: s.trace_id, quote: s.quote, idx: s.idx,
+    note: s.mode ? `[${s.mode}]` : '(accepted)',
+    source: 'accepted_suggestion', mode: s.mode, ts: new Date().toISOString(),
+  });
+  state.suggestions = state.suggestions.filter(x => x.id !== id);
+  await saveAnnotations();
+  await api.post('/api/suggestions', state.suggestions);
+  renderTrace(); renderProgress(); renderSidebar();
+}
+async function dismissSuggestion(id) {
+  state.suggestions = state.suggestions.filter(x => x.id !== id);
+  await api.post('/api/suggestions', state.suggestions);
+  renderTrace(); renderProgress();
+}
+
+/* ------------------------------------------------------------------ *
+ * "No failure observed" -- distinguishes reviewed-and-clean from     *
+ * not-yet-reviewed, which free-text span annotation alone cannot do. *
+ * ------------------------------------------------------------------ */
+function updateNoFailureButton() {
+  const s = curTrace();
+  const btn = document.getElementById('no-failure-btn');
+  if (!s) { btn.classList.remove('marked'); return; }
+  const marked = state.annotations.some(a => a.trace_id === s.trace_id && a.no_failure);
+  btn.classList.toggle('marked', marked);
+}
+document.getElementById('no-failure-btn').onclick = async () => {
+  const s = curTrace();
+  if (!s) return;
+  const already = state.annotations.some(a => a.trace_id === s.trace_id && a.no_failure);
+  if (already) {
+    state.annotations = state.annotations.filter(a => !(a.trace_id === s.trace_id && a.no_failure));
+  } else {
+    // A real failure note and "no failure" are mutually exclusive for one trace.
+    state.annotations = state.annotations.filter(a => a.trace_id !== s.trace_id);
+    state.annotations.push({
+      id: 'a' + Date.now() + Math.floor(Math.random() * 1000),
+      trace_id: s.trace_id, note: 'no failure observed', no_failure: true,
+      ts: new Date().toISOString(),
+    });
+  }
+  await saveAnnotations();
+  renderTrace(); renderProgress(); renderSidebar();
+};
+
+/* ------------------------------------------------------------------ *
+ * Progress view                                                      *
+ * ------------------------------------------------------------------ */
+function renderProgress() {
+  renderTreemap();
+  renderQueue();
+}
+
+function normalizePatterns(p) {
+  if (!p || typeof p !== 'object') return [];
+  if (Array.isArray(p.modes)) return p.modes.filter(m => m && m.name);
+  return Object.entries(p).map(([name, m]) => ({name, ...(m || {})}));
+}
+function modeCount(m) {
+  if (typeof m.count === 'number') return m.count;
+  if (typeof m.any_instance_count === 'number') return m.any_instance_count;
+  if (typeof m.first_failure_count === 'number') return m.first_failure_count;
+  return (m.example_trace_ids || []).length;
+}
+
+function renderTreemap() {
+  const el = document.getElementById('treemap');
+  const modes = normalizePatterns(state.patterns);
+  if (!modes.length) { el.innerHTML = '<div class="empty">No modes yet. As you annotate, the agent groups your notes here.</div>'; return; }
+  modes.sort((a, b) => modeCount(b) - modeCount(a));
+  el.innerHTML = modes.map(m => {
+    const ids = m.example_trace_ids || [];
+    const quotes = m.example_quotes || [];
+    const items = (quotes.length ? quotes : ids).slice(0, 6).map((val, i) =>
+      `<li data-tid="${escape(quotes.length ? (ids[i] || '') : val)}">${escape(clip(val, 90))}</li>`).join('');
+    const status = m.status || 'candidate';
+    const grow = Math.max(1, modeCount(m));
+    const sev = typeof m.severity === 'number' ? ` · sev ${m.severity}` : '';
+    return `<div class="mode-block" style="flex-grow:${grow}">` +
+      `<h3>${escape(m.name)}<span class="status ${status}">${status}</span>` +
+      `<span class="count">${modeCount(m)}${sev}</span></h3>` +
+      `<div class="def">${escape(m.definition || '')}</div>` +
+      `<ul class="notes">${items}</ul></div>`;
+  }).join('');
+  el.querySelectorAll('li[data-tid]').forEach(li => {
+    li.onclick = () => { if (li.dataset.tid) gotoTrace(li.dataset.tid); };
+  });
+}
+
+function renderQueue() {
+  const el = document.getElementById('sugg-queue');
+  if (!state.suggestions.length) { el.innerHTML = '<div class="empty">No pending suggestions.</div>'; return; }
+  const rows = state.suggestions.map(s =>
+    `<div class="sugg-row"><input type="checkbox" data-id="${s.id}" checked />` +
+    `<span class="mode">${escape(s.mode || '')}</span>` +
+    `<span class="quote" data-tid="${escape(s.trace_id)}">"${escape(clip(s.quote || '', 110))}"</span></div>`
+  ).join('');
+  el.innerHTML =
+    `<div class="queue-tools">` +
+    `<label><input type="checkbox" id="sel-all" checked /> select all</label>` +
+    `<button class="accept" id="accept-sel">Accept selected</button>` +
+    `<button class="dismiss" id="dismiss-sel">Dismiss selected</button>` +
+    `<span class="empty" style="padding:0">${state.suggestions.length} pending · favor recall, prune the rest</span>` +
+    `</div>` + rows;
+
+  document.getElementById('sel-all').onchange = (e) => {
+    el.querySelectorAll('.sugg-row input[type=checkbox]').forEach(c => c.checked = e.target.checked);
+  };
+  el.querySelectorAll('.quote[data-tid]').forEach(q =>
+    q.onclick = () => gotoTrace(q.dataset.tid));
+  document.getElementById('accept-sel').onclick = () => bulkQueue(true);
+  document.getElementById('dismiss-sel').onclick = () => bulkQueue(false);
+}
+
+async function bulkQueue(accept) {
+  const el = document.getElementById('sugg-queue');
+  const ids = [...el.querySelectorAll('.sugg-row input[type=checkbox]:checked')].map(c => c.dataset.id);
+  for (const id of ids) { accept ? await acceptSuggestion(id) : await dismissSuggestion(id); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Map view                                                           *
+ * ------------------------------------------------------------------ */
+function renderMap() {
+  const canvas = document.getElementById('map');
+  const nodes = state.graph.nodes || [];
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = 620;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  if (!nodes.length) {
+    ctx.fillStyle = '#9ca3af'; ctx.font = '13px sans-serif';
+    ctx.fillText('No projection yet (GET /api/graph is empty).', 20, 30);
+    return;
+  }
+  const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 30;
+  const sx = v => pad + (v - minX) / ((maxX - minX) || 1) * (w - 2 * pad);
+  const sy = v => pad + (v - minY) / ((maxY - minY) || 1) * (h - 2 * pad);
+  const hues = ['#94a3b8','#a78bfa','#60a5fa','#34d399','#fbbf24','#f472b6','#22d3ee','#fb923c'];
+  const sampleIds = new Set(state.samples.map(s => s.trace_id));
+  const annIds = new Set(state.annotations.map(a => a.trace_id));
+
+  nodes.forEach(n => {
+    const annotated = annIds.has(n.trace_id);
+    const sampled = sampleIds.has(n.trace_id);
+    ctx.beginPath();
+    ctx.arc(sx(n.x), sy(n.y), sampled ? 6 : 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = annotated ? '#f97316' : hues[(n.cluster || 0) % hues.length];
+    ctx.fill();
+    if (sampled) { ctx.lineWidth = 1.5; ctx.strokeStyle = '#1a1a1a'; ctx.stroke(); }
+  });
+
+  canvas._nodes = nodes.map(n => ({...n, px: sx(n.x), py: sy(n.y)}));
+}
+document.getElementById('map').addEventListener('click', (e) => {
+  const canvas = document.getElementById('map');
+  const nodes = canvas._nodes || [];
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  let best = null, bestD = 1e9;
+  const sampleIds = new Set(state.samples.map(s => s.trace_id));
+  nodes.forEach(n => {
+    if (!sampleIds.has(n.trace_id)) return;
+    const d = (n.px - mx) ** 2 + (n.py - my) ** 2;
+    if (d < bestD) { bestD = d; best = n; }
+  });
+  if (best && bestD < 200) gotoTrace(best.trace_id);
+});
+
+/* ------------------------------------------------------------------ *
+ * Labels view (structured labeling, Part D/E)                       *
+ * ------------------------------------------------------------------ */
+async function renderLabels() {
+  const wrap = document.getElementById('labels-table-wrap');
+  const modes = normalizePatterns(state.patterns).filter(m => m.status === 'confirmed' || m.status === 'frozen');
+  if (!modes.length) {
+    wrap.innerHTML = '<div class="empty">No confirmed modes yet. This view fills in once the taxonomy stabilizes (Part D).</div>';
+    return;
+  }
+  // reviewed traces = anything with a human annotation (real note or no_failure mark)
+  const reviewedIds = [...new Set(state.annotations.map(a => a.trace_id))];
+  const fetched = await Promise.all(modes.map(m => api.get(`/api/labels/${encodeURIComponent(m.name)}`)));
+  modes.forEach((m, i) => { state.labelsByMode[m.name] = fetched[i] || {}; });
+
+  const header = `<tr><th>trace_id</th>${modes.map(m => `<th>${escape(m.name)}</th>`).join('')}</tr>`;
+  const rows = reviewedIds.map(tid => {
+    const cells = modes.map(m => {
+      const val = state.labelsByMode[m.name][tid];
+      const cls = val === 1 ? 'present' : val === 0 ? 'absent' : 'unset';
+      const glyph = val === 1 ? '●' : val === 0 ? '○' : '·';
+      return `<td class="label-cell ${cls}" data-tid="${escape(tid)}" data-mode="${escape(m.name)}">${glyph}</td>`;
+    }).join('');
+    return `<tr><td class="tid" data-tid="${escape(tid)}">${escape(tid)}</td>${cells}</tr>`;
+  }).join('');
+  wrap.innerHTML = `<table id="labels-table">${header}${rows}</table>` +
+    `<div class="empty">click a cell to cycle unset → present (failure) → absent (no failure) → unset</div>`;
+
+  wrap.querySelectorAll('td.tid').forEach(td => td.onclick = () => gotoTrace(td.dataset.tid));
+  wrap.querySelectorAll('.label-cell').forEach(td => td.onclick = async () => {
+    const tid = td.dataset.tid, mode = td.dataset.mode;
+    const cur = state.labelsByMode[mode][tid];
+    const next = cur === undefined ? 1 : cur === 1 ? 0 : undefined;
+    if (next === undefined) { delete state.labelsByMode[mode][tid]; }
+    else {
+      state.labelsByMode[mode][tid] = next;
+      await api.post(`/api/labels/${encodeURIComponent(mode)}`, {trace_id: tid, label: next});
+    }
+    renderLabels();
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ * Navigation + view switching                                        *
+ * ------------------------------------------------------------------ */
+function gotoTrace(tid) {
+  const i = state.samples.findIndex(s => s.trace_id === tid);
+  if (i < 0) { toast('that trace is not in the current sample'); return; }
+  state.cur = i;
+  persistCur();
+  switchView('trace');
+  renderHeader(); renderTrace(); updatePos(); renderSidebar();
+}
+function updatePos() {
+  document.getElementById('pos').textContent =
+    state.samples.length ? `${state.cur + 1} / ${state.samples.length}` : '0 / 0';
+}
+document.getElementById('prev').onclick = () => {
+  if (state.cur > 0) { state.cur--; persistCur(); renderHeader(); renderTrace(); updatePos(); renderSidebar(); }
+};
+document.getElementById('next').onclick = () => {
+  if (state.cur < state.samples.length - 1) { state.cur++; persistCur(); renderHeader(); renderTrace(); updatePos(); renderSidebar(); }
+};
+
+/* Remember which trace we were on, so a browser refresh resumes there
+   instead of always reopening the first sample. Keyed by sample count so
+   a freshly-expanded batch doesn't restore a now-meaningless index. */
+function persistCur() {
+  try { localStorage.setItem('cartwheel_cur', JSON.stringify({n: state.samples.length, i: state.cur})); }
+  catch (e) {}
+}
+function restoreCur() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('cartwheel_cur') || 'null');
+    if (saved && saved.n === state.samples.length && saved.i >= 0 && saved.i < state.samples.length) {
+      state.cur = saved.i;
+    }
+  } catch (e) {}
+}
+
+/* ------------------------------------------------------------------ *
+ * Sidebar: jump to any sample, see reviewed status at a glance        *
+ * ------------------------------------------------------------------ */
+function reviewStatus(traceId) {
+  const anns = state.annotations.filter(a => a.trace_id === traceId);
+  if (!anns.length) return 'unreviewed';
+  if (anns.some(a => !a.no_failure)) return 'reviewed';
+  return 'no-failure';
+}
+function renderSidebar() {
+  const el = document.getElementById('sidebar-list');
+  el.innerHTML = state.samples.map((s, i) => {
+    const status = reviewStatus(s.trace_id);
+    const dotClass = status === 'reviewed' ? 'reviewed' : status === 'no-failure' ? 'no-failure' : '';
+    const label = (s.meta && s.meta.scenario_id) || s.trace_id;
+    return `<li data-i="${i}" class="${i === state.cur ? 'active' : ''}" title="${escape(s.trace_id)}">` +
+      `<span class="idx">${i + 1}</span><span class="dot ${dotClass}"></span>` +
+      `<span class="label">${escape(label)}</span></li>`;
+  }).join('');
+  el.querySelectorAll('li').forEach(li => li.onclick = () => {
+    state.cur = parseInt(li.dataset.i, 10);
+    persistCur();
+    switchView('trace');
+    renderHeader(); renderTrace(); updatePos(); renderSidebar();
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'j' || e.key === 'ArrowDown' || e.key === 'ArrowRight') document.getElementById('next').click();
+  if (e.key === 'k' || e.key === 'ArrowUp' || e.key === 'ArrowLeft') document.getElementById('prev').click();
+});
+
+function switchView(name) {
+  document.querySelectorAll('.views button').forEach(b =>
+    b.classList.toggle('active', b.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name + '-view').classList.add('active');
+  document.getElementById('trace-nav').style.display = name === 'trace' ? 'flex' : 'none';
+  if (name === 'map') renderMap();
+  if (name === 'progress') renderProgress();
+  if (name === 'labels') renderLabels();
+}
+document.querySelectorAll('.views button').forEach(b =>
+  b.onclick = () => switchView(b.dataset.view));
+
+function updateCounts() {
+  const reviewed = new Set(state.annotations.map(a => a.trace_id)).size;
+  document.getElementById('counts').textContent =
+    `${state.samples.length} traces · ${reviewed} reviewed · ${state.annotations.length} notes · ` +
+    `${normalizePatterns(state.patterns).length} modes · ${state.suggestions.length} suggestions`;
+}
+
+/* ------------------------------------------------------------------ *
+ * Polling                                                            *
+ * ------------------------------------------------------------------ */
+let lastSig = '';
+async function poll() {
+  try {
+    const [samples, suggestions, patterns, annotations] = await Promise.all([
+      api.get('/api/samples'), api.get('/api/suggestions'),
+      api.get('/api/patterns'), api.get('/api/annotations'),
+    ]);
+    const newSampleCount = Array.isArray(samples) ? samples.length : 0;
+    const grewSamples = newSampleCount > state.samples.length;
+    const newSuggCount = Array.isArray(suggestions) ? suggestions.length : 0;
+    const grewSugg = newSuggCount > state.suggestions.length;
+
+    const key = a => a.id || `${a.trace_id}::${(a.note || '').slice(0, 40)}`;
+    const seen = new Set(state.annotations.map(key));
+    const remote = asAnnotationList(annotations);
+    const merged = [...state.annotations];
+    remote.forEach(a => { const k = key(a); if (!seen.has(k)) { seen.add(k); merged.push(a); } });
+
+    const sig = JSON.stringify([newSampleCount, newSuggCount,
+      normalizePatterns(patterns).length, merged.length]);
+    if (sig === lastSig) return;
+    lastSig = sig;
+
+    state.samples = Array.isArray(samples) ? samples : state.samples;
+    state.suggestions = Array.isArray(suggestions) ? suggestions : state.suggestions;
+    state.patterns = patterns && typeof patterns === 'object' ? patterns : state.patterns;
+    state.annotations = merged;
+
+    if (grewSamples) toast(`new traces added to your batch (${newSampleCount})`);
+    if (grewSugg) toast(`new agent suggestions to review (${newSuggCount})`);
+
+    renderHeader(); renderTrace(); renderProgress(); updatePos(); updateCounts(); renderSidebar();
+  } catch (e) { /* server not up yet; keep trying */ }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilities                                                          *
+ * ------------------------------------------------------------------ */
+function escape(s) {
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function md(s) {
+  return escape(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
+function pretty(v) {
+  if (typeof v === 'string') return v;
+  try { return JSON.stringify(v, null, 2); } catch (e) { return String(v); }
+}
+function clip(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n) + '…' : s; }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+window.addEventListener('resize', () => {
+  if (document.getElementById('map-view').classList.contains('active')) renderMap();
+  else layoutMargin();
+});
+
+/* ------------------------------------------------------------------ *
+ * Boot                                                               *
+ * ------------------------------------------------------------------ */
+(async function boot() {
+  await loadAll();
+  restoreCur();
+  renderHeader(); renderTrace(); renderProgress(); updatePos(); updateCounts(); renderSidebar();
+  setInterval(poll, 2000);
+})();
+</script>
+</body>
+</html>

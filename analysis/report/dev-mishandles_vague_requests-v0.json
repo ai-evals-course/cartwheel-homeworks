@@ -1,0 +1,38 @@
+{
+  "judge_id": "mishandles_vague_requests-v0",
+  "split": "dev",
+  "tpr": 0.8125,
+  "tnr": 0.5333,
+  "tpr_interval": [
+    0.6806,
+    0.8981
+  ],
+  "tnr_interval": [
+    0.3012,
+    0.7519
+  ],
+  "agreement": 0.746,
+  "tp": 39,
+  "fn": 9,
+  "tn": 8,
+  "fp": 7,
+  "n": 63,
+  "disagreements": [
+    "0234525e72b78418765775fa7ccf55c5",
+    "02654e693da104e32943d4c20f249351",
+    "445cb673e56e40db05ad8b955eaef416",
+    "5efaa2f9e3550013fc2db4982e426d0a",
+    "78b8e5e27c1c4314cf43c85805813a5f",
+    "8218a58ce6e4986ae5c4585da7994270",
+    "a5972ebd4b24d665168af9a1b2708b70",
+    "a9d9963d61294c62a9b163b9164305ec",
+    "b0cbf5cc1400753f9b00ceffad68b6bb",
+    "c7c758bbe22bcd8a66f7c6269e2ebbda",
+    "e2049124ffb9d6f5585332bf4780e4d0",
+    "live-40c62313f80a4d6582a37d99bb1127de",
+    "live-46db4e4a541e484f9a2f8559a1f45464",
+    "live-68521f97bbf74d45bdeed0a04b92237e",
+    "live-ab3e3f81516b4f37a770302c1d804a58",
+    "live-e02b7d8aa83842db89e44b7164bf4479"
+  ]
+}

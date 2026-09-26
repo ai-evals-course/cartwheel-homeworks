@@ -46,10 +46,15 @@ def summarize_job(
     result_path = job_dir / "result.json"
     if not result_path.exists():
         raise FileNotFoundError(f"Harbor result not found: {result_path}")
-    result = json.loads(result_path.read_text())
+    # harbor==0.23.0 always writes the job-level result.json with
+    # exclude_trial_results=True (see harbor/job.py): per-trial records live
+    # in <job_dir>/<trial_name>/result.json instead of an inline
+    # "trial_results" list. Read each trial's own result file directly.
+    trial_paths = sorted(job_dir.glob("*/result.json"))
     trials: dict[str, list[dict[str, Any]]] = defaultdict(list)
     unknown: list[str] = []
-    for trial in result.get("trial_results", []):
+    for trial_path in trial_paths:
+        trial = json.loads(trial_path.read_text())
         case_id = _case_id(str(trial.get("task_name", "")), set(by_id))
         if case_id is None:
             unknown.append(str(trial.get("task_name", "")))

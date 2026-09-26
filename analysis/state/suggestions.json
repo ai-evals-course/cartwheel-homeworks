@@ -1,1 +1,47 @@
-[]
+[
+  {
+    "id": "s001",
+    "trace_id": "406b35840b31d8fc4507e3ddfe207fae",
+    "mode": "missing_policy_citation",
+    "reason": "regex scan: reply says 'not refund-eligible' with no policy id nearby",
+    "status": "rejected",
+    "rejection_note": "Plain field lookup ('refund eligible: No'), not a claim derived from a policy document -- RESP-1 doesn't apply to raw eligibility flags, only to reasoning that cites a policy (return windows, thresholds, overrides).",
+    "ts": "2026-09-20T17:39:56Z"
+  },
+  {
+    "id": "s002",
+    "trace_id": "2ea90fd940e580168e6593f4eac2785f",
+    "mode": "inefficient_tool_use",
+    "reason": "regex scan: 3 find_order calls in one trace",
+    "status": "rejected",
+    "rejection_note": "The 3 calls are a reasonable adaptive retry (broadening the query after a no-match on a different item, not repeated guesses at the same thing) -- not wasteful thrashing.",
+    "ts": "2026-09-20T17:39:56Z"
+  },
+  {
+    "id": "s003",
+    "trace_id": "live-ab3e3f81516b4f37a770302c1d804a58",
+    "mode": "inefficient_tool_use",
+    "reason": "regex scan: 3 get_policy calls in one trace",
+    "status": "rejected",
+    "rejection_note": "Each get_policy call is for a distinct, genuinely relevant policy id (cw-disputes, cw-refunds, cw-escalations) for a dispute question -- thorough grounding across distinct topics, not redundancy.",
+    "ts": "2026-09-20T17:39:56Z"
+  },
+  {
+    "id": "s004",
+    "trace_id": "013c6d72a4d1cfdc5357a66c1ff180b7",
+    "mode": "asks_for_unusable_information",
+    "reason": "regex scan: reply mentions 'product page'",
+    "status": "rejected",
+    "rejection_note": "'Product page' appears only in general description of how store overrides work, not as something asked of the customer.",
+    "ts": "2026-09-20T17:39:56Z"
+  },
+  {
+    "id": "s005",
+    "trace_id": "d6b8d8e53fee7a6b820fe2553d0a26a7",
+    "mode": "asks_for_unusable_information",
+    "reason": "regex scan: reply mentions 'product page'",
+    "status": "rejected",
+    "rejection_note": "Same as s004 -- descriptive text, not a request made of the customer.",
+    "ts": "2026-09-20T17:39:56Z"
+  }
+]

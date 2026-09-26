@@ -32,7 +32,9 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator
 
+import raindrop.analytics as raindrop_analytics
 from agents import Runner, SQLiteSession
+from agents.items import ToolCallItem, ToolCallOutputItem
 from fastapi import FastAPI, Header, HTTPException
 from opentelemetry import trace
 from pydantic import BaseModel
@@ -53,6 +55,11 @@ _tracer = trace.get_tracer("cartwheel.server")
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     load_env()
     setup_tracing()  # no-op with a warning if LANGFUSE_PUBLIC_KEY is unset
+    # HW4 Part C (Raindrop Workshop). tracing_enabled defaults to False, so
+    # this never touches OpenTelemetry or the Langfuse tracer provider set
+    # up above -- it's a separate begin()/finish() event channel to the
+    # local Workshop daemon (auto-detected on localhost:5899).
+    raindrop_analytics.init()
     yield
 
 
@@ -124,7 +131,29 @@ def create_session(body: SessionCreate) -> dict[str, Any]:
     user_id, role, store_id, and issued_at.
     """
     ### YOUR CODE HERE (HW2)
-    raise NotImplementedError("HW2: implement POST /sessions")
+    if body.role not in ROLES:
+        raise HTTPException(status_code=400, detail=f"unknown role: {body.role!r}")
+
+    with db.connection() as conn:
+        user = db.get_user(conn, body.user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"unknown user id: {body.user_id}")
+    if user.role != body.role:
+        raise HTTPException(status_code=403, detail="claimed role does not match the stored role")
+
+    ctx = AuthContext(user_id=user.id, role=user.role, store_id=user.store_id)
+    session_id = str(uuid.uuid4())
+    session = SQLiteSession(session_id, str(SESSIONS_DB))
+    _SESSIONS[session_id] = (ctx, session)
+
+    payload = {
+        "session_id": session_id,
+        "user_id": user.id,
+        "role": user.role,
+        "store_id": user.store_id,
+        "issued_at": time.time(),
+    }
+    return {"session_id": session_id, "token": create_token(payload)}
 
 
 def _authorize(session_id: str, authorization: str | None) -> AuthContext:
@@ -138,6 +167,32 @@ def _authorize(session_id: str, authorization: str | None) -> AuthContext:
     if session_id not in _SESSIONS:
         raise HTTPException(status_code=404, detail="unknown session (server restarted?)")
     return _SESSIONS[session_id][0]
+
+
+def _summarize_tool_activity(new_items: list[Any]) -> list[dict[str, Any]]:
+    """Compact tool-call/result pairs for Raindrop Workshop inspection.
+
+    tool_span()/task_span() are no-ops without tracing_enabled=True (which
+    would mean Traceloop touching the same OTel provider Langfuse owns), so
+    tool visibility rides on the interaction's plain properties instead.
+    """
+    calls: list[dict[str, Any]] = []
+    for item in new_items:
+        if isinstance(item, ToolCallItem):
+            raw = item.raw_item
+            name = getattr(raw, "name", None)
+            args_raw = getattr(raw, "arguments", None)
+            if isinstance(raw, dict):
+                name = name or raw.get("name")
+                args_raw = args_raw if args_raw is not None else raw.get("arguments")
+            try:
+                args = json.loads(args_raw) if isinstance(args_raw, str) else (args_raw or {})
+            except json.JSONDecodeError:
+                args = args_raw
+            calls.append({"name": name, "arguments": args})
+        elif isinstance(item, ToolCallOutputItem) and calls:
+            calls[-1]["result"] = item.output
+    return calls
 
 
 @app.post("/sessions/{session_id}/messages")
@@ -159,7 +214,49 @@ async def post_message(
     messages with role and parts fields.
     """
     ### YOUR CODE HERE (HW2)
-    raise NotImplementedError("HW2: implement the traced message endpoint")
+    ctx = _authorize(session_id, authorization)
+    _, session = _SESSIONS[session_id]
+    agent = build_agent(ctx, model=body.model)
+    version = prompt_version()
+    capture = os.environ.get("TRACELOOP_TRACE_CONTENT", "false").lower() == "true"
+    with _tracer.start_as_current_span("cartwheel.session_message") as span:
+        if span.is_recording():
+            span.set_attribute("cartwheel.session_id", session_id)
+            span.set_attribute("cartwheel.user_role", ctx.role)
+            span.set_attribute("cartwheel.user_id", str(ctx.user_id))
+            span.set_attribute("cartwheel.prompt_version", version)
+            if body.scenario_id:
+                span.set_attribute("cartwheel.scenario_id", body.scenario_id)
+            if capture:
+                span.set_attribute(
+                    "gen_ai.input.messages",
+                    json.dumps([{"role": "user", "parts": [{"type": "text", "content": body.message}]}]),
+                )
+        interaction = raindrop_analytics.begin(
+            user_id=str(ctx.user_id),
+            event="cartwheel.session_message",
+            input=body.message,
+            convo_id=session_id,
+            properties={"role": ctx.role, "scenario_id": body.scenario_id},
+        )
+        try:
+            result = await Runner.run(
+                agent, body.message, session=session, context=ctx, max_turns=MAX_TURNS
+            )
+        except Exception:
+            interaction.finish(output=None)
+            raise
+        reply = str(result.final_output)
+        interaction.finish(
+            output=reply,
+            properties={"tool_calls": _summarize_tool_activity(result.new_items)},
+        )
+        if span.is_recording() and capture:
+            span.set_attribute(
+                "gen_ai.output.messages",
+                json.dumps([{"role": "assistant", "parts": [{"type": "text", "content": reply}]}]),
+            )
+    return {"session_id": session_id, "reply": reply, "prompt_version": version}
 
 
 @app.get("/health")

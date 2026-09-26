@@ -53,7 +53,16 @@ def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
         agent.helpcenter.load_policy_docs() returns every parsed doc.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement get_policy")
+    for doc in load_policy_docs():
+        if doc.policy_id == policy_id:
+            return {
+                "ok": True,
+                "policy_id": doc.policy_id,
+                "title": doc.title,
+                "audience": doc.audience,
+                "body": doc.body,
+            }
+    return {"ok": False, "error": "not_found", "reason": f"no policy doc with id {policy_id!r}"}
 
 
 def search_products(
@@ -96,7 +105,49 @@ def search_products(
         Use `with db.connection() as conn:` to close the database automatically.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement search_products")
+    query = query.strip()
+    if not query:
+        return {"ok": False, "error": "invalid_argument", "reason": "query must not be empty"}
+    if max_price_usd is not None and max_price_usd <= 0:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": f"max_price_usd must be positive, got {max_price_usd}",
+        }
+
+    limit = max(1, min(limit, MAX_SEARCH_LIMIT))
+    tokens = [tok.lower() for tok in query.split()]
+
+    with db.connection() as conn:
+        store_id = None
+        if store is not None:
+            found_store = db.get_store_by_name(conn, store)
+            if found_store is None:
+                return {"ok": False, "error": "not_found", "reason": f"no store matching {store!r}"}
+            store_id = found_store.id
+
+        candidates = db.list_products(conn, store_id)
+
+    def matches(product: db.Product) -> bool:
+        haystack = f"{product.title} {product.description}".lower()
+        return all(tok in haystack for tok in tokens)
+
+    matched = [p for p in candidates if matches(p)]
+    if max_price_usd is not None:
+        matched = [p for p in matched if p.price_usd <= max_price_usd]
+    matched.sort(key=lambda p: (p.price_usd, p.id))
+    matched = matched[:limit]
+
+    products = [
+        {
+            "product_id": p.id,
+            "store_id": p.store_id,
+            "title": p.title,
+            "price_usd": p.price_usd,
+        }
+        for p in matched
+    ]
+    return {"ok": True, "products": products, "count": len(products)}
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
@@ -122,7 +173,24 @@ def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
         tool: the model cannot ask for someone else's orders through it.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement list_my_orders")
+    if ctx.role == "support":
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "support staff have no orders of their own; use get_order instead",
+        }
+
+    with db.connection() as conn:
+        if ctx.role == "shopper":
+            orders = db.list_orders_for_user(conn, ctx.user_id, limit=DEFAULT_ORDER_LIMIT)
+        else:
+            orders = db.list_orders_for_store(conn, ctx.store_id, limit=DEFAULT_ORDER_LIMIT)
+
+    return {
+        "ok": True,
+        "orders": [order.to_public_dict() for order in orders],
+        "count": len(orders),
+    }
 
 
 def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]:
@@ -168,7 +236,29 @@ def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]
     if paused is not None:
         return {"ok": False, "error": "paused", "reason": paused}
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement cancel_order")
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {"ok": False, "error": "not_found", "reason": f"no order with id {order_id}"}
+
+        if not can_cancel_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"{ctx.role} {ctx.user_id} may not cancel order {order_id}"
+            )
+
+        if order.status != "placed":
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": (
+                    f"order {order_id} has status {order.status!r}; "
+                    "orders can be cancelled only before shipment"
+                ),
+            }
+
+        db.set_order_status(conn, order_id, "cancelled")
+
+    return {"ok": True, "order_id": order_id, "status": "cancelled"}
 
 
 def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
@@ -203,4 +293,67 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
         match, return {"ok": True, "orders": []}.
     """
     ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement find_order")
+    from rapidfuzz import fuzz
+
+    with db.connection() as conn:
+        if ctx.role == "shopper":
+            candidates = db.list_order_search_candidates(conn, user_id=ctx.user_id)
+        elif ctx.role == "merchant":
+            candidates = db.list_order_search_candidates(conn, store_id=ctx.store_id)
+        elif ctx.role == "support":
+            candidates = db.list_order_search_candidates(conn, all_orders=True)
+        else:
+            return {"ok": False, "error": "invalid_argument", "reason": f"unsupported role {ctx.role!r}"}
+
+        product_titles = {p.id: p.title for p in db.list_products(conn)}
+
+    query_lower = query.lower()
+    matched = [
+        order
+        for order in candidates
+        if fuzz.partial_ratio(query_lower, product_titles.get(order.product_id, "").lower()) >= 60
+    ][:5]
+
+    return {"ok": True, "orders": [order.to_public_dict() for order in matched]}
+
+
+def get_store_info(ctx: AuthContext, store: str) -> dict[str, Any]:
+    """Look up public information about a store, including its policy overrides.
+
+    Risk tier: read. This is a homework-added tool (not part of the five
+    required holes): it fills a gap noted in the HW1 handout ("look up public
+    store information and policy overrides"). Every role may look it up; a
+    store's category and override settings are public, like its policy docs.
+
+    Args:
+        ctx: The caller's auth context. Unused here, but every tool takes it.
+        store: A store name or slug. Matched case-insensitively with
+            agent.db.get_store_by_name.
+
+    Returns:
+        On success: {"ok": True, "store_id": int, "name": str, "slug": str,
+        "category": str, "return_window_days_override": int | None,
+        "restocking_fee_opt_in": bool}.
+        {"ok": False, "error": "invalid_argument", "reason": ...} for an
+        empty store string.
+        {"ok": False, "error": "not_found", "reason": ...} for no match.
+    """
+    store = store.strip()
+    if not store:
+        return {"ok": False, "error": "invalid_argument", "reason": "store must not be empty"}
+
+    with db.connection() as conn:
+        found = db.get_store_by_name(conn, store)
+
+    if found is None:
+        return {"ok": False, "error": "not_found", "reason": f"no store matching {store!r}"}
+
+    return {
+        "ok": True,
+        "store_id": found.id,
+        "name": found.name,
+        "slug": found.slug,
+        "category": found.category,
+        "return_window_days_override": found.return_window_days_override,
+        "restocking_fee_opt_in": found.restocking_fee_opt_in,
+    }

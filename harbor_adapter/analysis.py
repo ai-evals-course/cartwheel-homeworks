@@ -21,12 +21,16 @@ def analyze_capability_job(
     result_path = job_dir / "result.json"
     if not result_path.exists():
         raise FileNotFoundError(f"Harbor result not found: {result_path}")
-    result = json.loads(result_path.read_text())
-    trials = [
-        trial
-        for trial in result.get("trial_results", [])
-        if str(trial.get("task_name", "")).endswith(case_id)
-    ]
+    # harbor==0.23.0 always writes the job-level result.json with
+    # exclude_trial_results=True (see harbor/job.py): per-trial records live
+    # in <job_dir>/<trial_name>/result.json instead of an inline
+    # "trial_results" list. Read each trial file directly, and recover trial
+    # order from each trial's own started_at timestamp.
+    all_trials = [json.loads(path.read_text()) for path in job_dir.glob("*/result.json")]
+    trials = sorted(
+        (t for t in all_trials if str(t.get("task_name", "")).endswith(case_id)),
+        key=lambda trial: trial.get("started_at") or "",
+    )
     if len(trials) != expected_attempts:
         raise ValueError(
             f"{case_id}: expected {expected_attempts} trials, found {len(trials)}"
@@ -82,7 +86,7 @@ def analyze_capability_job(
     return {
         "case_id": case_id,
         "model": next(iter(models)),
-        "trial_order": "result.json trial_results order",
+        "trial_order": "sorted by each trial's own started_at timestamp",
         "trials": trial_records,
         "rewards": rewards,
         "n": len(rewards),

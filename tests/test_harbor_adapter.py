@@ -15,6 +15,23 @@ def _write_cases(path: Path, cases: list[dict]) -> None:
     path.write_text("\n".join(json.dumps(case) for case in cases) + "\n")
 
 
+def _write_trials(job_dir: Path, trials: list[dict]) -> None:
+    """Write each trial to its own <job_dir>/<name>/result.json, matching
+    harbor==0.23.0's actual per-trial layout (its job-level result.json
+    always excludes trial_results; see harbor/job.py). Trials without an
+    explicit "started_at" get one assigned in list order, so tests can
+    rely on a deterministic execution order without depending on
+    filesystem glob order."""
+    job_dir.mkdir(parents=True, exist_ok=True)
+    (job_dir / "result.json").write_text(json.dumps({"stats": {}}))
+    for index, trial in enumerate(trials):
+        trial = {**trial}
+        trial.setdefault("started_at", f"2024-01-01T00:00:{index:02d}Z")
+        trial_dir = job_dir / f"trial_{index:03d}"
+        trial_dir.mkdir(parents=True, exist_ok=True)
+        (trial_dir / "result.json").write_text(json.dumps(trial))
+
+
 def test_provider_key_follows_the_selected_model() -> None:
     assert _provider_key("gpt-example") == "OPENAI_API_KEY"
     assert _provider_key("o4-mini") == "OPENAI_API_KEY"
@@ -154,10 +171,9 @@ def test_summary_blocks_regressions_but_reports_capabilities(
         }
 
     job = tmp_path / "job"
-    job.mkdir()
     trials = [trial("e-201", value) for value in [1, 1, 1, 1, 0]]
     trials += [trial("e-202", value) for value in [0, 0, 1, 0, 1]]
-    (job / "result.json").write_text(json.dumps({"trial_results": trials}))
+    _write_trials(job, trials)
 
     markdown, passed = summarize_job(
         job, cases_path=cases_path, expected_attempts=5
@@ -189,10 +205,9 @@ def test_baseline_summary_reports_the_observed_classification(tmp_path: Path) ->
         }
 
     job = tmp_path / "job"
-    job.mkdir()
     trials = [trial("e-301", 1, i) for i in range(5)]
     trials += [trial("e-302", value, i) for i, value in enumerate([1, 1, 1, 0, 0])]
-    (job / "result.json").write_text(json.dumps({"trial_results": trials}))
+    _write_trials(job, trials)
 
     markdown, passed = summarize_job(
         job,
@@ -219,7 +234,6 @@ def test_baseline_summary_does_not_classify_infrastructure_errors(
     }
     _write_cases(cases_path, [case])
     job = tmp_path / "job"
-    job.mkdir()
     trials = [
         {
             "task_name": "cartwheel/evals__e-303",
@@ -235,7 +249,7 @@ def test_baseline_summary_does_not_classify_infrastructure_errors(
             "exception_info": {"message": "sandbox failed"},
         }
     )
-    (job / "result.json").write_text(json.dumps({"trial_results": trials}))
+    _write_trials(job, trials)
 
     markdown, passed = summarize_job(
         job,
@@ -290,7 +304,6 @@ def test_capability_analysis_uses_5_10_and_15_observed_runs(
         lambda n, c, k: (n + c + k) / 100,
     )
     job = tmp_path / "job"
-    job.mkdir()
     trials = []
     for attempt in range(14, -1, -1):
         trials.append(
@@ -309,7 +322,11 @@ def test_capability_analysis_uses_5_10_and_15_observed_runs(
                 "exception_info": None,
             }
         )
-    (job / "result.json").write_text(json.dumps({"trial_results": trials}))
+    # Appended in reverse (attempt 14 first): _write_trials assigns each
+    # trial an increasing started_at in list order, so this still checks
+    # that ordering follows true execution order (started_at), not the
+    # trial_name label or directory/glob order.
+    _write_trials(job, trials)
 
     result = analyze_capability_job(job, "e-401")
 
@@ -317,7 +334,7 @@ def test_capability_analysis_uses_5_10_and_15_observed_runs(
     assert result["rewards"][:3] == [1, 0, 1]
     assert result["model"] == "student/provider-model"
     assert result["trials"][0]["trial_name"] == "trial-14"
-    assert result["trial_order"] == "result.json trial_results order"
+    assert result["trial_order"] == "sorted by each trial's own started_at timestamp"
     assert [row["n"] for row in result["comparisons"]] == [5, 10, 15]
     assert set(result["comparisons"][-1]["pass_at_k"]) == {
         "1",

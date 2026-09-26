@@ -9,6 +9,11 @@ data/cartwheel.db
 
 # Local conversation state and scenario/replay run outputs.
 .sessions.db
+.sessions.db-shm
+.sessions.db-wal
+.live_chat_sessions.db
+.live_chat_sessions.db-shm
+.live_chat_sessions.db-wal
 scenarios/results/
 replay/results/
 .harbor/
