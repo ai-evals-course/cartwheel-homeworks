@@ -18,6 +18,43 @@ import pytest
 from seed.generate import generate_world
 
 
+@pytest.fixture(autouse=True)
+def _no_leaked_ambient_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Guard every test against real credentials/global tracing state that
+    leaked in from outside this test, before this test's own body runs.
+
+    Two known, unrelated leaks motivate this, both invisible to the test
+    that actually trips over them:
+
+    - Importing litellm (e.g. via agents.extensions.models.litellm_model,
+      triggered by building an agent for any non-OpenAI model) runs
+      litellm's own `_dotenv.load_dotenv(override=True)` as a *module
+      import* side effect. That overwrites os.environ with this repo's
+      real .env values (LANGFUSE_*, etc.) once per process, on whichever
+      test happens to import it first -- invisible to and unfixable by
+      that test's own mocking, since it's third-party code.
+    - Calling the real (unmocked) instrument.setup_openai_tracing() or
+      instrument.instrument_genai() sets module-level globals
+      (_openai_tracing_enabled / _genai_instrumented) directly, which
+      monkeypatch cannot track or undo, so they stay flipped for every
+      later test.
+
+    Reset before each test, not just once at session start, because either
+    leak can first occur mid-session at any point.
+    """
+    from observability import instrument
+
+    for key in (
+        "LANGFUSE_PUBLIC_KEY",
+        "LANGFUSE_SECRET_KEY",
+        "LANGFUSE_HOST",
+        "CARTWHEEL_JUDGE_TRACE_SOURCE",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setattr(instrument, "_genai_instrumented", False)
+    monkeypatch.setattr(instrument, "_openai_tracing_enabled", False)
+
+
 @pytest.fixture(scope="session")
 def world(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Path]:
     root = tmp_path_factory.mktemp("world")
