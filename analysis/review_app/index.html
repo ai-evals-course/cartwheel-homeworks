@@ -188,6 +188,40 @@
   .lab-pill.fail.prov .n, .lab-pill.fail.prov .v { color: var(--error); }
   .lab-pill:hover { filter: brightness(0.96); }
   .lf { font-size: 11px; color: var(--muted); }
+
+  /* HW5 labels */
+  #hw5 { display: none; grid-template-columns: 260px 1fr; min-height: calc(100vh - 50px); }
+  #hw5.active { display: grid; }
+  #hw5-queue { border-right: 1px solid var(--line); background: var(--panel); overflow-y: auto; height: calc(100vh - 50px); position: sticky; top: 50px; }
+  #hw5-queue .q-head { padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .h5-item { padding: 6px 12px; border-bottom: 1px solid #f0f0ec; cursor: pointer; font-size: 12px; display: grid; grid-template-columns: 14px 1fr auto; gap: 6px; align-items: baseline; }
+  .h5-item:hover { background: #f4f4f0; } .h5-item.current { background: #ecebe5; }
+  .h5-item .dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #bbb; display: inline-block; }
+  .h5-item.pass .dot { background: var(--ok); border-color: var(--ok); }
+  .h5-item.fail .dot { background: var(--error); border-color: var(--error); }
+  .h5-item .why { color: var(--muted); grid-column: 2 / 4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #hw5-main { padding: 16px 24px 80px; max-width: 1000px; }
+  .h5-def { background: #eef2f7; border: 1px solid #c7d3e2; border-radius: 8px; padding: 5px 12px; margin-bottom: 10px; font-size: 12.5px; }
+  .h5-def summary { color: var(--ink); font-size: 12.5px; }
+  .h5-def ol, .h5-def ul { margin: 4px 0 4px 18px; padding: 0; }
+  .h5-why { background: #fff8e1; border-left: 3px solid var(--annot); padding: 6px 10px; margin-bottom: 12px; font-size: 13px; border-radius: 4px; }
+  .h5-turn { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; }
+  .h5-turn.context { background: #fafaf7; }
+  .h5-turn.target { border: 2px solid var(--ink); opacity: 1; }
+  .h5-turn .th { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .h5-turn .tbadge { background: var(--ink); color: #fff; border-radius: 999px; padding: 0 8px; font-weight: 600; font-size: 11px; }
+  .h5-hw4 { margin-top: 8px; font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 6px; }
+  .h5-hw4 .f { color: var(--error); font-weight: 600; }
+  .h5-ctl { position: sticky; bottom: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin-top: 12px; box-shadow: 0 -2px 8px rgba(0,0,0,.05); }
+  .h5-ctl .rules { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; margin-bottom: 6px; }
+  .h5-ctl .rules label { display: flex; gap: 5px; align-items: center; }
+  .h5-ctl .rules input { width: auto; margin: 0; }
+  .h5-ctl .row { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+  .h5-cur { font-size: 12.5px; }
+  .h5-quotes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; font-size: 12.5px; }
+  .h5-q { background: #fff1c2; border-bottom: 2px solid var(--annot); border-radius: 4px; padding: 1px 4px 1px 8px; display: inline-flex; gap: 6px; align-items: center; }
+  .h5-quotable { cursor: text; }
+  .h5-cur .p { color: var(--ok); font-weight: 700; } .h5-cur .x { color: var(--error); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -201,6 +235,7 @@
     <button data-view="labeling">Labeling</button>
     <button data-view="progress">Progress</button>
     <button data-view="suggestions">Suggestions <span id="sugg-count"></span></button>
+    <button data-view="hw5">HW5 labels</button>
   </span>
   <span class="spacer"></span>
   <span id="progress-strip"></span>
@@ -241,6 +276,12 @@
 <!-- SUGGESTIONS -->
 <div id="suggestions" class="view"><div class="page" id="suggestions-page"></div></div>
 
+<!-- HW5 LABELS -->
+<div id="hw5" class="view">
+  <div id="hw5-queue"></div>
+  <div id="hw5-main"></div>
+</div>
+
 <div id="popover">
   <div class="muted" style="font-size:11.5px" id="pop-quote"></div>
   <textarea id="pop-text" placeholder="What did you observe? Plain words, one failure."></textarea>
@@ -259,6 +300,9 @@
     <tr><td><kbd>r</kbd></td><td>mark reviewed (first failure noted) and advance</td></tr>
     <tr><td><kbd>1</kbd>..<kbd>8</kbd></td><td>labeling view: toggle Fail / Pass for mode N on the focused trace</td></tr>
     <tr><td><kbd>Tab</kbd></td><td>labeling view: move focus to the next trace</td></tr>
+    <tr><td><kbd>p</kbd> / <kbd>f</kbd></td><td>HW5 view: save Pass / Fail for the conversation and advance</td></tr>
+    <tr><td><kbd>1</kbd>..<kbd>3</kbd></td><td>HW5 view: toggle Fail rule N</td></tr>
+    <tr><td><kbd>t</kbd></td><td>HW5 view: move the target to the next turn</td></tr>
     <tr><td><kbd>Esc</kbd></td><td>close popover / help</td></tr>
   </table>
   <p class="muted" style="font-size:12px">Select any text in the conversation to annotate it.</p>
@@ -516,6 +560,20 @@ document.addEventListener('mouseup', e => {
   $('#pop-quote').textContent = '“' + text.slice(0, 140) + (text.length > 140 ? '…' : '') + '”';
   $('#pop-text').value = ''; $('#pop-novel').checked = false; $('#pop-text').focus();
 });
+// HW5: selecting text in a reply adds it as an evidence quote (no popover).
+document.addEventListener('mouseup', () => {
+  if (S.view !== 'hw5') return;
+  const sel = window.getSelection(); const text = sel ? sel.toString().replace(/\s+/g, ' ').trim() : '';
+  if (!text || !sel.rangeCount) return;
+  const node = sel.getRangeAt(0).commonAncestorContainer;
+  const body = (node.nodeType === 1 ? node : node.parentElement).closest('.h5-quotable');
+  if (!body) return;
+  sel.removeAllRanges();
+  if (S.hw5.quotes.some(q => q.trace_id === body.dataset.trace && q.text === text)) return;
+  S.hw5.quotes.push({trace_id: body.dataset.trace, text});
+  S.hw5.note = ($('#h5-note') || {}).value ?? S.hw5.note;
+  renderHW5(); toast('evidence added: not saved until you press Pass or Fail');
+});
 function closePopover() {
   $('#popover').style.display = 'none';
   if (pending && pending.mark && pending.mark.isConnected) { const m = pending.mark; m.replaceWith(...m.childNodes); }
@@ -706,6 +764,22 @@ function modeForm(i) {
 // ---------------------------------------------------------------------------
 // labeling
 // ---------------------------------------------------------------------------
+// One compact line per tool call: name(args) -> result summary.
+function toolLine(call) {
+  const args = Object.entries(call.args || {}).filter(([, v]) => v !== null && v !== '').map(([k, v]) => `${k}=${typeof v === 'string' ? v : JSON.stringify(v)}`).join(', ');
+  const r = call.result || {}; let out = '';
+  if (r.error) out = `error: ${r.error}`;
+  else if (Array.isArray(r.orders)) out = `${r.orders.length} order(s)` + (r.orders.length && r.orders.length <= 3 ? ': ' + r.orders.map(o => `#${o.order_id} $${o.total_usd} ${o.status}${o.refund_eligible ? ' eligible' : ''}`).join('; ') : '');
+  else if (r.order) out = `#${r.order.order_id} ${r.order.store_name || ''} $${r.order.total_usd} ${r.order.status}, delivered ${r.order.delivered_at || '-'}, ${r.order.refund_eligible ? 'eligible' : 'not eligible'}`;
+  else if (Array.isArray(r.results)) out = r.results.slice(0, 3).map(x => x.policy_id).join(', ') + (r.results.length > 3 ? ', …' : '');
+  else if (r.policy_id && r.body) out = `${r.policy_id} (${r.body.length} chars)`;
+  else if (r.return_window_days !== undefined) out = `${r.store_name || ''}: ${r.return_window_days} days${r.has_override ? ' (override)' : ''}`;
+  else if (Array.isArray(r.products)) out = `${r.products.length} product(s)`;
+  else if (r.status || r.ticket_id) out = [r.status, r.ticket_id ? `ticket ${r.ticket_id}` : null, r.refund_id ? `refund ${r.refund_id}` : null, r.amount_usd ? `$${r.amount_usd}` : null].filter(Boolean).join(' · ');
+  else out = JSON.stringify(r).slice(0, 90);
+  const isWrite = ['issue_refund', 'cancel_order', 'escalate_to_human'].includes(call.name);
+  return `<div class="lab-tool ${isWrite ? 'write' : ''}"><b>${esc(call.name)}</b>(${esc(args.slice(0, 80))}) <span class="muted">→ ${esc(out)}</span></div>`;
+}
 function renderLabeling() {
   const modes = labelingModes(); const allCount = finalModes().length;
   const c = S.convs[S.current];
@@ -715,21 +789,6 @@ function renderLabeling() {
   const unj = c.turns.reduce((n, tr) => n + modes.filter(m => pairState(m, tr.trace_id) !== 'done').length, 0);
   const inQueue = S.queue.length ? S.queue : S.list.map(x => x.scenario_id);
   const doneConvs = inQueue.filter(sid => { const cv = S.list.find(x => x.scenario_id === sid); return cv && (S.convs[sid] ? S.convs[sid].turns : []).length && S.convs[sid].turns.every(tr => modes.every(m => pairState(m, tr.trace_id) === 'done')); }).length;
-  const toolLine = call => {
-    const args = Object.entries(call.args || {}).filter(([, v]) => v !== null && v !== '').map(([k, v]) => `${k}=${typeof v === 'string' ? v : JSON.stringify(v)}`).join(', ');
-    const r = call.result || {}; let out = '';
-    if (r.error) out = `error: ${r.error}`;
-    else if (Array.isArray(r.orders)) out = `${r.orders.length} order(s)` + (r.orders.length && r.orders.length <= 3 ? ': ' + r.orders.map(o => `#${o.order_id} $${o.total_usd} ${o.status}${o.refund_eligible ? ' eligible' : ''}`).join('; ') : '');
-    else if (r.order) out = `#${r.order.order_id} ${r.order.store_name || ''} $${r.order.total_usd} ${r.order.status}, delivered ${r.order.delivered_at || '-'}, ${r.order.refund_eligible ? 'eligible' : 'not eligible'}`;
-    else if (Array.isArray(r.results)) out = r.results.slice(0, 3).map(x => x.policy_id).join(', ') + (r.results.length > 3 ? ', …' : '');
-    else if (r.policy_id && r.body) out = `${r.policy_id} (${r.body.length} chars)`;
-    else if (r.return_window_days !== undefined) out = `${r.store_name || ''}: ${r.return_window_days} days${r.has_override ? ' (override)' : ''}`;
-    else if (Array.isArray(r.products)) out = `${r.products.length} product(s)`;
-    else if (r.status || r.ticket_id) out = [r.status, r.ticket_id ? `ticket ${r.ticket_id}` : null, r.refund_id ? `refund ${r.refund_id}` : null, r.amount_usd ? `$${r.amount_usd}` : null].filter(Boolean).join(' · ');
-    else out = JSON.stringify(r).slice(0, 90);
-    const isWrite = ['issue_refund', 'cancel_order', 'escalate_to_human'].includes(call.name);
-    return `<div class="lab-tool ${isWrite ? 'write' : ''}"><b>${esc(call.name)}</b>(${esc(args.slice(0, 80))}) <span class="muted">→ ${esc(out)}</span></div>`;
-  };
   const notes = tr => annsFor(c.scenario_id).filter(a => a.trace_id === tr.trace_id && a.kind !== 'no_failure');
   const cards = c.turns.map((tr, ti) => `<div class="lab-card ${ti === S.labelFocus ? 'focus' : ''}" data-ti="${ti}">
     <div class="lab-conv">
@@ -834,12 +893,158 @@ function renderProgress() {
 }
 
 // ---------------------------------------------------------------------------
+// HW5 labels: one Pass (1) / Fail (0) per conversation for the selected mode
+// ---------------------------------------------------------------------------
+S.hw5 = {queue: {}, labels: {}, mode: null, filter: 'needs_review', current: null, target: null, rules: new Set(), note: '', quotes: []};
+const HW5_RULES = ['repetition', 'unneeded_mechanics', 'unsolicited_next_steps'];
+const HW5_NEIGHBORS = ['unsolicited_next_steps', 'irrelevant_policy_nuance', 'incomplete_outcome_report'];
+async function loadHW5() {
+  const d = await api('/api/hw5'); S.hw5.queue = d.queue || {}; S.hw5.labels = d.labels || {};
+  if (!S.hw5.mode) S.hw5.mode = Object.keys(S.hw5.queue)[0] || null;
+}
+function hw5Items() { return ((S.hw5.queue[S.hw5.mode] || {}).items) || []; }
+function hw5Label(sid) { return (S.hw5.labels[S.hw5.mode] || []).find(r => r.scenario_id === sid); }
+function hw5Visible() {
+  const f = S.hw5.filter;
+  return hw5Items().filter(i => f === 'all' || (f === 'needs_review' ? i.status === 'needs_review' : f === 'labeled' ? !!hw5Label(i.scenario_id) : i.status === f));
+}
+async function openHW5(sid) {
+  if (!sid) return;
+  if (!S.convs[sid]) S.convs[sid] = await api('/api/conversation/' + sid);
+  const item = hw5Items().find(i => i.scenario_id === sid); const l = hw5Label(sid);
+  S.hw5.current = sid; S.hw5.target = (l && l.trace_id) || (item && item.target_trace_id);
+  S.hw5.rules = new Set((l && l.rules) || []); S.hw5.note = (l && l.note) || '';
+  S.hw5.quotes = ((l && l.quotes) || []).map(q => ({...q}));
+  renderHW5(); window.scrollTo({top: 0});
+  const el = $(`#hw5-queue .h5-item[data-sid="${sid}"]`); if (el) el.scrollIntoView({block: 'nearest'});
+}
+function renderHW5() {
+  if (!S.hw5.mode) { $('#hw5-main').innerHTML = '<p class="muted">No HW5 queue yet. Run <code>uv run python -m analysis.hw5_queue</code>.</p>'; return; }
+  const items = hw5Items(); const vis = hw5Visible(); const rows = S.hw5.labels[S.hw5.mode] || [];
+  const nPass = rows.filter(r => r.label === 1).length, nFail = rows.filter(r => r.label === 0).length;
+  const count = st => items.filter(i => i.status === st).length;
+  $('#hw5-queue').innerHTML = `<div class="q-head">
+      <div><b class="mono">${esc(S.hw5.mode)}</b></div>
+      <div style="margin:4px 0">Pass <b style="color:var(--ok)">${nPass}</b> · Fail <b style="color:var(--error)">${nFail}</b> <span class="muted">(min 30 each)</span></div>
+      <select id="h5-filter" class="small">
+        ${[['needs_review', `needs review (${count('needs_review')})`], ['carried', `carried from HW4 (${count('carried')})`], ['done', `reviewed in HW5 (${count('done')})`], ['labeled', `all labeled (${rows.length})`], ['all', `all (${items.length})`]]
+          .map(([v, l]) => `<option value="${v}" ${v === S.hw5.filter ? 'selected' : ''}>${l}</option>`).join('')}
+      </select></div>
+    ${vis.map(i => { const l = hw5Label(i.scenario_id); const cls = !l ? '' : l.label === 1 ? 'pass' : 'fail';
+      const why = i.status === 'needs_review' ? (i.reasons || []).join('; ') : l ? `${l.label === 1 ? 'Pass' : 'Fail'} · ${l.origin || ''}${(l.rules || []).length ? ' · ' + l.rules.join(', ') : ''}` : '';
+      return `<div class="h5-item ${cls} ${i.scenario_id === S.hw5.current ? 'current' : ''}" data-sid="${i.scenario_id}"><span class="dot"></span><span class="mono">${i.scenario_id}</span><span class="muted">${esc(i.origin)}</span><span class="why">${esc(why)}</span></div>`; }).join('') || '<p class="muted" style="padding:0 12px">Nothing in this filter.</p>'}`;
+  $('#h5-filter').onchange = e => { S.hw5.filter = e.target.value; renderHW5(); };
+  $$('#hw5-queue .h5-item').forEach(el => el.onclick = () => openHW5(el.dataset.sid));
+
+  const c = S.convs[S.hw5.current]; const item = items.find(i => i.scenario_id === S.hw5.current);
+  if (!c || !item) { $('#hw5-main').innerHTML = '<p class="muted">Pick a conversation from the list.</p>'; return; }
+  const def = (S.hw5.queue[S.hw5.mode] || {}).definition || {}; const l = hw5Label(c.scenario_id);
+  const ti = Math.max(0, c.turns.findIndex(tr => tr.trace_id === S.hw5.target));
+  const hw4Line = tr => {
+    const bits = [];
+    const v = labelFor(S.hw5.mode, tr.trace_id);
+    if (v) bits.push(`${S.hw5.mode}: <span class="${v.label === 1 ? 'f' : ''}">${v.label === 1 ? 'FAIL' : 'pass'}</span> (${esc(v.source)})${v.note && v.source === 'human' ? ' · ' + esc(v.note.slice(0, 220)) : ''}`);
+    HW5_NEIGHBORS.forEach(n => { const x = labelFor(n, tr.trace_id); if (x && x.label === 1) bits.push(`${n}: <span class="f">FAIL</span> (${esc(x.source)})${x.note && x.source === 'human' ? ' · ' + esc(x.note.slice(0, 160)) : ''}`); });
+    annsFor(c.scenario_id).filter(a => a.trace_id === tr.trace_id && a.kind !== 'no_failure' && a.note).forEach(a => bits.push(`note: ${a.quote ? `<i>“${esc(a.quote.slice(0, 80))}”</i> ` : ''}${esc(a.note.slice(0, 200))}`));
+    return bits.length ? `<div class="h5-hw4"><b>HW4</b><br>${bits.join('<br>')}</div>` : '';
+  };
+  // Same timeline as the Review view: User box, model steps (thinking, tool calls
+  // with expandable results), then the reply.
+  const stepsHtml = tr => (tr.steps || []).map(stp => {
+    if (!stp.reasoning.length && !stp.calls.length) return '';
+    return `<div class="step"><div class="lbl">step ${stp.index + 1}${stp.latency_ms != null ? ` · ${(stp.latency_ms / 1000).toFixed(1)}s` : ''}</div>
+      ${stp.reasoning.map(r => `<div class="msg thinking"><div class="lbl">Thinking</div><div class="body">${esc(r)}</div></div>`).join('')}
+      ${stp.calls.map(cl => `<div class="${callClass(cl)}">
+        <div class="call-head"><span class="tri">▶</span><span class="name">${esc(cl.name)}</span><span class="args">${esc(JSON.stringify(cl.args))}</span><span class="sum">→ ${esc(cl.summary)}</span><span class="lat">${cl.latency_ms != null ? cl.latency_ms + ' ms' : ''}${cl.permission_denied ? ' · permission_denied' : ''}</span></div>
+        <div class="detail">${resultDetail(cl)}</div></div>`).join('')}
+    </div>`;
+  }).join('');
+  const turns = c.turns.map((tr, i) => `<div class="h5-turn ${i === ti ? 'target' : 'context'}">
+      <div class="th">turn ${i + 1} of ${c.turns.length} ${i === ti ? '<span class="tbadge">TARGET REPLY</span>' : i < ti ? '<span>context</span>' : '<span>after target</span>'}
+        <span style="flex:1"></span>${i !== ti ? `<button class="small" data-target="${tr.trace_id}">make target</button>` : ''}</div>
+      <div class="msg user"><div class="lbl">User</div><div class="body">${esc(tr.user)}</div></div>
+      ${stepsHtml(tr)}
+      ${tr.orphan_tools.length ? `<div class="msg" style="border-left-color:var(--error)"><div class="lbl">unpaired tool results</div><pre class="mono">${esc(JSON.stringify(tr.orphan_tools, null, 1))}</pre></div>` : ''}
+      <div class="msg reply"><div class="lbl">Reply${i === ti ? ' (being judged)' : ''} <span class="muted" style="font-weight:400;text-transform:none;letter-spacing:0">· select text to add it as evidence</span></div><div class="body h5-quotable" data-trace="${tr.trace_id}">${md(tr.reply || '')}</div></div>
+      ${hw4Line(tr)}
+    </div>`).join('');
+  const t = c.tuple || {};
+  $('#hw5-main').innerHTML = `
+    <details class="h5-def" ${S.hw5.defOpen ? 'open' : ''} id="h5-def"><summary><b>${esc(S.hw5.mode)} ${esc(def.version || '')}</b> · <b style="color:var(--error)">Fail</b> ${HW5_RULES.map((r, i) => `<kbd>${i + 1}</kbd> ${r.replace(/_/g, ' ')}`).join(' ')} · <b style="color:var(--ok)">Pass</b> answer + one citation + one line of context <span class="muted">(full definition)</span></summary>
+      <div style="margin-top:6px">${esc(def.question || '')}</div>
+      <ol>${HW5_RULES.map((r, i) => `<li><b>${r.replace(/_/g, ' ')}</b>: ${esc((def.fail_rules || {})[r] || '')}</li>`).join('')}</ol>
+      <b>Pass</b>: ${esc(def.pass || '')}<br><b>Never verbose</b>:<ul>${(def.never_verbose || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+      <span class="muted">${esc(def.unit || '')}</span></details>
+    <div class="line" style="margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b class="mono">${esc(c.scenario_id)}</b> <span class="badge role-${c.role}">${esc(c.role)}</span> <span class="chip">intent: <b>${esc(t.intent || '')}</b></span> <span class="badge ${c.group}">${esc(c.group || '')}</span> <span class="chip">${c.turns.length} turn${c.turns.length > 1 ? 's' : ''} · ${c.tool_call_count} tool calls</span>
+      <span style="flex:1"></span><a href="#" class="chip" id="h5-expand">${S.expandAll ? 'collapse' : 'expand'} all results <kbd>e</kbd></a><a href="#" class="chip" id="h5-sys">system prompt <kbd>s</kbd></a></div>
+    <div class="sysprompt mono muted" id="h5-sysprompt"><pre style="white-space:pre-wrap;margin:0 0 8px">${esc(c.system_prompt || '(none captured)')}</pre></div>
+    ${(item.reasons || []).length ? `<div class="h5-why"><b>Why this is in the queue:</b> ${item.reasons.map(esc).join('; ')}</div>` : ''}
+    ${turns}
+    <div class="h5-ctl">
+      <div class="h5-cur">${l ? `Current HW5 label: <span class="${l.label === 1 ? 'p' : 'x'}">${l.label === 1 ? 'PASS' : 'FAIL'}</span> <span class="muted">· ${esc(l.origin || '')} · ${esc(l.ts || '')}</span>` : '<span class="muted">No HW5 label yet.</span>'}</div>
+      <div class="rules" style="margin-top:6px">${HW5_RULES.map((r, i) => `<label><input type="checkbox" data-rule="${r}" ${S.hw5.rules.has(r) ? 'checked' : ''}> <kbd>${i + 1}</kbd> ${r.replace(/_/g, ' ')}</label>`).join('')}</div>
+      <div class="h5-quotes">${S.hw5.quotes.length ? S.hw5.quotes.map((q, qi) => `<span class="h5-q"><span class="muted">${c.turns.length > 1 ? `t${c.turns.findIndex(tr => tr.trace_id === q.trace_id) + 1} ` : ''}</span>“${esc(q.text)}” <button class="small" data-unquote="${qi}" title="remove">✕</button></span>`).join('') : '<span class="muted">No highlighted evidence. Select text in a reply to add it.</span>'}</div>
+      <textarea id="h5-note" placeholder="Evidence: quote the part of the target reply that decides it, and why (a short note is enough for Pass).">${esc(S.hw5.note)}</textarea>
+      <div class="row">
+        <button class="pass" id="h5-pass">Pass <kbd>p</kbd></button>
+        <button class="fail" id="h5-fail">Fail <kbd>f</kbd></button>
+        <span style="flex:1"></span>
+        <button class="small" id="h5-prev">← prev <kbd>k</kbd></button><button class="small" id="h5-next">next → <kbd>j</kbd></button>
+      </div>
+    </div>`;
+  $('#h5-def').ontoggle = e => { S.hw5.defOpen = e.target.open; };
+  $$('#hw5-main [data-unquote]').forEach(b => b.onclick = () => { S.hw5.quotes.splice(+b.dataset.unquote, 1); renderHW5(); });
+  S.hw5.quotes.forEach((q, qi) => { const el = $(`#hw5-main .h5-quotable[data-trace="${q.trace_id}"]`); if (el) highlightText(el, q.text, 'ann', 'h5q' + qi); });
+  $$('#hw5-main .call-head').forEach(h => h.onclick = () => h.parentElement.classList.toggle('open'));
+  $('#h5-expand').onclick = e => { e.preventDefault(); S.expandAll = !S.expandAll; renderHW5(); };
+  $('#h5-sys').onclick = e => { e.preventDefault(); $('#h5-sysprompt').classList.toggle('open'); };
+  $$('#hw5-main [data-target]').forEach(b => b.onclick = () => { S.hw5.target = b.dataset.target; renderHW5(); });
+  $$('#hw5-main [data-rule]').forEach(cb => cb.onchange = () => { cb.checked ? S.hw5.rules.add(cb.dataset.rule) : S.hw5.rules.delete(cb.dataset.rule); });
+  const ta = $('#h5-note'); ta.oninput = () => { S.hw5.note = ta.value; }; ta.onkeydown = e => { e.stopPropagation(); if (e.key === 'Escape') ta.blur(); };
+  $('#h5-pass').onclick = () => saveHW5(1); $('#h5-fail').onclick = () => saveHW5(0);
+  $('#h5-prev').onclick = () => stepHW5(-1); $('#h5-next').onclick = () => stepHW5(1);
+}
+function stepHW5(delta) {
+  const vis = hw5Visible().map(i => i.scenario_id); if (!vis.length) return;
+  const i = vis.indexOf(S.hw5.current);
+  openHW5(vis[i < 0 ? 0 : (i + delta + vis.length) % vis.length]);
+}
+async function saveHW5(label) {
+  const sid = S.hw5.current; if (!sid) return;
+  const rules = label === 0 ? [...S.hw5.rules] : [];
+  if (label === 0 && !rules.length) { toast('Fail: tick the rule(s) that apply (1, 2, 3)'); return; }
+  const before = hw5Visible().map(i => i.scenario_id); const pos = before.indexOf(sid);
+  try {
+    const res = await api('/api/hw5/label', {mode: S.hw5.mode, scenario_id: sid, trace_id: S.hw5.target, label, rules, note: S.hw5.note, quotes: S.hw5.quotes});
+    if (res.error) { toast(res.error); return; }
+    S.hw5.labels[S.hw5.mode] = (S.hw5.labels[S.hw5.mode] || []).filter(r => r.scenario_id !== sid).concat([res.row]);
+    const item = hw5Items().find(i => i.scenario_id === sid); if (item) { item.status = 'done'; item.target_trace_id = res.row.trace_id; }
+    toast(`${sid}: ${label === 1 ? 'Pass' : 'Fail'} saved`);
+  } catch (e) { toast('save failed'); return; }
+  // Advance to the next item in the (possibly shrunken) filtered list.
+  const after = hw5Visible().map(i => i.scenario_id);
+  const next = after.length ? (after.includes(sid) ? after[(after.indexOf(sid) + 1) % after.length] : after[Math.min(pos, after.length - 1)]) : null;
+  if (next && next !== sid) openHW5(next); else { renderHW5(); if (!after.length || next === sid) toast('queue done for this filter'); }
+}
+function hw5Key(e) {
+  if (e.key === 'j') { stepHW5(1); return; } if (e.key === 'k') { stepHW5(-1); return; }
+  if (e.key === 'p') { saveHW5(1); return; } if (e.key === 'f') { saveHW5(0); return; }
+  if (e.key === 'e') { S.expandAll = !S.expandAll; renderHW5(); return; }
+  if (e.key === 's') { const p = $('#h5-sysprompt'); if (p) p.classList.toggle('open'); return; }
+  if (e.key === 'a') { const t = $('#h5-note'); if (t) { t.focus(); e.preventDefault(); } return; }
+  if (e.key === 't') { const c = S.convs[S.hw5.current]; if (!c) return; const i = c.turns.findIndex(tr => tr.trace_id === S.hw5.target); S.hw5.target = c.turns[(i + 1) % c.turns.length].trace_id; renderHW5(); return; }
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= HW5_RULES.length) { const r = HW5_RULES[n - 1]; S.hw5.rules.has(r) ? S.hw5.rules.delete(r) : S.hw5.rules.add(r); renderHW5(); }
+}
+
+// ---------------------------------------------------------------------------
 // views, batches, keys, boot
 // ---------------------------------------------------------------------------
 function showView(v) {
   S.view = v; $$('#top .tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
   $$('.view').forEach(el => el.classList.toggle('active', el.id === v));
   if (v === 'annotations') renderAnnotations(); if (v === 'taxonomy') renderTaxonomy(); if (v === 'labeling') renderLabeling(); if (v === 'progress') renderProgress(); if (v === 'suggestions') renderSuggestions();
+  if (v === 'hw5') { const vis = hw5Visible(); if (!S.hw5.current && vis.length) openHW5(vis[0].scenario_id); else renderHW5(); }
   if (v === 'review') { renderQueue(); layoutNotes(); }
 }
 $$('#top .tabs button').forEach(b => b.onclick = () => showView(b.dataset.view));
@@ -856,6 +1061,7 @@ document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === 'Escape') { $('#help').classList.remove('show'); closePopover(); return; }
   if (e.key === '?') { $('#help').classList.toggle('show'); return; }
+  if (S.view === 'hw5') { hw5Key(e); return; }
   if (e.key === 'j') nextConv(1); else if (e.key === 'k') nextConv(-1);
   else if (S.view === 'review') {
     if (e.key === 'n') markNoFailure(); else if (e.key === 'r') nextConv(1);
@@ -895,6 +1101,7 @@ async function boot() {
   renderBatchSelect(); renderQueue(); $('#sugg-count').textContent = pendingCount();
   let start = qs.get('conv'); if (!start) { try { start = localStorage.getItem('cw-current'); } catch (e) {} }
   if (start && S.list.some(c => c.scenario_id === start)) await openConv(start); else if (S.queue.length) await openConv(S.queue[0]);
+  try { await loadHW5(); } catch (e) {}
   const view = qs.get('view'); if (view && $$('#top .tabs button').some(b => b.dataset.view === view)) showView(view);
   setInterval(poll, 4000);
 }

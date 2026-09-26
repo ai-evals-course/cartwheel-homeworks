@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "validate-evaluator": {
+      "source": "ai-evals-course/evals-skills",
+      "sourceType": "github",
+      "skillPath": "skills/validate-evaluator/SKILL.md",
+      "computedHash": "352940cb517f18754852de4d33def23f2639b2bf4ef27a075cee9750e81802ba"
+    },
+    "write-judge-prompt": {
+      "source": "ai-evals-course/evals-skills",
+      "sourceType": "github",
+      "skillPath": "skills/write-judge-prompt/SKILL.md",
+      "computedHash": "c87a033d0c3ed3efa07b651ed30a88b19ba12f062b6eba003de082a12ff0f8d2"
+    }
+  }
+}

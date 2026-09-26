@@ -30,6 +30,7 @@ The first live run fetches the 313 traces listed in `traces/support_traces.json`
 | Labeling | one Fail / Pass per (trace, mode) for the final modes; each judgment writes a Langfuse score and a line in `labels/<mode>.jsonl` | `analysis/state/labels/` |
 | Progress | reviewed counts per batch, role, group, intent; label completeness per mode | reads the above |
 | Suggestions | pending / accepted / rejected agent suggestions with the rejection reason | `analysis/state/suggestions.json` |
+| HW5 labels | one Pass / Fail per conversation for the HW5 mode: definition, target reply with earlier turns as context, HW4 labels and notes, Fail rule checkboxes, evidence note. No Langfuse score. | `analysis/state/hw5_labels/<mode>.jsonl` (1 = Pass, 0 = Fail), queue in `analysis/state/hw5_queue.json` |
 
 Batches come from `analysis/state/sample_manifest.json` (`batches: [{name, method, reason, scenario_ids}]`) and drive the review queue.
 
@@ -39,7 +40,9 @@ Batches come from `analysis/state/sample_manifest.json` (`batches: [{name, metho
 
 ## Keys
 
-`j` / `k` next / previous, `n` no failure observed and advance, `r` reviewed and advance, `a` focus the note box, `e` expand all tool results, `s` system prompt, `1`..`9`, `0` toggle mode N (0 = mode 10) in the Labeling view, `c` confirm all pairs on the conversation and advance, `Tab` next trace in Labeling, `?` key list.
+`j` / `k` next / previous, `n` no failure observed and advance, `r` reviewed and advance, `a` focus the note box, `e` expand all tool results, `s` system prompt, `1`..`9`, `0` toggle mode N (0 = mode 10) in the Labeling view, `c` confirm all pairs on the conversation and advance, `Tab` next trace in Labeling, `?` key list. HW5 labels view: `p` / `f` save Pass / Fail and advance, `1`..`3` toggle a Fail rule, `t` move the target to the next turn, `a` focus the evidence note, `j` / `k` next / previous.
+
+Build or refresh the HW5 queue with `uv run python -m analysis.hw5_queue` (add `--enrich 20` for new candidates). It never overwrites an existing HW5 label.
 
 ## Annotation record
 
