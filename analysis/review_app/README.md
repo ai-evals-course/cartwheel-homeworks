@@ -42,6 +42,8 @@ Batches come from `analysis/state/sample_manifest.json` (`batches: [{name, metho
 
 `j` / `k` next / previous, `n` no failure observed and advance, `r` reviewed and advance, `a` focus the note box, `e` expand all tool results, `s` system prompt, `1`..`9`, `0` toggle mode N (0 = mode 10) in the Labeling view, `c` confirm all pairs on the conversation and advance, `Tab` next trace in Labeling, `?` key list. HW5 labels view: `p` / `f` save Pass / Fail and advance, `1`..`3` toggle a Fail rule, `t` move the target to the next turn, `a` focus the evidence note, `j` / `k` next / previous.
 
+HW5 deep links: `?view=hw5&judge=verbose_reply-v0&filter=disagree&conv=support-0066` opens that judge version, list filter, and conversation (filters: `needs_review`, `carried`, `done`, `labeled`, `all`, `disagree`, `disagree_open`, `dev`, `train`).
+
 Build or refresh the HW5 queue with `uv run python -m analysis.hw5_queue` (add `--enrich 20` for new candidates). It never overwrites an existing HW5 label.
 
 ## Annotation record

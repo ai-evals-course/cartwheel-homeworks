@@ -1195,7 +1195,12 @@ async function boot() {
   let start = qs.get('conv'); if (!start) { try { start = localStorage.getItem('cw-current'); } catch (e) {} }
   if (start && S.list.some(c => c.scenario_id === start)) await openConv(start); else if (S.queue.length) await openConv(S.queue[0]);
   try { await loadHW5(); } catch (e) {}
+  // HW5 deep link: ?view=hw5&judge=<judge id>&filter=<filter>&conv=<scenario id>
+  if (qs.get('judge') && (S.hw5.judges[S.hw5.mode] || []).some(j => j.judge_id === qs.get('judge'))) S.hw5.judgeId = qs.get('judge');
+  if (qs.get('filter')) S.hw5.filter = qs.get('filter');
+  if (qs.get('view') === 'hw5' && qs.get('conv') && hw5Items().some(i => i.scenario_id === qs.get('conv'))) S.hw5.current = qs.get('conv');
   const view = qs.get('view'); if (view && $$('#top .tabs button').some(b => b.dataset.view === view)) showView(view);
+  if (S.view === 'hw5' && S.hw5.current) openHW5(S.hw5.current);
   setInterval(poll, 4000);
 }
 boot();

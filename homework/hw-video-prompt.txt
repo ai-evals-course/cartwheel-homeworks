@@ -1,0 +1,37 @@
+Create video review notes for Homework <N> of the Cartwheel course.
+
+Replace <N> with the homework number before running. Run from the repository root.
+
+## Read first
+
+1. `AGENTS.md`.
+2. The handout: `homework/module-*/hw<N>.md`. Find every instruction about the video (a "Video" section, a "record" paragraph in the last part, and any video mention in the introduction).
+3. The example to imitate: `homework/module-2/hw4-video-prep.md`.
+4. The student's own record of the work: `homework/module-*/hw<N>-progress.md`, `hw<N>-notes.md` if present, and the reports, prompts, labels, and state files those name. Use them as the only source of facts.
+5. `analysis/review_app/README.md` for how to start the review interface and build deep links.
+
+## Output
+
+Write `hw<N>-video-prep.md` in the same folder as `hw<N>.md`. Do not overwrite an existing file without asking; if one exists, show the differences and ask.
+
+## Format
+
+- Title: `# HW<N> video prep (<length and take rules from the handout>)`, then one line with the handout's title.
+- A short setup paragraph: the command to start the review interface, the deep link pattern, and what to have open (a terminal in the repo). Then a one-line command that opens every localhost link in the notes, like the HW4 example.
+- One `## <k>. <item>` subsection per video item, in the handout's order:
+  - Use the handout's exact wording for the header. If the handout lists the items as bullets, copy each bullet verbatim. If it gives them in a sentence, split the sentence into items and keep the handout's own words for each (capitalize the first letter, keep the rest as written). Include items that apply only in some cases, with their condition, unless the student skipped that part.
+  - Exactly two bullets:
+    - `- Open:` the file (with the section or search term) or the full URL to show. Prefer deep links into the review interface. For a terminal step, give the exact command in backticks.
+    - `- ` a 1 to 2 sentence explanation of what to say, with the specific ids, numbers, and decisions from the student's records. Two sentences at most: count them before saving, and cut detail rather than join clauses with semicolons.
+- No other sections unless the handout requires something that does not fit an item.
+
+## Rules
+
+- Record only what the student's files show. Never invent results, decisions, or reasons.
+- Where an item asks for the student's own judgment and their records do not state it (for example "whether you would use the judge"), give the facts they need and write `[Your decision: ...]` for them to fill in. Leave assessments and decisions to the student.
+- When an item asks for "one" example, pick the one that best shows the whole loop in the student's records and name it; do not list alternatives.
+- Check every file path and section you cite exists. Check every deep link points to a conversation, view, and filter that exist in the current state. Do not show held-out test predictions for a judge that is not frozen.
+- For numbers (rates, intervals, counts), copy them from the saved report files, not from memory, and name the file.
+- For any "recalculate live" item, give a command that reads only saved files and makes no model calls, and run it once to confirm it prints the expected numbers.
+- Plain, direct language. No em dashes.
+- When done, report the file path, the items you found in the handout, and anything you could not verify.
