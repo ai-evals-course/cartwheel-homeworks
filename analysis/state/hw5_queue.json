@@ -179,7 +179,7 @@
         "scenario_id": "support-0047",
         "target_trace_id": "1b8fec97e5b3f21c7180f8ee900a3695",
         "origin": "hw4",
-        "status": "carried",
+        "status": "done",
         "reasons": []
       },
       {
@@ -237,7 +237,7 @@
         "scenario_id": "support-0066",
         "target_trace_id": "fa015c4d50cc0ef5aedd2358b3704a6b",
         "origin": "hw4",
-        "status": "carried",
+        "status": "done",
         "reasons": []
       },
       {
@@ -587,7 +587,7 @@
         "scenario_id": "support-0183",
         "target_trace_id": "b0dfb8375799e4889ae99afdec9d1beb",
         "origin": "hw4",
-        "status": "carried",
+        "status": "done",
         "reasons": []
       },
       {

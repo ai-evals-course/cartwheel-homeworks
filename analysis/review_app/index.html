@@ -218,6 +218,17 @@
   .h5-ctl .rules input { width: auto; margin: 0; }
   .h5-ctl .row { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
   .h5-cur { font-size: 12.5px; }
+  .h5-judge { background: #f3f0ff; border: 1px solid #d9d0fb; border-left: 4px solid var(--sugg); border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 13px; }
+  .h5-judge.dis { border-left-color: var(--error); background: #fff4f2; border-color: #f3cfc9; }
+  .h5-judge .crit { margin-top: 4px; white-space: pre-wrap; color: #333; }
+  .h5-judge .p, .h5-item .p { color: var(--ok); font-weight: 700; } .h5-judge .x { color: var(--error); font-weight: 700; }
+  .h5-judge .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .h5-dis { color: var(--error); font-weight: 600; }
+  .h5-done { color: var(--ok); font-weight: 700; } .h5-flip { color: #b36b00; font-weight: 700; }
+  .h5-judge.fixed { border-left-color: var(--ok); background: #f1faf4; border-color: #cde8d6; }
+  .h5-status { margin: -2px 0 6px; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .h5-status.done { background: #dff3e6; color: #1d6b38; } .h5-status.flip { background: #fff1d6; color: #8a5200; } .h5-status.open { background: #fde2de; color: #9b2a1f; }
+  .h5-status a { color: inherit; margin-left: 6px; }
   .h5-quotes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; font-size: 12.5px; }
   .h5-q { background: #fff1c2; border-bottom: 2px solid var(--annot); border-radius: 4px; padding: 1px 4px 1px 8px; display: inline-flex; gap: 6px; align-items: center; }
   .h5-quotable { cursor: text; }
@@ -303,6 +314,7 @@
     <tr><td><kbd>p</kbd> / <kbd>f</kbd></td><td>HW5 view: save Pass / Fail for the conversation and advance</td></tr>
     <tr><td><kbd>1</kbd>..<kbd>3</kbd></td><td>HW5 view: toggle Fail rule N</td></tr>
     <tr><td><kbd>t</kbd></td><td>HW5 view: move the target to the next turn</td></tr>
+    <tr><td><kbd>n</kbd></td><td>HW5 view: next disagreement still to do</td></tr>
     <tr><td><kbd>Esc</kbd></td><td>close popover / help</td></tr>
   </table>
   <p class="muted" style="font-size:12px">Select any text in the conversation to annotate it.</p>
@@ -895,18 +907,55 @@ function renderProgress() {
 // ---------------------------------------------------------------------------
 // HW5 labels: one Pass (1) / Fail (0) per conversation for the selected mode
 // ---------------------------------------------------------------------------
-S.hw5 = {queue: {}, labels: {}, mode: null, filter: 'needs_review', current: null, target: null, rules: new Set(), note: '', quotes: []};
+S.hw5 = {splits: {}, judges: {}, reviews: [], judgeId: null, reviewDraft: '', queue: {}, labels: {}, mode: null, filter: 'needs_review', current: null, target: null, rules: new Set(), note: '', quotes: []};
 const HW5_RULES = ['repetition', 'unneeded_mechanics', 'unsolicited_next_steps'];
 const HW5_NEIGHBORS = ['unsolicited_next_steps', 'irrelevant_policy_nuance', 'incomplete_outcome_report'];
 async function loadHW5() {
   const d = await api('/api/hw5'); S.hw5.queue = d.queue || {}; S.hw5.labels = d.labels || {};
+  S.hw5.splits = d.splits || {}; S.hw5.judges = d.judges || {}; S.hw5.reviews = d.reviews || [];
   if (!S.hw5.mode) S.hw5.mode = Object.keys(S.hw5.queue)[0] || null;
+  const js = S.hw5.judges[S.hw5.mode] || [];
+  if (js.length && !js.some(j => j.judge_id === S.hw5.judgeId)) { S.hw5.judgeId = js[js.length - 1].judge_id; if (S.hw5.filter === 'needs_review') S.hw5.filter = 'disagree'; }
 }
 function hw5Items() { return ((S.hw5.queue[S.hw5.mode] || {}).items) || []; }
 function hw5Label(sid) { return (S.hw5.labels[S.hw5.mode] || []).find(r => r.scenario_id === sid); }
+function hw5Split(sid) { const l = hw5Label(sid); const sp = S.hw5.splits[S.hw5.mode] || {}; if (!l) return null; for (const n of ['train', 'dev', 'test']) if ((sp[n] || []).includes(l.trace_id)) return n; return null; }
+function hw5Judge() { return (S.hw5.judges[S.hw5.mode] || []).find(j => j.judge_id === S.hw5.judgeId) || null; }
+// Judge verdict (1 = Pass, 0 = Fail) for a conversation's labeled trace, if visible.
+function hw5Verdict(sid) { const j = hw5Judge(); const l = hw5Label(sid); if (!j || !l || !(l.trace_id in j.predictions)) return null; return {pred: j.predictions[l.trace_id], critique: j.critiques[l.trace_id]}; }
+function hw5Disagrees(sid) { const v = hw5Verdict(sid); const l = hw5Label(sid); return !!(v && l && v.pred !== l.label); }
+// In the judge's saved dev disagreement list (stays listed after a label fix).
+function hw5WasDisagreement(sid) { const j = hw5Judge(); const l = hw5Label(sid); return !!(j && l && (j.dev_disagreements || []).includes(l.trace_id)); }
+// open: no decision yet · flip: decided "label wrong" but the label still disagrees · done
+function hw5DisStatus(sid) {
+  if (!hw5WasDisagreement(sid)) return null;
+  const rv = hw5Review(sid);
+  if (!rv) return 'open';
+  if (rv.decision === 'label_wrong' && hw5Disagrees(sid)) return 'flip';
+  return 'done';
+}
+const HW5_DECISION_TEXT = {judge_wrong: 'judge is wrong', label_wrong: 'label fixed', definition_unclear: 'definition unclear'};
+function hw5DisCounts() { const all = hw5Items().filter(i => hw5WasDisagreement(i.scenario_id)); return {total: all.length, done: all.filter(i => hw5DisStatus(i.scenario_id) === 'done').length}; }
+function nextOpenDisagreement() {
+  const ids = hw5Items().filter(i => ['open', 'flip'].includes(hw5DisStatus(i.scenario_id))).map(i => i.scenario_id);
+  const order = ids.slice(ids.indexOf(S.hw5.current) + 1).concat(ids);
+  const next = order.find(sid => sid !== S.hw5.current);
+  if (next) openHW5(next); else { toast(`all ${hw5DisCounts().total} disagreements are done`); renderHW5(); }
+}
+function hw5Review(sid) { const l = hw5Label(sid); return l ? S.hw5.reviews.find(r => r.judge_id === S.hw5.judgeId && r.trace_id === l.trace_id) : null; }
 function hw5Visible() {
   const f = S.hw5.filter;
-  return hw5Items().filter(i => f === 'all' || (f === 'needs_review' ? i.status === 'needs_review' : f === 'labeled' ? !!hw5Label(i.scenario_id) : i.status === f));
+  return hw5Items().filter(i => {
+    const sid = i.scenario_id;
+    if (f === 'all') return true;
+    if (f === 'needs_review') return i.status === 'needs_review';
+    if (f === 'labeled') return !!hw5Label(sid);
+    if (f === 'disagree') return hw5WasDisagreement(sid);
+    if (f === 'disagree_open') return ['open', 'flip'].includes(hw5DisStatus(sid));
+    if (f === 'dev') return hw5Split(sid) === 'dev';
+    if (f === 'train') return hw5Split(sid) === 'train';
+    return i.status === f;
+  });
 }
 async function openHW5(sid) {
   if (!sid) return;
@@ -914,7 +963,7 @@ async function openHW5(sid) {
   const item = hw5Items().find(i => i.scenario_id === sid); const l = hw5Label(sid);
   S.hw5.current = sid; S.hw5.target = (l && l.trace_id) || (item && item.target_trace_id);
   S.hw5.rules = new Set((l && l.rules) || []); S.hw5.note = (l && l.note) || '';
-  S.hw5.quotes = ((l && l.quotes) || []).map(q => ({...q}));
+  S.hw5.quotes = ((l && l.quotes) || []).map(q => ({...q})); S.hw5.reviewDraft = '';
   renderHW5(); window.scrollTo({top: 0});
   const el = $(`#hw5-queue .h5-item[data-sid="${sid}"]`); if (el) el.scrollIntoView({block: 'nearest'});
 }
@@ -926,14 +975,29 @@ function renderHW5() {
   $('#hw5-queue').innerHTML = `<div class="q-head">
       <div><b class="mono">${esc(S.hw5.mode)}</b></div>
       <div style="margin:4px 0">Pass <b style="color:var(--ok)">${nPass}</b> · Fail <b style="color:var(--error)">${nFail}</b> <span class="muted">(min 30 each)</span></div>
+      ${(S.hw5.judges[S.hw5.mode] || []).length ? (() => { const j = hw5Judge(); const it = (j && j.iterations.length) ? j.iterations[j.iterations.length - 1] : null;
+        return `<div style="margin:4px 0"><select id="h5-judge" class="small">${S.hw5.judges[S.hw5.mode].map(x => `<option value="${esc(x.judge_id)}" ${x.judge_id === S.hw5.judgeId ? 'selected' : ''}>${esc(x.judge_id)} · ${esc(x.status)}</option>`).join('')}</select>
+          ${it ? `<div class="muted">dev TPR ${it.dev_tpr} · TNR ${it.dev_tnr} <span title="as computed when the run finished">(at run time)</span></div>` : ''}
+          ${j && j.withheld_test ? `<div class="muted">${j.withheld_test} test predictions hidden until frozen</div>` : ''}
+          ${(() => { const k = hw5DisCounts(); if (!k.total) return ''; return `<div style="margin-top:6px"><b>${k.done} / ${k.total}</b> disagreements done${k.done === k.total ? ' <span class="h5-done">✓ all done</span>' : ''}<div class="bar" style="margin-top:3px"><i style="width:${100 * k.done / k.total}%"></i></div></div>`; })()}</div>`; })() : ''}
       <select id="h5-filter" class="small">
+        ${(S.hw5.judges[S.hw5.mode] || []).length ? [['disagree', `dev disagreements (${hw5DisCounts().total})`], ['disagree_open', `disagreements still to do (${hw5DisCounts().total - hw5DisCounts().done})`], ['dev', `dev split (${hw5Items().filter(i => hw5Split(i.scenario_id) === 'dev').length})`], ['train', `training split (${hw5Items().filter(i => hw5Split(i.scenario_id) === 'train').length})`]]
+          .map(([v, l]) => `<option value="${v}" ${v === S.hw5.filter ? 'selected' : ''}>${l}</option>`).join('') : ''}
         ${[['needs_review', `needs review (${count('needs_review')})`], ['carried', `carried from HW4 (${count('carried')})`], ['done', `reviewed in HW5 (${count('done')})`], ['labeled', `all labeled (${rows.length})`], ['all', `all (${items.length})`]]
           .map(([v, l]) => `<option value="${v}" ${v === S.hw5.filter ? 'selected' : ''}>${l}</option>`).join('')}
       </select></div>
     ${vis.map(i => { const l = hw5Label(i.scenario_id); const cls = !l ? '' : l.label === 1 ? 'pass' : 'fail';
       const why = i.status === 'needs_review' ? (i.reasons || []).join('; ') : l ? `${l.label === 1 ? 'Pass' : 'Fail'} · ${l.origin || ''}${(l.rules || []).length ? ' · ' + l.rules.join(', ') : ''}` : '';
-      return `<div class="h5-item ${cls} ${i.scenario_id === S.hw5.current ? 'current' : ''}" data-sid="${i.scenario_id}"><span class="dot"></span><span class="mono">${i.scenario_id}</span><span class="muted">${esc(i.origin)}</span><span class="why">${esc(why)}</span></div>`; }).join('') || '<p class="muted" style="padding:0 12px">Nothing in this filter.</p>'}`;
+      const v = hw5Verdict(i.scenario_id); const sp = hw5Split(i.scenario_id); const rv = hw5Review(i.scenario_id);
+      const ds = hw5DisStatus(i.scenario_id);
+      const jm = !v ? `<span class="muted">${esc(sp || i.origin)}</span>`
+        : ds === 'done' ? `<span class="h5-done">✓ done</span>`
+        : ds === 'flip' ? `<span class="h5-flip">flip label</span>`
+        : ds === 'open' ? `<span class="h5-dis">to decide</span>`
+        : `<span class="muted">judge ${v.pred === 1 ? 'Pass' : 'Fail'}</span>`;
+      return `<div class="h5-item ${cls} ${i.scenario_id === S.hw5.current ? 'current' : ''}" data-sid="${i.scenario_id}"><span class="dot"></span><span class="mono">${i.scenario_id}</span>${jm}<span class="why">${esc(why)}</span></div>`; }).join('') || '<p class="muted" style="padding:0 12px">Nothing in this filter.</p>'}`;
   $('#h5-filter').onchange = e => { S.hw5.filter = e.target.value; renderHW5(); };
+  const jsel = $('#h5-judge'); if (jsel) jsel.onchange = e => { S.hw5.judgeId = e.target.value; renderHW5(); };
   $$('#hw5-queue .h5-item').forEach(el => el.onclick = () => openHW5(el.dataset.sid));
 
   const c = S.convs[S.hw5.current]; const item = items.find(i => i.scenario_id === S.hw5.current);
@@ -960,8 +1024,8 @@ function renderHW5() {
     </div>`;
   }).join('');
   const turns = c.turns.map((tr, i) => `<div class="h5-turn ${i === ti ? 'target' : 'context'}">
-      <div class="th">turn ${i + 1} of ${c.turns.length} ${i === ti ? '<span class="tbadge">TARGET REPLY</span>' : i < ti ? '<span>context</span>' : '<span>after target</span>'}
-        <span style="flex:1"></span>${i !== ti ? `<button class="small" data-target="${tr.trace_id}">make target</button>` : ''}</div>
+      <div class="th">turn ${i + 1} of ${c.turns.length} ${i === ti ? `<span class="tbadge">TARGET REPLY${c.turns.length > 1 ? ' · judge this turn only' : ''}</span>` : i < ti ? '<span>context</span>' : '<span>after target: not judged, not sent to the judge</span>'}
+        <span style="flex:1"></span>${i !== ti && !hw5Split(c.scenario_id) ? `<button class="small" data-target="${tr.trace_id}">make target</button>` : ''}</div>
       <div class="msg user"><div class="lbl">User</div><div class="body">${esc(tr.user)}</div></div>
       ${stepsHtml(tr)}
       ${tr.orphan_tools.length ? `<div class="msg" style="border-left-color:var(--error)"><div class="lbl">unpaired tool results</div><pre class="mono">${esc(JSON.stringify(tr.orphan_tools, null, 1))}</pre></div>` : ''}
@@ -980,6 +1044,21 @@ function renderHW5() {
     <div class="sysprompt mono muted" id="h5-sysprompt"><pre style="white-space:pre-wrap;margin:0 0 8px">${esc(c.system_prompt || '(none captured)')}</pre></div>
     ${(item.reasons || []).length ? `<div class="h5-why"><b>Why this is in the queue:</b> ${item.reasons.map(esc).join('; ')}</div>` : ''}
     ${turns}
+    ${(() => { const v = hw5Verdict(c.scenario_id); if (!v) return ''; const dis = hw5Disagrees(c.scenario_id); const rv = hw5Review(c.scenario_id);
+      const ds = hw5DisStatus(c.scenario_id); const flipTo = v.pred === 1 ? 'Pass' : 'Fail';
+      const banner = ds === 'done' ? `<div class="h5-status done">✓ Done: ${esc(HW5_DECISION_TEXT[rv.decision])}${rv.decision === 'label_wrong' ? ` (your label now matches the judge: ${flipTo})` : ''}. <a href="#" class="h5-next">Next disagreement →</a></div>`
+        : ds === 'flip' ? `<div class="h5-status flip">Almost done: you chose "my label is wrong", so change your label below to <b>${flipTo}</b> (tick a rule if Fail).</div>`
+        : ds === 'open' ? `<div class="h5-status open">To do: choose one of the three decisions below and add a short note.</div>` : '';
+      return `<div class="h5-judge ${ds ? (ds === 'done' ? 'fixed' : 'dis') : ''}">
+        ${banner}
+        <div><b>${esc(S.hw5.judgeId)}</b>: <span class="${v.pred === 1 ? 'p' : 'x'}">${v.pred === 1 ? 'PASS' : 'FAIL'}</span> · you: <span class="${l.label === 1 ? 'p' : 'x'}">${l.label === 1 ? 'PASS' : 'FAIL'}</span> ${dis ? '· <b>disagreement</b>' : ds ? '· <b>agree now</b> (was a disagreement)' : '· agree'}</div>
+        <div class="crit">${esc(v.critique || '(no critique saved)')}</div>
+        ${ds ? `<div class="row" style="margin-top:6px">
+          ${[['judge_wrong', 'Judge is wrong (fix prompt)'], ['label_wrong', 'My label is wrong (fix label)'], ['definition_unclear', 'Definition is unclear']].map(([k, t]) => `<button class="small ${rv && rv.decision === k ? 'primary' : ''}" data-decide="${k}">${t}</button>`).join('')}
+        </div>
+        <textarea id="h5-rnote" placeholder="Why? What should change in the prompt or the definition? (saved with the decision)" style="margin-top:6px;min-height:40px">${esc(rv ? rv.note || '' : S.hw5.reviewDraft)}</textarea>
+        ${rv ? `<div class="muted" style="font-size:11.5px">decided ${esc(rv.decision.replace(/_/g, ' '))} · ${esc(rv.ts)}. If your label is wrong, change it below; if the definition changes, recheck affected labels.</div>` : ''}` : ''}
+      </div>`; })()}
     <div class="h5-ctl">
       <div class="h5-cur">${l ? `Current HW5 label: <span class="${l.label === 1 ? 'p' : 'x'}">${l.label === 1 ? 'PASS' : 'FAIL'}</span> <span class="muted">· ${esc(l.origin || '')} · ${esc(l.ts || '')}</span>` : '<span class="muted">No HW5 label yet.</span>'}</div>
       <div class="rules" style="margin-top:6px">${HW5_RULES.map((r, i) => `<label><input type="checkbox" data-rule="${r}" ${S.hw5.rules.has(r) ? 'checked' : ''}> <kbd>${i + 1}</kbd> ${r.replace(/_/g, ' ')}</label>`).join('')}</div>
@@ -993,6 +1072,9 @@ function renderHW5() {
       </div>
     </div>`;
   $('#h5-def').ontoggle = e => { S.hw5.defOpen = e.target.open; };
+  $$('#hw5-main .h5-next').forEach(a => a.onclick = e => { e.preventDefault(); nextOpenDisagreement(); });
+  $$('#hw5-main [data-decide]').forEach(b => b.onclick = () => saveHW5Review(b.dataset.decide));
+  const rn = $('#h5-rnote'); if (rn) { rn.oninput = () => { S.hw5.reviewDraft = rn.value; }; rn.onkeydown = e => { e.stopPropagation(); if (e.key === 'Escape') rn.blur(); }; }
   $$('#hw5-main [data-unquote]').forEach(b => b.onclick = () => { S.hw5.quotes.splice(+b.dataset.unquote, 1); renderHW5(); });
   S.hw5.quotes.forEach((q, qi) => { const el = $(`#hw5-main .h5-quotable[data-trace="${q.trace_id}"]`); if (el) highlightText(el, q.text, 'ann', 'h5q' + qi); });
   $$('#hw5-main .call-head').forEach(h => h.onclick = () => h.parentElement.classList.toggle('open'));
@@ -1003,6 +1085,16 @@ function renderHW5() {
   const ta = $('#h5-note'); ta.oninput = () => { S.hw5.note = ta.value; }; ta.onkeydown = e => { e.stopPropagation(); if (e.key === 'Escape') ta.blur(); };
   $('#h5-pass').onclick = () => saveHW5(1); $('#h5-fail').onclick = () => saveHW5(0);
   $('#h5-prev').onclick = () => stepHW5(-1); $('#h5-next').onclick = () => stepHW5(1);
+}
+async function saveHW5Review(decision) {
+  const sid = S.hw5.current; const l = hw5Label(sid); if (!l) return;
+  const rn = $('#h5-rnote'); const note = rn ? rn.value : S.hw5.reviewDraft;
+  try {
+    const res = await api('/api/hw5/review', {judge_id: S.hw5.judgeId, trace_id: l.trace_id, scenario_id: sid, decision, note});
+    if (res.error) { toast(res.error); return; }
+    S.hw5.reviews = S.hw5.reviews.filter(r => !(r.judge_id === res.row.judge_id && r.trace_id === res.row.trace_id)).concat([res.row]);
+    toast(hw5DisStatus(sid) === 'done' ? `${sid}: done (${HW5_DECISION_TEXT[decision]})` : `${sid}: now change your label`); renderHW5();
+  } catch (e) { toast('save failed'); }
 }
 function stepHW5(delta) {
   const vis = hw5Visible().map(i => i.scenario_id); if (!vis.length) return;
@@ -1019,7 +1111,7 @@ async function saveHW5(label) {
     if (res.error) { toast(res.error); return; }
     S.hw5.labels[S.hw5.mode] = (S.hw5.labels[S.hw5.mode] || []).filter(r => r.scenario_id !== sid).concat([res.row]);
     const item = hw5Items().find(i => i.scenario_id === sid); if (item) { item.status = 'done'; item.target_trace_id = res.row.trace_id; }
-    toast(`${sid}: ${label === 1 ? 'Pass' : 'Fail'} saved`);
+    toast(`${sid}: ${label === 1 ? 'Pass' : 'Fail'} saved${hw5DisStatus(sid) === 'done' ? ' · disagreement done' : ''}`);
   } catch (e) { toast('save failed'); return; }
   // Advance to the next item in the (possibly shrunken) filtered list.
   const after = hw5Visible().map(i => i.scenario_id);
@@ -1028,11 +1120,12 @@ async function saveHW5(label) {
 }
 function hw5Key(e) {
   if (e.key === 'j') { stepHW5(1); return; } if (e.key === 'k') { stepHW5(-1); return; }
+  if (e.key === 'n') { nextOpenDisagreement(); return; }
   if (e.key === 'p') { saveHW5(1); return; } if (e.key === 'f') { saveHW5(0); return; }
   if (e.key === 'e') { S.expandAll = !S.expandAll; renderHW5(); return; }
   if (e.key === 's') { const p = $('#h5-sysprompt'); if (p) p.classList.toggle('open'); return; }
   if (e.key === 'a') { const t = $('#h5-note'); if (t) { t.focus(); e.preventDefault(); } return; }
-  if (e.key === 't') { const c = S.convs[S.hw5.current]; if (!c) return; const i = c.turns.findIndex(tr => tr.trace_id === S.hw5.target); S.hw5.target = c.turns[(i + 1) % c.turns.length].trace_id; renderHW5(); return; }
+  if (e.key === 't') { const c = S.convs[S.hw5.current]; if (!c) return; if (hw5Split(S.hw5.current)) { toast('target is locked: this conversation is in the split'); return; } const i = c.turns.findIndex(tr => tr.trace_id === S.hw5.target); S.hw5.target = c.turns[(i + 1) % c.turns.length].trace_id; renderHW5(); return; }
   const n = parseInt(e.key, 10);
   if (n >= 1 && n <= HW5_RULES.length) { const r = HW5_RULES[n - 1]; S.hw5.rules.has(r) ? S.hw5.rules.delete(r) : S.hw5.rules.add(r); renderHW5(); }
 }

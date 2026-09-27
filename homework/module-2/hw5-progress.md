@@ -78,17 +78,18 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 
 ### Part C, write and refine the judge
 - [x] Draft with `write-judge-prompt`, training examples only: `analysis/prompts/verbose_reply-v0.txt` (examples: 0134 clear Pass, 0164 clear Fail, 0237 borderline Pass; all training)
-- [ ] Boundary review against neighbors; instruction to ignore instructions quoted in the trace
-- [ ] Approve model and trace count before the paid dev batch
-- [ ] `run_development`: v0 dev metrics to `analysis/report/dev-<judge_id>.json`
-- [ ] Review app shows judge verdict and critique beside my label; inspect every disagreement
+- [x] Boundary review against neighbors; instruction to ignore instructions quoted in the trace
+- [x] Approve model and trace count before the paid dev batch (gpt-4o-mini, 40 dev traces, approved 2026-09-26)
+- [x] `run_development`: v0 dev metrics to `analysis/report/dev-verbose_reply-v0.json`
+- [x] Review app shows judge verdict and critique beside my label (HW5 tab, decisions saved to `analysis/state/hw5_dev_review.jsonl`)
+- [ ] Inspect every v0 disagreement (14) and record a decision
 - [ ] Revision 1 (optional)
 - [ ] Revision 2 (optional, max)
 - [ ] Why I stopped revising
 
 | Version | Change | Dev TPR [95% CI] | Dev TNR [95% CI] | Label flips |
 | --- | --- | --- | --- | --- |
-| v0 | | | | |
+| v0 | initial draft (0134, 0164, 0237 examples; visible conversation only) | 0.333 [0.172, 0.546] (TP 7, FN 14) | 1.000 [0.832, 1.000] (TN 19, FP 0) | 0 |
 
 ### Part D, freeze and test
 - [ ] Choose final version (my decision)
@@ -117,3 +118,4 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 - **2026-09-26, light uniform trim.** Judge inputs drop the model's pre-tool text (`agent_reasoning`): the user never sees it and it was not evidence for any label. Every tool call and result stays, because rule 2 (relevance to the user's situation) and the RESP-8 exception depend on order records and write results (HW5 handout line 92: include the tool data used to decide). Same rule for every record. Median input 2.6k to 1.8k characters.
 - **2026-09-26, support-0194 kept Fail** (training): repetition, the delivery date is stated three ways.
 - **2026-09-26, visible conversation only.** Tool calls and results removed from the prompt examples and from `hw5_trace_inputs.json` (option A): verbosity is judged from what the user saw, and I labeled from the reply itself. Inputs are `user` and `assistant` messages for every turn up to the target (median 645 characters). Supersedes the light-trim entry above. Trace ids unchanged, so the split stands. Known risk: relevance calls that depend on facts the reply does not state (for example support-0008, where no store override applied).
+- **2026-09-26, target turn mix-up (dev).** The queue picked the target turn from HW4 labels, including agent-provisional ones. For support-0120 and support-0038 that made turn 1 of 2 the target, while I read to the end of the conversation. The judge saw only turn 1. Inputs are locked after v0, so the fix is to relabel those two against turn 1, not to move the target. The review app no longer allows moving the target for conversations in the split.

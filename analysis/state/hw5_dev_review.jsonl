@@ -1,0 +1,14 @@
+{"judge_id": "verbose_reply-v0", "trace_id": "5409b3cfa7c03957cccebf4361316979", "scenario_id": "support-0006", "decision": "label_wrong", "note": null, "ts": "2026-09-27T01:32:21+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "2ef8a2a1c8e8e40b12af387014c5a0af", "scenario_id": "support-0028", "decision": "judge_wrong", "note": null, "ts": "2026-09-27T01:06:00+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "8d9b7ca383decc606861ae9405a7b3c3", "scenario_id": "support-0042", "decision": "judge_wrong", "note": null, "ts": "2026-09-27T01:08:36+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "1b8fec97e5b3f21c7180f8ee900a3695", "scenario_id": "support-0047", "decision": "label_wrong", "note": "Although the person didn't ask about how disputes are handled, they did ask about disputes, and these are additional details relevant to a dispute. However \"not automatically\" is a fail", "ts": "2026-09-27T01:10:45+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "fa015c4d50cc0ef5aedd2358b3704a6b", "scenario_id": "support-0066", "decision": "label_wrong", "note": null, "ts": "2026-09-27T01:12:17+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "891be4deb9dc6edd8ba871ee3d54500a", "scenario_id": "support-0087", "decision": "judge_wrong", "note": null, "ts": "2026-09-27T01:17:06+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "c8028783f8a9ef8b275855fa5e1125c9", "scenario_id": "support-0115", "decision": "judge_wrong", "note": null, "ts": "2026-09-27T01:18:20+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "168a15f8b84afda8f86b4a50f1b84eed", "scenario_id": "support-0120", "decision": "label_wrong", "note": null, "ts": "2026-09-27T01:23:49+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "e8b29aebeba277d2188c44b7b06fa857", "scenario_id": "support-0132", "decision": "judge_wrong", "note": null, "ts": "2026-09-27T01:21:06+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "61bc4731a02edf2386259eabdef1747f", "scenario_id": "support-0172", "decision": "definition_unclear", "note": null, "ts": "2026-09-27T01:22:16+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "6e1176c923472c7dfd512ef36097b020", "scenario_id": "support-0174", "decision": "definition_unclear", "note": null, "ts": "2026-09-27T01:25:19+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "b0dfb8375799e4889ae99afdec9d1beb", "scenario_id": "support-0183", "decision": "label_wrong", "note": null, "ts": "2026-09-27T01:26:37+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "f3dd0cc0250e005e551762780c888874", "scenario_id": "support-0229", "decision": "definition_unclear", "note": null, "ts": "2026-09-27T01:30:19+00:00"}
+{"judge_id": "verbose_reply-v0", "trace_id": "e7cec92d6e2a72b0e19b082a972b5e8e", "scenario_id": "support-0250", "decision": "definition_unclear", "note": null, "ts": "2026-09-27T01:31:27+00:00"}

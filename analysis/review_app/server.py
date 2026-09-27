@@ -37,6 +37,7 @@ API:
     POST /api/labels                   one judgment: file line + Langfuse score
     GET  /api/hw5                      HW5 queue, definition, and labels per mode
     POST /api/hw5/label                one HW5 conversation label (1 = Pass, 0 = Fail)
+    POST /api/hw5/review               my decision on one judge disagreement
 """
 
 from __future__ import annotations
@@ -61,6 +62,8 @@ STATE_DIR = ROOT / "analysis" / "state"
 LABELS_DIR = STATE_DIR / "labels"
 HW5_LABELS_DIR = STATE_DIR / "hw5_labels"
 HW5_QUEUE_FILE = STATE_DIR / "hw5_queue.json"
+HW5_REVIEW_FILE = STATE_DIR / "hw5_dev_review.jsonl"
+HW5_DECISIONS = ("judge_wrong", "label_wrong", "definition_unclear")
 CACHE_DIR = APP_DIR / ".cache"
 CACHE_FILE = CACHE_DIR / "traces.json"
 EXPORT_FILE = ROOT / "traces" / "support_traces.json"
@@ -518,11 +521,67 @@ def write_label(entry: dict[str, Any], *, offline: bool) -> dict[str, Any]:
     return {"row": row, "langfuse": langfuse_status}
 
 
+def read_hw5_judges(mode: str) -> list[dict[str, Any]]:
+    """Each judge version's verdicts and critiques for ``mode``.
+
+    Predictions use Pass = 1. Test-split predictions are withheld until the
+    version is frozen, so they cannot be seen while choosing the prompt.
+    """
+    splits = _read_json(STATE_DIR / "splits.json", {}).get(mode, {})
+    split_of = {tid: name for name in ("train", "dev", "test") for tid in splits.get(name, [])}
+    out = []
+    for path in sorted((STATE_DIR / "judges").glob(f"{mode}-v*.json"), key=lambda p: int(p.stem.rsplit("-v", 1)[1])):
+        judge = _read_json(path, {})
+        digest = judge.get("prompt_hash")
+        frozen = judge.get("status") == "frozen"
+        preds = (judge.get("predictions") or {}).get(digest, {})
+        critiques = (judge.get("critiques") or {}).get(digest, {})
+        visible = {tid for tid in preds if frozen or split_of.get(tid) != "test"}
+        out.append({
+            "judge_id": judge.get("judge_id"),
+            "status": judge.get("status"),
+            "model": judge.get("model"),
+            "iterations": judge.get("iterations", []),
+            "predictions": {tid: preds[tid] for tid in visible},
+            "critiques": {tid: critiques.get(tid) for tid in visible},
+            "withheld_test": len(preds) - len(visible),
+            # Disagreements as saved when the dev run finished, so a later label
+            # fix does not drop the conversation from the review list.
+            "dev_disagreements": _read_json(ROOT / "analysis" / "report" / f"dev-{judge.get('judge_id')}.json", {}).get("disagreements", []),
+        })
+    return out
+
+
 def read_hw5() -> dict[str, Any]:
-    """HW5 queue plus the current labels for every mode in it."""
+    """HW5 queue, current labels, split membership, and judge verdicts per mode."""
     queue = _read_json(HW5_QUEUE_FILE, {})
     labels = {mode: _read_jsonl(HW5_LABELS_DIR / f"{mode}.jsonl") for mode in queue}
-    return {"queue": queue, "labels": labels}
+    all_splits = _read_json(STATE_DIR / "splits.json", {})
+    splits = {mode: {name: all_splits.get(mode, {}).get(name, []) for name in ("train", "dev", "test")} for mode in queue}
+    judges = {mode: read_hw5_judges(mode) for mode in queue}
+    reviews = _read_jsonl(HW5_REVIEW_FILE)
+    return {"queue": queue, "labels": labels, "splits": splits, "judges": judges, "reviews": reviews}
+
+
+def write_hw5_review(entry: dict[str, Any]) -> dict[str, Any]:
+    """Record my decision on one judge disagreement (latest per judge and trace)."""
+    if entry.get("decision") not in HW5_DECISIONS:
+        raise ValueError(f"decision must be one of {HW5_DECISIONS}")
+    row = {
+        "judge_id": entry["judge_id"],
+        "trace_id": entry["trace_id"],
+        "scenario_id": entry.get("scenario_id"),
+        "decision": entry["decision"],
+        "note": (entry.get("note") or "").strip() or None,
+        "ts": _now(),
+    }
+    with _LOCK:
+        rows = [r for r in _read_jsonl(HW5_REVIEW_FILE)
+                if not (r["judge_id"] == row["judge_id"] and r["trace_id"] == row["trace_id"])]
+        rows.append(row)
+        rows.sort(key=lambda r: (r["judge_id"], str(r.get("scenario_id") or "")))
+        _write_jsonl(HW5_REVIEW_FILE, rows)
+    return {"row": row}
 
 
 def write_hw5_label(entry: dict[str, Any]) -> dict[str, Any]:
@@ -680,6 +739,16 @@ class Handler(BaseHTTPRequestHandler):
                 return
             try:
                 self._json(write_hw5_label(data))
+            except ValueError as exc:
+                self._json({"error": str(exc)}, 400)
+            return
+        if path == "/api/hw5/review":
+            required = {"judge_id", "trace_id", "decision"}
+            if not isinstance(data, dict) or not required <= set(data):
+                self._json({"error": f"need {sorted(required)}"}, 400)
+                return
+            try:
+                self._json(write_hw5_review(data))
             except ValueError as exc:
                 self._json({"error": str(exc)}, 400)
             return
