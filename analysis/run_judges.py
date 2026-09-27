@@ -12,14 +12,12 @@ The judge reads ``analysis/state/hw5_trace_inputs.json`` through
 into ``role: content`` lines, so the records are shaped for that text:
 
 - ``user``: the user's message.
-- Text the model wrote before a tool call ("I'll look up...") is left out.
-  The chat does not show it to the user, and the judge rates only the reply
-  the user saw.
-- ``tool_call`` / ``tool_result``: ``name`` plus the tool data. The flattened
-  text only prints ``arguments`` and ``content``, so the tool name is carried
-  inside them as well.
 - ``assistant``: the reply the user saw. The last ``assistant`` message is the
   reply under evaluation; earlier ones belong to earlier turns.
+
+Tool calls, tool results, and the model's pre-tool text are left out: the
+user never sees them, and verbosity was labeled from the visible
+conversation alone (2026-09-26).
 
 Labels, notes, quotes, scenario metadata, and the system prompt stay out of
 the input.
@@ -60,27 +58,11 @@ def _eligible_labels(mode: str) -> list[dict[str, Any]]:
 
 
 def _turn_messages(turn: dict[str, Any]) -> list[dict[str, Any]]:
-    messages: list[dict[str, Any]] = [{"role": "user", "text": turn["user"]}]
-    for step in turn["steps"]:
-        for call in step["calls"]:
-            messages.append({
-                "role": "tool_call",
-                "name": call["name"],
-                "arguments": {"tool": call["name"], "arguments": call["args"]},
-            })
-            messages.append({
-                "role": "tool_result",
-                "name": call["name"],
-                "content": {"tool": call["name"], "result": call["result"]},
-            })
-    for orphan in turn["orphan_tools"]:
-        messages.append({
-            "role": "tool_result",
-            "name": orphan["name"],
-            "content": {"tool": orphan["name"], "result": orphan["result"]},
-        })
-    messages.append({"role": "assistant", "text": turn["reply"]})
-    return messages
+    """The visible part of one turn: the user's message and the reply."""
+    return [
+        {"role": "user", "text": turn["user"]},
+        {"role": "assistant", "text": turn["reply"]},
+    ]
 
 
 def build_inputs(mode: str = MODE) -> list[dict[str, Any]]:
@@ -112,11 +94,13 @@ def check_inputs(records: list[dict[str, Any]], mode: str = MODE) -> dict[str, A
     input_ids = [r["trace_id"] for r in records]
     assert len(input_ids) == len(set(input_ids)), "duplicate trace ids in the inputs"
     assert set(input_ids) == label_ids, "inputs and labels do not match one to one"
-    allowed = {"role", "text", "name", "arguments", "content"}
+    allowed = {"role", "text"}
     leaked = ("scenario_id", "support-0", "verbose_reply", "cartwheel.", "coverage", "challenge")
     for record in records:
         assert set(record) == {"trace_id", "trace"}
         assert record["trace"][-1]["role"] == "assistant", record["trace_id"]
+        assert {m["role"] for m in record["trace"]} <= {"user", "assistant"}, record["trace_id"]
+        assert all(m["text"].strip() for m in record["trace"]), record["trace_id"]
         for message in record["trace"]:
             assert set(message) <= allowed, (record["trace_id"], set(message) - allowed)
         text = normalize_trace(record)["text"]
