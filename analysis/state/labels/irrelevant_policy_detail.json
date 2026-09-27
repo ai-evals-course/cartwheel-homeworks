@@ -1,17 +1,201 @@
 {
  "mode": "irrelevant_policy_detail",
  "definition": "The reply explains a rule that does not govern this case: the 30-day platform default when a store override applies, the under-$100 automatic path on an order over $100, or a restocking-fee rule on an order that cannot be returned at all.",
- "boundary": "Not this: stating the one rule that actually decided the outcome, even at length. Not this: naming the store's override as the governing rule while mentioning the platform default as brief contrast \u2014 that is correct behaviour and explains why the number differs from what the shopper expected. This mode is the default explained as if it governs, a threshold that decided nothing, a fee the store has not opted into, or policy recited after the matter is already settled. Not this either: repeating a fact already given, which is recorded but not elevated to a mode.",
+ "boundary": "Two tests, and a reply fails on either. FIRST: does the rule the reply cites govern the path the agent actually took? Citing the over-$100 review rule while opening the approval ticket is correct, not padding. SECOND: does that rule bear on what the user actually asked? A rule explained after the action is complete governs nothing further, UNLESS it explains the action the user requested -- telling a shopper their refund was instant because it was under $100 answers their question and is a PASS. Volunteering the same rule to someone who only asked whether their money had been sent is a FAIL. FAIL: the platform default stated as the operative rule while the store's real window is never named as governing; a threshold cited for a path not being taken; a fee the store has not opted into; rules added after the matter is settled that bear on nothing the user raised. PASS: the governing rule named and applied, wherever the default appears in the sentence, even at length. PASS also when the trace fails for another reason -- a wrong date, a wrong conclusion -- provided the policy named is the one that governs. Not this either: repeating a fact already given, which is recorded but not elevated to a mode.",
  "requirement_source": "SPEC.md RESP-5",
- "labelled_at": "2026-09-22T17:17:55.586735+00:00",
+ "labelled_at": "2026-09-27T01:19:12.753560+00:00",
  "score_destination": "analysis/state/labels only; Langfuse was never available (Docker could not be installed)",
- "reviewed_sample_size": 102,
- "present": 10,
- "absent": 92,
+ "reviewed_sample_size": 149,
+ "present": 9,
+ "absent": 140,
  "undecided": 0,
- "sample_fraction": 0.098,
+ "sample_fraction": 0.06,
  "fraction_note": "sample fraction within the reviewed set, not a prevalence estimate; the sample was built by clustering and focused search",
  "judgments": [
+  {
+   "session_id": "34e35f6d04a74d08881f165c821a5d43",
+   "scenario_id": "hw5-gen-0001",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "f69c30cf34bc4df8b6271e7f40e41734",
+   "scenario_id": "hw5-gen-0002",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "96a535e143f34104a47283522ef3c4b8",
+   "scenario_id": "hw5-gen-0004",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "f7dc7b3299394b7d8407ab457352f80b",
+   "scenario_id": "hw5-gen-0005",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "020dbc2e6d3e4ad497c133af81f5546e",
+   "scenario_id": "hw5-gen-0006",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "54407bd2e3a14278a854bce6399d87f8",
+   "scenario_id": "hw5-gen-0007",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "a6ca4f4cec0a413aabff7c1b85edae3c",
+   "scenario_id": "hw5-gen-0008",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "1a0e3ff7025a407f8492cf4c91765849",
+   "scenario_id": "hw5-gen-0009",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "present",
+   "method": "human_review",
+   "evidence": "shortlisted candidate accepted on reading"
+  },
+  {
+   "session_id": "b2ee586bd6f8455dae6dc31c6e78b148",
+   "scenario_id": "hw5-gen-0010",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "a7bdc76ac30e458eb4b3d3c9b75c90a0",
+   "scenario_id": "hw5-gen-0011",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "c7f974766fa948cdb18cdd16a9ab4b5e",
+   "scenario_id": "hw5-gen-0012",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "f07e9a2354d847b49a4074bcc4ad46a3",
+   "scenario_id": "hw5-gen-0013",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "ae0fb30a86544f22969cc75e0b236114",
+   "scenario_id": "hw5-gen-0014",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "78f31351f67047d28ab7b5d4bf06768a",
+   "scenario_id": "hw5-gen-0023",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "5b70b53da302436385f559aa6218afc5",
+   "scenario_id": "hw5-gen-0031",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "0cd0e64579c5433d803ebc08471455a1",
+   "scenario_id": "hw5-gen-0032",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "5edbfb3cc21b483a871b9c9457a0b979",
+   "scenario_id": "hw5-gen-0033",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "242e1458e6c14c19824cbe87b3c388d7",
+   "scenario_id": "hw5-gen-0036",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "present",
+   "method": "human_review",
+   "evidence": "shortlisted candidate accepted on reading"
+  },
+  {
+   "session_id": "8a31d4ef7b184698be68b484dc288e58",
+   "scenario_id": "hw5-gen-0038",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "9bc5ce873d794863a6c666ee8c090e3f",
+   "scenario_id": "hw5-gen-0045",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "9d7517d2d8f4480c906bf398c8531566",
+   "scenario_id": "hw5-gen-0054",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "56c6a0cc1a004d068b51d682bed44cfc",
+   "scenario_id": "hw5-gen-0055",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "39c60cda89914395a563805286ba215c",
+   "scenario_id": "hw5-gen-0060",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
   {
    "session_id": "48b2c4ee58e44540bad2994561b10328",
    "scenario_id": "support-0001",
@@ -144,9 +328,17 @@
    "session_id": "0f0f41b8dcc2464f87f6be152a171a9e",
    "scenario_id": "support-0026",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "1cd84690436a485f93f309d0f2291b86",
+   "scenario_id": "support-0027",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "6ba818d82a494d56a26317094ec9492f",
@@ -165,6 +357,14 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "8407eb70ed37456584f679a1208bfb99",
+   "scenario_id": "support-0030",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "1b00ec341e674bd694c86728927df881",
    "scenario_id": "support-0033",
    "mode": "irrelevant_policy_detail",
@@ -173,20 +373,44 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "fa73882de5e046b381ae963cdf4d9976",
+   "scenario_id": "support-0034",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "aa2c0bb08c934801878840753ddb27d9",
    "scenario_id": "support-0035",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "9f9b4df5e20842c9877c9807dfb9e67c",
+   "scenario_id": "support-0036",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "9a95b2b5d8b64440a891af5ee1fa417f",
    "scenario_id": "support-0037",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "5561b29fd22748cf957ec8fcdedd1404",
+   "scenario_id": "support-0038",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "c4fbef941f704561a3acfe5bed1e664d",
@@ -200,13 +424,29 @@
    "session_id": "b99fdd7eade345d7974f445e2f034dbd",
    "scenario_id": "support-0040",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "cb3ee1e191bb4c57a877fe0599740947",
    "scenario_id": "support-0041",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "3f113adffaeb493e8c46f03cae39523b",
+   "scenario_id": "support-0042",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "8d341412793c407abfcc0ad4cced37aa",
+   "scenario_id": "support-0044",
    "mode": "irrelevant_policy_detail",
    "judgment": "absent",
    "method": "human_review",
@@ -229,12 +469,36 @@
    "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
-   "session_id": "0c9be1957b88420ba9bc07acb0ac005e",
-   "scenario_id": "support-0051",
+   "session_id": "6c8ae69ce1a244bf8fabf4633b7e1b0c",
+   "scenario_id": "support-0048",
    "mode": "irrelevant_policy_detail",
    "judgment": "present",
    "method": "human_review",
    "evidence": "shortlisted candidate accepted on reading"
+  },
+  {
+   "session_id": "4e04af0f1d5e48dbb1b4ffdeddc21abb",
+   "scenario_id": "support-0049",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "d98af4aa1e504073973118807c00843e",
+   "scenario_id": "support-0050",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "present",
+   "method": "human_review",
+   "evidence": "shortlisted candidate accepted on reading"
+  },
+  {
+   "session_id": "0c9be1957b88420ba9bc07acb0ac005e",
+   "scenario_id": "support-0051",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "a8898169770d4a81a57868e074efcfac",
@@ -251,6 +515,14 @@
    "judgment": "absent",
    "method": "human_review",
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
+  },
+  {
+   "session_id": "93d38963d6cf45e6a6336bab4cf281cf",
+   "scenario_id": "support-0061",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "f53a1203d5fa4cdaa952b9e06dc0449c",
@@ -381,6 +653,14 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "cdd48858c4c647b7b6761f28e15300fe",
+   "scenario_id": "support-0091",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "present",
+   "method": "human_review",
+   "evidence": "shortlisted candidate accepted on reading"
+  },
+  {
    "session_id": "8e59c7d7379b4fa1bd0b7e703462d36e",
    "scenario_id": "support-0094",
    "mode": "irrelevant_policy_detail",
@@ -469,6 +749,14 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "e260c4b4904d4468988f5e079d178d56",
+   "scenario_id": "support-0127",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "9654602c1dae41b79c323ba852917255",
    "scenario_id": "support-0130",
    "mode": "irrelevant_policy_detail",
@@ -493,12 +781,36 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "b0bd029d24ab4256aed8b13a6dbc444a",
+   "scenario_id": "support-0134",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "42def3002baa43d186fafdbbbe131900",
    "scenario_id": "support-0135",
    "mode": "irrelevant_policy_detail",
    "judgment": "absent",
    "method": "human_review",
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
+  },
+  {
+   "session_id": "a1ebdf787dd04107b3c9c1fcf51d71cf",
+   "scenario_id": "support-0140",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "2c4216f0a2a147988ec8b20ba33c02c4",
+   "scenario_id": "support-0141",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "f32c072b8b4d44559386eaf9e515fcd8",
@@ -541,6 +853,14 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "3e99ea8217654b2da2faac7cfc6a4c02",
+   "scenario_id": "support-0147",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "1c776684d44d4ce3856305a5d9c8c038",
    "scenario_id": "support-0149",
    "mode": "irrelevant_policy_detail",
@@ -563,6 +883,14 @@
    "judgment": "absent",
    "method": "human_review",
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
+  },
+  {
+   "session_id": "69a8aefb397a406c8a1633535b65d599",
+   "scenario_id": "support-0154",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "ee1fc6f79b7843c0bd9b8cbc747f9951",
@@ -693,6 +1021,22 @@
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
   },
   {
+   "session_id": "ed1c1f13a2a6490b8b81334a69b1ec8d",
+   "scenario_id": "support-0206",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "1a3c083ad4bb4157b136a26bcc060877",
+   "scenario_id": "support-0207",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "e986b07f3ece47248e1311c139006b13",
    "scenario_id": "support-0209",
    "mode": "irrelevant_policy_detail",
@@ -701,8 +1045,24 @@
    "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
+   "session_id": "8d16c74bb2534b28bb3cd5a5c8491009",
+   "scenario_id": "support-0212",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
    "session_id": "181ef1c737c34d8682f9e0406ab52451",
    "scenario_id": "support-0214",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "00e6002ecb354458b6354c30b4a53a27",
+   "scenario_id": "support-0216",
    "mode": "irrelevant_policy_detail",
    "judgment": "absent",
    "method": "human_review",
@@ -720,9 +1080,9 @@
    "session_id": "0270b647138140e5bbdfec4455253c13",
    "scenario_id": "support-0218",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "7206951a172e4c85aac7dd7b9f95dd42",
@@ -760,9 +1120,17 @@
    "session_id": "c3748e6311404d07ba784fbe829258d7",
    "scenario_id": "support-0224",
    "mode": "irrelevant_policy_detail",
-   "judgment": "present",
+   "judgment": "absent",
    "method": "human_review",
-   "evidence": "shortlisted candidate accepted on reading"
+   "evidence": "shortlisted as a candidate and rejected on reading"
+  },
+  {
+   "session_id": "b504df6427414438b8fe0174281b9025",
+   "scenario_id": "support-0225",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "absent",
+   "method": "human_review",
+   "evidence": "shortlisted as a candidate and rejected on reading"
   },
   {
    "session_id": "5c55a361bbda4efda2f7b75e83f6f2cf",
@@ -827,6 +1195,14 @@
    "judgment": "absent",
    "method": "human_review",
    "evidence": "never shortlisted by the mode's heuristic and never annotated"
+  },
+  {
+   "session_id": "376056140bef4f5f85cdad36b14fe8de",
+   "scenario_id": "support-0248",
+   "mode": "irrelevant_policy_detail",
+   "judgment": "present",
+   "method": "human_review",
+   "evidence": "shortlisted candidate accepted on reading"
   }
  ]
 }

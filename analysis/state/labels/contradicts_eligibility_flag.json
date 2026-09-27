@@ -3,15 +3,199 @@
  "definition": "The tools returned refund_eligible, and the reply reaches the opposite conclusion \u2014 denying a refund the flag allows, or implying one the flag forbids.",
  "boundary": "Not this: a denial that matches refund_eligible: false, or an approval that matches true. Not this either: a reply that reaches no eligibility conclusion at all, which is abandons_mid_task. This mode requires a stated conclusion that is the opposite of the flag.",
  "requirement_source": "SPEC.md RESP-2, RESP-3",
- "labelled_at": "2026-09-22T17:17:55.586047+00:00",
+ "labelled_at": "2026-09-27T01:19:12.752307+00:00",
  "score_destination": "analysis/state/labels only; Langfuse was never available (Docker could not be installed)",
- "reviewed_sample_size": 102,
- "present": 15,
- "absent": 87,
+ "reviewed_sample_size": 149,
+ "present": 17,
+ "absent": 132,
  "undecided": 0,
- "sample_fraction": 0.147,
+ "sample_fraction": 0.114,
  "fraction_note": "sample fraction within the reviewed set, not a prevalence estimate; the sample was built by clustering and focused search",
  "judgments": [
+  {
+   "session_id": "34e35f6d04a74d08881f165c821a5d43",
+   "scenario_id": "hw5-gen-0001",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "f69c30cf34bc4df8b6271e7f40e41734",
+   "scenario_id": "hw5-gen-0002",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "96a535e143f34104a47283522ef3c4b8",
+   "scenario_id": "hw5-gen-0004",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "f7dc7b3299394b7d8407ab457352f80b",
+   "scenario_id": "hw5-gen-0005",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "020dbc2e6d3e4ad497c133af81f5546e",
+   "scenario_id": "hw5-gen-0006",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "54407bd2e3a14278a854bce6399d87f8",
+   "scenario_id": "hw5-gen-0007",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "a6ca4f4cec0a413aabff7c1b85edae3c",
+   "scenario_id": "hw5-gen-0008",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "1a0e3ff7025a407f8492cf4c91765849",
+   "scenario_id": "hw5-gen-0009",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "b2ee586bd6f8455dae6dc31c6e78b148",
+   "scenario_id": "hw5-gen-0010",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "a7bdc76ac30e458eb4b3d3c9b75c90a0",
+   "scenario_id": "hw5-gen-0011",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "c7f974766fa948cdb18cdd16a9ab4b5e",
+   "scenario_id": "hw5-gen-0012",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "f07e9a2354d847b49a4074bcc4ad46a3",
+   "scenario_id": "hw5-gen-0013",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "ae0fb30a86544f22969cc75e0b236114",
+   "scenario_id": "hw5-gen-0014",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "78f31351f67047d28ab7b5d4bf06768a",
+   "scenario_id": "hw5-gen-0023",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "5b70b53da302436385f559aa6218afc5",
+   "scenario_id": "hw5-gen-0031",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "0cd0e64579c5433d803ebc08471455a1",
+   "scenario_id": "hw5-gen-0032",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "5edbfb3cc21b483a871b9c9457a0b979",
+   "scenario_id": "hw5-gen-0033",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "242e1458e6c14c19824cbe87b3c388d7",
+   "scenario_id": "hw5-gen-0036",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "8a31d4ef7b184698be68b484dc288e58",
+   "scenario_id": "hw5-gen-0038",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "9bc5ce873d794863a6c666ee8c090e3f",
+   "scenario_id": "hw5-gen-0045",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "9d7517d2d8f4480c906bf398c8531566",
+   "scenario_id": "hw5-gen-0054",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "56c6a0cc1a004d068b51d682bed44cfc",
+   "scenario_id": "hw5-gen-0055",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "39c60cda89914395a563805286ba215c",
+   "scenario_id": "hw5-gen-0060",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
   {
    "session_id": "48b2c4ee58e44540bad2994561b10328",
    "scenario_id": "support-0001",
@@ -149,6 +333,14 @@
    "evidence": "reply states no refund eligibility conclusion"
   },
   {
+   "session_id": "1cd84690436a485f93f309d0f2291b86",
+   "scenario_id": "support-0027",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
    "session_id": "6ba818d82a494d56a26317094ec9492f",
    "scenario_id": "support-0028",
    "mode": "contradicts_eligibility_flag",
@@ -165,12 +357,28 @@
    "evidence": "tools returned refund_eligible=True, reply denies"
   },
   {
+   "session_id": "8407eb70ed37456584f679a1208bfb99",
+   "scenario_id": "support-0030",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "tools returned refund_eligible=True, reply denies"
+  },
+  {
    "session_id": "1b00ec341e674bd694c86728927df881",
    "scenario_id": "support-0033",
    "mode": "contradicts_eligibility_flag",
    "judgment": "absent",
    "method": "code_check",
    "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "fa73882de5e046b381ae963cdf4d9976",
+   "scenario_id": "support-0034",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=True"
   },
   {
    "session_id": "aa2c0bb08c934801878840753ddb27d9",
@@ -181,12 +389,28 @@
    "evidence": "reply states no refund eligibility conclusion"
   },
   {
+   "session_id": "9f9b4df5e20842c9877c9807dfb9e67c",
+   "scenario_id": "support-0036",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
+  },
+  {
    "session_id": "9a95b2b5d8b64440a891af5ee1fa417f",
    "scenario_id": "support-0037",
    "mode": "contradicts_eligibility_flag",
    "judgment": "present",
    "method": "code_check",
    "evidence": "tools returned refund_eligible=True, reply denies"
+  },
+  {
+   "session_id": "5561b29fd22748cf957ec8fcdedd1404",
+   "scenario_id": "support-0038",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
   },
   {
    "session_id": "c4fbef941f704561a3acfe5bed1e664d",
@@ -213,6 +437,22 @@
    "evidence": "reply states no refund eligibility conclusion"
   },
   {
+   "session_id": "3f113adffaeb493e8c46f03cae39523b",
+   "scenario_id": "support-0042",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "8d341412793c407abfcc0ad4cced37aa",
+   "scenario_id": "support-0044",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
    "session_id": "f2af709c8cc14cefa978129016b1f200",
    "scenario_id": "support-0045",
    "mode": "contradicts_eligibility_flag",
@@ -227,6 +467,30 @@
    "judgment": "absent",
    "method": "code_check",
    "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "6c8ae69ce1a244bf8fabf4633b7e1b0c",
+   "scenario_id": "support-0048",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "4e04af0f1d5e48dbb1b4ffdeddc21abb",
+   "scenario_id": "support-0049",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "d98af4aa1e504073973118807c00843e",
+   "scenario_id": "support-0050",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
   },
   {
    "session_id": "0c9be1957b88420ba9bc07acb0ac005e",
@@ -251,6 +515,14 @@
    "judgment": "absent",
    "method": "code_check",
    "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "93d38963d6cf45e6a6336bab4cf281cf",
+   "scenario_id": "support-0061",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
   },
   {
    "session_id": "f53a1203d5fa4cdaa952b9e06dc0449c",
@@ -381,6 +653,14 @@
    "evidence": "reply states no refund eligibility conclusion"
   },
   {
+   "session_id": "cdd48858c4c647b7b6761f28e15300fe",
+   "scenario_id": "support-0091",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "tools returned refund_eligible=False, reply grants"
+  },
+  {
    "session_id": "8e59c7d7379b4fa1bd0b7e703462d36e",
    "scenario_id": "support-0094",
    "mode": "contradicts_eligibility_flag",
@@ -469,6 +749,14 @@
    "evidence": "reply states no refund eligibility conclusion"
   },
   {
+   "session_id": "e260c4b4904d4468988f5e079d178d56",
+   "scenario_id": "support-0127",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
    "session_id": "9654602c1dae41b79c323ba852917255",
    "scenario_id": "support-0130",
    "mode": "contradicts_eligibility_flag",
@@ -493,8 +781,32 @@
    "evidence": "no eligibility flag was returned in this conversation"
   },
   {
+   "session_id": "b0bd029d24ab4256aed8b13a6dbc444a",
+   "scenario_id": "support-0134",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
    "session_id": "42def3002baa43d186fafdbbbe131900",
    "scenario_id": "support-0135",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "a1ebdf787dd04107b3c9c1fcf51d71cf",
+   "scenario_id": "support-0140",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "2c4216f0a2a147988ec8b20ba33c02c4",
+   "scenario_id": "support-0141",
    "mode": "contradicts_eligibility_flag",
    "judgment": "absent",
    "method": "code_check",
@@ -541,6 +853,14 @@
    "evidence": "no eligibility flag was returned in this conversation"
   },
   {
+   "session_id": "3e99ea8217654b2da2faac7cfc6a4c02",
+   "scenario_id": "support-0147",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
    "session_id": "1c776684d44d4ce3856305a5d9c8c038",
    "scenario_id": "support-0149",
    "mode": "contradicts_eligibility_flag",
@@ -563,6 +883,14 @@
    "judgment": "absent",
    "method": "code_check",
    "evidence": "reply states no refund eligibility conclusion"
+  },
+  {
+   "session_id": "69a8aefb397a406c8a1633535b65d599",
+   "scenario_id": "support-0154",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "no eligibility flag was returned in this conversation"
   },
   {
    "session_id": "ee1fc6f79b7843c0bd9b8cbc747f9951",
@@ -693,6 +1021,22 @@
    "evidence": "no eligibility flag was returned in this conversation"
   },
   {
+   "session_id": "ed1c1f13a2a6490b8b81334a69b1ec8d",
+   "scenario_id": "support-0206",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
+  },
+  {
+   "session_id": "1a3c083ad4bb4157b136a26bcc060877",
+   "scenario_id": "support-0207",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
+  },
+  {
    "session_id": "e986b07f3ece47248e1311c139006b13",
    "scenario_id": "support-0209",
    "mode": "contradicts_eligibility_flag",
@@ -701,8 +1045,24 @@
    "evidence": "reply agrees with refund_eligible=False"
   },
   {
+   "session_id": "8d16c74bb2534b28bb3cd5a5c8491009",
+   "scenario_id": "support-0212",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
+  },
+  {
    "session_id": "181ef1c737c34d8682f9e0406ab52451",
    "scenario_id": "support-0214",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply agrees with refund_eligible=False"
+  },
+  {
+   "session_id": "00e6002ecb354458b6354c30b4a53a27",
+   "scenario_id": "support-0216",
    "mode": "contradicts_eligibility_flag",
    "judgment": "absent",
    "method": "code_check",
@@ -763,6 +1123,14 @@
    "judgment": "present",
    "method": "code_check",
    "evidence": "tools returned refund_eligible=True, reply denies"
+  },
+  {
+   "session_id": "b504df6427414438b8fe0174281b9025",
+   "scenario_id": "support-0225",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
   },
   {
    "session_id": "5c55a361bbda4efda2f7b75e83f6f2cf",
@@ -827,6 +1195,14 @@
    "judgment": "absent",
    "method": "code_check",
    "evidence": "no eligibility flag was returned in this conversation"
+  },
+  {
+   "session_id": "376056140bef4f5f85cdad36b14fe8de",
+   "scenario_id": "support-0248",
+   "mode": "contradicts_eligibility_flag",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "reply states no refund eligibility conclusion"
   }
  ]
 }

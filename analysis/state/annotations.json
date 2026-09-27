@@ -1378,39 +1378,6 @@
   "created_at": "2026-09-22T01:03:32.501625+00:00"
  },
  {
-  "session_id": "0c9be1957b88420ba9bc07acb0ac005e",
-  "scenario_id": "support-0051",
-  "trace_id": "bea9ad116ef34a427430392ff9300057",
-  "span": "agent reply turn 1",
-  "quoted_text": "cy **(cw-returns)**, items can be returned within 30 days of delivery, and individual stores can set their own window. Northwi",
-  "note": "quotes the 30-day platform default while Northwind Books overrides to 45 days. HEURISTIC \u2014 expect false positives, reject freely.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T01:03:32.501641+00:00"
- },
- {
-  "session_id": "c3748e6311404d07ba784fbe829258d7",
-  "scenario_id": "support-0224",
-  "trace_id": "864e5ebefbcbc49971c5c4a330cbd4fc",
-  "span": "agent reply turn 1",
-  "quoted_text": ") and the store policy:\n\n* Cartwheel's default is 30 days from delivery [cw-returns]\n* Northwind Books overrides that to 45 da",
-  "note": "quotes the 30-day platform default while Northwind Books overrides to 45 days. HEURISTIC \u2014 expect false positives, reject freely.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T01:03:32.501643+00:00"
- },
- {
-  "session_id": "aa2c0bb08c934801878840753ddb27d9",
-  "scenario_id": "support-0035",
-  "trace_id": "7092809a2cc84eb9a267353cf1d5111d",
-  "span": "agent reply turn 1",
-  "quoted_text": "Found it \u2014 order **6233** from Pocket Arcade for $121.00, delivered on June 27. It's showing as refund-eligibl",
-  "note": "Don't need to explain the $100 limit; it can just be escalated in these cases. Not relevant otherwise.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T01:30:20.052080+00:00"
- },
- {
   "session_id": "f2af709c8cc14cefa978129016b1f200",
   "scenario_id": "support-0045",
   "trace_id": "0e22ebf26fa026704c41b97ab85ee747",
@@ -1666,17 +1633,6 @@
   "created_at": "2026-09-22T14:09:52.722373+00:00"
  },
  {
-  "session_id": "0f0f41b8dcc2464f87f6be152a171a9e",
-  "scenario_id": "support-0026",
-  "trace_id": "b54fef1f4c50e775f5281cb0c406b695",
-  "span": "agent reply turn 1",
-  "quoted_text": "restocking",
-  "note": "raises a restocking fee; Paper Lantern Press has not opted into one. Candidate only \u2014 read it and reject if the rule does govern this case.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T14:09:52.722374+00:00"
- },
- {
   "session_id": "1276f724139248d89dc1a7a9efe47618",
   "scenario_id": "support-0029",
   "trace_id": "9caf274493a06cfe30ee4a39f5f87c56",
@@ -1686,28 +1642,6 @@
   "from_suggestion": true,
   "mode": "unwarranted_offer",
   "created_at": "2026-09-22T14:09:52.722376+00:00"
- },
- {
-  "session_id": "9a95b2b5d8b64440a891af5ee1fa417f",
-  "scenario_id": "support-0037",
-  "trace_id": "8166c68ff1ea83e88b8f150816e81c3d",
-  "span": "agent reply turn 1",
-  "quoted_text": "$100",
-  "note": "explains the $100 automatic limit on a $193.00 order, which was never going to take the automatic path. Candidate only \u2014 read it and reject if the rule does govern this case.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T14:09:52.722377+00:00"
- },
- {
-  "session_id": "b99fdd7eade345d7974f445e2f034dbd",
-  "scenario_id": "support-0040",
-  "trace_id": "89c519c10b75cbf402b18ea4c12af940",
-  "span": "agent reply turn 1",
-  "quoted_text": "$100",
-  "note": "explains the $100 automatic limit on a $145.25 order, which was never going to take the automatic path. Candidate only \u2014 read it and reject if the rule does govern this case.",
-  "from_suggestion": true,
-  "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T14:09:52.722379+00:00"
  },
  {
   "session_id": "a8898169770d4a81a57868e074efcfac",
@@ -1754,14 +1688,75 @@
   "created_at": "2026-09-22T14:09:52.722390+00:00"
  },
  {
-  "session_id": "0270b647138140e5bbdfec4455253c13",
-  "scenario_id": "support-0218",
-  "trace_id": "675bf6b4884a9b399e9aa1a62f805c01",
+  "session_id": "376056140bef4f5f85cdad36b14fe8de",
+  "scenario_id": "support-0248",
+  "trace_id": "6a09d1cd2aea05e6cd71ac38be10e190",
   "span": "agent reply turn 1",
-  "quoted_text": "30-day",
-  "note": "quotes the 30-day platform default while Saltbox Pantry overrides to 7 days. Candidate only \u2014 read it and reject if the rule does govern this case.",
+  "quoted_text": "",
+  "note": "order already refunded and the agent still explains the over 100 review step that happened.",
+  "from_suggestion": true,
+  "reworded": true,
+  "mode": "irrelevant_policy_detail",
+  "created_at": "2026-09-25T21:25:20.546841+00:00"
+ },
+ {
+  "session_id": "d98af4aa1e504073973118807c00843e",
+  "scenario_id": "support-0050",
+  "trace_id": "9cac2c5d8b8541862957aa56ca700d94",
+  "span": "agent reply turn 1",
+  "quoted_text": "",
+  "note": "Restocking fee policy is irrelevant when the refund is already ineligible, even if the candidate states that the item is unopened",
+  "from_suggestion": true,
+  "reworded": true,
+  "mode": "irrelevant_policy_detail",
+  "created_at": "2026-09-25T21:25:20.546842+00:00"
+ },
+ {
+  "session_id": "cdd48858c4c647b7b6761f28e15300fe",
+  "scenario_id": "support-0091",
+  "trace_id": "40984a3cbdc5b5fba3a93cdc4958602a",
+  "span": "agent reply turn 1",
+  "quoted_text": "",
+  "note": "Only need to mention restocking fee if store has opted in or if asked about open box. In this case this was offered as part of a explnation on return policy for an already shipped item as an alternate route, but the restocking fee is still irrelvant.",
+  "from_suggestion": true,
+  "reworded": true,
+  "mode": "irrelevant_policy_detail",
+  "created_at": "2026-09-25T21:25:20.546843+00:00"
+ },
+ {
+  "session_id": "1a0e3ff7025a407f8492cf4c91765849",
+  "scenario_id": "hw5-gen-0009",
+  "trace_id": "38ad3f4957116bf15a77838de6ce150f",
+  "span": "agent reply turn 1",
+  "quoted_text": "",
+  "note": "Explains a restocking fee Northwind Books does not charge, and a meta-rule about how store overrides take precedence. Neither governs anything the shopper has to decide. The 45-day window it names is correct and is not the problem.",
+  "from_suggestion": true,
+  "reworded": true,
+  "mode": "irrelevant_policy_detail",
+  "created_at": "2026-09-26T23:43:40.747477+00:00",
+  "note_original": "Names the store's actual policy as the reason why the return is valid but doesn't auto file the ticket for the return over the 100$ threshold"
+ },
+ {
+  "session_id": "242e1458e6c14c19824cbe87b3c388d7",
+  "scenario_id": "hw5-gen-0036",
+  "trace_id": "370128c3d5ae574157762e1fb0844f91",
+  "span": "agent reply turn 1",
+  "quoted_text": "",
+  "note": "This appropriately sites the return policy as the reason for refund ineligibility but then escalates to human for the amount being over 100$ rather than because of a discretion in the record saying the item is still eligible",
+  "from_suggestion": true,
+  "reworded": true,
+  "mode": "irrelevant_policy_detail",
+  "created_at": "2026-09-26T23:43:40.747479+00:00"
+ },
+ {
+  "session_id": "6c8ae69ce1a244bf8fabf4633b7e1b0c",
+  "scenario_id": "support-0048",
+  "trace_id": "bf3f3a3ce078ed2405274e0b02c7647b",
+  "span": "agent reply turn 1",
+  "quoted_text": "",
+  "note": "Cites the unopened-items restocking exemption for Clover Field Naturals, which has not opted into restocking fees at all. The exemption governs nothing here, and saying unopened items are never charged implies an opened one might be, which is false for this store. The $100 half of the reply is correct.",
   "from_suggestion": true,
   "mode": "irrelevant_policy_detail",
-  "created_at": "2026-09-22T14:09:52.722391+00:00"
+  "created_at": "2026-09-27T00:05:37.158702+00:00"
  }
 ]

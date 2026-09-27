@@ -101,6 +101,46 @@ misunderstanding will produce candidates that confirm it. The only real guard wa
 human accepted or rejected every candidate, and rejected 24 of 60 — including three where
 the rejection exposed a bug in the heuristic rather than a difference of opinion.
 
+## Homework 5 substitutions
+
+Two more, and the second is the first time the *handout's own tooling* rather than an
+install was the obstacle.
+
+**`gpt-4o-mini` -> `rl-muse-spark-1-1-playground`.** The handout names `gpt-4o-mini` as
+the judge model. The configured endpoint serves three models and none is an OpenAI one,
+which a read-only `/models` call established before anything was built. All three were
+then probed on a miniature judging task: `1-1` answered correctly in 5.3s, `1-3-sglang`
+in 7.0s, `1-2` in 64.1s.
+
+`1-1` was chosen over `1-3-sglang` deliberately, not by speed. The agent under test ran on
+`1-3-sglang`, and a judge sharing the model it grades is least likely to notice that
+model's own kinds of mistake. The constraint bought judge independence that the handout's
+setup does not require and a student with an OpenAI key would not get.
+
+**DocETL -> a direct classifier.** DocETL enforces its output schema with a named-function
+`tool_choice`. The endpoint rejects it:
+
+    OpenAIException - only "auto" is supported for tool_choice
+
+`analysis/tools/muse_classify.py` calls the endpoint with plain chat completions, requests
+the schema in the prompt, and parses the reply. The rest of the pipeline is untouched:
+`run_judge` accepts a `classify` callable in place of the DocETL backend, and the
+replacement returns the same predictions-plus-critiques structure, so caching, resume,
+alignment and disagreement review all behave identically.
+
+Two smaller traps worth recording, both specific to a repository that has carried its
+Homework 2 configuration forward:
+
+- Loading `.env` to expose the model key also exposed the `LANGFUSE_*` keys, so the
+  helpers concluded Langfuse was available and tried to fetch traces from a server that
+  never ran. The handout anticipates this and the fix is its own:
+  `CARTWHEEL_JUDGE_TRACE_SOURCE`, set inside `analysis/run_judges.py` rather than left to
+  a shell export that could be forgotten.
+- The judge is registered as `openai/<model>` because that is how LiteLLM routes to an
+  OpenAI-compatible endpoint. LiteLLM strips the prefix; calling the endpoint directly
+  means stripping it too, or the server is asked for a model it has never heard of and
+  answers 404.
+
 ## Related substitutions in this project
 
 Two others, both for the same reason:

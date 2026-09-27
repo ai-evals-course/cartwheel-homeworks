@@ -48,7 +48,7 @@ left open. Fractions are **within the reviewed sample**, not prevalence estimate
 | `cites_policy_by_internal_id` | 50 | 52 | 49.0% | code rule | RESP-1 (revised) |
 | `tool_call_malformed` | 17 | 85 | 16.7% | code rule | TOOL-3 |
 | `contradicts_eligibility_flag` | 15 | 87 | 14.7% | code rule, 1 by hand | RESP-2, RESP-3 |
-| `irrelevant_policy_detail` | 10 | 92 | 9.8% | human reading | RESP-1, RESP-3 |
+| `irrelevant_policy_detail` | 9 | 93 | 8.8% | human reading | RESP-5 |
 | `unwarranted_offer` | 10 | 92 | 9.8% | human reading | RESP-3, ESC-4 |
 | `detail_level_ignores_the_ask` | 5 | 97 | 4.9% | human reading | RESP-3 |
 | `abandons_mid_task` | 4 | 98 | 3.9% | code rule | RESP-3 |

@@ -190,8 +190,11 @@ async function boot(){
   PATTERNS=await (await fetch("/api/patterns")).json();
   STATUS  =await (await fetch("/api/review_status")).json();
   MANIFEST=await (await fetch("/api/sample_manifest")).json();
+  const linked=decodeURIComponent(location.hash.slice(1));
+  const linkedIdx=linked?RECORDS.findIndex(r=>r.scenario_id===linked):-1;
   const saved=+localStorage.getItem("cartwheel_idx")||0;
-  idx=Math.min(saved,RECORDS.length-1);
+  idx=linkedIdx>=0?linkedIdx:Math.min(saved,RECORDS.length-1);
+  if(linkedIdx>=0) show("review");
   render();
 }
 const save=async(n,d)=>fetch("/api/"+n,{method:"POST",headers:{"Content-Type":"application/json"},
@@ -514,6 +517,19 @@ function progressView(){
         <div class="meta" style="margin-top:5px"><i>&ldquo;${esc(s.quoted_text)}&rdquo;</i></div>
         <div style="font-size:13px">${esc(s.note)}</div></div>`).join("")
      : `<p class="meta"><i>Nothing pending.</i></p>`;
+  const justDone=SUGGS.filter(s=>s.resolved&&s.source&&s.resolved_at)
+                      .sort((a,b)=>(b.resolved_at||"").localeCompare(a.resolved_at||"")).slice(0,8);
+  if(justDone.length) h+=`<h4 style="margin:16px 0 6px;font-size:13px;color:var(--muted)">
+      Recently decided &mdash; check these read the way you meant</h4>`+
+    justDone.map(s=>`<div class="theme" style="opacity:.72;border-left-color:${
+        s.resolved==="accepted"?"var(--note-line)":"var(--line)"}">
+      <div class="row"><b style="font-family:ui-monospace,monospace">${esc(s.scenario_id)}</b>
+        <span class="pill">${s.resolved==="accepted"?"FAIL (failure present)":"PASS (absent)"}</span>
+        <span class="grow"></span>
+        <button data-undo="${esc(s.scenario_id)}" data-mode="${esc(s.mode||"")}">undo</button></div>
+      ${(s.rejected_reason||s.accepted_note)?`<div class="meta" style="margin-top:4px">${esc(s.rejected_reason||s.accepted_note)}</div>`
+        :(s.resolved==="rejected"?`<div class="meta" style="margin-top:4px;color:#a40e26">
+             no reason recorded &mdash; was this deliberate?</div>`:"")}</div>`).join("");
   h+=`<h3 style="margin-top:22px">Your notes, newest first (${real.length})</h3>`+
     real.slice().reverse().map(a=>`<div class="mode">
         <div class="meta">${esc(a.scenario_id)} · ${esc(a.span)}</div>
@@ -526,15 +542,35 @@ function progressView(){
   const pending=SUGGS.filter(s=>!s.resolved);
   document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=async()=>{
     const s=pending[+b.dataset.acc];
+    // Accepting used to file the agent's own wording as the note, so the reviewer's
+    // reasoning was lost and accepting meant giving up the chance to say why. The
+    // agent's reason is offered as a starting point and can be replaced entirely.
+    const suggested=s.note.replace("[agent suggestion] ","");
+    const note=prompt("Why is this a failure? (your words; edit or replace mine)",suggested);
+    if(note===null) return;              // Escape or Cancel aborts, as with reject
     ANNOS.push({session_id:s.session_id,scenario_id:s.scenario_id,trace_id:s.trace_id,
-                span:s.span,quoted_text:s.quoted_text,note:s.note.replace("[agent suggestion] ",""),
-                from_suggestion:true,mode:s.mode});
+                span:s.span,quoted_text:s.quoted_text,note:note.trim()||suggested,
+                from_suggestion:true,reworded:note.trim()!==suggested,mode:s.mode});
     s.resolved="accepted"; s.resolved_at=new Date().toISOString();
+    s.accepted_note=note.trim()||suggested;
     await save("annotations",ANNOS); await save("suggestions",SUGGS); progressView();});
   document.querySelectorAll("[data-rej]").forEach(b=>b.onclick=async()=>{
     const s=pending[+b.dataset.rej];
     const why=prompt("Why is this not an instance? (saved with the rejection)","");
-    s.resolved="rejected"; s.rejected_reason=why||""; s.resolved_at=new Date().toISOString();
+    // prompt() returns null on Escape or Cancel. Committing the rejection anyway
+    // silently resolved candidates the reviewer had not decided on, and the row then
+    // vanished so there was nothing to notice. Dismissing the dialog now cancels.
+    if(why===null) return;
+    s.resolved="rejected"; s.rejected_reason=why; s.resolved_at=new Date().toISOString();
+    await save("suggestions",SUGGS); progressView();});
+  document.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{
+    const s=SUGGS.find(x=>x.scenario_id===b.dataset.undo&&x.mode===b.dataset.mode&&x.resolved);
+    if(!s) return;
+    if(s.resolved==="accepted"){
+      ANNOS=ANNOS.filter(a=>!(a.from_suggestion&&a.scenario_id===s.scenario_id&&a.mode===s.mode));
+      await save("annotations",ANNOS);
+    }
+    delete s.resolved; delete s.resolved_at; delete s.rejected_reason;
     await save("suggestions",SUGGS); progressView();});
 }
 function show(which){
@@ -566,9 +602,26 @@ document.addEventListener("keydown",e=>{
 
 function render(){
   localStorage.setItem("cartwheel_idx",idx);
+  // Keep the address bar pointing at the open conversation so a specific trace
+  // can be linked to and returned to. Deep links matter once you are chasing
+  // judge disagreements one scenario at a time.
+  const sid=RECORDS[idx] && RECORDS[idx].scenario_id;
+  if(sid && decodeURIComponent(location.hash.slice(1))!==sid){
+    history.replaceState(null,"","#"+sid);
+  }
   header(); conversation(); expected();
   requestAnimationFrame(paintNotes);
 }
+
+function openScenario(sid){
+  const i=RECORDS.findIndex(r=>r.scenario_id===sid);
+  if(i<0) return false;
+  idx=i; show("review"); render(); return true;
+}
+addEventListener("hashchange",()=>{
+  const sid=decodeURIComponent(location.hash.slice(1));
+  if(sid && RECORDS[idx] && RECORDS[idx].scenario_id!==sid) openScenario(sid);
+});
 boot();
 </script>
 </body>
