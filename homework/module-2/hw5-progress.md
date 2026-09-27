@@ -110,10 +110,18 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 | **All on current labels** (14 Pass / 26 Fail) | v0 0.500 [0.268, 0.732] / 1.000 [0.871, 1.000]; v1 0.286 [0.117, 0.547] / 1.000; v2 0.429 [0.214, 0.674] / 0.923 [0.759, 0.979] | | | |
 
 ### Part D, freeze and test
-- [ ] Choose final version (my decision)
-- [ ] Approve model and trace count before the paid test batch
-- [ ] `run_test(judge_id)`: freeze, run test, save `analysis/report/test-<judge_id>.json`
-- [ ] Report confusion counts, TPR, TNR, intervals, class counts
+- [x] Choose final version (my decision): **v0** (best dev TPR 0.50 and TNR 1.00 on current labels; all intervals overlap)
+- [x] Approve model and trace count before the paid test batch (gpt-4o-mini, 40 test traces, approved 2026-09-27)
+- [x] Freeze `verbose_reply-v0` (2026-09-27, `analysis.run_judges freeze`)
+- [x] `run_test(judge_id)`: run test, save `analysis/report/test-verbose_reply-v0.json` (2026-09-27)
+- [x] Report confusion counts, TPR, TNR, intervals, class counts:
+
+| Test (21 Pass / 19 Fail) | Human Pass | Human Fail |
+| --- | ---: | ---: |
+| Judge Pass | TP 4 | FP 2 (0192, 0202) |
+| Judge Fail | FN 17 | TN 17 |
+
+TPR 0.190 [0.077, 0.400]; TNR 0.895 [0.686, 0.971]; agreement 0.525. Recomputed independently from `analysis/state/judges/verbose_reply-v0.json`, `hw5_labels`, and `splits.json`: same numbers.
 - [ ] Would I use the judge? (my decision)
 
 ### Part E, commit and video

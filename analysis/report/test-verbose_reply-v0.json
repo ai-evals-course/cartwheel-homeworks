@@ -1,0 +1,45 @@
+{
+  "judge_id": "verbose_reply-v0",
+  "split": "test",
+  "tpr": 0.1905,
+  "tnr": 0.8947,
+  "tpr_interval": [
+    0.0767,
+    0.4
+  ],
+  "tnr_interval": [
+    0.6861,
+    0.9706
+  ],
+  "agreement": 0.525,
+  "tp": 4,
+  "fn": 17,
+  "tn": 17,
+  "fp": 2,
+  "n": 40,
+  "disagreements": [
+    "20cfb34964e90b24a7ffca0dd827aa5c",
+    "214a9664bbe02ff28addbc7a31c7b36b",
+    "26be5d0ecf9ef929076758825f818a1d",
+    "3ea0b3e13ac5d04540b99b32ab7899c1",
+    "71dd82e225587efb0b96091501b7f9f0",
+    "7d39703c00359e1ece85dd29d1fb02b7",
+    "8a4b8393c3fc0c2ea633bfe6577cb462",
+    "95236a75300dcabe92b5b881cce01a41",
+    "9c550c45be48d652083d481879f65520",
+    "9f364d7dd24fe1ee44a91039aefa4c18",
+    "af83dfdaaa89b9bfd51d75b9b0f8c8d2",
+    "b6cf93a3d5198d44b87aea2b6cc34be2",
+    "b91b19c5af698bb46951dc512135371e",
+    "be629428cc3b148066befa3fcda0967f",
+    "d2c00ee7f6ceaba26dfc3927accf68b0",
+    "e197344ac6c0e5f811a4f3492c2b0239",
+    "ee63b464493a6669fb23da2b87c199ed",
+    "f47303d80a62b6ffdaccc490ebe77db8",
+    "ffe3857a020e5c55ea953479e7157963"
+  ],
+  "class_counts": {
+    "pass": 21,
+    "fail": 19
+  }
+}

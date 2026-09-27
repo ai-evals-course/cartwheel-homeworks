@@ -6,6 +6,8 @@ Run from the repository root:
     uv run python -m analysis.run_judges split       # split labels once (20/40/40, seed 7)
     uv run --env-file .env python -m analysis.run_judges dev analysis/prompts/verbose_reply-v0.txt
     uv run --env-file .env python -m analysis.run_judges resume verbose_reply-v0
+    uv run python -m analysis.run_judges freeze verbose_reply-v0
+    uv run --env-file .env python -m analysis.run_judges test verbose_reply-v0
 
 The judge reads ``analysis/state/hw5_trace_inputs.json`` through
 ``CARTWHEEL_JUDGE_TRACE_SOURCE``. The helpers flatten each record's ``trace``
@@ -194,9 +196,42 @@ def resume_development(judge_id: str) -> dict[str, Any]:
     return _dev_metrics(judge_id)
 
 
+def freeze(judge_id: str) -> dict[str, Any]:
+    """Freeze the chosen version once. Freezing is one-way and unlocks test."""
+    from analysis.helpers import freeze_judge
+
+    judge = freeze_judge(judge_id)
+    return {"judge_id": judge_id, "status": judge["status"], "frozen_at": judge["frozen_at"]}
+
+
+def run_test(judge_id: str) -> dict[str, Any]:
+    """Freeze the judge (if not yet frozen), run the test split, save metrics.
+
+    Safe to rerun after an interruption: it never freezes twice, and cached
+    predictions are reused, so only missing test traces are sent.
+    """
+    from analysis.helpers import freeze_judge, judge_alignment, run_judge
+    from analysis.helpers import tools
+
+    _use_saved_inputs()
+    if tools._load_judge(judge_id).get("status") != "frozen":
+        freeze_judge(judge_id)
+    run_judge(judge_id, split="test", batch_size=10)
+    metrics = judge_alignment(judge_id, split="test")
+    splits = json.loads((STATE / "splits.json").read_text())[MODE]
+    labels = {r["trace_id"]: r["label"] for r in _hw5_labels(MODE)}
+    metrics["class_counts"] = {
+        "pass": sum(labels[t] == 1 for t in splits["test"]),
+        "fail": sum(labels[t] == 0 for t in splits["test"]),
+    }
+    REPORT.mkdir(parents=True, exist_ok=True)
+    (REPORT / f"test-{judge_id}.json").write_text(json.dumps(metrics, indent=2) + "\n")
+    return metrics
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["prepare", "split", "counts", "dev", "resume"])
+    parser.add_argument("command", choices=["prepare", "split", "counts", "dev", "resume", "freeze", "test"])
     parser.add_argument("target", nargs="?", help="prompt path (dev) or judge id (resume)")
     args = parser.parse_args()
     if args.command == "prepare":
@@ -210,6 +245,11 @@ def main() -> None:
         print(json.dumps({k: v for k, v in metrics.items() if k != "disagreements"}, indent=2))
     elif args.command == "resume":
         metrics = resume_development(args.target)
+        print(json.dumps({k: v for k, v in metrics.items() if k != "disagreements"}, indent=2))
+    elif args.command == "freeze":
+        print(json.dumps(freeze(args.target), indent=2))
+    elif args.command == "test":
+        metrics = run_test(args.target)
         print(json.dumps({k: v for k, v in metrics.items() if k != "disagreements"}, indent=2))
     else:
         print(split_counts())
