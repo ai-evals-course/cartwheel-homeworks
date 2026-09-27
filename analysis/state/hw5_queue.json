@@ -334,7 +334,7 @@
         "scenario_id": "support-0103",
         "target_trace_id": "1c303c23853df10222595fe6ecd94979",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -392,7 +392,7 @@
         "scenario_id": "support-0118",
         "target_trace_id": "c89578e38c4b96f863924e674a641410",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -401,7 +401,7 @@
         "scenario_id": "support-0120",
         "target_trace_id": "168a15f8b84afda8f86b4a50f1b84eed",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -424,7 +424,7 @@
         "scenario_id": "support-0132",
         "target_trace_id": "e8b29aebeba277d2188c44b7b06fa857",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -454,7 +454,7 @@
         "scenario_id": "support-0140",
         "target_trace_id": "40d0f6aacf480458663c499339224483",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -463,7 +463,7 @@
         "scenario_id": "support-0151",
         "target_trace_id": "985896bc93ebb76b863326ab874ee8c7",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -493,7 +493,7 @@
         "scenario_id": "support-0158",
         "target_trace_id": "5d6e74bd0f2c3712ef553e1b3e6a348d",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -502,7 +502,7 @@
         "scenario_id": "support-0161",
         "target_trace_id": "682678d4f391ccee11e351119321f4e2",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -518,7 +518,7 @@
         "scenario_id": "support-0168",
         "target_trace_id": "3ab3db94f9fbd20c5b0c22197a9a42de",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -527,7 +527,7 @@
         "scenario_id": "support-0169",
         "target_trace_id": "f47303d80a62b6ffdaccc490ebe77db8",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "boundary v1: unsolicited_next_steps Fail on turn 1, verbose_reply Pass"
         ]
@@ -571,7 +571,7 @@
         "scenario_id": "support-0177",
         "target_trace_id": "aec73e9746f1386f167fe1fc24af0e3f",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -601,7 +601,7 @@
         "scenario_id": "support-0192",
         "target_trace_id": "9f364d7dd24fe1ee44a91039aefa4c18",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional",
           "boundary v1: unsolicited_next_steps Fail on turn 2, verbose_reply Pass"
@@ -639,7 +639,7 @@
         "scenario_id": "support-0202",
         "target_trace_id": "8a4b8393c3fc0c2ea633bfe6577cb462",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -655,7 +655,7 @@
         "scenario_id": "support-0204",
         "target_trace_id": "ccb9ac73056c94dcb5bb2b7149a3652b",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -671,7 +671,7 @@
         "scenario_id": "support-0212",
         "target_trace_id": "67ca5956e4cfc57aa0cdc669cfab234a",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional",
           "boundary v1: irrelevant_policy_nuance Fail on turn 1, verbose_reply Pass"
@@ -695,7 +695,7 @@
         "scenario_id": "support-0217",
         "target_trace_id": "1d64910a303986a1ecc4e7f95fb341aa",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional",
           "boundary v1: irrelevant_policy_nuance Fail on turn 1, verbose_reply Pass"
@@ -705,7 +705,7 @@
         "scenario_id": "support-0219",
         "target_trace_id": "d2c00ee7f6ceaba26dfc3927accf68b0",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -714,7 +714,7 @@
         "scenario_id": "support-0222",
         "target_trace_id": "39ea9fe80e643bd559810cbdbb43a6a3",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -730,7 +730,7 @@
         "scenario_id": "support-0229",
         "target_trace_id": "f3dd0cc0250e005e551762780c888874",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "boundary v1: unsolicited_next_steps Fail on turn 1, verbose_reply Pass"
         ]
@@ -760,7 +760,7 @@
         "scenario_id": "support-0237",
         "target_trace_id": "173c7634991214ea6016d17d3a3fa865",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]
@@ -769,7 +769,7 @@
         "scenario_id": "support-0243",
         "target_trace_id": "7117832e7d57b89b4bb95c7c60ff52d9",
         "origin": "hw4",
-        "status": "needs_review",
+        "status": "done",
         "reasons": [
           "HW4 label is agent provisional"
         ]

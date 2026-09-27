@@ -40,6 +40,7 @@ Chosen 2026-09-26. Of the three modes with 30+ Fail conversations, it is the onl
 | --- | ---: | ---: | ---: |
 | HW4 labels, human only (2026-09-26) | 30 | 40 | 30 (agent provisional) |
 | HW5 queue built (2026-09-26): carried from HW4 | 28 | 35 | 37 queued for review |
+| **HW5 labels complete (2026-09-26)** | **47** | **53** | 0 |
 
 Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 total.
 
@@ -53,12 +54,12 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 ### Part A, choose one failure mode
 - [x] Choose mode: `verbose_reply`
 - [x] Boundary decisions (see definition v1 and Decisions)
-- [ ] Recheck labels affected by the boundary change (see Decisions, 2026-09-26)
-- [ ] Confirm the 30 conversations that still have `agent_provisional` labels
-- [ ] Enrich: `next_to_label(mode="verbose_reply", strategy="enrich")`, label candidates
-- [ ] At least 30 Pass and 30 Fail conversations, human labeled
+- [x] Recheck labels affected by the boundary change: 7 moved to Fail, 3 stayed Pass (0006, 0169, 0229)
+- [x] Confirm the 30 conversations that still have `agent_provisional` labels
+- [x] Enrich: not needed (47 Fail, 53 Pass from 100 conversations)
+- [x] At least 30 Pass and 30 Fail conversations, human labeled (100 conversations, one label each)
 - [x] Review app: "HW5 labels" tab writes `analysis/state/hw5_labels/verbose_reply.jsonl` (1 = Pass, 0 = Fail); HW4 labels untouched. Queue built by `analysis/hw5_queue.py` into `analysis/state/hw5_queue.json` (2026-09-26)
-- [ ] Review the 37 queued conversations (30 with provisional HW4 labels, 10 on the boundary recheck list, 3 overlap)
+- [x] Review the 37 queued conversations (30 with provisional HW4 labels, 10 on the boundary recheck list, 3 overlap)
 
 ### Part B, prepare inputs and split
 - [ ] `analysis/run_judges.py`: `prepare_inputs()` writes `analysis/state/hw5_trace_inputs.json`
@@ -106,3 +107,4 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 - **2026-09-26, labels to recheck after the boundary change.** Currently labeled Pass for `verbose_reply` but Fail for a neighbor:
   - `unsolicited_next_steps` Fail (human labels): support-0006, 0011, 0037, 0040, 0052, 0169, 0192, 0229
   - `irrelevant_policy_nuance` Fail (provisional): support-0212, 0217
+- **2026-09-26, agent change (outside HW5 scope).** support-0103 showed the agent reasoning without the current date. Added `Today's date: {today}` (from `db.world_asof`, 2026-07-01) to the session context in `SYSTEM_PROMPT_TEMPLATE`; SPEC RESP-7 note updated. Affects new runs only: HW5 judges the saved HW3 traces, and the 0103 label stays a verbosity judgment. This is the `no_reference_date` mode's fix.

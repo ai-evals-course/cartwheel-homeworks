@@ -55,6 +55,7 @@ platform; you serve its shoppers, merchants, and support staff.
 - User role: {role}
 - User id: {user_id}
 - Store id: {store_id}
+- Today's date: {today}. Compute return windows and deadlines from this date.
 
 ## Capabilities and boundaries
 You help with: order status, returns and refunds, product and policy
@@ -93,7 +94,17 @@ def render_system_prompt(ctx: AuthContext, template: str | None = None) -> str:
         role=ctx.role,
         user_id=ctx.user_id,
         store_id=ctx.store_id if ctx.store_id is not None else "none",
+        today=_world_today(),
     )
+
+
+def _world_today() -> str:
+    """The world's fixed date (RESP-7), or "unknown" when the database is missing."""
+    try:
+        with db.connection() as conn:
+            return db.world_asof(conn).isoformat()
+    except Exception:
+        return "unknown"
 
 
 def prompt_version(template: str | None = None) -> str:

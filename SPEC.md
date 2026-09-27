@@ -148,8 +148,9 @@ Requirements that do not fit in the sections above, including tone and style gui
   and the inconsistency rather than the inference. *Added in HW4
   (2026-09-21) from Workshop review; motivating annotations `muat4ln8zme38`
   (support-0054), `muat6waaziwzz` (support-0230), `muat8yknal4y1`
-  (support-0245). The prompt does not yet include the date; the seed world
-  is as of 2026-07-01 (`seed/generate.py`, `db.world_asof`).*
+  (support-0245). The seed world is as of 2026-07-01 (`seed/generate.py`,
+  `db.world_asof`). Since 2026-09-26 the system prompt states this date
+  in its session context (motivating trace: support-0103).*
 - **RESP-8.** A reply that reports the result of `issue_refund` or
   `cancel_order`, or answers an order status question, always includes the
   order (number, product title, store), the amount or current status, what
