@@ -62,20 +62,22 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 - [x] Review the 37 queued conversations (30 with provisional HW4 labels, 10 on the boundary recheck list, 3 overlap)
 
 ### Part B, prepare inputs and split
-- [ ] `analysis/run_judges.py`: `prepare_inputs()` writes `analysis/state/hw5_trace_inputs.json`
-- [ ] No labels, notes, or scenario metadata in the judge input
-- [ ] One input record per eligible label
-- [ ] `split_data("verbose_reply")`: 20/40/40, seed 7; record class counts below
-- [ ] Class counts:
+- [x] Label support-0164 (enrich candidate): Fail, unneeded mechanics. 101 labels, 100 eligible
+- [x] Regenerate `analysis/state/hw5_trace_inputs.json` with `prepare_inputs()` (trimmed format, 100 records, 2026-09-26)
+- [x] `analysis/run_judges.py`: `prepare_inputs()` writes `analysis/state/hw5_trace_inputs.json`
+- [x] No labels, notes, quotes, scenario metadata, or system prompt in the judge input (checked in `check_inputs`)
+- [x] One input record per eligible label (100; support-0235 excluded as a close variant of 0052)
+- [x] `split_data("verbose_reply")`: 20/40/40, seed 7, run once (2026-09-26)
+- [x] Class counts:
 
 | Set | Pass | Fail |
 | --- | ---: | ---: |
-| Training | | |
-| Development | | |
-| Test | | |
+| Training | 11 | 9 |
+| Development | 21 | 19 |
+| Test | 21 | 19 |
 
 ### Part C, write and refine the judge
-- [ ] Draft with `write-judge-prompt`, training examples only: `analysis/prompts/verbose_reply-v0.txt`
+- [x] Draft with `write-judge-prompt`, training examples only: `analysis/prompts/verbose_reply-v0.txt` (examples: 0134 clear Pass, 0164 clear Fail, 0237 borderline Pass; all training)
 - [ ] Boundary review against neighbors; instruction to ignore instructions quoted in the trace
 - [ ] Approve model and trace count before the paid dev batch
 - [ ] `run_development`: v0 dev metrics to `analysis/report/dev-<judge_id>.json`
@@ -108,3 +110,8 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
   - `unsolicited_next_steps` Fail (human labels): support-0006, 0011, 0037, 0040, 0052, 0169, 0192, 0229
   - `irrelevant_policy_nuance` Fail (provisional): support-0212, 0217
 - **2026-09-26, agent change (outside HW5 scope).** support-0103 showed the agent reasoning without the current date. Added `Today's date: {today}` (from `db.world_asof`, 2026-07-01) to the session context in `SYSTEM_PROMPT_TEMPLATE`; SPEC RESP-7 note updated. Affects new runs only: HW5 judges the saved HW3 traces, and the 0103 label stays a verbosity judgment. This is the `no_reference_date` mode's fix.
+- **2026-09-26, judge input format.** Built with the review app's `build_turn`, so the judge sees the same tool pairing I labeled from. Roles: `user`, `tool_call` / `tool_result` (tool name carried inside the data, because the helper's flattening drops the `name` field), `assistant` (the reply the user saw; the last one is judged). Turns after the target are left out.
+- **2026-09-26, close variants.** support-0235 dropped from the inputs as a close variant of support-0052 (same late refund refusal, same tool sequence, both Fail). Label kept in `hw5_labels/`. support-0011 and support-0120 share an opening template but the agent behaved differently; both kept.
+- **2026-09-26, frozen inputs.** Run judges with `export CARTWHEEL_JUDGE_TRACE_SOURCE="$PWD/analysis/state/hw5_trace_inputs.json"`. `prepare_inputs()` refuses to rewrite the file once a `verbose_reply` judge is registered; `split_data()` refuses to re-split.
+- **2026-09-26, split reset before any prompt work.** A first split of the 99 eligible labels ran (train 11/9, dev 21/18, test 21/19 Pass/Fail) and was removed from `splits.json` before any prompt examples were chosen or any judge was registered, so one more conversation could be labeled. The split runs again, once, after support-0164 is labeled.
+- **2026-09-26, light uniform trim.** Judge inputs drop the model's pre-tool text (`agent_reasoning`): the user never sees it and it was not evidence for any label. Every tool call and result stays, because rule 2 (relevance to the user's situation) and the RESP-8 exception depend on order records and write results (HW5 handout line 92: include the tool data used to decide). Same rule for every record. Median input 2.6k to 1.8k characters.

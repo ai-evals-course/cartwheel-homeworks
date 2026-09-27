@@ -16,7 +16,7 @@
       ],
       "unit": "One record per conversation. Target = the turn labeled Fail, otherwise the last turn. Earlier turns are context."
     },
-    "updated_at": "2026-09-26T23:35:58+00:00",
+    "updated_at": "2026-09-27T00:44:46+00:00",
     "items": [
       {
         "scenario_id": "support-0001",
@@ -611,7 +611,7 @@
         "scenario_id": "support-0194",
         "target_trace_id": "dabe65f6482e93bce5a1c2f2847f5374",
         "origin": "hw4",
-        "status": "carried",
+        "status": "done",
         "reasons": []
       },
       {
@@ -794,6 +794,15 @@
         "origin": "hw4",
         "status": "carried",
         "reasons": []
+      },
+      {
+        "scenario_id": "support-0164",
+        "target_trace_id": "73a47cfaf95115f78c5858a478a9560f",
+        "origin": "enrich",
+        "status": "done",
+        "reasons": [
+          "enrich candidate: semantic neighbor of a confirmed failure"
+        ]
       }
     ]
   }
