@@ -1,0 +1,34 @@
+{
+  "judge_id": "verbose_reply-v1",
+  "split": "dev",
+  "tpr": 0.25,
+  "tnr": 1.0,
+  "tpr_interval": [
+    0.1018,
+    0.495
+  ],
+  "tnr_interval": [
+    0.862,
+    1.0
+  ],
+  "agreement": 0.7,
+  "tp": 4,
+  "fn": 12,
+  "tn": 24,
+  "fp": 0,
+  "n": 40,
+  "disagreements": [
+    "283e5e53dc518598a6dfedd6c9700364",
+    "2ef8a2a1c8e8e40b12af387014c5a0af",
+    "61bc4731a02edf2386259eabdef1747f",
+    "6e1176c923472c7dfd512ef36097b020",
+    "891be4deb9dc6edd8ba871ee3d54500a",
+    "8d9b7ca383decc606861ae9405a7b3c3",
+    "9866e2d06822061c27b69381595caef3",
+    "c8028783f8a9ef8b275855fa5e1125c9",
+    "e7cec92d6e2a72b0e19b082a972b5e8e",
+    "e8b29aebeba277d2188c44b7b06fa857",
+    "f3dd0cc0250e005e551762780c888874",
+    "fc8d189e31fd5f5951a11f951fd17142"
+  ]
+}

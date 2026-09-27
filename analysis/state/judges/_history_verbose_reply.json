@@ -3,6 +3,22 @@
     {
       "judge_id": "verbose_reply-v0",
       "prompt_hash": "78497f500aab"
+    },
+    {
+      "judge_id": "verbose_reply-v1",
+      "prompt_hash": "43c52624247e"
+    },
+    {
+      "judge_id": "verbose_reply-v2",
+      "prompt_hash": "4c0f16fb59d3"
+    },
+    {
+      "judge_id": "verbose_reply-v3",
+      "prompt_hash": "21c0a914d14f"
+    },
+    {
+      "judge_id": "verbose_reply-v4",
+      "prompt_hash": "13f4b30af309"
     }
   ]
 }

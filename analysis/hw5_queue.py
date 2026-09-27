@@ -37,20 +37,23 @@ QUEUE_FILE = STATE / "hw5_queue.json"
 MODE = "verbose_reply"
 
 DEFINITION = {
-    "version": "v1",
+    "version": "v2",
     "question": "Does the target assistant reply contain content the user did not need for their next decision?",
     "fail_rules": {
         "repetition": "States the same fact or instruction more than once.",
         "unneeded_mechanics": "Policy mechanics, caveats, or background the user did not ask about and that are not relevant to their situation, so the reply gives too much detail or overcomplicates the answer (includes override or exception mentions that do not apply).",
-        "unsolicited_next_steps": "Offers next steps or further actions the user did not ask for.",
+        "unsolicited_next_steps": "Offers a different or additional action beyond the user's request. Telling the user how to continue the same request is not an unsolicited next step."
     },
     "pass": "The reply gives the answer, one citation, and at most one sentence of relevant context.",
     "never_verbose": [
-        "RESP-8 fields after issue_refund / cancel_order or an order status answer: order (number, title, store), amount or status, what happens next, timing.",
+        "RESP-8 fields after issue_refund / cancel_order or an order status answer: order (number, title, store), amount or status, what happens next (including queued for human review), timing, and a link to the relevant policy.",
+        "Explaining the outcome: one or two sentences on why an action could not be done, was escalated, or was queued (RESP-4, ESC-1), and lookup details that directly confirm the answer.",
+        "Refusals and cannot-do replies: a brief refusal plus one sentence on what the user can do instead or how to continue the same request.",
         "Policy detail that bears directly on the user's situation or decision.",
         "Tool calls. Judge only the user-visible reply; redundant lookups are a separate mode.",
+        "Short-answer requests: keep the outcome, the required fields, and a clause on why it cannot be done; explanations of how the process works (thresholds, internal rules, approval mechanics) become unneeded mechanics (RESP-8)."
     ],
-    "unit": "One record per conversation. Target = the turn labeled Fail, otherwise the last turn. Earlier turns are context.",
+    "unit": "One record per conversation. Target = the turn labeled Fail, otherwise the last turn. Earlier turns are context."
 }
 
 # Boundary v1 (2026-09-26) moved these neighbors inside verbose_reply.

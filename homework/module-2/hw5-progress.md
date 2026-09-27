@@ -27,6 +27,14 @@ Chosen 2026-09-26. Of the three modes with 30+ Fail conversations, it is the onl
 
 **Unit.** One record per conversation. The target reply is the turn labeled Fail if there is one, otherwise the last turn. Earlier turns go in as context.
 
+### Definition v2 (2026-09-26, after v0 dev review)
+
+Changes from v1, from the dev disagreement review (no dev text in the prompt):
+
+- Rule 3 narrowed: unsolicited next steps are offers of a different or additional action. Telling the user how to continue the same request is not rule 3.
+- Never verbose, added: explaining the outcome in one or two sentences (why it could not be done, was escalated, or was queued; RESP-4, ESC-1); lookup details that confirm the answer; a brief refusal plus one sentence on what the user can do instead; a link to the relevant policy in a refund or cancellation report; "queued for human review" is a required field.
+- Short-answer requests (RESP-8): keep the outcome, the required fields, and a clause on why it cannot be done. Explanations of how the process works (thresholds, internal rules, approval mechanics) become unneeded mechanics.
+
 **Neighbors.**
 
 - `unsolicited_next_steps`: now folded into Fail rule 3.
@@ -82,14 +90,24 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 - [x] Approve model and trace count before the paid dev batch (gpt-4o-mini, 40 dev traces, approved 2026-09-26)
 - [x] `run_development`: v0 dev metrics to `analysis/report/dev-verbose_reply-v0.json`
 - [x] Review app shows judge verdict and critique beside my label (HW5 tab, decisions saved to `analysis/state/hw5_dev_review.jsonl`)
-- [ ] Inspect every v0 disagreement (14) and record a decision
-- [ ] Revision 1 (optional)
-- [ ] Revision 2 (optional, max)
+- [x] Inspect every v0 disagreement (14) and record a decision (2026-09-26): judge wrong 5 (0028, 0042, 0087, 0115, 0132), label wrong 5 (0006, 0047, 0066, 0120, 0183, relabeled Pass to Fail), definition unclear 4 (0172, 0174, 0229, 0250)
+- [x] Revision 1: `analysis/prompts/verbose_reply-v1.txt` (definition v2; adds training examples 0030 and 0184; dev-derived wording removed). Run 2026-09-26, `analysis/report/dev-verbose_reply-v1.json`
+- [x] Inspect every v1 disagreement (12): definition unclear 6, judge wrong 4, label wrong 2 (0042, 0229 to Fail); dev now 14 Pass / 26 Fail
+- [x] Revision 2: `analysis/prompts/verbose_reply-v2.txt` (same rules; allowed categories first, tagged sentence-by-sentence critique, default Pass unless a quoted sentence breaks a rule; examples 0134, 0164, 0030, 0184). Run 2026-09-27, `analysis/report/dev-verbose_reply-v2.json`
+- [ ] Inspect every v2 disagreement (10)
+- [x] Revision 3 (beyond the handout's two-revision limit, my choice): `analysis/prompts/verbose_reply-v3.txt`, written fresh by a separate agent from training data, my labels and notes, and the dev error review only (no earlier prompts). 4.5k characters; examples 0164 (Fail), 0030 (Pass), 0184 (Pass), 0194 (Fail); Example 1 critique also cites the store override paragraph (rule 2). Run 2026-09-27, `analysis/report/dev-verbose_reply-v3.json`
+- [x] Revision 4: `analysis/prompts/verbose_reply-v4.txt` = v3 plus the out-of-scope exception in rule 3. Run 2026-09-27, `analysis/report/dev-verbose_reply-v4.json`
 - [ ] Why I stopped revising
 
 | Version | Change | Dev TPR [95% CI] | Dev TNR [95% CI] | Label flips |
 | --- | --- | --- | --- | --- |
 | v0 | initial draft (0134, 0164, 0237 examples; visible conversation only) | 0.333 [0.172, 0.546] (TP 7, FN 14) | 1.000 [0.832, 1.000] (TN 19, FP 0) | 0 |
+| v0, relabeled | same predictions, 5 dev labels fixed after review (dev now 16 Pass / 24 Fail); `analysis/report/dev-verbose_reply-v0-relabeled.json` | 0.438 [0.231, 0.668] (TP 7, FN 9) | 1.000 [0.862, 1.000] (TN 24, FP 0) | 5 |
+| v1 | definition v2 rules (outcome explanations, refusals, short-answer rule, narrower rule 3); training examples 0030 and 0184 added | 0.250 [0.102, 0.495] (TP 4, FN 12) | 1.000 [0.862, 1.000] (TN 24, FP 0) | 0 |
+| v2 | same rules; allowed categories first, sentence-by-sentence tagged critique, Fail only on a quoted sentence; examples 0134, 0164, 0030, 0184 | 0.429 [0.214, 0.674] (TP 6, FN 8) | 0.923 [0.759, 0.979] (TN 24, FP 2) | 0 |
+| v3 | fresh 4.5k prompt (default Pass, quote-to-fail, 3 rules, 4 training examples); third revision | 0.357 [0.163, 0.612] (TP 5, FN 9) | 1.000 [0.871, 1.000] (TN 26, FP 0) | 0 |
+| v4 | v3 plus a rule 3 exception: after refusing an out-of-scope request, one sentence on what the assistant can help with is fine; fourth revision | 0.357 [0.163, 0.612] (TP 5, FN 9) | 0.962 [0.811, 0.993] (TN 25, FP 1) | 0 |
+| **All on current labels** (14 Pass / 26 Fail) | v0 0.500 [0.268, 0.732] / 1.000 [0.871, 1.000]; v1 0.286 [0.117, 0.547] / 1.000; v2 0.429 [0.214, 0.674] / 0.923 [0.759, 0.979] | | | |
 
 ### Part D, freeze and test
 - [ ] Choose final version (my decision)
@@ -119,3 +137,5 @@ Minimum: 30 Fail and 30 Pass from independent conversations. Target: about 100 t
 - **2026-09-26, support-0194 kept Fail** (training): repetition, the delivery date is stated three ways.
 - **2026-09-26, visible conversation only.** Tool calls and results removed from the prompt examples and from `hw5_trace_inputs.json` (option A): verbosity is judged from what the user saw, and I labeled from the reply itself. Inputs are `user` and `assistant` messages for every turn up to the target (median 645 characters). Supersedes the light-trim entry above. Trace ids unchanged, so the split stands. Known risk: relevance calls that depend on facts the reply does not state (for example support-0008, where no store override applied).
 - **2026-09-26, target turn mix-up (dev).** The queue picked the target turn from HW4 labels, including agent-provisional ones. For support-0120 and support-0038 that made turn 1 of 2 the target, while I read to the end of the conversation. The judge saw only turn 1. Inputs are locked after v0, so the fix is to relabel those two against turn 1, not to move the target. The review app no longer allows moving the target for conversations in the split.
+- **2026-09-27, support-0237 is a Fail.** ", not automatically" is an unrequested contrast (rule 2), the same call as support-0047. Training label changed to Fail (repetition). Not used as an example in v2; the unedited reply stays in the v0 and v1 prompts as they were run.
+- **2026-09-27, third revision.** v1 and v2 each fixed some dev errors and caused others, and both got longer. I asked for a fresh, shorter prompt written without looking at v0 to v2, to test whether a simpler prompt does better. This exceeds the handout's two revisions and makes dev scores more optimistic; the test split is still untouched, so the test result stays unbiased.

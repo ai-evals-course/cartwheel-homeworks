@@ -1,0 +1,32 @@
+{
+  "judge_id": "verbose_reply-v0",
+  "split": "dev",
+  "labels": "after dev review relabels (2026-09-26)",
+  "tpr": 0.4375,
+  "tnr": 1.0,
+  "tpr_interval": [
+    0.231,
+    0.6682
+  ],
+  "tnr_interval": [
+    0.862,
+    1.0
+  ],
+  "agreement": 0.775,
+  "tp": 7,
+  "fn": 9,
+  "tn": 24,
+  "fp": 0,
+  "n": 40,
+  "disagreements": [
+    "2ef8a2a1c8e8e40b12af387014c5a0af",
+    "61bc4731a02edf2386259eabdef1747f",
+    "6e1176c923472c7dfd512ef36097b020",
+    "891be4deb9dc6edd8ba871ee3d54500a",
+    "8d9b7ca383decc606861ae9405a7b3c3",
+    "c8028783f8a9ef8b275855fa5e1125c9",
+    "e7cec92d6e2a72b0e19b082a972b5e8e",
+    "e8b29aebeba277d2188c44b7b06fa857",
+    "f3dd0cc0250e005e551762780c888874"
+  ]
+}
