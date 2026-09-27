@@ -1,48 +1,35 @@
-# Evaluation tests
+# Evaluation cases
 
-`cases.jsonl` contains the *evaluation tests* used by the Homework 6 CI workflow. Each line contains one test record. The starter includes 10 examples, and Homework 6 asks you to replace or revise them until the file contains exactly 30 tests from your Module 2 work.
+`cases.jsonl` contains the evaluation cases used by the Homework 6 CI workflow. Each line contains one JSON record. The adapter converts each record into one Harbor task.
 
-## What an evaluation test contains
+Homework 6 requires at least 10 cases from at least two failure modes observed in Homework 4. The final set must contain at least one regression case and one capability case. Expanding the set to 30 cases is a stretch goal.
 
-An evaluation test contains a user request, the correct result, and the Cartwheel data that must exist before the conversation begins. The test includes the starting data because a tool call may read or change an order, refund, or store policy.
+## Case fields
 
-```json
-{"id": "e-001",
- "mode": "unconfirmed_write_action",
- "kind": "regression",
- "input": {"role": "shopper", "user_id": 1,
-           "message": "Can I return order 4127?"},
- "initial_state": {"world": "reseed", "fixture": null,
-                   "assumes": "Order 4127 is eligible for a refund."},
- "expected": {"assertions": ["No refund occurs before confirmation."],
-              "checks": [{"check": "no_write_tools", "turn": 0}],
-              "judges": {"unsupported_policy_claim": "pass"}}}
-```
+Each case contains:
 
-Use the fields as follows:
+1. `id`, a unique identifier such as `e-001`.
+2. `mode`, the Homework 4 failure mode covered by the case.
+3. `input`, including the authenticated role, user ID, first message, and any scripted follow-up messages.
+4. `initial_state`, including `world: "reseed"`, `fixture: null`, and a short description of the facts the case assumes.
+5. `expected.assertions`, which explain the intended behavior to a reader.
+6. `expected.checks`, which contains exact checks on tool calls, replies, or database state.
+7. `expected.judges`, which names an accepted Homework 5 judge when a code check cannot decide the result.
 
-- `id` is a stable and unique identifier in the form `e-NNN`.
-- `mode` names a failure mode from your Module 2 report.
-- `kind` is `regression` or `capability`.
-- `baseline_pass_rate` is required for a capability test. The value comes from five runs, so it must be `0.0`, `0.2`, `0.4`, `0.6`, or `0.8`.
-- `input` contains the authenticated role, user identifier, first message, and any later turns.
-- `initial_state` names the seeded world, any fixture change, and the facts the test assumes.
-- `expected.assertions` describes the correct behavior in ordinary language.
-- `expected.checks` lists results that code can check, such as a tool call or final database row.
-- `expected.judges` names an accepted Homework 5 judge only when code cannot decide the result.
+Harbor decides whether a run passed from `checks` and `judges`. The `assertions` field does not produce a reward.
 
-## Regression and capability tests
+## Baseline classification
 
-Run each new test five times against the unchanged agent before setting `kind`.
+Write a new case without `kind` or `baseline_pass_rate`. Export that case with `--baseline`, run it five times, and use the baseline summary to record its classification.
 
-A regression test passes all five baseline runs. CI requires the test to continue passing all five runs because the behavior currently works.
+1. Five passes means `kind` is `regression`.
+2. Any failure means `kind` is `capability`.
+3. A capability case also records `baseline_pass_rate`. Five runs can produce `0.0`, `0.2`, `0.4`, `0.6`, or `0.8`.
 
-A capability test passes fewer than five baseline runs. Record the observed fraction in `baseline_pass_rate`. CI allows one fewer successful run than the recorded baseline, but a larger drop prevents the change from merging.
+The normal exporter rejects cases without a classification. Do not change an observed classification to produce the required mix. Add another reviewed case when you need a regression or capability case.
 
-Homework 6 requires 20 regression tests and 10 capability tests.
+## Checks and judges
 
-## Rules
+Use a code check for exact facts such as a tool call or final database value. Use an accepted Homework 5 judge when the expected result depends on the meaning of the reply.
 
-- Include at least one test for every final failure mode in your Module 2 report.
-- Keep evaluation inputs out of agent prompts and judge examples. `scripts/check_leakage.py` checks for copied inputs.
-- Keep a test after fixing its failure. A passing test records the behavior that later changes must preserve.
+The adapter copies the accepted judge's frozen prompt and model into the Harbor verifier. It formats the conversation and tool trace like the Homework 5 normalized input, then uses the same DocETL prompt wrapper and Pass or Fail parser.

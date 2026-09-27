@@ -29,16 +29,34 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Iterator
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from agents import Agent, Runner
+from agents.tracing import get_trace_provider, set_trace_provider
+from agents.tracing.provider import DefaultTraceProvider
 
 from agent.agent import TOOLS_BY_ROLE, render_system_prompt
 from agent.auth import AuthContext
 from tests.eval.fake_model import FakeModel, text_message, tool_call
 
 SHOPPER_1 = AuthContext(user_id=1, role="shopper")
+
+
+@pytest.fixture(autouse=True)
+def disable_hosted_tracing() -> Iterator[None]:
+    """Keep scripted offline runs from starting the hosted trace exporter."""
+    previous_provider = get_trace_provider()
+    offline_provider = DefaultTraceProvider()
+    offline_provider.set_disabled(True)
+    set_trace_provider(offline_provider)
+    try:
+        yield
+    finally:
+        set_trace_provider(previous_provider)
+        offline_provider.shutdown()
 
 
 def _build_fake_agent(ctx: AuthContext, fake: FakeModel) -> Agent[AuthContext]:

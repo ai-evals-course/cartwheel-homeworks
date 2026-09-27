@@ -13,6 +13,7 @@ data/cartwheel.db
 .sessions.db-wal
 scenarios/results/
 replay/results/
+.harbor/
 
 # Local HW1 working notes and captured CLI transcripts (not submission files).
 .hw1-progress.md

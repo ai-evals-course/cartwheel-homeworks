@@ -368,6 +368,24 @@ def retrieved_docs_text(transcript: dict[str, Any]) -> str:
     return "\n\n".join(chunks) if chunks else "(no policy documents were retrieved)"
 
 
+def judge_trace_text(transcript: dict[str, Any]) -> str:
+    """Format a runtime transcript like the normalized traces used in HW5."""
+    lines: list[str] = []
+    for turn in transcript.get("turns", []):
+        lines.append(f"user: {turn.get('user', '')}")
+        for call in turn.get("tool_calls", []):
+            arguments = json.dumps(
+                call.get("args"), ensure_ascii=False, sort_keys=True, default=str
+            )
+            result = json.dumps(
+                call.get("result"), ensure_ascii=False, sort_keys=True, default=str
+            )
+            lines.append(f"tool_call: {arguments}")
+            lines.append(f"tool_result: {result}")
+        lines.append(f"assistant: {turn.get('reply', '')}")
+    return "\n".join(lines)
+
+
 def judge_reply(judge: dict[str, Any], reply: str, docs: str) -> str:
     """Run one frozen judge on a reply. Returns "pass" or "fail".
 

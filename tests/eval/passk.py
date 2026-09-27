@@ -1,7 +1,8 @@
 """pass@k, pass^k, and the CI result for one case (Module 3, Lecture 1.3).
 
 Your agent samples, so a single end-to-end run is a noisy measurement. These
-three functions turn k runs of one evaluation case into a signal and a decision:
+three functions turn n observed runs of one evaluation case into a signal and a
+decision:
 
   - :func:`pass_at_k` answers the capability question: can the agent EVER get
     this right? It rises with k.
@@ -96,16 +97,16 @@ def pass_hat_k(n: int, c: int, k: int) -> float:
 def case_passes(
     kind: str,
     passes: int,
-    k: int,
+    n: int,
     baseline_pass_rate: float | None = None,
 ) -> dict[str, Any]:
-    """Return the CI decision for one evaluation case run k times.
+    """Return the CI decision for one evaluation case run n times.
 
     The evaluation case set holds two kinds of case:
 
       - A **regression** case guards a previously fixed bug. Its pinned
-        baseline is k of k, and it blocks the merge on ANY failed run
-        (`passes < k`). A rerun is allowed only for infrastructure errors
+        baseline is n of n, and it blocks the merge on ANY failed run
+        (`passes < n`). A rerun is allowed only for infrastructure errors
         (those never reach this function; see replay/harness.py), never for
         a verdict flip.
       - A **capability** case covers a core behavior the agent has never
@@ -115,8 +116,8 @@ def case_passes(
 
     Args:
         kind: "regression" or "capability".
-        passes: number of runs that passed (0 <= passes <= k).
-        k: number of runs (k >= 1).
+        passes: number of observed runs that passed (0 <= passes <= n).
+        n: number of observed runs (n >= 1).
         baseline_pass_rate: the pinned per-case baseline in [0, 1], optional.
             Recorded for tracking but does not affect the CI decision.
 
@@ -130,9 +131,9 @@ def case_passes(
 
     Raises:
         ValueError: if kind is not "regression" or "capability", or if
-            passes is outside [0, k].
+            passes is outside [0, n].
 
-    Worked numbers (Artifact G, k = 5):
+    Worked numbers (Artifact G, n = 5):
         case_passes("regression", 5, 5)          -> pass
         case_passes("regression", 4, 5)          -> block (any failed run)
         case_passes("capability", 3, 5, 0.6)     -> pass  (never blocks)

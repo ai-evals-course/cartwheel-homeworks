@@ -1,4 +1,4 @@
-"""The sandbox-replay harness (Module 3's marquee exercise).
+"""The supplied sandbox replay harness used by later course modules.
 
 When a case fails in CI, one red run tells you almost nothing: was it
 a real regression, or the rare tail of a case that was always slightly
@@ -6,7 +6,7 @@ flaky? Rerunning until green *hides* the regression. The right move is to
 characterize the failure: replay that one input many times in a fresh, reset
 sandbox and measure the distribution.
 
-The two functions you implement are the harness core:
+The two functions below provide the harness core:
 
   - :func:`replay_case` is the fan-out loop: n rollouts, a world reset
     before every one, infrastructure retries that never touch a verdict.
@@ -18,8 +18,8 @@ The harness supplies the measurement; YOU supply the judgment. A high,
 consistent failure rate is a regression to fix and block in CI. A rare
 failure should become an evaluation case rather than a reason to block every merge. Record the decision and the measured rate in the homework artifact.
 
-Both functions take injectable callables (`runner`, `reset`) so the contract
-tests run offline with scripted rollouts. The real wiring is
+Both functions take injectable callables (`runner`, `reset`) so tests can run
+offline with scripted rollouts. The real wiring is
 `replay.rollout.world_reset` for the reset and a closure over
 `replay.rollout.run_case` + `apply_checks` for the runner; `python -m
 replay` (below in __main__.py) assembles exactly that.
@@ -27,6 +27,9 @@ replay` (below in __main__.py) assembles exactly that.
 
 from __future__ import annotations
 
+import random
+from collections import Counter
+from statistics import median
 from typing import Any, Callable
 
 
@@ -75,8 +78,27 @@ def replay_case(
     Returns:
         A list of exactly n record dicts, each with a "rollout" index added.
     """
-    ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement replay_case")
+    if n < 1:
+        raise ValueError("n must be at least 1")
+    if max_infra_retries < 0:
+        raise ValueError("max_infra_retries cannot be negative")
+
+    records: list[dict[str, Any]] = []
+    for rollout in range(n):
+        retries = 0
+        while True:
+            reset()
+            try:
+                record = dict(runner())
+            except ReplayInfraError:
+                if retries >= max_infra_retries:
+                    raise
+                retries += 1
+                continue
+            record["rollout"] = rollout
+            records.append(record)
+            break
+    return records
 
 
 def summarize_rollouts(
@@ -116,5 +138,50 @@ def summarize_rollouts(
     The summary is the measurement; the regression-versus-tail decision is
     yours, made in the write-up, from these numbers.
     """
-    ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement summarize_rollouts")
+    if not records:
+        raise ValueError("records cannot be empty")
+    if not 0 < confidence < 1:
+        raise ValueError("confidence must be between 0 and 1")
+    if bootstrap_iterations < 1:
+        raise ValueError("bootstrap_iterations must be at least 1")
+
+    n = len(records)
+    failures = sum(not bool(record.get("passed")) for record in records)
+    failure_rate = failures / n
+    rng = random.Random(seed)
+    bootstrap_rates = []
+    for _ in range(bootstrap_iterations):
+        sample = rng.choices(records, k=n)
+        bootstrap_rates.append(
+            sum(not bool(record.get("passed")) for record in sample) / n
+        )
+    bootstrap_rates.sort()
+    alpha = 1 - confidence
+    low_index = int((alpha / 2) * (len(bootstrap_rates) - 1))
+    high_index = int((1 - alpha / 2) * (len(bootstrap_rates) - 1))
+
+    mode_counts: Counter[str] = Counter()
+    for record in records:
+        if not record.get("passed"):
+            mode_counts.update(record.get("failure_modes", []))
+
+    step_values = sorted(
+        int(record["steps"]) for record in records if "steps" in record
+    )
+    step_summary = None
+    if step_values:
+        step_summary = {
+            "min": step_values[0],
+            "median": median(step_values),
+            "max": step_values[-1],
+        }
+
+    return {
+        "n": n,
+        "failures": failures,
+        "failure_rate": failure_rate,
+        "ci_low": bootstrap_rates[low_index],
+        "ci_high": bootstrap_rates[high_index],
+        "mode_counts": dict(mode_counts),
+        "steps": step_summary,
+    }
