@@ -203,6 +203,36 @@ def recalc(judge_id: str | None = None) -> None:
               f"{m['fn']} false alarms")
 
 
+def disagreement(scenario_id: str, judge_id: str = "irrelevant_policy_detail-v5") -> None:
+    """Show one trace's human label beside the judge's verdict and reasoning.
+
+    Defaults to v5, the judge whose development disagreements drove the revision.
+    """
+    import textwrap
+    rec = json.loads((STATE / "judges" / f"{judge_id}.json").read_text())
+    crit = rec["critiques"]
+    if crit and isinstance(next(iter(crit.values())), dict):
+        crit = next(iter(crit.values()))
+    preds = {}
+    for v in rec["predictions"].values():
+        preds.update(v)
+    rows = [json.loads(l) for l in LABELS.read_text().splitlines() if l.strip()]
+    row = next((r for r in rows if r["scenario_id"] == scenario_id), None)
+    if row is None:
+        raise SystemExit(f"{scenario_id} is not labelled")
+    tid = row["trace_id"]
+    human = "Pass" if row["label"] == 1 else "FAIL"
+    pred = preds.get(tid)
+    judge = "-" if pred is None else ("Pass" if pred == 1 else "FAIL")
+    print(f"\n  {scenario_id}   judge {judge_id}")
+    print(f"  human says: {human:5}      judge says: {judge}")
+    print(f"  {'AGREE' if human == judge else 'DISAGREE'}\n")
+    print("  JUDGE'S REASONING\n")
+    print(textwrap.fill(" ".join(str(crit.get(tid, "(none)")).split()), 88,
+                        initial_indent="    ", subsequent_indent="    "))
+    print()
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "prepare"
     if cmd == "prepare":
@@ -232,8 +262,11 @@ if __name__ == "__main__":
             jid = withpreds[-1].stem
             print(f"judge: {jid}")
             run_test(jid)
+    elif cmd == "why":
+        disagreement(sys.argv[2], *(sys.argv[3:4] or []))
     elif cmd == "recalc":
         recalc(sys.argv[2] if len(sys.argv) > 2 else None)
     else:
         raise SystemExit(
-            "commands: prepare | split | dev [prompt] | test [judge_id] | recalc [judge_id]")
+            "commands: prepare | split | dev [prompt] | test [judge_id] | "
+            "recalc [judge_id] | why <scenario_id> [judge_id]")

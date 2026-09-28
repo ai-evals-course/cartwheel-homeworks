@@ -1,0 +1,84 @@
+{
+ "case_id": "e-002",
+ "mode": "contradicts_eligibility_flag",
+ "n": 5,
+ "passes": 0,
+ "observed_pass_rate": 0.0,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #129 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that return! To get started, I need to look up your order for the handmade serving bowl and check the return policy for Blue Heron Ceramics.\n\nCould you share your order ID if you have it? If not, I can search for it.",
+   "tool_calls": [],
+   "rollout": 0
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #129 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that return! Let me look up your recent orders to find the serving bowl and check the return policy for Blue Heron Ceramics.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #129 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "That handmade serving bowl didn't meet your expectations \u2014 let's look into returning it to Blue Heron Ceramics. I'll pull up your order and check their return policy.I'll look up your recent orders and check Blue Heron Ceramics' return policy.\nFound your recent orders \u2014 I see two from Blue Heron Ceramics. To make sure I have the right one for the serving bowl, could you confirm if you're referring to the order delivered on June 8th?",
+   "tool_calls": [
+    "list_my_orders",
+    "get_store_info",
+    "search_help_center"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #129 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Happy to help with that return. To make sure I check the right return window and options for Blue Heron Ceramics, could you share roughly when you bought the bowl? In the meantime, let me pull up your recent orders for it.",
+   "tool_calls": [],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #129 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that return. Let me check your order and the store\u2019s policy.\nThanks \u2014 I found your order for the serving bowl.\n\nLet me confirm the return eligibility and the exact return policy that applies.",
+   "tool_calls": [
+    "search_help_center",
+    "get_store_info",
+    "find_order"
+   ],
+   "rollout": 4
+  }
+ ]
+}

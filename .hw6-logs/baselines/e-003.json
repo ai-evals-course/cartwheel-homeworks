@@ -1,0 +1,79 @@
+{
+ "case_id": "e-003",
+ "mode": "contradicts_eligibility_flag",
+ "n": 5,
+ "passes": 0,
+ "observed_pass_rate": 0.0,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #161 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help with that refund for the Copperline Tools socket set.\n\nCould you share your order number? If you don't have it, I can look it up - just to confirm, was it the Everyday Socket Set you're wanting to return?",
+   "tool_calls": [],
+   "rollout": 0
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #161 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you get your money back for that socket set. Let me first find your order for the everyday socket set from Copperline Tools to check its refund status.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #161 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you get your money back for that socket set. Let me pull up your orders with that item to check eligibility.",
+   "tool_calls": [],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #161 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you get your money back for that socket set.\n\nTo check your options, I need to find your order for the Everyday Socket Set from Copperline Tools.",
+   "tool_calls": [],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called",
+    "refund for #161 is auto_approved (saw [])"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 you want a refund for the Everyday Socket Set from Copperline Tools. I'll pull up your orders to locate it and check the return options.I'll search for that socket set in your purchase history to find the right order.\nFound your order \u2014 order **#161** for the Everyday Socket Set ($69.75, delivered June 1st) from Copperline Tools.\n\nLet me check the store's return window and our return policy to confirm your options for getting your money back.",
+   "tool_calls": [
+    "find_order",
+    "list_my_orders"
+   ],
+   "rollout": 4
+  }
+ ]
+}

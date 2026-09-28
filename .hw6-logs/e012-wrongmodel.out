@@ -1,0 +1,5 @@
+model openai/rl-muse-spark-1-3-sglang-playground   1 case(s) x 5 rollouts = 5 agent runs
+judge calls: 5
+
+  e-012  irrelevant_policy_detail       [.x...]  4/5  -> capability   1361s
+       failed check: tool get_order called

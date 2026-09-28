@@ -1,0 +1,13 @@
+model openai/rl-muse-spark-1-1-playground   1 case(s) x 5 rollouts = 5 agent runs
+judge calls: 5
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+  e-012  irrelevant_policy_detail       [xxxxx]  0/5  -> capability   1432s
+       failed check: tool get_order called
