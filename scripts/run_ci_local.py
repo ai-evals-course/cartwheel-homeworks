@@ -116,7 +116,15 @@ def main() -> None:
         json.dumps({"trial_results": trials}, indent=1) + "\n")
     print(f"\nresult -> {job / 'result.json'}")
 
-    markdown, passed = summarize_job(job, cases_path=CASES,
+    # When only a subset was run, summarise only that subset. Passing the full case
+    # file makes the report list every case that was not run as "incomplete", which
+    # buries the result under nine rows of noise.
+    cases_path = CASES
+    if args.case:
+        subset = job / "cases-subset.jsonl"
+        subset.write_text("".join(json.dumps(c) + "\n" for c in cases))
+        cases_path = subset
+    markdown, passed = summarize_job(job, cases_path=cases_path,
                                      expected_attempts=args.n_attempts)
     (job / "summary.md").write_text(markdown)
     print()
