@@ -1,0 +1,154 @@
+{
+ "trial_results": [
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 0,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 1,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 2,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 3,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 4,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 5,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 6,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 7,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 8,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 9,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 10,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 11,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 12,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 13,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 14,
+   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  }
+ ]
+}
