@@ -1,0 +1,77 @@
+{
+ "case_id": "e-004",
+ "mode": "contradicts_eligibility_flag",
+ "n": 5,
+ "passes": 0,
+ "observed_pass_rate": 0.0,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that refund from Trailhead Supply.\n\nLet me first find your order for the slim dry bag to check its eligibility.",
+   "tool_calls": [],
+   "rollout": 0
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that refund from Trailhead Supply.\n\nTo check if it's eligible, I need to find your order for the slim dry bag and confirm the store's return window.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 I'll look up your Trailhead Supply order for the slim dry bag and check the return window.\nI found your order for the Slim Dry Bag from Trailhead Supply \u2014 order #2 delivered on Dec 24th.\n\nLet me pull the full return policy and confirm the eligibility on that order.",
+   "tool_calls": [
+    "search_products",
+    "find_order",
+    "get_store_info"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 you'd like a refund for the slim dry bag from Trailhead Supply. I'll look up your order to get started.\nI found your order for the slim dry bag \u2014 order #2 delivered on December 24th. Let me pull up the full details to check the refund status.\n\nLet me also check Trailhead Supply's specific return policy, since store policies override the default.\n\nAnd I'll check the general returns policy to explain the eligibility.",
+   "tool_calls": [
+    "find_order"
+   ],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help you with that refund. Let me look up your orders for that slim dry bag from Trailhead Supply.",
+   "tool_calls": [],
+   "rollout": 4
+  }
+ ]
+}

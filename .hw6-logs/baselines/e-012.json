@@ -1,0 +1,91 @@
+{
+ "case_id": "e-012",
+ "mode": "irrelevant_policy_detail",
+ "n": 5,
+ "passes": 0,
+ "observed_pass_rate": 0.0,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {
+    "irrelevant_policy_detail": "pass"
+   },
+   "judge_critiques": {
+    "irrelevant_policy_detail": "The reply does not explain any policy rule. It only acknowledges the request to return the rustic water bottle from Meridian Cycles and says it will look up the order and the store's return window. It does not cite the $100 automatic-approval threshold, does not cite restocking fees or exemptions, and does not state a specific return window duration (Cartwheel 30-day default or any store override). Since no rule is explained, there is no rule that fails to govern this case."
+   },
+   "final_reply": "Got it \u2014 you want to return the rustic water bottle from Meridian Cycles. Let me look up your order for that item and what the return window is for that store.",
+   "tool_calls": [],
+   "rollout": 0
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {
+    "irrelevant_policy_detail": "pass"
+   },
+   "judge_critiques": {
+    "irrelevant_policy_detail": "The reply does not explain any policy rule. It only acknowledges the request to return the Rustic Water Bottle from Meridian Cycles and states intent to check the store's return rules and find the order. It does not cite the $100 auto-approval threshold, any restocking-fee rule or exemption, or any specific return window (Cartwheel default or store override). With zero rules explained, there is no rule that fails to govern the case."
+   },
+   "final_reply": "Got it \u2014 you want to return the Rustic Water Bottle from Meridian Cycles. Let me check that store's return rules and find your order to see what options you have.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {
+    "irrelevant_policy_detail": "pass"
+   },
+   "judge_critiques": {
+    "irrelevant_policy_detail": "The reply does not explain any specific policy rule. It does not cite the $100 auto-approval threshold, restocking-fee rules, or a specific return-window duration (30-day default or store override). It only states procedural intent to find the order and confirm the store's return window. To the extent return-window concept is mentioned, it governs this case because the customer explicitly requested a return for 'rustic water bottle, meridian cycles' and eligibility depends on the window. No irrelevant rule is explained."
+   },
+   "final_reply": "Got it \u2014 you want to return the rustic water bottle from Meridian Cycles. I can help with that.\n\nTo check if it's eligible, I need to find your order first and confirm the store's return window.",
+   "tool_calls": [],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {
+    "irrelevant_policy_detail": "pass"
+   },
+   "judge_critiques": {
+    "irrelevant_policy_detail": "The reply explains no policy rules. It only acknowledges the request to return the rustic water bottle from Meridian Cycles and states it will look up the order and the store's return policy. It does not cite the $100 auto-approval threshold, any restocking-fee rule or exemption, or any specific return window (Cartwheel default or store override). With zero rules explained, there is no rule that fails to govern this case."
+   },
+   "final_reply": "Got it \u2014 you want to return the rustic water bottle from Meridian Cycles. I can help with that.\n\nTo check if it's eligible, I need to look up your order and the store's return policy.",
+   "tool_calls": [],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {
+    "irrelevant_policy_detail": "pass"
+   },
+   "judge_critiques": {
+    "irrelevant_policy_detail": "The reply explains no policy rules. It does not cite the $100 auto-approval threshold, does not mention restocking fees or exemptions, and does not state any specific return window duration (e.g., 30-day default or store override). It only acknowledges the customer's request to return the rustic water bottle from Meridian Cycles and states intent to pull up orders and check the applicable return window. Since no rule is explained, there is no rule that fails to govern this case."
+   },
+   "final_reply": "Got it \u2014 you'd like to return the rustic water bottle from Meridian Cycles. Let me pull up your orders to find it and check the return window that applies.",
+   "tool_calls": [],
+   "rollout": 4
+  }
+ ]
+}

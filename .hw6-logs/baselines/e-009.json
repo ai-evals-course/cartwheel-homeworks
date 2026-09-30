@@ -1,0 +1,79 @@
+{
+ "case_id": "e-009",
+ "mode": "cites_policy_by_internal_id",
+ "n": 5,
+ "passes": 2,
+ "observed_pass_rate": 0.4,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I'll look up Northwind Books' return policy and confirm that walnut poetry collection for you.\nFound it \u2014 Northwind Books carries the Walnut Poetry Collection (I see two editions: $85.75 and $231.50).\n\nFor Northwind Books, the return window is **45 days** from delivery \u2014 that's longer than the Cartwheel default of 30 days. So you have 45 days to start a return.\n\nThere's no restocking fee for that store either.\n\nWant me to check if you have an order for it and what the eligibility looks like?",
+   "tool_calls": [
+    "get_store_info",
+    "search_products"
+   ],
+   "rollout": 0
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I'll check the return policy for that book \u2014 starting with Northwind Books' specific return window since store policies override the default.\n\nFor the Walnut Poetry Collection at Northwind Books, let me look up the store details and the product info for you.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "reply does not contain 'store-northwind-books-policy'",
+    "reply does not contain 'cw-returns'"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "That title sounds lovely \u2014 I'll check Northwind Books' return window and confirm the collection's details for you.\nFor Northwind Books, the return window is **45 days from delivery** for the Walnut Poetry Collection.\n\nThat's the store's own window which overrides the Cartwheel platform default of 30 days \u2014 so you get a bit extra time with Northwind.\n\n* Details from the help center: Northwind Books accepts returns within 45 days of delivery instead of the 30-day default, and that store window takes precedence [store-northwind-books-policy]. The 30-day default is described in [cw-returns].\n\nI saw two listings for the Walnut Poetry Collection in their catalog ($85.75 and $231.50) \u2014 both would have the same 45-day window. Northwind also doesn't charge a restocking fee.\n\nIf you have an order and want to check eligibility, just share your order ID and I can look it up for you.",
+   "tool_calls": [
+    "search_help_center",
+    "get_store_info",
+    "search_products"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "reply does not contain 'store-northwind-books-policy'"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I'll check Northwind Books' return policy for that collection.\nNorthwind Books has a **45-day return window** \u2014 that's longer than the standard 30-day Cartwheel default.\n\nThis applies to the Walnut Poetry Collection and other items from their store, as long as they're in returnable condition.\n\nReference: `store-northwind-books-policy`",
+   "tool_calls": [
+    "get_store_info"
+   ],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "reply does not contain 'store-northwind-books-policy'"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I'll check Northwind Books' return window for that Walnut Poetry collection.\nNorthwind Books offers a **45-day return window** for the Walnut Poetry collection \u2014 that's longer than the standard 30-day Cartwheel default.\n\nTheir store policy overrides the platform default, so you have 45 days from purchase to start a return [store-northwind-books-policy].\n\nDo you have an order for it you'd like me to check?",
+   "tool_calls": [
+    "get_store_info"
+   ],
+   "rollout": 4
+  }
+ ]
+}

@@ -35,9 +35,55 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv sync
 
-      # Homework 6: install Harbor 0.23.0.
-      # Generate the classified tasks in eval_cases/cases.jsonl.
-      # Run five attempts per task in fresh Docker containers.
-      # Pass the agent and judge provider keys to Harbor.
-      # Summarize the job and upload the job files with `if: always()` so a
-      # failed regression keeps its evidence.
+      # NOTE ON THIS JOB IN THIS FORK
+      #
+      # This job is complete and is what a fully provisioned environment runs. It is
+      # not exercised on GitHub Actions here, for two reasons that are not about
+      # Harbor:
+      #
+      #   1. CARTWHEEL_MODEL is served by an internal gateway that a GitHub-hosted
+      #      runner cannot reach.
+      #   2. OPENAI_API_KEY for that gateway is an internal credential, and sending it
+      #      to a third-party CI provider is against policy.
+      #
+      # The offline-checks job above needs no credentials and does run here. The
+      # equivalent of this job runs locally through scripts/run_ci_local.py, which
+      # feeds Harbor-shaped results to the same harbor_adapter.summary.summarize_job
+      # and therefore the same tests/eval/passk decision.
+      # See analysis/report/hw6-ci-substitution.md.
+
+      - name: Install Harbor
+        run: uv tool install 'harbor==0.23.0'
+
+      - name: Generate the classified Harbor tasks
+        # Rejects any case still missing kind / baseline_pass_rate.
+        run: uv run python scripts/export_harbor_tasks.py
+
+      - name: Run five attempts per task in fresh Docker containers
+        run: |
+          PYTHONPATH="$PWD" harbor run \
+            -p .harbor/tasks \
+            -a harbor_adapter.agent:CartwheelAgent \
+            -m "$CARTWHEEL_MODEL" \
+            -e docker \
+            --n-attempts 5 \
+            --job-name hw6-evals \
+            --jobs-dir .harbor/jobs \
+            --yes
+
+      - name: Summarize the job and apply the CI gate
+        # always() so an intentional regression still reports its evidence. The script
+        # exits non-zero when a regression case fails any of its five runs.
+        if: always()
+        run: |
+          uv run python scripts/summarize_harbor_job.py \
+            .harbor/jobs/hw6-evals \
+            --expected-attempts 5
+
+      - name: Upload the Harbor job files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hw6-evals-job
+          path: .harbor/jobs/hw6-evals
+          if-no-files-found: warn

@@ -1,0 +1,28 @@
+model openai/rl-muse-spark-1-1-playground
+1 cases x 15 attempts = 15 agent runs
+judge calls: 0
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+  e-009  capability  [xxxxx..x!.x!.x.] 5/15   1933s
+
+result -> /Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.hw6-logs/jobs/hw6-capability-15/result.json
+
+## Cartwheel evaluation results
+
+| Case | Kind | Passed | Trials | pass@1 | pass@3 | pass@5 | pass^5 | CI decision |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `e-009` | capability | 5 | 15 | 0.333 | 0.736 | 0.916 | 0.000 | pass |
+
+Infrastructure problems:
+- e-009: 2 trial(s) did not produce a reward
+
+Regression cases block on any failed trial. Capability cases do not block.
+
+CI gate: BLOCK

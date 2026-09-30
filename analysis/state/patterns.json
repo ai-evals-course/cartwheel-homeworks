@@ -1,1 +1,334 @@
-{"modes": []}
+{
+ "contradicts_eligibility_flag": {
+  "status": "candidate",
+  "count": 4,
+  "description": "The tools returned refund_eligible, and the reply reaches the opposite conclusion \u2014 denying a refund the flag allows, or implying one the flag forbids.",
+  "boundary": "Not this: a denial that matches refund_eligible: false, or an approval that matches true. Not this either: a reply that reaches no eligibility conclusion at all, which is abandons_mid_task. This mode requires a stated conclusion that is the opposite of the flag.",
+  "example_ids": [
+   "support-0015",
+   "support-0019",
+   "support-0018",
+   "support-0024"
+  ],
+  "example_quotes": [
+   "Agent is using the wrong date since above tools return that refund is eligible.",
+   "The agent is using the wrong clock for return window. Since the tool calls are saying that the return is eligible.",
+   "Refund eligibility is showing as false so agent should have denied refund eligibility"
+  ],
+  "requirement_source": "SPEC.md RESP-2, RESP-3",
+  "likely_evaluator": "code check \u2014 compare refund_eligible in the tool result against whether the reply grants or denies",
+  "note": "Runs both ways. Strongest signal in the dataset: order_in_window conversations fail 88% of the time, worse than order_past_window at 63%, because the agent finds a reason to refuse an order that is genuinely refundable. Shelby's proposed fix, from support-0217: make the agent trust the eligibility flag rather than re-deriving it.",
+  "close_negatives": [
+   "support-0036",
+   "support-0050",
+   "support-0051",
+   "support-0053",
+   "support-0054",
+   "support-0055"
+  ],
+  "close_negative_count": 39,
+  "revision": {
+   "date": "2026-09-21",
+   "change": "Removed support-0068, 0217, 0241. All three end mid-task without stating any conclusion, so there is nothing to contradict. Moved to abandons_mid_task.",
+   "effect": "detector agreement went from 14/17 to full agreement"
+  }
+ },
+ "tool_call_malformed": {
+  "status": "candidate",
+  "count": 8,
+  "description": "The agent sends arguments the tool rejects \u2014 the literal string \"null\" for optional parameters, or a store filter that does not exist \u2014 and the call fails before reaching the application.",
+  "boundary": "Not this: a well-formed call that returns an empty or negative result.",
+  "example_ids": [
+   "support-0196",
+   "support-0192",
+   "support-0199"
+  ],
+  "example_quotes": [
+   "JSON error has showed up a couple times when querying input for tool search_products",
+   "Invalid JSON search for search_prouducts error happened again",
+   "Why does a store need to be named to search for a product?"
+  ],
+  "requirement_source": "SPEC.md TOOL-3",
+  "likely_evaluator": "code check \u2014 span status ERROR on a tool call, or 'Invalid JSON input' in the result",
+  "note": "A TOOL failure, not a prompt failure. 66 of 160 search_products calls across the full run send the string \"null\" for optional parameters and are rejected before reaching the application. Shelby found it independently in three separate conversations.",
+  "close_negatives": [
+   "support-0201",
+   "support-0202",
+   "support-0205"
+  ],
+  "close_negative_count": 3
+ },
+ "unwarranted_offer": {
+  "status": "candidate",
+  "count": 11,
+  "description": "The reply proposes a next step that does not apply: a return when the complaint is non-delivery, an exception before any review, a replacement for an ineligible order, or another order that may not exist.",
+  "boundary": "Not this: offering escalation where the user has raised something the agent genuinely cannot resolve.",
+  "example_ids": [
+   "support-0001",
+   "support-0015",
+   "support-0063",
+   "support-0067",
+   "support-0083"
+  ],
+  "example_quotes": [
+   "Shouldn't offer return upfront when not recieving it is the problem that the user specified.",
+   "Don't offer an exception when the case hasn't been reviewed yet.",
+   "Don't imploy that there is another order if there isn't"
+  ],
+  "requirement_source": "SPEC.md RESP-3, ESC-4",
+  "close_negatives": [
+   "support-0142",
+   "support-0105",
+   "support-0152",
+   "support-0026"
+  ],
+  "close_negative_count": 4
+ },
+ "missing_escalation": {
+  "status": "candidate",
+  "count": 9,
+  "description": "The conversation contains a clear signal for human handoff \u2014 an account change, a damaged record, a repeated or frustrated request \u2014 and escalate_to_human is never called.",
+  "boundary": "Not this: escalation offered and the conversation ends before the user accepts.",
+  "example_ids": [
+   "support-0218",
+   "support-0039"
+  ],
+  "example_quotes": [
+   "Should esclate to human because of customer's tone frustration and the note on asking twice.",
+   "should just have reiterated ineligibility and escalated to human for follow up due to the frustration."
+  ],
+  "requirement_source": "SPEC.md ESC-2, ESC-3, ESC-4",
+  "likely_evaluator": "code check \u2014 escalate_to_human absent where the outcome entails it (8 such cases in the run)",
+  "close_negatives": [
+   "support-0040",
+   "support-0199",
+   "support-0196",
+   "support-0168",
+   "support-0169",
+   "support-0170"
+  ],
+  "close_negative_count": 13
+ },
+ "detail_level_ignores_the_ask": {
+  "status": "candidate",
+  "count": 8,
+  "description": "The amount of detail contradicts the ask: a shorthand request answered at length, an open request answered with one unexplained fact, or a brief answer that drops facts the reader needs (the dates, the policy that decided it).",
+  "boundary": "Length alone is not the signal. A long reply to a terse user is not this mode: five such candidates were reviewed and all five rejected. The failure is omitting the basis for the decision \u2014 the deciding rule, the window, the dates \u2014 whatever the length. Not this either: a short reply that is short because the agent abandoned the task, which is abandons_mid_task.",
+  "example_ids": [
+   "support-0107",
+   "support-0108",
+   "support-0110",
+   "support-0121",
+   "support-0149",
+   "support-0058",
+   "support-0084"
+  ],
+  "example_quotes": [
+   "Even though citing a short answer as requested should still state policy and provide consistent details on the dates ordered, shipped and recieved.",
+   "Even though short answer should still provide policy citation and consistent order details like dates."
+  ],
+  "requirement_source": "SPEC.md RESP-5",
+  "note": "Refined after batch 2. Shelby's correction: brevity is not the failure, dropping the deciding facts is. A one-line answer that names the rule and the date passes.",
+  "close_negatives": [
+   "support-0019",
+   "support-0020",
+   "support-0032",
+   "support-0059"
+  ],
+  "close_negative_count": 4,
+  "revision": {
+   "date": "2026-09-22",
+   "change": "Human review rejected every length-mismatch candidate and accepted only the one where a decision was stated without its basis, so the definition was rewritten around the missing basis rather than the word count.",
+   "effect": "rules out a length-based judge, which would have been the obvious wrong build"
+  }
+ },
+ "irrelevant_policy_detail": {
+  "status": "candidate",
+  "count": 9,
+  "description": "The reply explains a rule that does not govern this case: the 30-day platform default when a store override applies, the under-$100 automatic path on an order over $100, or a restocking-fee rule on an order that cannot be returned at all.",
+  "boundary": "Two tests, and a reply fails on either. FIRST: does the rule the reply cites govern the path the agent actually took? Citing the over-$100 review rule while opening the approval ticket is correct, not padding. SECOND: does that rule bear on what the user actually asked? A rule explained after the action is complete governs nothing further, UNLESS it explains the action the user requested -- telling a shopper their refund was instant because it was under $100 answers their question and is a PASS. Volunteering the same rule to someone who only asked whether their money had been sent is a FAIL. FAIL: the platform default stated as the operative rule while the store's real window is never named as governing; a threshold cited for a path not being taken; a fee the store has not opted into; rules added after the matter is settled that bear on nothing the user raised. PASS: the governing rule named and applied, wherever the default appears in the sentence, even at length. PASS also when the trace fails for another reason -- a wrong date, a wrong conclusion -- provided the policy named is the one that governs. Not this either: repeating a fact already given, which is recorded but not elevated to a mode.",
+  "example_ids": [
+   "hw5-gen-0009",
+   "hw5-gen-0036",
+   "support-0023",
+   "support-0025",
+   "support-0048",
+   "support-0050",
+   "support-0091",
+   "support-0221",
+   "support-0248"
+  ],
+  "example_quotes": [
+   "Don't need to reference 30 day window for broader policy since it doesn't apply",
+   "Don't need to know what happens for refunds of 100 or less since this order is for over 100",
+   "Don't need additional response on impact of being worn since its irrelevant.",
+   "Dont need to share this since its irrelevant."
+  ],
+  "requirement_source": "SPEC.md RESP-5",
+  "likely_evaluator": "LLM judge \u2014 deciding whether a cited rule governs the case needs the order's state",
+  "note": "Split from irrelevant_or_redundant_detail on Shelby's call, 2026-09-18. Quoting an inapplicable rule misleads; repeating an applicable one is untidy. Different fixes, so different modes -- and only the first was elevated.",
+  "close_negatives": [
+   "hw5-gen-0001",
+   "hw5-gen-0002",
+   "hw5-gen-0004",
+   "hw5-gen-0005",
+   "hw5-gen-0006",
+   "hw5-gen-0007",
+   "hw5-gen-0008",
+   "hw5-gen-0010",
+   "hw5-gen-0011",
+   "hw5-gen-0012",
+   "hw5-gen-0013",
+   "hw5-gen-0014",
+   "hw5-gen-0023",
+   "hw5-gen-0031",
+   "hw5-gen-0032",
+   "hw5-gen-0033",
+   "hw5-gen-0038",
+   "hw5-gen-0045",
+   "hw5-gen-0054",
+   "hw5-gen-0055",
+   "hw5-gen-0060",
+   "support-0003",
+   "support-0012",
+   "support-0021",
+   "support-0022",
+   "support-0027",
+   "support-0030",
+   "support-0034",
+   "support-0035",
+   "support-0036",
+   "support-0037",
+   "support-0039",
+   "support-0040",
+   "support-0041",
+   "support-0042",
+   "support-0044",
+   "support-0047",
+   "support-0049",
+   "support-0051",
+   "support-0061",
+   "support-0062",
+   "support-0063",
+   "support-0080",
+   "support-0081",
+   "support-0086",
+   "support-0127",
+   "support-0134",
+   "support-0140",
+   "support-0141",
+   "support-0143",
+   "support-0145",
+   "support-0147",
+   "support-0154",
+   "support-0206",
+   "support-0207",
+   "support-0209",
+   "support-0212",
+   "support-0214",
+   "support-0216",
+   "support-0219",
+   "support-0220",
+   "support-0224",
+   "support-0225"
+  ],
+  "close_negative_count": 21,
+  "revision": {
+   "date": "2026-09-24",
+   "change": "Reviewer re-read every trace in the threshold shape. support-0035, 0037 and 0040 all cite the over-$100 review rule and all call escalate_to_human, so each is taking the path it cites. support-0224 names the store override as governing and fails only on date arithmetic. All four moved to Pass. The heuristic had matched the strings '$100' and '30-day' without checking what the rule did.",
+   "effect": "Fails fell from 10 to 6; the boundary reduced to one testable question"
+  },
+  "revision_shape4": {
+   "date": "2026-09-26",
+   "change": "Reviewer judged hw5-gen-0055 a Pass -- a completed refund whose reply explains only the under-$100 threshold that produced it -- which contradicted an earlier Fail on support-0034, a structurally identical reply. Today's reading stands: explaining the rule behind the action the user asked for is legitimate. support-0023 remains a Fail because it adds the return window and restocking fee on top; support-0248 remains a Fail because the user asked only whether their money had been sent.",
+   "effect": "shape 4 narrowed from 'any policy after completion' to 'policy bearing on nothing the user raised'"
+  },
+  "unobserved_shapes": {
+   "1_default_as_operative": {
+    "description": "The platform default stated as the operative rule while the store's real window is never named as governing.",
+    "instances": 0,
+    "evidence": "67 conversations concern an order from one of the four override stores. In 38 the agent called get_store_info and named the store's window in all 38. In the other 29 it named no window at all, having abandoned the turn or been asked something else. No conversation states the 30-day default as operative while concealing the override. 16 scenarios were generated specifically to provoke this, placing orders in the gap between the two windows where the rules disagree; the agent was correct in 15 and the 16th was a different shape.",
+    "why": "Perfect correlation with get_store_info: every conversation that called it named the governing window, and none that skipped it did. That tool was added by the student in Homework 1 precisely because the agent had applied the platform default without checking for an override.",
+    "removed": "2026-09-26"
+   }
+  },
+  "revision_dev_review": {
+   "date": "2026-09-26",
+   "change": "Development disagreement review against judge v5. Of four disagreements, three were label errors and one a judge error. support-0038, 0026 and 0218 moved to Pass; support-0221 stays a Fail because the escalation it cites was for a window exception, not for the $100 threshold.",
+   "effect": "TNR on the original labels was measuring label inconsistency, not judge skill"
+  }
+ },
+ "abandons_mid_task": {
+  "status": "candidate",
+  "count": 7,
+  "description": "The reply's final sentence announces a step the agent is about to take \u2014 pulling the order, checking the policy \u2014 and the turn ends without that step being taken or any conclusion reached. The user receives a progress report instead of an answer.",
+  "boundary": "The deciding question is whether the user received an answer. If the reply reaches no conclusion at all, this mode applies regardless of what the conversation was about. Not this: an agent that announces a lookup and then performs it in the same turn. Not this: a deliberate question back to the user, which is defers_what_was_asked. Not this: a conditional offer ('let me know and I can open a ticket'), which completes the turn and hands the user a next step.",
+  "example_ids": [
+   "support-0016",
+   "support-0052",
+   "support-0060",
+   "support-0022",
+   "support-0068",
+   "support-0217",
+   "support-0241"
+  ],
+  "example_quotes": [
+   "now I'll pull up the full details for order 3950 to confirm whether it's still eligible for a refund",
+   "Got it \u2014 let me check the details of that order to confirm it's eligible for a return.",
+   "I'll start by listing your recent orders to find the Travel Crewneck"
+  ],
+  "requirement_source": "SPEC.md RESP-2, RESP-3 \u2014 the reply neither reports a result nor states that information is missing",
+  "likely_evaluator": "code check \u2014 the final sentence matches an announce-a-lookup pattern and no tool call follows it",
+  "note": "Found through a rejected suggestion: the retrieval signal for contradicts_eligibility_flag matched denial-shaped wording inside a sentence that was announcing a lookup. 21 of 261 conversations. Plausibly an interaction with the think-aloud instruction upstream added to SYSTEM_PROMPT_TEMPLATE (\"State what you are about to look up and why. Do not call a tool without explaining first.\"), which may be read as licence to stop after the explanation.",
+  "close_negatives": [
+   "support-0012",
+   "support-0014",
+   "support-0018",
+   "support-0028",
+   "support-0054"
+  ],
+  "close_negative_count": 22,
+  "revision": {
+   "date": "2026-09-21",
+   "change": "Re-sorted by what went wrong rather than what the conversation was about. Removed support-0004, 0012, 0039, 0049, 0061, 0083, 0104: five are conditional offers that do complete the turn, 0039 is missing_escalation, 0083 is unwarranted_offer. Added 0022 (was wrongly a close negative), and 0068, 0217, 0241 which were filed under contradicts_eligibility_flag.",
+   "effect": "detector agreement with human coding went from 3/5 to full agreement"
+  }
+ },
+ "cites_policy_by_internal_id": {
+  "status": "confirmed",
+  "count": 115,
+  "description": "The reply cites a policy using its internal identifier (cw-returns, store-northwind-books-policy) rather than naming it in plain language. The citation itself is required; printing the internal label is the failure.",
+  "boundary": "Not this: 'per our return policy' with no identifier. Also not this: the identifier recorded on the trace, which is correct and required.",
+  "example_ids": [
+   "support-0015",
+   "support-0019",
+   "support-0025",
+   "support-0028",
+   "support-0041",
+   "support-0062",
+   "support-0063",
+   "support-0067",
+   "support-0070",
+   "support-0074",
+   "support-0079"
+  ],
+  "example_quotes": [
+   "Don't show internal command data",
+   "Do not show internal reference code.",
+   "Don't need to add label if you've already cited the return policy verbally."
+  ],
+  "requirement_source": "SPEC.md RESP-1, as revised \u2014 see analysis/report/spec_revisions.md",
+  "likely_evaluator": "code check \u2014 regex for cw-* or store-*-policy in the reply",
+  "note": "Renamed from leaks_internal_policy_id on 2026-09-21. 'Leak' implied exfiltration; this is a readability problem, not a security one. Shelby: 'not necessarily a leak but more of a share of internal labeling'.",
+  "prevalence_note": "Deterministic check finds 115 of 261 conversations (44%).",
+  "close_negatives": [
+   "support-0161",
+   "support-0011",
+   "support-0014",
+   "support-0022",
+   "support-0043",
+   "support-0045"
+  ],
+  "close_negative_count": 49
+ }
+}

@@ -1,0 +1,1208 @@
+{
+ "mode": "abandons_mid_task",
+ "definition": "The reply's final sentence announces a step the agent is about to take \u2014 pulling the order, checking the policy \u2014 and the turn ends without that step being taken or any conclusion reached. The user receives a progress report instead of an answer.",
+ "boundary": "The deciding question is whether the user received an answer. If the reply reaches no conclusion at all, this mode applies regardless of what the conversation was about. Not this: an agent that announces a lookup and then performs it in the same turn. Not this: a deliberate question back to the user, which is defers_what_was_asked. Not this: a conditional offer ('let me know and I can open a ticket'), which completes the turn and hands the user a next step.",
+ "requirement_source": "SPEC.md RESP-2, RESP-3 \u2014 the reply neither reports a result nor states that information is missing",
+ "labelled_at": "2026-09-27T01:19:12.749909+00:00",
+ "score_destination": "analysis/state/labels only; Langfuse was never available (Docker could not be installed)",
+ "reviewed_sample_size": 149,
+ "present": 4,
+ "absent": 145,
+ "undecided": 0,
+ "sample_fraction": 0.027,
+ "fraction_note": "sample fraction within the reviewed set, not a prevalence estimate; the sample was built by clustering and focused search",
+ "judgments": [
+  {
+   "session_id": "34e35f6d04a74d08881f165c821a5d43",
+   "scenario_id": "hw5-gen-0001",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f69c30cf34bc4df8b6271e7f40e41734",
+   "scenario_id": "hw5-gen-0002",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "96a535e143f34104a47283522ef3c4b8",
+   "scenario_id": "hw5-gen-0004",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f7dc7b3299394b7d8407ab457352f80b",
+   "scenario_id": "hw5-gen-0005",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "020dbc2e6d3e4ad497c133af81f5546e",
+   "scenario_id": "hw5-gen-0006",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "54407bd2e3a14278a854bce6399d87f8",
+   "scenario_id": "hw5-gen-0007",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a6ca4f4cec0a413aabff7c1b85edae3c",
+   "scenario_id": "hw5-gen-0008",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1a0e3ff7025a407f8492cf4c91765849",
+   "scenario_id": "hw5-gen-0009",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b2ee586bd6f8455dae6dc31c6e78b148",
+   "scenario_id": "hw5-gen-0010",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a7bdc76ac30e458eb4b3d3c9b75c90a0",
+   "scenario_id": "hw5-gen-0011",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c7f974766fa948cdb18cdd16a9ab4b5e",
+   "scenario_id": "hw5-gen-0012",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f07e9a2354d847b49a4074bcc4ad46a3",
+   "scenario_id": "hw5-gen-0013",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "ae0fb30a86544f22969cc75e0b236114",
+   "scenario_id": "hw5-gen-0014",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "78f31351f67047d28ab7b5d4bf06768a",
+   "scenario_id": "hw5-gen-0023",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5b70b53da302436385f559aa6218afc5",
+   "scenario_id": "hw5-gen-0031",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0cd0e64579c5433d803ebc08471455a1",
+   "scenario_id": "hw5-gen-0032",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5edbfb3cc21b483a871b9c9457a0b979",
+   "scenario_id": "hw5-gen-0033",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "242e1458e6c14c19824cbe87b3c388d7",
+   "scenario_id": "hw5-gen-0036",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8a31d4ef7b184698be68b484dc288e58",
+   "scenario_id": "hw5-gen-0038",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9bc5ce873d794863a6c666ee8c090e3f",
+   "scenario_id": "hw5-gen-0045",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9d7517d2d8f4480c906bf398c8531566",
+   "scenario_id": "hw5-gen-0054",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "56c6a0cc1a004d068b51d682bed44cfc",
+   "scenario_id": "hw5-gen-0055",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "39c60cda89914395a563805286ba215c",
+   "scenario_id": "hw5-gen-0060",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "48b2c4ee58e44540bad2994561b10328",
+   "scenario_id": "support-0001",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b43f3d7c11634abba6ed2c6764122c15",
+   "scenario_id": "support-0003",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "db237c7dfa0e47d1ad21ddcfb01bdc7c",
+   "scenario_id": "support-0006",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "476035d79aaf42c4bb2e1ca1091e5e83",
+   "scenario_id": "support-0008",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a05220316ed1469d802d65af555825a6",
+   "scenario_id": "support-0009",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "61e6fa1ed7d843bfa122312f095bb7ae",
+   "scenario_id": "support-0013",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f91da729e9004738832e6faeeb1de39a",
+   "scenario_id": "support-0015",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "bf9adb092d944464adff8fbbd799c636",
+   "scenario_id": "support-0017",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "74441680036a4ff8ba50047162be5b3d",
+   "scenario_id": "support-0018",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "65af4b47480941b0a73388eb023686d1",
+   "scenario_id": "support-0019",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "2e185e9d0acf44d5a857aa444598885c",
+   "scenario_id": "support-0020",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c87f41cc5ada417d8e9e8649f6d2d941",
+   "scenario_id": "support-0021",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f7ddc32376204242911e1b331708f8ee",
+   "scenario_id": "support-0022",
+   "mode": "abandons_mid_task",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "final reply ends: ...\"I found your order #3814. Now I need to check Northwind Books' specific return window, since the store's policy overrides the default.\""
+  },
+  {
+   "session_id": "d564bb42cff94898878f7f24b5949171",
+   "scenario_id": "support-0023",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0188b294a9f945ebb29c0991cba0ca48",
+   "scenario_id": "support-0024",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "32e2fe278ea646aa8c24d7c877255604",
+   "scenario_id": "support-0025",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0f0f41b8dcc2464f87f6be152a171a9e",
+   "scenario_id": "support-0026",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1cd84690436a485f93f309d0f2291b86",
+   "scenario_id": "support-0027",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "6ba818d82a494d56a26317094ec9492f",
+   "scenario_id": "support-0028",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1276f724139248d89dc1a7a9efe47618",
+   "scenario_id": "support-0029",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8407eb70ed37456584f679a1208bfb99",
+   "scenario_id": "support-0030",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1b00ec341e674bd694c86728927df881",
+   "scenario_id": "support-0033",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "fa73882de5e046b381ae963cdf4d9976",
+   "scenario_id": "support-0034",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "aa2c0bb08c934801878840753ddb27d9",
+   "scenario_id": "support-0035",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9f9b4df5e20842c9877c9807dfb9e67c",
+   "scenario_id": "support-0036",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9a95b2b5d8b64440a891af5ee1fa417f",
+   "scenario_id": "support-0037",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5561b29fd22748cf957ec8fcdedd1404",
+   "scenario_id": "support-0038",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c4fbef941f704561a3acfe5bed1e664d",
+   "scenario_id": "support-0039",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b99fdd7eade345d7974f445e2f034dbd",
+   "scenario_id": "support-0040",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "cb3ee1e191bb4c57a877fe0599740947",
+   "scenario_id": "support-0041",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "3f113adffaeb493e8c46f03cae39523b",
+   "scenario_id": "support-0042",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8d341412793c407abfcc0ad4cced37aa",
+   "scenario_id": "support-0044",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f2af709c8cc14cefa978129016b1f200",
+   "scenario_id": "support-0045",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "52663120e1fb4c73bdda40185a7f0edf",
+   "scenario_id": "support-0047",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "6c8ae69ce1a244bf8fabf4633b7e1b0c",
+   "scenario_id": "support-0048",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "4e04af0f1d5e48dbb1b4ffdeddc21abb",
+   "scenario_id": "support-0049",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "d98af4aa1e504073973118807c00843e",
+   "scenario_id": "support-0050",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0c9be1957b88420ba9bc07acb0ac005e",
+   "scenario_id": "support-0051",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a8898169770d4a81a57868e074efcfac",
+   "scenario_id": "support-0058",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0cb9b0fb2ce64ae59fdf51d344d2bcd0",
+   "scenario_id": "support-0059",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "93d38963d6cf45e6a6336bab4cf281cf",
+   "scenario_id": "support-0061",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f53a1203d5fa4cdaa952b9e06dc0449c",
+   "scenario_id": "support-0062",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1dde75a88b3b4c148f89dda09a1fa0d1",
+   "scenario_id": "support-0063",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5aa931067b9a4b598eaa7bab17d1346b",
+   "scenario_id": "support-0067",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "4af52db36411452a8d8757fe823297da",
+   "scenario_id": "support-0068",
+   "mode": "abandons_mid_task",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "final reply ends: ...\" order \u2014 to give you an accurate answer I need to check Bright Socket Electronics' specific return window, since that overrides the default.\""
+  },
+  {
+   "session_id": "5fdc4ae2459542b68ac3052f2dd5ec21",
+   "scenario_id": "support-0070",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b36ec752e3b84698bbc019a6c70e54d1",
+   "scenario_id": "support-0073",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f84a3926960c409a9982622ef5fc2c5f",
+   "scenario_id": "support-0074",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a1c280fafef240e085a6ffd0208fe203",
+   "scenario_id": "support-0077",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "70829679fa23432a954586913d449aa7",
+   "scenario_id": "support-0078",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "fe692e1f46234348b90f812a8669c476",
+   "scenario_id": "support-0079",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0302c702c8d8442da82294740442e7d4",
+   "scenario_id": "support-0080",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9c72e664ac4642d7bc5f58448b04bf80",
+   "scenario_id": "support-0083",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "3d11b551468242779d9c8d8239b07efa",
+   "scenario_id": "support-0084",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "556280d7e8f2479e808a47b112695fa4",
+   "scenario_id": "support-0085",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b43313d6f4304eecb2e06cf8058be954",
+   "scenario_id": "support-0086",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f5e4940d353946c3a74ae1d0f658cb10",
+   "scenario_id": "support-0088",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "cdd48858c4c647b7b6761f28e15300fe",
+   "scenario_id": "support-0091",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8e59c7d7379b4fa1bd0b7e703462d36e",
+   "scenario_id": "support-0094",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "2c22cfce74654c73ba4af252e3421db4",
+   "scenario_id": "support-0102",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1104ea2fb1ff4a5db4f768b0a61eeebd",
+   "scenario_id": "support-0105",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "53790ac45ddf4ea3b42467c32f0d0722",
+   "scenario_id": "support-0106",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "143d80026f524f83993409d3d5ff272f",
+   "scenario_id": "support-0107",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "268cfb5a4cd64e41be50152a4a3b2426",
+   "scenario_id": "support-0108",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "7a5ae68f6e6f4cbd832c3dfc1dd09cea",
+   "scenario_id": "support-0109",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "eec10dd868cd4da2a1a2b29150cdb6fa",
+   "scenario_id": "support-0114",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0447809701f04d669a9d84839c862c3c",
+   "scenario_id": "support-0116",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "6704f5e4302841989b75727bfa27cc18",
+   "scenario_id": "support-0119",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "64ad317e4f8d45ffa50d78c3fca74f95",
+   "scenario_id": "support-0120",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "e260c4b4904d4468988f5e079d178d56",
+   "scenario_id": "support-0127",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9654602c1dae41b79c323ba852917255",
+   "scenario_id": "support-0130",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "48e143983949402898570e2ce30d7e3c",
+   "scenario_id": "support-0132",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "dc1ed8e24afd4f65a2961e10906452ea",
+   "scenario_id": "support-0133",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b0bd029d24ab4256aed8b13a6dbc444a",
+   "scenario_id": "support-0134",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "42def3002baa43d186fafdbbbe131900",
+   "scenario_id": "support-0135",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a1ebdf787dd04107b3c9c1fcf51d71cf",
+   "scenario_id": "support-0140",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "2c4216f0a2a147988ec8b20ba33c02c4",
+   "scenario_id": "support-0141",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f32c072b8b4d44559386eaf9e515fcd8",
+   "scenario_id": "support-0142",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c7a5f416d067468b9788a9ef7667fecc",
+   "scenario_id": "support-0143",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "a3a10254b22b47b2814834d01e983cb4",
+   "scenario_id": "support-0144",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c90b39b00b3c4f658dc20ec241cab4cc",
+   "scenario_id": "support-0145",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5ed62b5682bf49afa88f638f99c42793",
+   "scenario_id": "support-0146",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "3e99ea8217654b2da2faac7cfc6a4c02",
+   "scenario_id": "support-0147",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1c776684d44d4ce3856305a5d9c8c038",
+   "scenario_id": "support-0149",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "40415f8d77fa41b38c586f852322565f",
+   "scenario_id": "support-0152",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "6727e6f3d69f41ff900c83b5d6d4188d",
+   "scenario_id": "support-0153",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "69a8aefb397a406c8a1633535b65d599",
+   "scenario_id": "support-0154",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "ee1fc6f79b7843c0bd9b8cbc747f9951",
+   "scenario_id": "support-0155",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8acd7c86083a4c34b00701b7eda2affa",
+   "scenario_id": "support-0168",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1648baba69d64eceab4fab56d5a554e3",
+   "scenario_id": "support-0170",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5a6084a7225f407cbf073b3f83a33451",
+   "scenario_id": "support-0173",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9d7a327e8ac44370a92a896685541e71",
+   "scenario_id": "support-0179",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "dc84c2f0f6934985bd1f8bc7de986812",
+   "scenario_id": "support-0188",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "bd4b3cc2e3644a6d96899a549290edfd",
+   "scenario_id": "support-0191",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "2b408f3fe2304703a1ef0c57140fae38",
+   "scenario_id": "support-0192",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "3fdb0a469db4447eae3c04a6906e25bd",
+   "scenario_id": "support-0196",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "4c6710a64dfc489fbb7f9e9ec18198ae",
+   "scenario_id": "support-0196",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "ef11bae5946a4007950ff278f6bdbad0",
+   "scenario_id": "support-0198",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "55601a1c779941abbbd85cd2b9c65b85",
+   "scenario_id": "support-0199",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f69932b994fc44c9a154e7c9a1f03418",
+   "scenario_id": "support-0199",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "bd55679c002e4855a677afabe53003fe",
+   "scenario_id": "support-0201",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "005104928e414fe0a667416f3e516dff",
+   "scenario_id": "support-0202",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "afb2f27217b04c9c9b2580d4b9f85ed8",
+   "scenario_id": "support-0205",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "ed1c1f13a2a6490b8b81334a69b1ec8d",
+   "scenario_id": "support-0206",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "1a3c083ad4bb4157b136a26bcc060877",
+   "scenario_id": "support-0207",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "e986b07f3ece47248e1311c139006b13",
+   "scenario_id": "support-0209",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "8d16c74bb2534b28bb3cd5a5c8491009",
+   "scenario_id": "support-0212",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "181ef1c737c34d8682f9e0406ab52451",
+   "scenario_id": "support-0214",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "00e6002ecb354458b6354c30b4a53a27",
+   "scenario_id": "support-0216",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "80512cae0f6d487190e2f57b4e2e8bd5",
+   "scenario_id": "support-0217",
+   "mode": "abandons_mid_task",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "final reply ends: ...\"I found your order \u2014 now I'll pull up the full details for order 3950 to confirm whether it's still eligible for a refund.\""
+  },
+  {
+   "session_id": "0270b647138140e5bbdfec4455253c13",
+   "scenario_id": "support-0218",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "7206951a172e4c85aac7dd7b9f95dd42",
+   "scenario_id": "support-0219",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "9ac5fb71e545423ca4a13da6c4029651",
+   "scenario_id": "support-0220",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b97d8f40a21841bf8bacac9b0bc9cac9",
+   "scenario_id": "support-0221",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0a583de5889345858298e446aa53d265",
+   "scenario_id": "support-0222",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "c3748e6311404d07ba784fbe829258d7",
+   "scenario_id": "support-0224",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "b504df6427414438b8fe0174281b9025",
+   "scenario_id": "support-0225",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "5c55a361bbda4efda2f7b75e83f6f2cf",
+   "scenario_id": "support-0229",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "0e48161e0c474c1c89d0ed9723068c0b",
+   "scenario_id": "support-0232",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "487cf81196ba4662ab39631fe989fba9",
+   "scenario_id": "support-0233",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "f895f05866da4e2fbde3526242e43506",
+   "scenario_id": "support-0234",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "e99d2e2387554bbd90b877c923fb5ec9",
+   "scenario_id": "support-0236",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "db2b2b67ff5e4127863d84bb1e85ce2f",
+   "scenario_id": "support-0238",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "6ef7006f7f5e45f79d666f0641b011ed",
+   "scenario_id": "support-0241",
+   "mode": "abandons_mid_task",
+   "judgment": "present",
+   "method": "code_check",
+   "evidence": "final reply ends: ...\"d?\\n\\nOnce you point me to the right one, I'll pull up that specific order and check whether it's still eligible for a refund and what the nex\""
+  },
+  {
+   "session_id": "7bef261cafca4deba77b995679910a5f",
+   "scenario_id": "support-0246",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  },
+  {
+   "session_id": "376056140bef4f5f85cdad36b14fe8de",
+   "scenario_id": "support-0248",
+   "mode": "abandons_mid_task",
+   "judgment": "absent",
+   "method": "code_check",
+   "evidence": "final reply does not end on an announced lookup"
+  }
+ ]
+}
