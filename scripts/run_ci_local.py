@@ -97,8 +97,16 @@ def main() -> None:
             # the case id, and the reward nested under verifier_result.rewards.reward.
             # An infrastructure error carries no verifier_result at all, which the
             # summariser reports as "did not produce a reward" rather than a failure.
-            trial = {"task_name": f"cartwheel/{case['id']}", "attempt": i,
+            # agent_info.model_info is what harbor_adapter.analysis reads to confirm a
+            # single agent model across the trial set; without it the Part E analyser
+            # rejects the job for having no recorded model.
+            provider, _, name = args.model.partition("/")
+            trial = {"task_name": f"cartwheel/{case['id']}",
+                     "trial_name": f"{case['id']}-attempt-{i}",
+                     "attempt": i,
                      "exception_info": r.get("infra_error"),
+                     "agent_info": {"model_info": {"name": name or args.model,
+                                                   "provider": provider if name else None}},
                      "metadata": {"checks_failed": r.get("checks_failed"),
                                   "judges": r.get("judges"),
                                   "tool_calls": r.get("tool_calls")}}

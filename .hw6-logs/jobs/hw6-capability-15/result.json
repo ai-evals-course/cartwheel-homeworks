@@ -2,138 +2,407 @@
  "trial_results": [
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-0",
    "attempt": 0,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-1",
    "attempt": 1,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info",
+     "search_help_center",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-2",
    "attempt": 2,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info",
+     "search_products",
+     "search_help_center"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-3",
    "attempt": 3,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-4",
    "attempt": 4,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-5",
    "attempt": 5,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
     "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-6",
    "attempt": 6,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-7",
    "attempt": 7,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-8",
    "attempt": 8,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
     "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-9",
    "attempt": 9,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-10",
    "attempt": 10,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
     "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-11",
    "attempt": 11,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
-    "checks_failed": [],
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'"
+    ],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-12",
    "attempt": 12,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
-    "tool_calls": []
+    "tool_calls": [
+     "get_store_info"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
    }
   },
   {
    "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-13",
    "attempt": 13,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-14",
+   "attempt": 14,
+   "exception_info": null,
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
+   "metadata": {
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
+    "judges": {},
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  }
+ ],
+ "discarded_trials": [
+  {
+   "task_name": "cartwheel/e-009",
+   "trial_name": "e-009-attempt-8",
+   "attempt": 8,
+   "exception_info": "Timeout: litellm.Timeout: Timeout Error: OpenAIException - request timed out",
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
@@ -142,8 +411,15 @@
   },
   {
    "task_name": "cartwheel/e-009",
-   "attempt": 14,
-   "exception_info": "ServiceUnavailableError: litellm.ServiceUnavailableError: ServiceUnavailableError: OpenAIException - The backend is temporarily overloaded. Please retry.",
+   "trial_name": "e-009-attempt-11",
+   "attempt": 11,
+   "exception_info": "Timeout: litellm.Timeout: Timeout Error: OpenAIException - request timed out",
+   "agent_info": {
+    "model_info": {
+     "name": "rl-muse-spark-1-1-playground",
+     "provider": "openai"
+    }
+   },
    "metadata": {
     "checks_failed": [],
     "judges": {},
