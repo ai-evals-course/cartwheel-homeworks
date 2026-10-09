@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cartwheel trace review</title>
+<style>
+  :root{
+    --user:#1f6feb; --agent:#2da44e; --tool:#8250df; --scaffold:#8b949e;
+    --note:#fff8c5; --note-line:#d4a72c; --sugg:#f0e7ff; --sugg-line:#8250df;
+    --bg:#fff; --ink:#1f2328; --muted:#656d76; --line:#d0d7de; --panel:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+       color:var(--ink);background:var(--bg)}
+  header{position:sticky;top:0;z-index:20;background:var(--bg);
+         border-bottom:1px solid var(--line);padding:10px 16px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+  button{font:inherit;padding:5px 11px;border:1px solid var(--line);border-radius:6px;
+         background:var(--panel);cursor:pointer}
+  button:hover{background:#eaeef2}
+  button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs button{border-radius:6px}
+  .meta{color:var(--muted);font-size:13px}
+  .flag{display:inline-block;background:#fff1e5;border:1px solid #ffcfa3;color:#8a4b00;
+        border-radius:999px;padding:1px 9px;font-size:12px;margin-right:6px}
+  .flag.bad{background:#ffebe9;border-color:#ffc1bc;color:#a40e26}
+  .done{background:#dafbe1;border-color:#aceebb;color:#0a5227}
+
+  /* three columns: conversation | expected | your notes */
+  main{display:grid;grid-template-columns:minmax(0,1fr) 300px 270px;gap:20px;
+       padding:18px 16px 120px;align-items:start}
+  /* Never hide the notes column: they are the point of the tool, and a hidden note
+     reads as a lost note. Narrow the other columns first, then stack. */
+  @media (max-width:1320px){main{grid-template-columns:minmax(0,1fr) 250px 230px;gap:14px}
+                            .note{width:216px}}
+  @media (max-width:1080px){main{grid-template-columns:minmax(0,1fr) 230px}
+                            #expected{grid-column:1/-1;order:3}
+                            #margin{grid-column:2}}
+
+  .turn{margin:0 0 26px}
+  .turnlabel{font-size:12px;color:var(--muted);text-transform:uppercase;
+             letter-spacing:.06em;margin:0 0 6px}
+  .block{border-left:3px solid var(--line);padding:6px 0 6px 12px;margin:0 0 6px}
+  .block .who{font-size:12px;font-weight:600;margin-bottom:3px}
+  .user{border-left-color:var(--user)} .user .who{color:var(--user)}
+  .agent{border-left-color:var(--agent)} .agent .who{color:var(--agent)}
+  .toolbox{border:1px solid var(--line);border-radius:8px;margin:6px 0;overflow:hidden}
+  .toolhead{background:#faf5ff;border-left:3px solid var(--tool);padding:5px 10px;
+            font-size:13px;display:flex;gap:8px;align-items:center}
+  .toolhead b{color:var(--tool)}
+  .toolhead.denied{background:#ffebe9;border-left-color:#cf222e}
+  .toolhead.denied b{color:#cf222e}
+  .kv{padding:6px 10px;border-top:1px solid var(--line)}
+  .kv .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  pre{margin:2px 0 0;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+      white-space:pre-wrap;word-break:break-word}
+  .clip{max-height:112px;overflow:hidden;position:relative}
+  .clip::after{content:"";position:absolute;inset:auto 0 0 0;height:34px;
+               background:linear-gradient(transparent,#fff)}
+  .more{font-size:12px;color:var(--user);cursor:pointer;padding:3px 10px 7px}
+  .scaffold{font-size:12px;color:var(--scaffold);padding:2px 0 2px 12px;
+            border-left:3px solid #eaeef2}
+  .agent .body,.user .body{white-space:pre-wrap}
+
+  /* expected column */
+  #expected{position:sticky;top:64px;background:var(--panel);border:1px solid var(--line);
+            border-radius:8px;padding:12px 13px;font-size:13.5px}
+  #expected h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;
+               letter-spacing:.06em;color:var(--muted)}
+  #expected .out{font-weight:600;margin-bottom:6px;word-break:break-word}
+  #expected .src{margin-top:10px;font-size:12px;color:var(--muted);
+                 border-top:1px solid var(--line);padding-top:8px;word-break:break-word}
+  #expected .spec{margin-top:8px;font-size:12px}
+  #expected code{background:#eaeef2;border-radius:4px;padding:1px 4px;font-size:12px}
+
+  /* sticky notes */
+  #margin{position:relative;min-height:400px}
+  .note{position:absolute;width:250px;background:var(--note);
+        border-left:4px solid var(--note-line);border-radius:5px;padding:7px 9px;
+        font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.14);transition:outline .1s}
+  .note.sugg{background:var(--sugg);border-left-color:var(--sugg-line)}
+  .note .q{font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:4px;
+           display:block;overflow-wrap:anywhere}
+  .note .acts{margin-top:5px;display:flex;gap:6px}
+  .note button{padding:1px 7px;font-size:12px}
+  .note.hl{outline:2px solid var(--note-line)}
+  mark.anno{background:var(--note);border-bottom:2px solid var(--note-line);cursor:pointer}
+  mark.anno.hl{outline:2px solid var(--note-line)}
+  mark.sugg{background:var(--sugg);border-bottom:2px dashed var(--sugg-line);cursor:pointer}
+  mark.pending{background:#ffe08a}
+
+  /* popover */
+  #pop{position:absolute;z-index:40;display:none;background:#fff;border:1px solid var(--line);
+       border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:9px;width:330px}
+  #pop textarea{width:100%;height:70px;font:inherit;padding:6px;border:1px solid var(--line);
+                border-radius:6px;resize:vertical}
+  #pop .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+
+  /* list + progress views */
+  .hidden{display:none !important}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:5px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  tr.clickable:hover{background:var(--panel);cursor:pointer}
+  .pill{font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;
+        background:var(--panel)}
+  .mode{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+  .mode h4{margin:0 0 5px;font-size:14px}
+  #bar{height:5px;background:#eaeef2;border-radius:3px;overflow:hidden;margin-top:8px}
+  #bar span{display:block;height:100%;background:var(--agent);transition:width .25s}
+  #bar span.notes{background:var(--note-line)}
+  .barwrap{display:flex;gap:2px;height:5px}
+  .theme{border:1px solid var(--sugg-line);border-left-width:4px;border-radius:8px;
+         padding:11px 13px;margin-bottom:11px;background:#fbf9ff}
+  .theme h4{margin:0 0 4px;font-size:14px;font-family:ui-monospace,monospace}
+  .theme .def{font-size:13.5px;margin-bottom:7px}
+  .theme .ev{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);
+             padding-top:6px;margin-top:6px}
+  .theme .ev div{margin:3px 0}
+  .chip{display:inline-block;font:12px ui-monospace,monospace;border-radius:5px;
+        padding:2px 7px;margin:2px 4px 2px 0;border:1px solid var(--line);background:#fff}
+  .chip.ok{background:#dafbe1;border-color:#aceebb;color:#0a5227}
+  .chip.miss{background:#ffebe9;border-color:#ffc1bc;color:#a40e26;text-decoration:line-through}
+  .chip.extra{background:var(--panel);color:var(--muted)}
+  .flowbox{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+  .flowbox .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;
+              margin-bottom:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="row">
+    <strong>Cartwheel trace review</strong>
+    <span class="tabs row" style="gap:6px">
+      <button id="tabReview" class="on">Review</button>
+      <button id="tabList">All conversations</button>
+      <button id="tabProgress">Progress</button>
+    </span>
+    <span class="grow"></span>
+    <span class="meta" id="counter"></span>
+    <button id="prev">◀ prev</button>
+    <button id="next">next ▶</button>
+    <button id="nextTodo" class="on">next in batch ▶</button>
+  </div>
+  <div class="row" id="subhead" style="margin-top:7px"></div>
+  <div id="bar"><span style="width:0%"></span></div>
+</header>
+
+<main id="reviewView">
+  <section id="convo"></section>
+  <aside id="expected"></aside>
+  <aside id="margin"></aside>
+</main>
+
+<main id="listView" class="hidden" style="grid-template-columns:1fr">
+  <div>
+    <div class="row" style="margin-bottom:10px">
+      <input id="filter" placeholder="filter: text, or  sample / sampletodo / denied / multi / flagged / done / todo / noted / unnoted / nofailure / missingtool"
+             style="flex:1;padding:6px 9px;border:1px solid var(--line);border-radius:6px;font:inherit">
+    </div>
+    <table id="listTable"></table>
+  </div>
+</main>
+
+<main id="progressView" class="hidden" style="grid-template-columns:1fr">
+  <div id="progressBody"></div>
+</main>
+
+<div id="pop">
+  <textarea id="popText" placeholder="What went wrong here, in your own words?"></textarea>
+  <div class="row" style="margin-top:6px">
+    <button id="popSave" class="on">Save note</button>
+    <button id="popCancel">Cancel</button>
+    <span class="hint">Cmd+Enter saves</span>
+  </div>
+</div>
+
+<script>
+let RECORDS=[], ANNOS=[], SUGGS=[], PATTERNS={}, STATUS={}, MANIFEST={}, idx=0, showScaffold=false, pending=null, editing=null;
+
+const $=s=>document.querySelector(s);
+const esc=s=>(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+async function boot(){
+  RECORDS=await (await fetch("/api/records")).json();
+  ANNOS  =await (await fetch("/api/annotations")).json();
+  SUGGS  =await (await fetch("/api/suggestions")).json();
+  PATTERNS=await (await fetch("/api/patterns")).json();
+  STATUS  =await (await fetch("/api/review_status")).json();
+  MANIFEST=await (await fetch("/api/sample_manifest")).json();
+  const linked=decodeURIComponent(location.hash.slice(1));
+  const linkedIdx=linked?RECORDS.findIndex(r=>r.scenario_id===linked):-1;
+  const saved=+localStorage.getItem("cartwheel_idx")||0;
+  idx=linkedIdx>=0?linkedIdx:Math.min(saved,RECORDS.length-1);
+  if(linkedIdx>=0) show("review");
+  render();
+}
+const save=async(n,d)=>fetch("/api/"+n,{method:"POST",headers:{"Content-Type":"application/json"},
+                                        body:JSON.stringify(d)});
+const rec =()=>RECORDS[idx];
+const notesFor=r=>ANNOS.filter(a=>a.session_id===r.session_id);
+const suggsFor=r=>SUGGS.filter(s=>s.session_id===r.session_id&&!s.resolved);
+const isReviewed=r=>STATUS[r.session_id]?.reviewed===true;
+const inSample=r=>!!MANIFEST[r.session_id];
+const sampleInfo=r=>MANIFEST[r.session_id]||null;
+const noFailure=r=>ANNOS.some(a=>a.session_id===r.session_id&&a.note==="no failure observed");
+async function setReviewed(sid,on){
+  STATUS[sid]={...(STATUS[sid]||{}),reviewed:on,updated_at:new Date().toISOString()};
+  await save("review_status",STATUS);
+}
+
+/* ---------- header ---------- */
+function header(){
+  const r=rec();
+  const done=RECORDS.filter(isReviewed).length;
+  const pct=Math.round(100*done/RECORDS.length);
+  $("#counter").textContent=`${idx+1} / ${RECORDS.length}   ·   ${done} reviewed (${pct}%)   ·   ${ANNOS.length} notes   ·   target 100`;
+  const inS=RECORDS.filter(inSample), sDone=inS.filter(isReviewed).length;
+  const pctGoal=Math.min(100, done);
+  $("#bar").innerHTML=`<span style="width:${pctGoal}%" title="${done} of the 100 required"></span>`;
+  if(inS.length) $("#counter").textContent+=`   ·   batch ${sDone}/${inS.length}`;
+  $("#subhead").innerHTML=
+    `<span class="pill">${esc(r.scenario_id)}</span>
+     <span class="pill">${esc(r.group)}</span>
+     <span class="pill">${esc(r.role)} ${esc(String(r.user_id??""))}</span>
+     <span class="pill">${esc(r.intent)}</span>
+     <span class="pill">${esc(r.user_style)}</span>
+     ${r.data_quality_case_id?`<span class="flag bad">${esc(r.data_quality_case_id)}</span>`:""}
+     ${r.flags.map(f=>`<span class="flag">${esc(f)}</span>`).join("")}
+     ${(r.tools_missing||[]).length?`<span class="flag bad">${esc(r.tools_missing.join(", "))} never called</span>`:""}
+     ${inSample(r)?`<span class="flag" title="${esc(sampleInfo(r).reason)}">batch ${sampleInfo(r).batch} · ${esc(sampleInfo(r).method)}</span>`:""}
+     ${isReviewed(r)?'<span class="flag done">review complete</span>'
+        :(notesFor(r).length?'<span class="flag bad">notes written, not marked complete</span>':"")}
+     <span class="grow"></span>
+     <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer">
+       <input type="checkbox" id="reviewDone" ${isReviewed(r)?"checked":""}> review complete</label>
+     <button id="noFailure" class="${noFailure(r)?"on":""}">${noFailure(r)?"✓ no failure observed":"no failure observed"}</button>
+     <button id="toggleScaffold">${showScaffold?"hide":"show"} plumbing</button>
+     <button id="expandAll">expand all</button>`;
+  $("#toggleScaffold").onclick=()=>{showScaffold=!showScaffold;render();};
+  $("#expandAll").onclick=()=>document.querySelectorAll(".clip").forEach(e=>{
+      e.classList.remove("clip");});
+  $("#reviewDone").onchange=async e=>{
+    await setReviewed(rec().session_id, e.target.checked); render();
+  };
+  // Toggle. Clicking again removes the note, for when a failure turns up later.
+  $("#noFailure").onclick=async()=>{
+    const r=rec();
+    if(noFailure(r)){
+      ANNOS=ANNOS.filter(a=>!(a.session_id===r.session_id&&a.note==="no failure observed"));
+    }else{
+      ANNOS.push({session_id:r.session_id,scenario_id:r.scenario_id,
+                  trace_id:r.turns[0]?.trace_id,span:"(whole conversation)",
+                  quoted_text:"",note:"no failure observed"});
+      await setReviewed(r.session_id,true);   // clean also means read
+    }
+    await save("annotations",ANNOS); render();
+  };
+}
+
+/* ---------- conversation ---------- */
+function conversation(){
+  const r=rec(); let h="";
+  for(const t of r.turns){
+    h+=`<div class="turn"><div class="turnlabel">turn ${t.n}${r.turn_count>1?" of "+r.turn_count:""}</div>`;
+    h+=`<div class="block user"><div class="who">USER</div><div class="body annotatable" data-span="user turn ${t.n}">${esc(t.user)||'<i class="meta">(no message recorded)</i>'}</div></div>`;
+    for(const s of t.steps){
+      if(s.kind==="scaffold"){
+        if(showScaffold) h+=`<div class="scaffold">${esc(s.name)} · ${Math.round(s.duration_ms)}ms</div>`;
+      } else if(s.kind==="model"){
+        if(showScaffold) h+=`<div class="scaffold">model call · ${Math.round(s.duration_ms)}ms${s.status==="ERROR"?" · ERROR":""}</div>`;
+      } else {
+        const long=(s.result||"").length>420;
+        h+=`<div class="toolbox">
+              <div class="toolhead${s.denied?" denied":""}"><b>${esc(s.name)}</b>
+                <span class="meta">${Math.round(s.duration_ms)}ms</span>
+                ${s.denied?'<span class="flag bad">permission denied</span>':""}
+                ${s.status==="ERROR"?'<span class="flag bad">tool error</span>':""}</div>
+              <div class="kv"><div class="k">arguments</div>
+                <pre class="annotatable" data-span="${esc(s.name)} arguments">${esc(s.arguments)}</pre></div>
+              <div class="kv"><div class="k">result</div>
+                <pre class="annotatable ${long?"clip":""}" data-span="${esc(s.name)} result">${esc(s.result)}</pre>
+                ${long?'<div class="more">show all</div>':""}</div>
+            </div>`;
+      }
+    }
+    h+=`<div class="block agent"><div class="who">AGENT</div><div class="body annotatable" data-span="agent reply turn ${t.n}">${esc(t.agent)||'<i class="meta">(no reply recorded — the run timed out)</i>'}</div></div>`;
+    h+=`</div>`;
+  }
+  $("#convo").innerHTML=h;
+  document.querySelectorAll(".more").forEach(b=>b.onclick=e=>{
+    e.target.previousElementSibling.classList.remove("clip"); e.target.remove();});
+}
+
+/* ---------- expected ---------- */
+function expected(){
+  const e=rec().expected||{};
+  const src=e.source||{};
+  $("#expected").innerHTML=
+    `<h3>What should have happened</h3>
+     <div class="out">${esc(e.outcome||"human judgment")}</div>
+     <div>${esc(e.reason||e.criterion||"")}</div>
+     <div class="src"><b>Ground truth</b><br>${esc(src.type||"")}<br><code>${esc(src.reference||"")}</code></div>
+     ${src.type==="specification"?`<div class="spec">from SPEC.md</div>`:""}
+     <div class="flowbox">
+       <div class="k">tool the outcome requires</div>
+       ${(rec().tools_required||[]).length
+          ? rec().tools_required.map(x=>`<span class="chip ${rec().tools_missing.includes(x)?"miss":"ok"}">${esc(x)}${rec().tools_missing.includes(x)?" — never called":" ✓"}</span>`).join("")
+          : `<span class="meta">none specifically; this outcome is about what the reply says</span>`}
+     </div>
+     <div class="flowbox">
+       <div class="k">tools actually called, in order</div>
+       ${(rec().tools_called||[]).length
+          ? rec().tools_called.map(x=>`<span class="chip ${(rec().tools_required||[]).includes(x)?"ok":"extra"}">${esc(x)}</span>`).join("")
+          : `<span class="meta">none</span>`}
+     </div>
+     <div class="src"><b>Tuple</b><br>${esc(rec().record_state||"")} · ${esc(rec().access||"")} · ${esc(rec().difficulty||"")}</div>
+     <div class="meta" style="margin-top:8px;font-size:11.5px">
+       "Requires" is entailed by the expected outcome &mdash; a refund cannot be approved
+       without issue_refund running. It is not a guessed sequence, and no order is implied.</div>`;
+}
+
+/* ---------- notes: highlight + margin ---------- */
+function paintNotes(){
+  const r=rec(), all=[...notesFor(r).map(a=>({...a,_k:"anno"})),
+                      ...suggsFor(r).map(s=>({...s,_k:"sugg"}))];
+  document.querySelectorAll(".annotatable").forEach(el=>{
+    let html=el.innerHTML;
+    for(const a of all){
+      if(!a.quoted_text) continue;
+      const q=esc(a.quoted_text);
+      if(html.includes(q)&&el.dataset.span===a.span){
+        html=html.replace(q,`<mark class="${a._k}" data-id="${a.id||a.created_at||q}">${q}</mark>`);
+      }
+    }
+    el.innerHTML=html;
+  });
+  const m=$("#margin"); m.innerHTML="";
+  const mrect=m.getBoundingClientRect(); let lastBottom=-1e9;
+  for(const a of all){
+    const mark=[...document.querySelectorAll("mark")].find(x=>x.textContent===a.quoted_text);
+    const div=document.createElement("div");
+    div.className="note"+(a._k==="sugg"?" sugg":"");
+    const isEditing = editing && editing.session_id===a.session_id &&
+                      editing.quoted_text===a.quoted_text && editing.note===a.note;
+    div.innerHTML=
+      (a.quoted_text?`<span class="q">“${esc(a.quoted_text.slice(0,90))}”</span>`:
+                     `<span class="q">whole conversation</span>`)+
+      (isEditing
+        ? `<textarea class="edit" style="width:100%;height:64px;font:inherit;padding:4px;
+             border:1px solid var(--line);border-radius:4px">${esc(a.note)}</textarea>`
+        : `<span class="noteText" style="cursor:text">${esc(a.note)}</span>`)+
+      `<div class="acts">${a._k==="sugg"
+        ?`<button data-act="accept">accept</button><button data-act="dismiss">dismiss</button>`
+        :(isEditing?`<button data-act="savetext">save</button><button data-act="canceledit">cancel</button>`
+                   :`<button data-act="edit">edit</button><button data-act="delete">delete</button>`)}</div>`;
+    m.appendChild(div);
+    let top = mark ? mark.getBoundingClientRect().top - mrect.top : 0;
+    if(top < lastBottom + 8) top = lastBottom + 8;
+    div.style.top = Math.max(0, top) + "px";
+    lastBottom = top + div.offsetHeight;
+    if(mark){
+      div.onmouseenter=()=>{mark.classList.add("hl");div.classList.add("hl");};
+      div.onmouseleave=()=>{mark.classList.remove("hl");div.classList.remove("hl");};
+      mark.onmouseenter=()=>{div.classList.add("hl");mark.classList.add("hl");};
+      mark.onmouseleave=()=>{div.classList.remove("hl");mark.classList.remove("hl");};
+    }
+    const noteText=div.querySelector(".noteText");
+    if(noteText && a._k!=="sugg") noteText.onclick=()=>{editing={...a};render();};
+    const ta=div.querySelector(".edit");
+    if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length);
+      ta.addEventListener("keydown",ev=>{
+        if(ev.key==="Enter"&&(ev.metaKey||ev.ctrlKey)) div.querySelector('[data-act="savetext"]').click();
+        if(ev.key==="Escape"){editing=null;render();}
+      });
+    }
+    div.querySelectorAll("button").forEach(b=>b.onclick=async()=>{
+      const act=b.dataset.act;
+      if(act==="edit"){ editing={...a}; return render(); }
+      if(act==="canceledit"){ editing=null; return render(); }
+      if(act==="savetext"){
+        const v=div.querySelector(".edit").value.trim();
+        const target=ANNOS.find(x=>x.session_id===a.session_id&&x.quoted_text===a.quoted_text&&x.note===a.note);
+        if(target){ if(v) target.note=v; else ANNOS=ANNOS.filter(x=>x!==target); }
+        editing=null; await save("annotations",ANNOS); return render();
+      }
+      if(act==="delete") ANNOS=ANNOS.filter(x=>x!==a&&!(x.quoted_text===a.quoted_text&&x.session_id===a.session_id&&x.note===a.note));
+      if(act==="accept"){ANNOS.push({session_id:a.session_id,scenario_id:a.scenario_id,
+          trace_id:a.trace_id,span:a.span,quoted_text:a.quoted_text,note:a.note,
+          from_suggestion:true});
+        SUGGS.forEach(s=>{if(s===a||(s.quoted_text===a.quoted_text&&s.session_id===a.session_id))s.resolved="accepted";});}
+      if(act==="dismiss") SUGGS.forEach(s=>{if(s===a||(s.quoted_text===a.quoted_text&&s.session_id===a.session_id))s.resolved="rejected";});
+      await save("annotations",ANNOS); await save("suggestions",SUGGS); render();
+    });
+  }
+}
+
+/* ---------- selecting text -> note ---------- */
+document.addEventListener("mouseup",e=>{
+  if($("#pop").contains(e.target)) return;
+  const sel=window.getSelection();
+  if(!sel||sel.isCollapsed||!sel.toString().trim()) return;
+  const host=sel.anchorNode?.parentElement?.closest(".annotatable");
+  if(!host) return;
+  const text=sel.toString();
+  const range=sel.getRangeAt(0);
+  const tmp=document.createElement("mark"); tmp.className="pending";
+  try{range.surroundContents(tmp);}catch(err){return;}
+  pending={text,span:host.dataset.span,tmp};
+  const r=tmp.getBoundingClientRect();
+  const p=$("#pop");
+  p.style.display="block";
+  p.style.left=Math.min(window.scrollX+r.left, window.innerWidth-350)+"px";
+  p.style.top=(window.scrollY+r.bottom+6)+"px";
+  $("#popText").value=""; $("#popText").focus();
+});
+function closePop(){
+  const p=$("#pop"); p.style.display="none";
+  if(pending?.tmp){const t=pending.tmp;t.replaceWith(...t.childNodes);}
+  pending=null;
+}
+$("#popCancel").onclick=closePop;
+$("#popText").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)) $("#popSave").click();
+  if(e.key==="Escape") closePop();
+});
+$("#popSave").onclick=async()=>{
+  const note=$("#popText").value.trim();
+  if(!note||!pending) return closePop();
+  const r=rec();
+  ANNOS.push({session_id:r.session_id,scenario_id:r.scenario_id,
+              trace_id:r.turns[0]?.trace_id,span:pending.span,
+              quoted_text:pending.text,note});
+  closePop(); await save("annotations",ANNOS); render();
+};
+
+/* ---------- other views ---------- */
+function listView(){
+  const q=$("#filter").value.trim().toLowerCase();
+  const keep=r=>{
+    if(!q) return true;
+    if(q==="denied") return r.denied;
+    if(q==="multi") return r.turn_count>1;
+    if(q==="flagged") return r.flags.length>0;
+    if(q==="done") return isReviewed(r);
+    if(q==="todo") return !isReviewed(r);
+    if(q==="noted") return notesFor(r).length>0;
+    if(q==="unnoted") return notesFor(r).length===0;
+    if(q==="nofailure") return noFailure(r);
+    if(q==="sample") return inSample(r);
+    if(q==="sampletodo") return inSample(r)&&!isReviewed(r);
+    if(q==="missingtool") return (r.tools_missing||[]).length>0;
+    return JSON.stringify(r).toLowerCase().includes(q);
+  };
+  const rows=RECORDS.map((r,i)=>({r,i})).filter(({r})=>keep(r));
+  $("#listTable").innerHTML=
+    `<tr><th>#</th><th>scenario</th><th>grp</th><th>role</th><th>intent</th>
+         <th>turns</th><th>spans</th><th>tools</th><th>flags</th><th>notes</th></tr>`+
+    rows.map(({r,i})=>`<tr class="clickable" data-i="${i}">
+      <td>${i+1}</td><td>${esc(r.scenario_id)}</td><td>${esc(r.group?.slice(0,4))}</td>
+      <td>${esc(r.role)}</td><td>${esc(r.intent)}</td><td>${r.turn_count}</td>
+      <td>${r.span_count}</td><td>${r.tool_count}</td>
+      <td>${r.flags.map(f=>`<span class="flag">${esc(f)}</span>`).join("")}</td>
+      <td>${notesFor(r).length||""}${isReviewed(r)?' <span class="flag done">done</span>':""}</td></tr>`).join("");
+  document.querySelectorAll("#listTable tr.clickable").forEach(tr=>
+    tr.onclick=()=>{idx=+tr.dataset.i;show("review");render();});
+}
+function progressView(){
+  const modes=Object.entries(PATTERNS);
+  const done=RECORDS.filter(isReviewed).length;
+  const real=ANNOS.filter(a=>a.note!=="no failure observed");
+  const clean=ANNOS.filter(a=>a.note==="no failure observed").length;
+  const bySess=new Set(real.map(a=>a.session_id));
+
+  let h=`<div class="row" style="gap:20px;margin-bottom:16px">
+      <div><div class="meta">reviewed</div><div style="font-size:26px">${done}<span class="meta" style="font-size:14px"> / 100</span></div></div>
+      <div><div class="meta">notes written</div><div style="font-size:26px">${real.length}</div></div>
+      <div><div class="meta">conversations with a failure</div><div style="font-size:26px">${bySess.size}</div></div>
+      <div><div class="meta">marked clean</div><div style="font-size:26px">${clean}</div></div>
+    </div>`;
+
+  h+=`<h3>Themes emerging from your notes</h3>
+      <p class="meta" style="margin-top:-4px">Proposed by the coding agent by reading your notes.
+         Not labels &mdash; you confirm, rename, split, or reject them. Nothing here is saved as a
+         judgment until Part E.</p>`;
+  h+= modes.length
+    ? modes.map(([k,v])=>`<div class="theme">
+         <h4>${esc(k)} <span class="pill">${(v.example_ids||[]).length||v.count||0} notes</span></h4>
+         <div class="def">${esc(v.description||"")}</div>
+         ${v.boundary?`<div class="meta"><b>not this:</b> ${esc(v.boundary)}</div>`:""}
+         <div class="ev"><b>your notes behind it</b>
+           ${(v.example_quotes||[]).map(q=>`<div>&ldquo;${esc(q)}&rdquo;</div>`).join("")}</div>
+       </div>`).join("")
+    : `<p class="meta"><i>Nothing yet. Once you have a handful of notes, tell me and I will read them
+        and propose groupings here. The handout wants the grouping to come after the observations,
+        not before.</i></p>`;
+
+  const pend=SUGGS.filter(s=>!s.resolved), acc=SUGGS.filter(s=>s.resolved==="accepted"),
+        rej=SUGGS.filter(s=>s.resolved==="rejected");
+  h+=`<h3 style="margin-top:22px">Agent suggestions to review
+        <span class="pill">${pend.length} pending</span>
+        <span class="pill">${acc.length} accepted</span>
+        <span class="pill">${rej.length} rejected</span></h3>
+      <p class="meta" style="margin-top:-4px">Retrieval signals, not labels. Open each one,
+         read the conversation, then accept or reject. Rejecting is expected &mdash; the
+         handout requires at least one.</p>`;
+  h+= pend.length ? pend.map((s,i)=>`<div class="theme" style="border-left-color:var(--sugg-line)">
+        <div class="row"><b style="font-family:ui-monospace,monospace">${esc(s.scenario_id)}</b>
+          <span class="pill">${esc(s.mode||"")}</span>
+          ${s.already_reviewed?'<span class="pill">you already reviewed this one</span>':'<span class="pill">not yet reviewed</span>'}
+          <span class="grow"></span>
+          <button data-open="${esc(s.session_id)}">open</button>
+          <button data-acc="${i}">accept</button>
+          <button data-rej="${i}">reject</button></div>
+        <div class="meta" style="margin-top:5px"><i>&ldquo;${esc(s.quoted_text)}&rdquo;</i></div>
+        <div style="font-size:13px">${esc(s.note)}</div></div>`).join("")
+     : `<p class="meta"><i>Nothing pending.</i></p>`;
+  const justDone=SUGGS.filter(s=>s.resolved&&s.source&&s.resolved_at)
+                      .sort((a,b)=>(b.resolved_at||"").localeCompare(a.resolved_at||"")).slice(0,8);
+  if(justDone.length) h+=`<h4 style="margin:16px 0 6px;font-size:13px;color:var(--muted)">
+      Recently decided &mdash; check these read the way you meant</h4>`+
+    justDone.map(s=>`<div class="theme" style="opacity:.72;border-left-color:${
+        s.resolved==="accepted"?"var(--note-line)":"var(--line)"}">
+      <div class="row"><b style="font-family:ui-monospace,monospace">${esc(s.scenario_id)}</b>
+        <span class="pill">${s.resolved==="accepted"?"FAIL (failure present)":"PASS (absent)"}</span>
+        <span class="grow"></span>
+        <button data-undo="${esc(s.scenario_id)}" data-mode="${esc(s.mode||"")}">undo</button></div>
+      ${(s.rejected_reason||s.accepted_note)?`<div class="meta" style="margin-top:4px">${esc(s.rejected_reason||s.accepted_note)}</div>`
+        :(s.resolved==="rejected"?`<div class="meta" style="margin-top:4px;color:#a40e26">
+             no reason recorded &mdash; was this deliberate?</div>`:"")}</div>`).join("");
+  h+=`<h3 style="margin-top:22px">Your notes, newest first (${real.length})</h3>`+
+    real.slice().reverse().map(a=>`<div class="mode">
+        <div class="meta">${esc(a.scenario_id)} · ${esc(a.span)}</div>
+        ${a.quoted_text?`<div class="meta"><i>&ldquo;${esc(a.quoted_text.slice(0,140))}&rdquo;</i></div>`:""}
+        <div>${esc(a.note)}</div></div>`).join("");
+  $("#progressBody").innerHTML=h;
+  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{
+    const i=RECORDS.findIndex(r=>r.session_id===b.dataset.open);
+    if(i>=0){idx=i;show("review");render();}});
+  const pending=SUGGS.filter(s=>!s.resolved);
+  document.querySelectorAll("[data-acc]").forEach(b=>b.onclick=async()=>{
+    const s=pending[+b.dataset.acc];
+    // Accepting used to file the agent's own wording as the note, so the reviewer's
+    // reasoning was lost and accepting meant giving up the chance to say why. The
+    // agent's reason is offered as a starting point and can be replaced entirely.
+    const suggested=s.note.replace("[agent suggestion] ","");
+    const note=prompt("Why is this a failure? (your words; edit or replace mine)",suggested);
+    if(note===null) return;              // Escape or Cancel aborts, as with reject
+    ANNOS.push({session_id:s.session_id,scenario_id:s.scenario_id,trace_id:s.trace_id,
+                span:s.span,quoted_text:s.quoted_text,note:note.trim()||suggested,
+                from_suggestion:true,reworded:note.trim()!==suggested,mode:s.mode});
+    s.resolved="accepted"; s.resolved_at=new Date().toISOString();
+    s.accepted_note=note.trim()||suggested;
+    await save("annotations",ANNOS); await save("suggestions",SUGGS); progressView();});
+  document.querySelectorAll("[data-rej]").forEach(b=>b.onclick=async()=>{
+    const s=pending[+b.dataset.rej];
+    const why=prompt("Why is this not an instance? (saved with the rejection)","");
+    // prompt() returns null on Escape or Cancel. Committing the rejection anyway
+    // silently resolved candidates the reviewer had not decided on, and the row then
+    // vanished so there was nothing to notice. Dismissing the dialog now cancels.
+    if(why===null) return;
+    s.resolved="rejected"; s.rejected_reason=why; s.resolved_at=new Date().toISOString();
+    await save("suggestions",SUGGS); progressView();});
+  document.querySelectorAll("[data-undo]").forEach(b=>b.onclick=async()=>{
+    const s=SUGGS.find(x=>x.scenario_id===b.dataset.undo&&x.mode===b.dataset.mode&&x.resolved);
+    if(!s) return;
+    if(s.resolved==="accepted"){
+      ANNOS=ANNOS.filter(a=>!(a.from_suggestion&&a.scenario_id===s.scenario_id&&a.mode===s.mode));
+      await save("annotations",ANNOS);
+    }
+    delete s.resolved; delete s.resolved_at; delete s.rejected_reason;
+    await save("suggestions",SUGGS); progressView();});
+}
+function show(which){
+  for(const [v,id] of [["review","#reviewView"],["list","#listView"],["progress","#progressView"]])
+    $(id).classList.toggle("hidden",v!==which);
+  for(const [v,id] of [["review","#tabReview"],["list","#tabList"],["progress","#tabProgress"]])
+    $(id).classList.toggle("on",v===which);
+  if(which==="list") listView();
+  if(which==="progress") progressView();
+}
+$("#tabReview").onclick=()=>show("review");
+$("#tabList").onclick=()=>show("list");
+$("#tabProgress").onclick=()=>show("progress");
+$("#filter").oninput=listView;
+$("#prev").onclick=()=>{idx=Math.max(0,idx-1);render();};
+$("#next").onclick=()=>{idx=Math.min(RECORDS.length-1,idx+1);render();};
+$("#nextTodo").onclick=()=>{
+  const order=[...RECORDS.keys()].filter(i=>inSample(RECORDS[i])&&!isReviewed(RECORDS[i]));
+  if(!order.length) return alert("Batch complete — every sampled conversation is marked reviewed.");
+  const nxt=order.find(i=>i>idx);
+  idx = nxt!==undefined ? nxt : order[0];
+  render();
+};
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT") return;
+  if(e.key==="ArrowLeft") $("#prev").click();
+  if(e.key==="ArrowRight") $("#next").click();
+});
+
+function render(){
+  localStorage.setItem("cartwheel_idx",idx);
+  // Keep the address bar pointing at the open conversation so a specific trace
+  // can be linked to and returned to. Deep links matter once you are chasing
+  // judge disagreements one scenario at a time.
+  const sid=RECORDS[idx] && RECORDS[idx].scenario_id;
+  if(sid && decodeURIComponent(location.hash.slice(1))!==sid){
+    history.replaceState(null,"","#"+sid);
+  }
+  header(); conversation(); expected();
+  requestAnimationFrame(paintNotes);
+}
+
+function openScenario(sid){
+  const i=RECORDS.findIndex(r=>r.scenario_id===sid);
+  if(i<0) return false;
+  idx=i; show("review"); render(); return true;
+}
+addEventListener("hashchange",()=>{
+  const sid=decodeURIComponent(location.hash.slice(1));
+  if(sid && RECORDS[idx] && RECORDS[idx].scenario_id!==sid) openScenario(sid);
+});
+boot();
+</script>
+</body>
+</html>

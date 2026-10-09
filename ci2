@@ -1,0 +1,6 @@
+#!/bin/zsh
+# Part D, run 2: after reverting the regression.
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+caffeinate -i nohup .hw6-logs/ci-run.sh hw6-evals-reverted > .hw6-logs/ci-2.log 2>&1 &
+disown
+echo "started: 3 cases x 5 attempts, ~25 min"

@@ -1,0 +1,267 @@
+{
+ "trial_results": [
+  {
+   "task_name": "cartwheel/e-007",
+   "attempt": 0,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "tool escalate_to_human called"
+    ],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-007",
+   "attempt": 1,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "tool escalate_to_human called"
+    ],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-007",
+   "attempt": 2,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "tool escalate_to_human called"
+    ],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-007",
+   "attempt": 3,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "tool escalate_to_human called"
+    ],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-007",
+   "attempt": 4,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "tool escalate_to_human called"
+    ],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 0,
+   "exception_info": "Timeout: litellm.Timeout: Timeout Error: OpenAIException - request timed out",
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 1,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "reply does not contain 'store-northwind-books-policy'",
+     "reply does not contain 'cw-returns'"
+    ],
+    "judges": {},
+    "tool_calls": [
+     "search_help_center",
+     "get_store_info",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 2,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 3,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": [
+     "get_store_info"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-009",
+   "attempt": 4,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": [
+     "get_store_info",
+     "search_help_center",
+     "search_products"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-010",
+   "attempt": 0,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": []
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-010",
+   "attempt": 1,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [
+     "reply does not contain 'cw-refunds'"
+    ],
+    "judges": {},
+    "tool_calls": [
+     "search_help_center",
+     "search_help_center",
+     "get_store_info",
+     "find_order"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 0.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-010",
+   "attempt": 2,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": [
+     "find_order",
+     "get_store_info",
+     "search_help_center"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-010",
+   "attempt": 3,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": [
+     "get_store_info",
+     "find_order",
+     "search_help_center"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  },
+  {
+   "task_name": "cartwheel/e-010",
+   "attempt": 4,
+   "exception_info": null,
+   "metadata": {
+    "checks_failed": [],
+    "judges": {},
+    "tool_calls": [
+     "get_store_info",
+     "search_help_center",
+     "search_help_center",
+     "find_order"
+    ]
+   },
+   "verifier_result": {
+    "rewards": {
+     "reward": 1.0
+    }
+   }
+  }
+ ]
+}

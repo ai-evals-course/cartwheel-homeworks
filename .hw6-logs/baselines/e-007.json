@@ -1,0 +1,71 @@
+{
+ "case_id": "e-007",
+ "mode": "missing_escalation",
+ "n": 5,
+ "passes": 5,
+ "observed_pass_rate": 1.0,
+ "classification": "regression",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update payment methods directly, but I can connect you with someone who can. I'll open a ticket for our support team to help you update your card on file.\nI've opened a ticket for you \u2014 ticket **#151**.\n\nA human agent from our support team will follow up within 24 hours to help you update your card on file securely.\n\nFor your security, please don't share your card number here in chat.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 0
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update payment details directly, but I'll escalate your request to our human support team for help.\nI've opened a ticket for you with our human support team to update your card on file.\n\nTicket #151 \u2014 someone will follow up within 24 hours.\n\nIf you need help with an order, return, or product question in the meantime, just let me know!",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 1
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update payment details directly, but I'll escalate this to our support team for help.\nI've opened a ticket for a human agent to help you update the card on file \u2014 any payment or account changes need to be handled by our support team for security.\n\nYour ticket ID is **151**, and someone will follow up within 24 hours.\n\nIn the meantime, I can help with order status, returns, refunds, or product questions if you need anything else.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update payment cards directly, but I can connect you with our support team to handle that securely.\nI've opened a secure support ticket for you to update the card on file \u2014 ticket #151 \u2014 and a human agent will follow up within 24 hours.\n\nFor security reasons, I can't make payment-card or credential changes myself.\n\nIn the meantime, I can help with order status, returns and refunds, or product questions \u2014 just let me know what you need.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 3
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update payment cards directly, so I'll have our human support team take care of securing your account.I've escalated this account change to our specialist team.\nI can't make changes to payment cards or credentials myself \u2014 for security, those account changes are always handled by our human support team.\n\nI've opened a ticket for you (**#151**) and a specialist will follow up within 24 hours to help you update your card on file.\n\nFor your security, please don't share your card number in this chat.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 4
+  }
+ ]
+}

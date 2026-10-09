@@ -1,0 +1,32 @@
+{
+  "versions": [
+    {
+      "judge_id": "irrelevant_policy_detail-v0",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v1",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v2",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v3",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v4",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v5",
+      "prompt_hash": "d8196b940583"
+    },
+    {
+      "judge_id": "irrelevant_policy_detail-v6",
+      "prompt_hash": "6ff2b5105f9d"
+    }
+  ]
+}

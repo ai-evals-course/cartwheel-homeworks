@@ -1,0 +1,76 @@
+{
+ "case_id": "e-005",
+ "mode": "contradicts_eligibility_flag",
+ "n": 5,
+ "passes": 0,
+ "observed_pass_rate": 0.0,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Could you share a bit more about when you got those items? I'll pull up your recent orders to find the Signature Power Bank and Pocket Arcade.",
+   "tool_calls": [],
+   "rollout": 0
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 you\u2019d like to return the signature power bank and the pocket arcade.\n\nLet me pull up your orders that contain those items so I can check return eligibility for you.",
+   "tool_calls": [],
+   "rollout": 1
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Happy to help with the return \u2014 can you share roughly when you bought those two items, or an order number if you have it? That'll help me pull up the right orders.\n\nIn the meantime I'll look up your recent orders for the signature power bank and pocket arcade to check their return windows.",
+   "tool_calls": [],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "You've asked about returning those items \u2014 I'll pull up your orders to check them.\nGot it \u2014 you want to return the signature power bank and the pocket arcade.\n\nI found one matching order for the signature power bank (order #3 from June 2025), but I didn't spot the pocket arcade in your recent orders. Let me check the details and the return rules for you.",
+   "tool_calls": [
+    "search_products",
+    "list_my_orders",
+    "find_order",
+    "find_order"
+   ],
+   "rollout": 3
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool get_order called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 you'd like to return the Signature Power Bank and the Pocket Arcade.\n\nLet me pull up your orders to see when you bought them and what return options are available.",
+   "tool_calls": [],
+   "rollout": 4
+  }
+ ]
+}

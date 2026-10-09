@@ -1,0 +1,30 @@
+[
+  {
+    "trace_id": "b3dd47e8a5bc67c1e315948e71277782",
+    "permalink": "hw2-spans.jsonl#trace_id=b3dd47e8a5bc67c1e315948e71277782",
+    "prompt_version": "d8c350db1f06",
+    "user_role": "merchant",
+    "user_id": 9002,
+    "tool_order": [
+      "get_order"
+    ],
+    "final_status": "completed",
+    "note": "Langfuse was unavailable on this machine (Docker could not be installed), so spans were captured with a local OpenTelemetry file exporter instead of the Langfuse backend. The instrumentation under test is unchanged: server/app.py and observability/instrument.py emit standard OTel spans regardless of which consumer receives them. permalink therefore points at the committed span file (hw2-spans.jsonl) rather than a Langfuse URL. In that file the model identifier is redacted to <internal-model> because it names internal infrastructure; every span, attribute, and parent/child relationship is otherwise untouched."
+  },
+  {
+    "trace_id": "20ebeaec50f0c70ae3b0397cd060bcd9",
+    "permalink": "hw2-spans.jsonl#trace_id=20ebeaec50f0c70ae3b0397cd060bcd9",
+    "prompt_version": "d8c350db1f06",
+    "user_role": "shopper",
+    "user_id": 1,
+    "tool_order": [
+      "get_order",
+      "search_help_center",
+      "get_store_info",
+      "get_policy",
+      "escalate_to_human"
+    ],
+    "final_status": "completed",
+    "note": "Langfuse was unavailable on this machine (Docker could not be installed), so spans were captured with a local OpenTelemetry file exporter instead of the Langfuse backend. The instrumentation under test is unchanged: server/app.py and observability/instrument.py emit standard OTel spans regardless of which consumer receives them. permalink therefore points at the committed span file (hw2-spans.jsonl) rather than a Langfuse URL. In that file the model identifier is redacted to <internal-model> because it names internal infrastructure; every span, attribute, and parent/child relationship is otherwise untouched."
+  }
+]

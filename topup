@@ -1,0 +1,7 @@
+#!/bin/zsh
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+.venv/bin/python scripts/topup_trials.py \
+  --job hw6-capability-15 \
+  --case e-009 \
+  --need 15 \
+  --model openai/rl-muse-spark-1-1-playground

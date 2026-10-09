@@ -1,0 +1,111 @@
+model openai/rl-muse-spark-1-1-playground   1 case(s) x 1 rollouts = 1 agent runs
+judge calls: 0
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+Traceback (most recent call last):
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/llms/openai/openai.py", line 888, in acompletion
+    headers, response = await self.make_openai_chat_completion_request(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/litellm_core_utils/logging_utils.py", line 300, in async_wrapper
+    result: Final = await func(*args, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/llms/openai/openai.py", line 447, in make_openai_chat_completion_request
+    raise e
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/llms/openai/openai.py", line 423, in make_openai_chat_completion_request
+    raw_response = await openai_aclient.chat.completions.with_raw_response.create(**data, timeout=timeout)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/openai/_legacy_response.py", line 386, in wrapped
+    return cast(LegacyAPIResponse[R], await func(*args, **kwargs))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/openai/resources/chat/completions/completions.py", line 2907, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1992, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/openai/_base_client.py", line 1777, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.InternalServerError: Error code: 504 - {'error': {'code': None, 'message': 'request timed out', 'param': None, 'type': 'server_error'}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/main.py", line 647, in acompletion
+    response = await _resolve_dispatched_chat_response(init_response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/main.py", line 712, in _resolve_dispatched_chat_response
+    return await pending
+           ^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/llms/openai/openai.py", line 948, in acompletion
+    raise OpenAIError(
+litellm.llms.openai.common_utils.OpenAIError: Error code: 504 - {'error': {'code': None, 'message': 'request timed out', 'param': None, 'type': 'server_error'}}
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/scripts/run_baseline_local.py", line 183, in <module>
+    main()
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/scripts/run_baseline_local.py", line 163, in main
+    rollouts = replay_case(make_runner(case, model, WORLD), reset, n=args.k)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/replay/harness.py", line 92, in replay_case
+    record = dict(runner())
+                  ^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/scripts/run_baseline_local.py", line 106, in runner
+    transcript = run_case(case, model=model)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/replay/rollout.py", line 220, in run_case
+    return asyncio.run(_run())
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/fbcode/platform010/Python3.12.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/fbcode/platform010/Python3.12.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/fbcode/platform010/Python3.12.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/replay/rollout.py", line 203, in _run
+    result = await Runner.run(
+             ^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/run.py", line 290, in run
+    return await runner.run(
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/run.py", line 1481, in run
+    turn_result = await model_task
+                  ^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/run_internal/run_loop.py", line 2073, in run_single_turn
+    new_response = await get_new_response(
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/run_internal/run_loop.py", line 2227, in get_new_response
+    new_response = await get_response_with_retry(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/run_internal/model_retry.py", line 490, in get_response_with_retry
+    response = await get_response()
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/extensions/models/litellm_model.py", line 240, in get_response
+    response = await self._fetch_response(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/agents/extensions/models/litellm_model.py", line 654, in _fetch_response
+    ret = await litellm.acompletion(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/utils.py", line 2065, in wrapper_async
+    raise e
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/utils.py", line 1861, in wrapper_async
+    result = await original_function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/main.py", line 700, in acompletion
+    raise exception_type(
+          ^^^^^^^^^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2675, in exception_type
+    raise e  # it's already mapped
+    ^^^^^^^
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 2436, in exception_type
+    _map_openai_exception(
+  File "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.venv/lib/python3.12/site-packages/litellm/litellm_core_utils/exception_mapping_utils.py", line 473, in _map_openai_exception
+    raise Timeout(
+litellm.exceptions.Timeout: litellm.Timeout: Timeout Error: OpenAIException - request timed out

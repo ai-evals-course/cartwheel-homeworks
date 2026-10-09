@@ -1,0 +1,73 @@
+{
+ "case_id": "e-006",
+ "mode": "missing_escalation",
+ "n": 5,
+ "passes": 4,
+ "observed_pass_rate": 0.8,
+ "classification": "capability",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update your email address directly, but I can open a ticket for our support team to handle the change.\nI've opened a ticket for you \u2014 **ticket #151**.\n\nOur support team will follow up within 24 hours to verify your identity and update the email address on your account. They'll reach out to you here once it's ready.\n\nIs there anything else I can help with your orders or returns in the meantime?",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 0
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update your account email directly for security reasons, but I can open a request for our support team to handle it.\nI've opened a request for our support team to update your account email.\n\n**Ticket #151** - our team will follow up within 24 hours to verify your identity and make the change.\n\nWhen they reach out, they'll need to confirm both your current email and your new email address, so please keep an eye out for their message.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 1
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update your email address directly \u2014 account changes require a human agent. I'll escalate this for you now.\nI've opened a ticket for you (ID 151) and a human agent will follow up to update your email address securely.\n\nFor security, account changes like email updates are handled by our support team \u2014 they\u2019ll reach out within 24 hours to verify and complete the change.\n\nIs there anything else I can help with regarding your orders or shopping on Cartwheel?",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": false,
+   "checks_passed": false,
+   "checks_failed": [
+    "tool escalate_to_human called"
+   ],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't change your email address directly in chat for security reasons \u2014 account and payment details can only be updated through your account settings, or with help from a human agent.\n\nLet me pull the exact policy for you and then open a ticket so a human support agent can assist with this account change.",
+   "tool_calls": [
+    "search_help_center"
+   ],
+   "rollout": 3
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can't update your email directly, but I can escalate this to our support team to handle the change for you.\nThanks for letting me know \u2014 I've opened a ticket for you with our support team to get your email updated.\n\n**Ticket #151** \u2014 a human agent will follow up within 24 hours to handle the change.\n\nWhen they reach out, they'll likely ask you to confirm your current email and provide your new one for verification. You don't need to share it here if you don't want to.\n\nLet me know if there's anything else I can help with in the meantime \u2014 like an order status, return, or product question.",
+   "tool_calls": [
+    "escalate_to_human"
+   ],
+   "rollout": 4
+  }
+ ]
+}

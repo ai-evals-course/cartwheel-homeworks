@@ -1,0 +1,14 @@
+#!/bin/zsh
+# Part D, run 1: the intentional regression. Short filename, no arguments, so the
+# command cannot be split by terminal line wrapping.
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+if [ -f .hw6-logs/jobs/hw6-evals-regression/result.json ]; then
+  echo "REFUSING: run 1 already has results, and rerunning would overwrite the"
+  echo "regression evidence. Delete .hw6-logs/jobs/hw6-evals-regression first if"
+  echo "you really mean to redo it."
+  exit 1
+fi
+caffeinate -i nohup .hw6-logs/ci-run.sh hw6-evals-regression > .hw6-logs/ci-1.log 2>&1 &
+disown
+echo "started: 3 cases x 5 attempts, ~25 min"
+echo "watch:   ls .hw6-logs/jobs/hw6-evals-regression/"

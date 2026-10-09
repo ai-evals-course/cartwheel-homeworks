@@ -22,11 +22,13 @@ from typing import Any
 
 from agent import db
 from agent.auth import AuthContext, can_cancel_order, permission_denied
+from agent.config import load_facts
 from agent.helpcenter import load_policy_docs
 from agent.killswitch import kill_switch
 
 MAX_SEARCH_LIMIT = 25
 DEFAULT_ORDER_LIMIT = 20
+MAX_FIND_ORDER_RESULTS = 5
 
 
 def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
@@ -52,8 +54,26 @@ def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
     Implementation notes:
         agent.helpcenter.load_policy_docs() returns every parsed doc.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement get_policy")
+    for doc in load_policy_docs():
+        if doc.policy_id == policy_id:
+            return {
+                "ok": True,
+                "policy_id": doc.policy_id,
+                "title": doc.title,
+                "audience": doc.audience,
+                "body": doc.body,
+            }
+    # Exact match only: a near-miss must not silently return a different doc,
+    # because a store override and the platform default disagree on purpose.
+    # The reason points the model at recovery instead of a bare dead end.
+    return {
+        "ok": False,
+        "error": "not_found",
+        "reason": (
+            f"no policy doc with id '{policy_id}'; ids are exact and "
+            f"case-sensitive, so use search_help_center to find the right id"
+        ),
+    }
 
 
 def search_products(
@@ -95,8 +115,55 @@ def search_products(
         agent.db.list_products(conn, store_id) gives the candidate set.
         Use `with db.connection() as conn:` to close the database automatically.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement search_products")
+    tokens = query.lower().split()
+    if not tokens:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "query must not be empty",
+        }
+    if max_price_usd is not None and max_price_usd <= 0:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": f"max_price_usd must be positive, got {max_price_usd}",
+        }
+    limit = max(1, min(limit, MAX_SEARCH_LIMIT))
+
+    with db.connection() as conn:
+        store_id = None
+        if store is not None:
+            matched = db.get_store_by_name(conn, store)
+            if matched is None:
+                return {
+                    "ok": False,
+                    "error": "not_found",
+                    "reason": f"no store named '{store}'",
+                }
+            store_id = matched.id
+
+        # Every token must appear in the title or description. Deliberately
+        # literal: the model rephrases, the tool stays predictable.
+        matches = []
+        for product in db.list_products(conn, store_id):
+            haystack = f"{product.title} {product.description}".lower()
+            if not all(token in haystack for token in tokens):
+                continue
+            if max_price_usd is not None and product.price_usd > max_price_usd:
+                continue
+            matches.append(product)
+
+    matches.sort(key=lambda p: (p.price_usd, p.id))
+    products = [
+        {
+            "product_id": p.id,
+            "store_id": p.store_id,
+            "title": p.title,
+            "price_usd": p.price_usd,
+        }
+        for p in matches[:limit]
+    ]
+    return {"ok": True, "products": products, "count": len(products)}
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
@@ -121,8 +188,24 @@ def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
         scope is baked into which query you run. That is the point of the
         tool: the model cannot ask for someone else's orders through it.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement list_my_orders")
+    with db.connection() as conn:
+        if ctx.role == "shopper":
+            orders = db.list_orders_for_user(conn, ctx.user_id, limit=DEFAULT_ORDER_LIMIT)
+        elif ctx.role == "merchant":
+            orders = db.list_orders_for_store(conn, ctx.store_id, limit=DEFAULT_ORDER_LIMIT)
+        else:
+            # Support staff have no orders of their own. Refusing is the point:
+            # "everything" is never the fallback for an inapplicable scope.
+            return {
+                "ok": False,
+                "error": "invalid_argument",
+                "reason": (
+                    "support staff have no orders of their own; "
+                    "look up a specific order with get_order instead"
+                ),
+            }
+    payload = [order.to_public_dict() for order in orders]
+    return {"ok": True, "orders": payload, "count": len(payload)}
 
 
 def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]:
@@ -167,8 +250,97 @@ def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]
     paused = kill_switch("cancel_order")
     if paused is not None:
         return {"ok": False, "error": "paused", "reason": paused}
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement cancel_order")
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {
+                "ok": False,
+                "error": "not_found",
+                "reason": f"no order #{order_id}",
+            }
+        # Scope before status (RESP-4): an out-of-scope caller must learn
+        # nothing about the order, not even whether it shipped.
+        if not can_cancel_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"role '{ctx.role}' (user {ctx.user_id}) may not cancel order #{order_id}"
+            )
+        if order.status != "placed":
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": (
+                    f"order #{order_id} has status '{order.status}'; "
+                    f"orders can be cancelled only before shipment"
+                ),
+            }
+        db.set_order_status(conn, order_id, "cancelled")
+        return {"ok": True, "order_id": order_id, "status": "cancelled"}
+
+
+def get_store_info(ctx: AuthContext, store: str) -> dict[str, Any]:
+    """Look up a store's public information and its return-window override.
+
+    Added in Homework 1 Part A to close a gap observed in manual conversations:
+    the agent could read in cw-returns that "individual stores may override this
+    window" but had no way to check whether a given store actually does. Asked
+    about an order from Blue Heron Ceramics it applied the platform default
+    without checking, and was correct only because that store has no override.
+    The same reasoning would refuse a Northwind Books return on day 35, which
+    the store's own 45-day window still allows.
+
+    Store policy is public help-center content, so every role may read it and
+    no permission check is needed.
+
+    Args:
+        ctx: The caller's auth context. Unused, but every tool takes it.
+        store: A store name or slug, matched case-insensitively by
+            agent.db.get_store_by_name.
+
+    Returns:
+        On success: {"ok": True, "store_id": int, "name": str, "slug": str,
+        "category": str, "return_window_days": int, "platform_default_days":
+        int, "has_override": bool, "restocking_fee_opt_in": bool,
+        "policy_id": str | None}. `return_window_days` is the window that
+        actually applies, so the caller never has to combine the override with
+        the default itself. `policy_id` is the store's own policy doc when one
+        exists, for citation.
+        On an empty store string: {"ok": False, "error": "invalid_argument"}.
+        On an unknown store: {"ok": False, "error": "not_found"}.
+    """
+    store = store.strip()
+    if not store:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "store must not be empty",
+        }
+    with db.connection() as conn:
+        matched = db.get_store_by_name(conn, store)
+    if matched is None:
+        return {
+            "ok": False,
+            "error": "not_found",
+            "reason": f"no store named '{store}'",
+        }
+
+    platform_default = load_facts()["return_window_days"]
+    override = matched.return_window_days_override
+    policy_id = f"store-{matched.slug}-policy"
+    if not any(doc.policy_id == policy_id for doc in load_policy_docs()):
+        policy_id = None
+
+    return {
+        "ok": True,
+        "store_id": matched.id,
+        "name": matched.name,
+        "slug": matched.slug,
+        "category": matched.category,
+        "return_window_days": override if override is not None else platform_default,
+        "platform_default_days": platform_default,
+        "has_override": override is not None,
+        "restocking_fee_opt_in": matched.restocking_fee_opt_in,
+        "policy_id": policy_id,
+    }
 
 
 def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
@@ -202,5 +374,33 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
         (at most 5), each as the dict returned by agent.db. If no orders
         match, return {"ok": True, "orders": []}.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement find_order")
+    # Scope comes from the authenticated context, never from the query, and
+    # "search everything" is never a fallback for an unclear scope.
+    if ctx.role == "shopper" and ctx.user_id is not None:
+        scope = {"user_id": ctx.user_id}
+    elif ctx.role == "merchant" and ctx.store_id is not None:
+        scope = {"store_id": ctx.store_id}
+    elif ctx.role == "support":
+        scope = {"all_orders": True}
+    else:
+        return permission_denied(
+            f"role '{ctx.role}' (user {ctx.user_id}) may not search orders"
+        )
+
+    tokens = query.lower().split()
+    if not tokens:
+        return {"ok": True, "orders": []}
+
+    with db.connection() as conn:
+        titles = {p.id: p.title.lower() for p in db.list_products(conn)}
+        # The helper returns the complete scope, newest first. Match across all
+        # of it before truncating: an old match can sit behind 20 newer orders.
+        matches = []
+        for order in db.list_order_search_candidates(conn, **scope):
+            title = titles.get(order.product_id, "")
+            if all(token in title for token in tokens):
+                matches.append(order)
+                if len(matches) == MAX_FIND_ORDER_RESULTS:
+                    break
+
+    return {"ok": True, "orders": [order.to_public_dict() for order in matches]}

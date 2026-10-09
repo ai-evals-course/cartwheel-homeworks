@@ -1,0 +1,566 @@
+{
+ "64ad317e4f8d45ffa50d78c3fca74f95": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 0 (of 8), distance 0.95",
+  "cluster": 0,
+  "scenario_id": "support-0120"
+ },
+ "0447809701f04d669a9d84839c862c3c": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 0 (of 8), distance 0.97",
+  "cluster": 0,
+  "scenario_id": "support-0116"
+ },
+ "0302c702c8d8442da82294740442e7d4": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 1 (of 8), distance 1.15",
+  "cluster": 1,
+  "scenario_id": "support-0080"
+ },
+ "5fdc4ae2459542b68ac3052f2dd5ec21": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 1 (of 8), distance 1.23",
+  "cluster": 1,
+  "scenario_id": "support-0070"
+ },
+ "a3a10254b22b47b2814834d01e983cb4": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 2 (of 8), distance 1.63",
+  "cluster": 2,
+  "scenario_id": "support-0144"
+ },
+ "7bef261cafca4deba77b995679910a5f": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 2 (of 8), distance 1.67",
+  "cluster": 2,
+  "scenario_id": "support-0246"
+ },
+ "1648baba69d64eceab4fab56d5a554e3": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 3 (of 8), distance 0.45",
+  "cluster": 3,
+  "scenario_id": "support-0170"
+ },
+ "b36ec752e3b84698bbc019a6c70e54d1": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 3 (of 8), distance 0.46",
+  "cluster": 3,
+  "scenario_id": "support-0073"
+ },
+ "f895f05866da4e2fbde3526242e43506": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 4 (of 8), distance 0.09",
+  "cluster": 4,
+  "scenario_id": "support-0234"
+ },
+ "487cf81196ba4662ab39631fe989fba9": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 4 (of 8), distance 0.22",
+  "cluster": 4,
+  "scenario_id": "support-0233"
+ },
+ "5aa931067b9a4b598eaa7bab17d1346b": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 5 (of 8), distance 0.42",
+  "cluster": 5,
+  "scenario_id": "support-0067"
+ },
+ "f91da729e9004738832e6faeeb1de39a": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 5 (of 8), distance 0.55",
+  "cluster": 5,
+  "scenario_id": "support-0015"
+ },
+ "3fdb0a469db4447eae3c04a6906e25bd": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 6 (of 8), distance 0.61",
+  "cluster": 6,
+  "scenario_id": "support-0196"
+ },
+ "4c6710a64dfc489fbb7f9e9ec18198ae": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 6 (of 8), distance 0.63",
+  "cluster": 6,
+  "scenario_id": "support-0196"
+ },
+ "0270b647138140e5bbdfec4455253c13": {
+  "batch": 1,
+  "method": "cluster_representative",
+  "reason": "closest to centroid of cluster 7 (of 8), distance 1.26",
+  "cluster": 7,
+  "scenario_id": "support-0218"
+ },
+ "f53a1203d5fa4cdaa952b9e06dc0449c": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0062"
+ },
+ "9c72e664ac4642d7bc5f58448b04bf80": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0083"
+ },
+ "6ba818d82a494d56a26317094ec9492f": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0028"
+ },
+ "bd4b3cc2e3644a6d96899a549290edfd": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 6,
+  "scenario_id": "support-0191"
+ },
+ "143d80026f524f83993409d3d5ff272f": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 0,
+  "scenario_id": "support-0107"
+ },
+ "9654602c1dae41b79c323ba852917255": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 3,
+  "scenario_id": "support-0130"
+ },
+ "cb3ee1e191bb4c57a877fe0599740947": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0041"
+ },
+ "32e2fe278ea646aa8c24d7c877255604": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0025"
+ },
+ "65af4b47480941b0a73388eb023686d1": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 1,
+  "scenario_id": "support-0019"
+ },
+ "db237c7dfa0e47d1ad21ddcfb01bdc7c": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 5,
+  "scenario_id": "support-0006"
+ },
+ "268cfb5a4cd64e41be50152a4a3b2426": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 0,
+  "scenario_id": "support-0108"
+ },
+ "1c776684d44d4ce3856305a5d9c8c038": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 3,
+  "scenario_id": "support-0149"
+ },
+ "db2b2b67ff5e4127863d84bb1e85ce2f": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 7,
+  "scenario_id": "support-0238"
+ },
+ "fe692e1f46234348b90f812a8669c476": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 1,
+  "scenario_id": "support-0079"
+ },
+ "afb2f27217b04c9c9b2580d4b9f85ed8": {
+  "batch": 1,
+  "method": "uniform_random",
+  "reason": "drawn uniformly at random from all 261 conversations",
+  "cluster": 6,
+  "scenario_id": "support-0205"
+ },
+ "181ef1c737c34d8682f9e0406ab52451": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0214"
+ },
+ "80512cae0f6d487190e2f57b4e2e8bd5": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0217"
+ },
+ "a8898169770d4a81a57868e074efcfac": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0058"
+ },
+ "1104ea2fb1ff4a5db4f768b0a61eeebd": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0105"
+ },
+ "0e48161e0c474c1c89d0ed9723068c0b": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0232"
+ },
+ "e99d2e2387554bbd90b877c923fb5ec9": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_past_window; dimension chosen before examining outcomes, quota 6 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_past_window",
+  "scenario_id": "support-0236"
+ },
+ "48e143983949402898570e2ce30d7e3c": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = none; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "none",
+  "scenario_id": "support-0132"
+ },
+ "6ef7006f7f5e45f79d666f0641b011ed": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = none; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "none",
+  "scenario_id": "support-0241"
+ },
+ "8acd7c86083a4c34b00701b7eda2affa": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = none; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "none",
+  "scenario_id": "support-0168"
+ },
+ "42def3002baa43d186fafdbbbe131900": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = none; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "none",
+  "scenario_id": "support-0135"
+ },
+ "2b408f3fe2304703a1ef0c57140fae38": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = damaged_record; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "damaged_record",
+  "scenario_id": "support-0192"
+ },
+ "9d7a327e8ac44370a92a896685541e71": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = damaged_record; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "damaged_record",
+  "scenario_id": "support-0179"
+ },
+ "dc84c2f0f6934985bd1f8bc7de986812": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = damaged_record; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "damaged_record",
+  "scenario_id": "support-0188"
+ },
+ "55601a1c779941abbbd85cd2b9c65b85": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = damaged_record; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "damaged_record",
+  "scenario_id": "support-0199"
+ },
+ "74441680036a4ff8ba50047162be5b3d": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_in_window; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_in_window",
+  "scenario_id": "support-0018"
+ },
+ "0f0f41b8dcc2464f87f6be152a171a9e": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_in_window; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_in_window",
+  "scenario_id": "support-0026"
+ },
+ "53790ac45ddf4ea3b42467c32f0d0722": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_in_window; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_in_window",
+  "scenario_id": "support-0106"
+ },
+ "0188b294a9f945ebb29c0991cba0ca48": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_in_window; dimension chosen before examining outcomes, quota 4 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_in_window",
+  "scenario_id": "support-0024"
+ },
+ "c4fbef941f704561a3acfe5bed1e664d": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_above_threshold; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_above_threshold",
+  "scenario_id": "support-0039"
+ },
+ "b99fdd7eade345d7974f445e2f034dbd": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_above_threshold; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_above_threshold",
+  "scenario_id": "support-0040"
+ },
+ "52663120e1fb4c73bdda40185a7f0edf": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_above_threshold; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_above_threshold",
+  "scenario_id": "support-0047"
+ },
+ "ee1fc6f79b7843c0bd9b8cbc747f9951": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = product; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "product",
+  "scenario_id": "support-0155"
+ },
+ "40415f8d77fa41b38c586f852322565f": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = product; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "product",
+  "scenario_id": "support-0152"
+ },
+ "6727e6f3d69f41ff900c83b5d6d4188d": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = product; dimension chosen before examining outcomes, quota 3 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "product",
+  "scenario_id": "support-0153"
+ },
+ "f32c072b8b4d44559386eaf9e515fcd8": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = store_policy_page; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "store_policy_page",
+  "scenario_id": "support-0142"
+ },
+ "5ed62b5682bf49afa88f638f99c42793": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = store_policy_page; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "store_policy_page",
+  "scenario_id": "support-0146"
+ },
+ "b43313d6f4304eecb2e06cf8058be954": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_shipped; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_shipped",
+  "scenario_id": "support-0086"
+ },
+ "3d11b551468242779d9c8d8239b07efa": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_shipped; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_shipped",
+  "scenario_id": "support-0084"
+ },
+ "70829679fa23432a954586913d449aa7": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_placed; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_placed",
+  "scenario_id": "support-0078"
+ },
+ "a1c280fafef240e085a6ffd0208fe203": {
+  "batch": 2,
+  "method": "stratified_on_record_state",
+  "reason": "record_state = order_placed; dimension chosen before examining outcomes, quota 2 of 30 across 9 values",
+  "dimension": "record_state",
+  "value": "order_placed",
+  "scenario_id": "support-0077"
+ },
+ "dc1ed8e24afd4f65a2961e10906452ea": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0133"
+ },
+ "2c22cfce74654c73ba4af252e3421db4": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0102"
+ },
+ "eec10dd868cd4da2a1a2b29150cdb6fa": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0114"
+ },
+ "f5e4940d353946c3a74ae1d0f658cb10": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0088"
+ },
+ "8e59c7d7379b4fa1bd0b7e703462d36e": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0094"
+ },
+ "005104928e414fe0a667416f3e516dff": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0202"
+ },
+ "0cb9b0fb2ce64ae59fdf51d344d2bcd0": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0059"
+ },
+ "1b00ec341e674bd694c86728927df881": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0033"
+ },
+ "ef11bae5946a4007950ff278f6bdbad0": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0198"
+ },
+ "f7ddc32376204242911e1b331708f8ee": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0022"
+ },
+ "5a6084a7225f407cbf073b3f83a33451": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0173"
+ },
+ "556280d7e8f2479e808a47b112695fa4": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0085"
+ },
+ "f2af709c8cc14cefa978129016b1f200": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0045"
+ },
+ "476035d79aaf42c4bb2e1ca1091e5e83": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0008"
+ },
+ "7a5ae68f6e6f4cbd832c3dfc1dd09cea": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from conversations never sampled, reviewed, or returned by a depth search. Purpose: test whether the taxonomy has stabilised.",
+  "scenario_id": "support-0109"
+ },
+ "6704f5e4302841989b75727bfa27cc18": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from untouched conversations; four added beyond the planned 15 so the review set clears 100 distinct traces even if some suggestion-only conversations are excluded.",
+  "scenario_id": "support-0119"
+ },
+ "b43f3d7c11634abba6ed2c6764122c15": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from untouched conversations; four added beyond the planned 15 so the review set clears 100 distinct traces even if some suggestion-only conversations are excluded.",
+  "scenario_id": "support-0003"
+ },
+ "bd55679c002e4855a677afabe53003fe": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from untouched conversations; four added beyond the planned 15 so the review set clears 100 distinct traces even if some suggestion-only conversations are excluded.",
+  "scenario_id": "support-0201"
+ },
+ "5c55a361bbda4efda2f7b75e83f6f2cf": {
+  "batch": 4,
+  "method": "uniform_random_final",
+  "reason": "drawn uniformly at random from untouched conversations; four added beyond the planned 15 so the review set clears 100 distinct traces even if some suggestion-only conversations are excluded.",
+  "scenario_id": "support-0229"
+ }
+}

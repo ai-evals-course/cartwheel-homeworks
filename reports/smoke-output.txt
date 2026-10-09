@@ -1,0 +1,81 @@
+Cartwheel smoke report
+========================================================================
+Source: locally captured OpenTelemetry spans
+        .hw3-logs/final-spans.jsonl
+Docker was unavailable on this machine, so the Langfuse stack in
+observability/docker-compose.yml could not run and reports/smoke.sql could not
+be executed against its ClickHouse. The instrumentation under test is unchanged:
+server/app.py and observability/instrument.py emit standard OTel spans whatever
+consumes them. The eight sections below are the same ones smoke.sql produces.
+========================================================================
+
+1. Traces per scenario (are scenario ids flowing end to end?)
+
+   scenarios in the file          250
+   scenarios with >=1 trace       250
+   scenarios with NO trace        0  
+   scenarios with >1 trace        40  (expected for reruns)
+
+2. Traces per user role (are all three roles represented?)
+
+   shopper        250
+   merchant        28
+   support         17
+
+3. Errors (anything raising?)
+
+   spans with status ERROR        71
+      search_products.tool               66
+      cartwheel-support.agent            2
+      cartwheel.session_message          2
+      openai.response                    1
+   runner records not 'completed' 1
+      support-0204     error: timed out
+
+4. Escalations (how often did the agent punt to a human?)
+
+   escalate_to_human calls        40
+   distinct scenarios escalating  37
+
+5. Token totals
+
+   not recorded by this provider's spans
+   requests              295
+   total wall            5.5 h
+   median request         33 s
+
+6. Longest traces by span count (candidates for a raw read)
+
+     27 spans  support-0203     challenge  6f25f6c9a8a944a63ef404caddc81eb4
+     27 spans  support-0204     challenge  9b7802dba755981e6c4658c883458b68
+     25 spans  support-0050     coverage   9cac2c5d8b8541862957aa56ca700d94
+     22 spans  support-0023     coverage   86ed08457379ff7e76218ffb714dd5e9
+     22 spans  support-0199     challenge  1414d69bcefb8fd4676b021827b6fb7d
+     22 spans  support-0203     challenge  5b9a74da41c7a15aaefa9493170e6870
+     21 spans  support-0204     challenge  ae95f6cf89e7ebed1e919730ab7ae729
+     20 spans  support-0049     coverage   fa8e4901cb761d63ccf83bab0d447e53
+     20 spans  support-0153     coverage   b7f63395c21a0c7869f1b2076488695b
+     20 spans  support-0157     coverage   93bc34b0be6b91a932231b732c5f1e8e
+
+7. Tool-call frequency (which tools does the agent actually use?)
+
+   get_order                   160
+   search_products             160
+   find_order                  130
+   get_policy                  113
+   search_help_center          110
+   get_store_info              103
+   list_my_orders               41
+   escalate_to_human            40
+   cancel_order                 12
+   issue_refund                  5
+   TOTAL                       874
+
+8. Permission denials (gold for Module 4; needs the HW2 attributes)
+
+   denied tool calls              12
+   distinct scenarios            12
+      merchant     12
+
+========================================================================
+end of report

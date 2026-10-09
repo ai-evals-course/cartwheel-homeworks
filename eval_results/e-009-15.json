@@ -1,0 +1,117 @@
+{
+  "case_id": "e-009",
+  "model": "openai/rl-muse-spark-1-1-playground",
+  "trial_order": "result.json trial_results order",
+  "trials": [
+    {
+      "trial_name": "e-009-attempt-0",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-1",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-2",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-3",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-4",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-5",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-6",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-7",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-8",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-9",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-10",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-11",
+      "passed": 0
+    },
+    {
+      "trial_name": "e-009-attempt-12",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-13",
+      "passed": 1
+    },
+    {
+      "trial_name": "e-009-attempt-14",
+      "passed": 0
+    }
+  ],
+  "rewards": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    0
+  ],
+  "n": 15,
+  "successes": 6,
+  "comparisons": [
+    {
+      "n": 5,
+      "successes": 0,
+      "pass_at_k": {
+        "1": 0.0,
+        "3": 0.0,
+        "5": 0.0
+      }
+    },
+    {
+      "n": 10,
+      "successes": 3,
+      "pass_at_k": {
+        "1": 0.30000000000000004,
+        "3": 0.7083333333333333,
+        "5": 0.9166666666666666
+      }
+    },
+    {
+      "n": 15,
+      "successes": 6,
+      "pass_at_k": {
+        "1": 0.4,
+        "3": 0.8153846153846154,
+        "5": 0.958041958041958,
+        "10": 1.0,
+        "15": 1.0
+      }
+    }
+  ]
+}

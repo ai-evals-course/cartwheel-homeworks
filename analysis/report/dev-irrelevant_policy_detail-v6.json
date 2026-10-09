@@ -1,0 +1,21 @@
+{
+ "judge_id": "irrelevant_policy_detail-v6",
+ "split": "dev",
+ "tpr": 1.0,
+ "tnr": 1.0,
+ "tpr_interval": [
+  0.9369,
+  1.0
+ ],
+ "tnr_interval": [
+  0.3424,
+  1.0
+ ],
+ "agreement": 1.0,
+ "tp": 57,
+ "fn": 0,
+ "tn": 2,
+ "fp": 0,
+ "n": 59,
+ "disagreements": []
+}

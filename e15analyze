@@ -1,0 +1,11 @@
+#!/bin/zsh
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+.venv/bin/python scripts/analyze_harbor_job.py \
+  .hw6-logs/jobs/hw6-capability-15 \
+  --case e-009 \
+  --out eval_results/e-009-15.json
+echo
+.venv/bin/python -c "
+import json
+d=json.load(open('eval_results/e-009-15.json'))
+print(json.dumps(d, indent=1)[:1400])"

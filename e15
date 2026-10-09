@@ -1,0 +1,16 @@
+#!/bin/zsh
+# Part E: 15 runs of one capability case, then the course's own analysis script.
+#
+# e-009 is the right case: it passed 2 of 5 at baseline. A case at 0/5 or 5/5 shows
+# nothing as k grows -- pass@k stays pinned at 0 or 1. Only an intermittent case makes
+# the trial-count comparison say anything.
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+mkdir -p eval_results
+caffeinate -i nohup .venv/bin/python scripts/run_ci_local.py \
+  --job-name hw6-capability-15 \
+  --case e-009 \
+  --n-attempts 15 \
+  --model openai/rl-muse-spark-1-1-playground > .hw6-logs/e15.log 2>&1 &
+disown
+echo "started: e-009 x 15 runs, ~45 min"
+echo "when done: ./e15analyze"

@@ -1,0 +1,77 @@
+{
+ "case_id": "e-010",
+ "mode": "cites_policy_by_internal_id",
+ "n": 5,
+ "passes": 5,
+ "observed_pass_rate": 1.0,
+ "classification": "regression",
+ "model": "openai/rl-muse-spark-1-1-playground",
+ "rollouts": [
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Got it \u2014 checking the return window for Second Stitch Apparel and how refunds are paid back for your Midnight crewneck.\nFound your order for the Midnight crewneck \u2014 let me pull the exact return window and refund details for you.",
+   "tool_calls": [
+    "get_store_info",
+    "search_help_center",
+    "find_order"
+   ],
+   "rollout": 0
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "Thanks for asking about the Midnight crewneck return \u2014 I'll check Second Stitch Apparel's specific policy and locate your order to confirm the refund details.\nFound your order for the Midnight crewneck \u2014 let me pull the full return and refund details for Second Stitch Apparel to confirm timing and how the refund is paid.",
+   "tool_calls": [
+    "search_help_center",
+    "get_store_info",
+    "find_order"
+   ],
+   "rollout": 1
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "For your Midnight crewneck from Second Stitch Apparel, I'll pull the return policy and your order details.\nGot it \u2014 found your order for the Midnight crewneck and Second Stitch's return details. Let me pull the full policies to confirm the window and how refunds are paid.",
+   "tool_calls": [
+    "search_help_center",
+    "get_store_info",
+    "find_order"
+   ],
+   "rollout": 2
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help with that \u2014 let me check the return rules for Second Stitch Apparel and look up your order for the Midnight crewneck.",
+   "tool_calls": [],
+   "rollout": 3
+  },
+  {
+   "passed": true,
+   "checks_passed": true,
+   "checks_failed": [],
+   "judges": {},
+   "judge_critiques": {},
+   "final_reply": "I can help with that return \u2014 I'll check Cartwheel's policy, Second Stitch Apparel's specific window, and find your order to confirm eligibility.\nI found your order for the Midnight crewneck from Second Stitch Apparel \u2014 order 89 for $282, delivered June 6th and marked refund-eligible.\n\nLet me pull the exact return details for that store and Cartwheel's refund timeline so I can answer precisely.",
+   "tool_calls": [
+    "search_help_center",
+    "get_store_info",
+    "find_order"
+   ],
+   "rollout": 4
+  }
+ ]
+}

@@ -1,0 +1,10 @@
+#!/bin/zsh
+# One case, five rollouts, to see whether the endpoint is clean enough for a full run.
+# Watch the marks: '!' means an infrastructure error, which is what contaminated the
+# first Part D attempt.
+cd "/Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks"
+.venv/bin/python scripts/run_ci_local.py \
+  --job-name probe \
+  --case e-007 \
+  --n-attempts 5 \
+  --model openai/rl-muse-spark-1-1-playground

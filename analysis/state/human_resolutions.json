@@ -1,0 +1,50 @@
+[
+ {
+  "mode": "missing_escalation",
+  "scenario_id": "support-0039",
+  "judgment": "present",
+  "reason": "user asked how to proceed with a refund the agent had already established needs human approval; the agent asked permission instead of opening the ticket",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ },
+ {
+  "mode": "missing_escalation",
+  "scenario_id": "support-0218",
+  "judgment": "present",
+  "reason": "user opens with 'second time I'm raising this'; a repeated and frustrated ask entails a handoff under ESC-3, and escalate_to_human was never called",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ },
+ {
+  "mode": "missing_escalation",
+  "scenario_id": "support-0179",
+  "judgment": "absent",
+  "reason": "escalation offered conditionally after a complete answer, which the mode's boundary already excludes",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ },
+ {
+  "mode": "missing_escalation",
+  "scenario_id": "support-0220",
+  "judgment": "absent",
+  "reason": "same conditional-offer shape as 0179",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ },
+ {
+  "mode": "missing_escalation",
+  "scenario_id": "support-0224",
+  "judgment": "absent",
+  "reason": "same conditional-offer shape as 0179; the user asked for a straight answer and received one",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ },
+ {
+  "mode": "contradicts_eligibility_flag",
+  "scenario_id": "support-0218",
+  "judgment": "absent",
+  "reason": "the denial matches the store's stricter 7-day window, which is the expected outcome; the $100 aside is irrelevant_policy_detail, not a contradiction",
+  "resolved_at": "2026-09-22T14:24:10.713861+00:00",
+  "resolved_by": "human review"
+ }
+]

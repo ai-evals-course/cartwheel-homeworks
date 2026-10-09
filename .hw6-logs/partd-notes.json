@@ -1,0 +1,14 @@
+{
+  "pull_request": "https://github.com/shelbyprue/cartwheel-homeworks/pull/1",
+  "branch": "hw6-regression-demo",
+  "run_1_regression": {
+    "commit": "b30ffdd",
+    "change": "removed the ESC-2 account-change escalation sentence from the agent system prompt",
+    "expected": "e-007 fails, CI gate blocks"
+  },
+  "run_2_reverted": {
+    "commit": "pending",
+    "change": "restore the sentence",
+    "expected": "e-007 passes 5/5, CI gate passes"
+  }
+}

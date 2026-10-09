@@ -27,6 +27,16 @@ from math import comb
 from typing import Any
 
 
+def _validate(n: int, c: int, k: int) -> None:
+    """Shared argument checks for the two estimators."""
+    if n < 1:
+        raise ValueError(f"n must be at least 1, got {n}")
+    if not 0 <= c <= n:
+        raise ValueError(f"c must be within [0, {n}], got {c}")
+    if not 1 <= k <= n:
+        raise ValueError(f"k must be within [1, {n}], got {k}")
+
+
 def pass_at_k(n: int, c: int, k: int) -> float:
     """Unbiased estimator of pass@k from n runs with c successes.
 
@@ -58,8 +68,13 @@ def pass_at_k(n: int, c: int, k: int) -> float:
         pass_at_k(8, 6, 4) == 1.0  (only 2 failures, so every 4-subset hits
                                     a success)
     """
-    ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement pass_at_k")
+    _validate(n, c, k)
+    # Every size-k subset contains a success once the failures run out, so the
+    # subtracted term is zero and the estimate is exactly 1. comb() would return 0
+    # here anyway, but saying it plainly documents the boundary.
+    if n - c < k:
+        return 1.0
+    return 1.0 - comb(n - c, k) / comb(n, k)
 
 
 def pass_hat_k(n: int, c: int, k: int) -> float:
@@ -90,8 +105,11 @@ def pass_hat_k(n: int, c: int, k: int) -> float:
         pass_hat_k(8, 6, 4) == C(6,4)/C(8,4) == 15/70 == 0.2142857...
         pass_hat_k(8, 6, 8) == 0.0  (not all 8 succeeded)
     """
-    ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement pass_hat_k")
+    _validate(n, c, k)
+    # No size-k subset can be all-success with fewer than k successes.
+    if c < k:
+        return 0.0
+    return comb(c, k) / comb(n, k)
 
 
 def case_passes(
@@ -140,5 +158,27 @@ def case_passes(
         case_passes("capability", 2, 5, 0.6)     -> pass  (never blocks)
         case_passes("capability", 1, 5, 0.6)     -> pass  (never blocks)
     """
-    ### YOUR CODE HERE (hw6)
-    raise NotImplementedError("hw6: implement case_passes")
+    if kind not in ("regression", "capability"):
+        raise ValueError(f"kind must be 'regression' or 'capability', got {kind!r}")
+    if n < 1:
+        raise ValueError(f"n must be at least 1, got {n}")
+    if not 0 <= passes <= n:
+        raise ValueError(f"passes must be within [0, {n}], got {passes}")
+
+    if kind == "regression":
+        # A regression case guards a behaviour that was reliable. Any failed run is a
+        # regression, so the bar is n of n -- not a rate, and not a rerun.
+        if passes == n:
+            return {"decision": "pass",
+                    "reason": f"regression case passed {passes} of {n} runs"}
+        return {"decision": "block",
+                "reason": f"regression case failed {n - passes} of {n} runs"}
+
+    # A capability case covers behaviour the agent has never held reliably. Blocking on
+    # it would make CI permanently red and teach everyone to ignore it, so it reports
+    # and never blocks.
+    baseline = ("" if baseline_pass_rate is None
+                else f", baseline {baseline_pass_rate:g}")
+    return {"decision": "pass",
+            "reason": (f"capability case passed {passes} of {n}{baseline}, "
+                       "not blocking")}

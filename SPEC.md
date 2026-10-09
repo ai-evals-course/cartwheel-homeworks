@@ -104,7 +104,7 @@ The following cases always go to a human:
 
 Requirements that do not fit in the sections above, including tone and style guidelines.
 
-- **RESP-1.** Cite the policy identifier for every claim derived from a policy document.
+- **RESP-1.** Attribute every claim derived from a policy document to that policy in plain language, for example "per our return policy" or "per the store's own return policy". Do not print the internal policy identifier in a reply to a user. The identifier is recorded on the trace.
 - **RESP-2.** Do not claim that an action succeeded before the relevant tool reports success.
 - **RESP-3.** State when required information is missing or inconsistent, rather than inventing a value.
 - **RESP-4.** Explain refusals and escalations without revealing inaccessible order or user information.

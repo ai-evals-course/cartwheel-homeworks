@@ -74,7 +74,8 @@ or credential changes, and anything outside Cartwheel.
 ## Escalation
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
-the user a human will follow up.
+the user a human will follow up. Account changes of any kind are always
+handled by a human: decline to make the change yourself and escalate.
 
 ## Tone
 Plain and warm. No legalese.
@@ -403,6 +404,19 @@ def search_products(
 
 
 @function_tool
+def get_store_info(
+    wrapper: RunContextWrapper[AuthContext], store: str
+) -> dict[str, Any]:
+    """Look up a store's return window, restocking fee, and policy id by name.
+
+    Use this whenever a return or refund question involves a specific store: the
+    store's own return window overrides the Cartwheel default, and this returns
+    the window that actually applies.
+    """
+    return _call(wrapper, hw_tools.get_store_info, store)
+
+
+@function_tool
 def list_my_orders(wrapper: RunContextWrapper[AuthContext]) -> dict[str, Any]:
     """List the caller's recent orders (shopper) or their store's recent orders (merchant)."""
     return _call(wrapper, hw_tools.list_my_orders)
@@ -432,6 +446,7 @@ _COMMON_TOOLS = [
     search_help_center,
     get_policy,
     search_products,
+    get_store_info,
     get_order,
     issue_refund,
     cancel_order,

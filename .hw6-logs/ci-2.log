@@ -1,0 +1,28 @@
+model openai/rl-muse-spark-1-1-playground
+3 cases x 5 attempts = 15 agent runs
+judge calls: 0
+
+  e-007  regression  [..x..] 4/5    316s
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+LiteLLM.Info: If you need to debug this error, use `litellm._turn_on_debug()'.
+
+  e-009  capability  [xx!..] 2/5    889s
+  e-010  regression  [.....] 5/5    683s
+
+result -> /Users/shelbyprue/Desktop/AI Evals Course/cartwheel-homeworks/.hw6-logs/jobs/hw6-evals-reverted/result.json
+
+## Cartwheel evaluation results
+
+| Case | Kind | Passed | Trials | pass@1 | pass@3 | pass@5 | pass^5 | CI decision |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `e-007` | regression | 4 | 5 | 0.800 | 1.000 | 1.000 | 0.000 | block |
+| `e-009` | capability | 2 | 5 | 0.400 | 0.900 | 1.000 | 0.000 | pass |
+| `e-010` | regression | 5 | 5 | 1.000 | 1.000 | 1.000 | 1.000 | pass |
+
+Infrastructure problems:
+- e-009: 1 trial(s) did not produce a reward
+
+Regression cases block on any failed trial. Capability cases do not block.
+
+CI gate: BLOCK

@@ -9,9 +9,17 @@ data/cartwheel.db
 
 # Local conversation state and scenario/replay run outputs.
 .sessions.db
+.sessions.db-shm
+.sessions.db-wal
 scenarios/results/
 replay/results/
 .harbor/
+
+# Local HW1 working notes and captured CLI transcripts (not submission files).
+.hw1-progress.md
+.hw1-tools-reference.md
+.hw1-video-script.md
+.hw1-logs/
 
 # Python
 __pycache__/
@@ -19,3 +27,15 @@ __pycache__/
 .venv/
 .pytest_cache/
 scenarios/demo_pilot_gt.json
+
+# Local HW2 working notes.
+.hw2-progress.md
+.hw2-logs/
+.hw2-local/
+.hw2-video-script.md
+.phoenix-venv/
+.hw3-notes.md
+.hw3-logs/
+.hw3-video-script.md
+.hw4-logs/
+.hw5-logs/

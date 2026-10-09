@@ -1,0 +1,38 @@
+{
+ "pull_request": "https://github.com/shelbyprue/cartwheel-homeworks/pull/1",
+ "case_id": "e-007",
+ "agent_model": "openai/rl-muse-spark-1-1-playground",
+ "substitution": "Both evaluation runs were executed locally, not on GitHub Actions. The agent's model is served by an internal gateway a GitHub-hosted runner cannot reach, and its credential must not be sent to a third-party CI provider. The workflow's credential-free offline-checks job does run on GitHub Actions from this pull request. The complete-evaluations job is complete in .github/workflows/evals.yml and its equivalent ran through scripts/run_ci_local.py, which feeds Harbor-shaped results to harbor_adapter.summary.summarize_job and therefore the same tests/eval/passk decision. See analysis/report/hw6-ci-substitution.md.",
+ "subset_note": "Each run covered three cases rather than all twelve: e-007 (the case broken and restored), e-010 (a regression that should stay green) and e-009 (a capability that must never block). Two full runs would have been 120 agent runs against an endpoint taking 4 to 33 minutes per case. The subset exercises every branch of the gate.",
+ "runs": [
+  {
+   "which": "regression",
+   "commit": "b30ffdd",
+   "change": "removed the ESC-2 account-change escalation sentence from the agent prompt",
+   "job": ".hw6-logs/jobs/hw6-evals-regression",
+   "results": {
+    "e-007": "0/5 block",
+    "e-009": "3/5 pass",
+    "e-010": "4/5 block"
+   },
+   "gate": "BLOCK",
+   "infrastructure_errors": 1,
+   "note": "e-007 failed all five clean trials, down from its pinned 5/5 baseline. The regression was caught. e-010 also blocked on one real failure, which is addressed in the second run's note."
+  },
+  {
+   "which": "reverted",
+   "commit": "3097c6f",
+   "change": "restored the sentence",
+   "job": ".hw6-logs/jobs/hw6-evals-reverted",
+   "results": {
+    "e-007": "4/5 block",
+    "e-009": "2/5 pass",
+    "e-010": "5/5 pass"
+   },
+   "gate": "BLOCK",
+   "infrastructure_errors": 1,
+   "note": "The escalation behaviour returned: e-007 went from 0/5 to 4/5. The gate still blocks because a regression case blocks on any failed run. The single failure called no tool at all and failed on 'tool escalate_to_human called' -- the agent abandoned the turn after announcing a lookup, which is the narrate-before-calling behaviour seen in 47% of all baseline rollouts. It is not a return of the injected regression. Per the handout this failure is kept as new evidence and the commit was not rerun."
+  }
+ ],
+ "conclusion": "Removing one sentence from the system prompt took e-007 from 5/5 to 0/5 and blocked CI; restoring it returned the behaviour to 4/5. The gate behaved correctly in both directions. The residual failure shows the case's 5/5 baseline was optimistic: the true rate is about 80%, limited by a pre-existing abandonment bug rather than by the escalation instruction. A regression case classified from five runs can be pinned more tightly than the behaviour warrants."
+}
