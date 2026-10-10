@@ -89,6 +89,8 @@ Implement `post_message` in `server/app.py`. The endpoint must authorize the bea
 
 Run the agent inside a root span named `cartwheel.session_message`. Record the following attributes on the root span:
 
+- `cartwheel.session_id`, the server session identifier
+- `langfuse.session.id`, the same session identifier, which Langfuse uses to group the traces of one conversation on its Sessions page
 - `cartwheel.user_role`
 - `cartwheel.user_id`, as the decimal user identifier stored in a string
 - `cartwheel.prompt_version`

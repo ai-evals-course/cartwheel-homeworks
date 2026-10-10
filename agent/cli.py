@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import time
 
 try:  # readline transparently upgrades input(): arrow keys, ctrl-a/e/k/w,
@@ -110,6 +111,7 @@ async def chat(
         f"cli-{ctx.role}-{ctx.user_id}-{int(time.time())}", str(SESSIONS_DB)
     )
     version = prompt_version()
+    capture = os.environ.get("TRACELOOP_TRACE_CONTENT", "false").lower() == "true"
     print(
         f"Cartwheel support CLI | role={ctx.role} user={ctx.user_id} "
         f"store={ctx.store_id} prompt_version={version} defenses={'on' if defenses else 'off'}"
@@ -127,9 +129,17 @@ async def chat(
             return
         with _tracer.start_as_current_span("cartwheel.session_message") as span:
             if span.is_recording():
+                span.set_attribute("cartwheel.session_id", session.session_id)
+                # Langfuse groups the traces of one conversation by this attribute.
+                span.set_attribute("langfuse.session.id", session.session_id)
                 span.set_attribute("cartwheel.user_role", ctx.role)
                 span.set_attribute("cartwheel.user_id", str(ctx.user_id))
                 span.set_attribute("cartwheel.prompt_version", version)
+                if capture:
+                    span.set_attribute(
+                        "gen_ai.input.messages",
+                        json.dumps([{"role": "user", "parts": [{"type": "text", "content": line}]}]),
+                    )
             result = await Runner.run(
                 agent,
                 line,
@@ -138,6 +148,13 @@ async def chat(
                 max_turns=MAX_TURNS,
                 run_config=run_config,
             )
+            if span.is_recording() and capture and not result.interruptions:
+                span.set_attribute(
+                    "gen_ai.output.messages",
+                    json.dumps(
+                        [{"role": "assistant", "parts": [{"type": "text", "content": str(result.final_output)}]}]
+                    ),
+                )
 
         # ------------------------------------------------------------------
         # Module 4 pause and resume code (Homework 8, Part D). With defenses on,

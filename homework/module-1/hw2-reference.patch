@@ -12,7 +12,7 @@
 # and record_tool_result and _set_permission_denied_attributes in
 # observability/instrument.py.
 diff --git a/observability/instrument.py b/observability/instrument.py
-index f6b2b17..14ad0a8 100644
+index 2c36c71..b0662de 100644
 --- a/observability/instrument.py
 +++ b/observability/instrument.py
 @@ -122,10 +122,11 @@ def record_tool_result(ctx: "AuthContext", result: dict[str, Any]) -> None:
@@ -42,7 +42,7 @@ index f6b2b17..14ad0a8 100644
 +    if denied:
 +        span.set_attribute("cartwheel.permission_denied.reason", str(result.get("reason") or ""))
 diff --git a/server/app.py b/server/app.py
-index 3828638..ee13798 100644
+index 28b8405..c4e38a3 100644
 --- a/server/app.py
 +++ b/server/app.py
 @@ -123,8 +123,34 @@ def create_session(body: SessionCreate) -> dict[str, Any]:
@@ -82,7 +82,7 @@ index 3828638..ee13798 100644
  
  
  def _authorize(session_id: str, authorization: str | None) -> AuthContext:
-@@ -158,8 +184,34 @@ async def post_message(
+@@ -159,8 +185,35 @@ async def post_message(
      gen_ai.output.messages on the root span as JSON arrays of OTel GenAI
      messages with role and parts fields.
      """
@@ -96,6 +96,7 @@ index 3828638..ee13798 100644
 +    with _tracer.start_as_current_span("cartwheel.session_message") as span:
 +        if span.is_recording():
 +            span.set_attribute("cartwheel.session_id", session_id)
++            span.set_attribute("langfuse.session.id", session_id)
 +            span.set_attribute("cartwheel.user_role", ctx.role)
 +            span.set_attribute("cartwheel.user_id", str(ctx.user_id))
 +            span.set_attribute("cartwheel.prompt_version", version)
