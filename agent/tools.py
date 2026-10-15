@@ -52,8 +52,16 @@ def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
     Implementation notes:
         agent.helpcenter.load_policy_docs() returns every parsed doc.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement get_policy")
+    for doc in load_policy_docs():
+        if doc.policy_id == policy_id:
+            return {
+                "ok": True,
+                "policy_id": doc.policy_id,
+                "title": doc.title,
+                "audience": doc.audience,
+                "body": doc.body,
+            }
+    return {"ok": False, "error": "not_found", "reason": f"no policy with id '{policy_id}'"}
 
 
 def search_products(
@@ -95,8 +103,46 @@ def search_products(
         agent.db.list_products(conn, store_id) gives the candidate set.
         Use `with db.connection() as conn:` to close the database automatically.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement search_products")
+    tokens = query.lower().split()
+    if not tokens:
+        return {"ok": False, "error": "invalid_argument", "reason": "empty query"}
+    if max_price_usd is not None and max_price_usd <= 0:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "max_price_usd must be positive",
+        }
+    limit = max(1, min(limit, MAX_SEARCH_LIMIT))
+
+    with db.connection() as conn:
+        store_id = None
+        if store is not None:
+            found = db.get_store_by_name(conn, store)
+            if found is None:
+                return {"ok": False, "error": "not_found", "reason": f"no store named '{store}'"}
+            store_id = found.id
+        candidates = db.list_products(conn, store_id)
+
+    matches = []
+    for product in candidates:
+        text = f"{product.title} {product.description}".lower()
+        if not all(token in text for token in tokens):
+            continue
+        if max_price_usd is not None and product.price_usd > max_price_usd:
+            continue
+        matches.append(product)
+    matches.sort(key=lambda p: (p.price_usd, p.id))
+
+    products = [
+        {
+            "product_id": p.id,
+            "store_id": p.store_id,
+            "title": p.title,
+            "price_usd": p.price_usd,
+        }
+        for p in matches[:limit]
+    ]
+    return {"ok": True, "products": products, "count": len(products)}
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
@@ -121,8 +167,22 @@ def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
         scope is baked into which query you run. That is the point of the
         tool: the model cannot ask for someone else's orders through it.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement list_my_orders")
+    with db.connection() as conn:
+        if ctx.role == "shopper":
+            orders = db.list_orders_for_user(conn, ctx.user_id, limit=DEFAULT_ORDER_LIMIT)
+        elif ctx.role == "merchant":
+            orders = db.list_orders_for_store(conn, ctx.store_id, limit=DEFAULT_ORDER_LIMIT)
+        else:
+            return {
+                "ok": False,
+                "error": "invalid_argument",
+                "reason": (
+                    "support staff have no orders of their own; "
+                    "look up a specific order with get_order instead"
+                ),
+            }
+    public = [order.to_public_dict() for order in orders]
+    return {"ok": True, "orders": public, "count": len(public)}
 
 
 def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]:
@@ -167,8 +227,25 @@ def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]
     paused = kill_switch("cancel_order")
     if paused is not None:
         return {"ok": False, "error": "paused", "reason": paused}
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement cancel_order")
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {"ok": False, "error": "not_found", "reason": f"no order #{order_id}"}
+        if not can_cancel_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"role '{ctx.role}' (user {ctx.user_id}) may not cancel order #{order_id}"
+            )
+        if order.status != "placed":
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": (
+                    f"order #{order_id} is '{order.status}'; orders can be cancelled "
+                    "only before shipment, while their status is 'placed'"
+                ),
+            }
+        db.set_order_status(conn, order_id, "cancelled")
+    return {"ok": True, "order_id": order_id, "status": "cancelled"}
 
 
 def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
@@ -202,5 +279,126 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
         (at most 5), each as the dict returned by agent.db. If no orders
         match, return {"ok": True, "orders": []}.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement find_order")
+    if ctx.role == "shopper" and ctx.user_id is not None:
+        scope: dict[str, Any] = {"user_id": ctx.user_id}
+    elif ctx.role == "merchant" and ctx.store_id is not None:
+        scope = {"store_id": ctx.store_id}
+    elif ctx.role == "support":
+        scope = {"all_orders": True}
+    else:
+        return permission_denied(f"role '{ctx.role}' has no order search scope")
+
+    # Case-insensitive substring match on the product title.
+    needle = query.strip().lower()
+    if not needle:
+        return {"ok": True, "orders": []}
+
+    with db.connection() as conn:
+        candidates = db.list_order_search_candidates(conn, **scope)
+        titles = {p.id: p.title.lower() for p in db.list_products(conn)}
+
+    matches = [o for o in candidates if needle in titles.get(o.product_id, "")]
+    return {"ok": True, "orders": [o.to_public_dict() for o in matches[:5]]}
+
+
+# ---------------------------------------------------------------------------
+# Student tool (HW1 Part A, additional tool)
+# ---------------------------------------------------------------------------
+
+
+def check_refund_eligibility(ctx: AuthContext, order_id: int) -> dict[str, Any]:
+    """Explain whether an order can be refunded, and why. Risk tier: read.
+
+    Gap it fills: in manual conversations the agent declined or queued
+    refunds without explaining the return window, the store override, or the
+    approval threshold, and without citing the policies behind them. This tool
+    returns those facts together so the model can explain and cite them.
+
+    Scope matches get_order (agent.auth.can_view_order): out-of-scope callers
+    get permission_denied and learn nothing about the order. The tool never
+    issues or queues a refund.
+
+    Returns:
+        If no order has this id: {"ok": False, "error": "not_found", ...}.
+        On success: {"ok": True, "order_id", "eligible": bool, "reason": str,
+        "status", "delivered_at", "as_of", "return_window_days",
+        "window_source": "store_override" | "platform_default",
+        "last_eligible_date", "days_remaining", "order_total_usd",
+        "full_refund_needs_human_approval": bool, "approval_threshold_usd",
+        "policy_ids": [...]}. Dates are ISO strings or None.
+    """
+    from datetime import timedelta
+
+    from agent.auth import can_view_order
+    from agent.config import load_facts
+    from seed.eligibility import (
+        effective_return_window_days,
+        is_refund_eligible,
+        refund_needs_approval,
+    )
+
+    facts = load_facts()
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {"ok": False, "error": "not_found", "reason": f"no order #{order_id}"}
+        if not can_view_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"role '{ctx.role}' (user {ctx.user_id}) may not view order #{order_id}"
+            )
+        store = db.get_store(conn, order.store_id)
+        as_of = db.world_asof(conn)
+
+    override = store.return_window_days_override if store else None
+    window = effective_return_window_days(facts["return_window_days"], override)
+    policy_ids = ["cw-returns"]
+    if override is not None:
+        policy_ids += ["cw-store-overrides", f"store-{store.slug}-policy"]
+
+    eligible = order.refund_eligible and is_refund_eligible(
+        status=order.status,
+        delivered_at=order.delivered_at,
+        as_of=as_of,
+        return_window_days=window,
+    )
+    last_day = days_remaining = None
+    if order.delivered_at is not None:
+        last_day = order.delivered_at + timedelta(days=window)
+        days_remaining = (last_day - as_of).days
+
+    if eligible:
+        reason = (
+            f"delivered {order.delivered_at}, within the {window}-day return window "
+            f"({days_remaining} days remaining, last day {last_day})"
+        )
+    elif order.status != "delivered":
+        reason = f"order status is '{order.status}'; only delivered orders can be refunded"
+    elif order.delivered_at is None:
+        reason = "the order has no delivery date on record"
+    else:
+        reason = (
+            f"delivered {order.delivered_at}; the {window}-day return window "
+            f"ended on {last_day}"
+        )
+
+    threshold = facts["refund_auto_approve_threshold_usd"]
+    needs_approval = refund_needs_approval(order.total_usd, threshold)
+    if eligible:
+        policy_ids.append("cw-refunds")
+    return {
+        "ok": True,
+        "order_id": order_id,
+        "eligible": eligible,
+        "reason": reason,
+        "status": order.status,
+        "delivered_at": order.delivered_at.isoformat() if order.delivered_at else None,
+        "as_of": as_of.isoformat(),
+        "return_window_days": window,
+        "window_source": "store_override" if override is not None else "platform_default",
+        "last_eligible_date": last_day.isoformat() if last_day else None,
+        "days_remaining": days_remaining,
+        "order_total_usd": order.total_usd,
+        "full_refund_needs_human_approval": needs_approval,
+        "approval_threshold_usd": threshold,
+        "policy_ids": policy_ids,
+    }

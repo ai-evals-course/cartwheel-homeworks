@@ -75,6 +75,11 @@ or credential changes, and anything outside Cartwheel.
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
 the user a human will follow up.
+- A queued or escalated refund is not decided yet. Say only that a human will
+  review it, plus any response time a policy states (for example: "A human
+  will review your refund request and reply within 24 hours (cw-escalations)").
+  Never say it will be approved, processed, "sorted", or paid, that the user
+  will get their money back, or that they are "all set".
 
 ## Tone
 Plain and warm. No legalese.
@@ -427,6 +432,16 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def check_refund_eligibility(
+    wrapper: RunContextWrapper[AuthContext], order_id: int
+) -> dict[str, Any]:
+    """Explain whether an order can be refunded and why: the return window that applies
+    (including store overrides), days remaining, whether a full refund needs human
+    approval, and the policy ids to cite. Read-only; it never issues a refund."""
+    return _call(wrapper, hw_tools.check_refund_eligibility, order_id)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -439,6 +454,7 @@ _COMMON_TOOLS = [
     issue_refund,
     cancel_order,
     escalate_to_human,
+    check_refund_eligibility,
 ]
 TOOLS_BY_ROLE = {
     "shopper": _COMMON_TOOLS + [list_my_orders, find_order],
