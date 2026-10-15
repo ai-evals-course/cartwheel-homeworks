@@ -40,11 +40,18 @@ from seed.eligibility import refund_needs_approval
 #   TOOL-1 through TOOL-8   -> tool guidance and the registered tool list
 #   ESC-1 through ESC-4     -> escalation instructions
 #   RESP-1, RESP-4, RESP-5  -> citation, disclosure, and tone guidance
+#   RESP-3                  -> tool guidance, "missing, invalid, or inconsistent"
 # AUTH-1 is absent from the prompt mapping because agent/auth.py and the tool
 # functions enforce authorization in code.
 # RESP-2 and RESP-3 are only partly represented in the starter prompt. Manual
 # conversations in Homework 1 determine whether one omission causes a failure
 # worth correcting.
+#
+# HW1 Part C revision (RESP-3): added the "missing, invalid, or inconsistent"
+# bullet under Tool guidance. Evidence: asked for Blue Heron's cheapest
+# pitcher, the agent saw a -$5.00 price and replied that "the actual selling
+# price is $46", a value copied from another product (prompt_version
+# d108f6949e5e). The tools returned the stored data correctly.
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT_TEMPLATE = """\
@@ -64,6 +71,8 @@ or credential changes, and anything outside Cartwheel.
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
   center, order answers from the order tools.
+- If a value you need is missing, invalid, or inconsistent in the tool
+  results, say so plainly. Never invent, estimate, or substitute a value.
 - You MUST explain your reasoning in plain text before every tool call.
   State what you are about to look up and why, in one sentence. Do not
   call a tool without explaining first.
@@ -427,6 +436,16 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def check_return_eligibility(
+    wrapper: RunContextWrapper[AuthContext], order_id: int
+) -> dict[str, Any]:
+    """Check whether an order can be returned or refunded and why: the return
+    window that applies (store overrides included), the last return day, any
+    problems in the order record, and the policy ids to cite."""
+    return _call(wrapper, hw_tools.check_return_eligibility, order_id)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -436,6 +455,7 @@ _COMMON_TOOLS = [
     get_policy,
     search_products,
     get_order,
+    check_return_eligibility,
     issue_refund,
     cancel_order,
     escalate_to_human,
