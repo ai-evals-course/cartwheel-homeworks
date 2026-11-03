@@ -70,6 +70,9 @@ or credential changes, and anything outside Cartwheel.
 - Cite the policy id (for example cw-returns) for every policy claim.
 - Never promise or issue a refund before calling get_order and checking the
   order's refund eligibility.
+- If a value you need is missing from a tool result (for example an order's
+  delivery date) or its dates contradict each other, say so and do not state
+  a deadline or eligibility as fact.
 
 ## Escalation
 When you are unsure, or an action is above your authority (for example a
@@ -427,6 +430,33 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def check_refund_eligibility(
+    wrapper: RunContextWrapper[AuthContext], order_id: int, amount_usd: float | None = None
+) -> dict[str, Any]:
+    """Explain whether an order can be refunded: its return window (store
+    override or platform default), deadline, days remaining, and whether the
+    amount (default: order total) needs human approval. Read-only; it does not
+    issue a refund. If data_issues is non-empty, escalate instead of stating a
+    deadline."""
+    return _call(wrapper, hw_tools.check_refund_eligibility, order_id, amount_usd)
+
+
+@function_tool
+def get_store_info(wrapper: RunContextWrapper[AuthContext], store: str) -> dict[str, Any]:
+    """Look up a store by name or slug: its return window, restocking-fee
+    policy, and the policy ids to cite, including the store's own policy doc."""
+    return _call(wrapper, hw_tools.get_store_info, store)
+
+
+@function_tool
+def summarize_order_history(wrapper: RunContextWrapper[AuthContext]) -> dict[str, Any]:
+    """Summarize all of the caller's orders (shopper) or their store's orders
+    (merchant): counts by status, total value (excluding cancelled and
+    refunded), and the most recent orders."""
+    return _call(wrapper, hw_tools.summarize_order_history)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -439,10 +469,12 @@ _COMMON_TOOLS = [
     issue_refund,
     cancel_order,
     escalate_to_human,
+    check_refund_eligibility,
+    get_store_info,
 ]
 TOOLS_BY_ROLE = {
-    "shopper": _COMMON_TOOLS + [list_my_orders, find_order],
-    "merchant": _COMMON_TOOLS + [list_my_orders, find_order],
+    "shopper": _COMMON_TOOLS + [list_my_orders, find_order, summarize_order_history],
+    "merchant": _COMMON_TOOLS + [list_my_orders, find_order, summarize_order_history],
     "support": _COMMON_TOOLS + [find_order],
 }
 
