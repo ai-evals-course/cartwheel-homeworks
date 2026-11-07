@@ -1,0 +1,48 @@
+{
+  "versions": [
+    {
+      "judge_id": "internal_language_exposed-v0",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v1",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v2",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v3",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v4",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v5",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v6",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v7",
+      "prompt_hash": "55841ae1380b"
+    },
+    {
+      "judge_id": "internal_language_exposed-v8",
+      "prompt_hash": "d70addf90812"
+    },
+    {
+      "judge_id": "internal_language_exposed-v9",
+      "prompt_hash": "032443a615bd"
+    },
+    {
+      "judge_id": "internal_language_exposed-v10",
+      "prompt_hash": "52570107dbe1"
+    }
+  ]
+}

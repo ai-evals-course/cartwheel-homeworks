@@ -1,0 +1,43 @@
+{
+  "judge_id": "internal_language_exposed-v8",
+  "split": "dev",
+  "tpr": 0.2727,
+  "tnr": 0.9038,
+  "tpr_interval": [
+    0.1315,
+    0.4815
+  ],
+  "tnr_interval": [
+    0.7939,
+    0.9582
+  ],
+  "agreement": 0.7162,
+  "tp": 6,
+  "fn": 16,
+  "tn": 47,
+  "fp": 5,
+  "n": 74,
+  "disagreements": [
+    "support-0005",
+    "support-0009",
+    "support-0026",
+    "support-0029",
+    "support-0035",
+    "support-0039",
+    "support-0046",
+    "support-0052",
+    "support-0055",
+    "support-0061",
+    "support-0084",
+    "support-0087",
+    "support-0112",
+    "support-0118",
+    "support-0149",
+    "support-0152",
+    "support-0173",
+    "support-0174",
+    "support-0176",
+    "support-0201",
+    "support-0203"
+  ]
+}

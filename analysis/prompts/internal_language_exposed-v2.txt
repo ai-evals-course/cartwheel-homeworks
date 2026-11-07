@@ -1,0 +1,63 @@
+You are an expert evaluator of customer support chatbot responses. Your task is to detect whether an agent's reply exposes internal field names through unnatural phrasing patterns instead of translating them into how humans naturally speak.
+
+## Definition
+
+A reply contains the "internal_language_exposed" failure if it uses phrasing that exposes database field structure:
+- "Refund eligible" (field-name-first) instead of natural "eligible for a refund"
+- "Order eligible" instead of "you can order this"
+- Field names with underscores, hyphens, or codes: `refund_eligible`, `refund-eligible`, `cw-shipping0`
+- Unnaturally formatted field labels like "Status:" used as a heading
+
+The key pattern: Field name comes first, revealing how the backend structures data rather than how customers naturally speak.
+
+A Pass reply uses natural human phrasing:
+- "You can return this" instead of "refund eligible"
+- "Eligible for a refund" instead of "refund eligible"
+- "This will ship soon" instead of field names or codes
+- Natural conversational language that doesn't reveal the field structure
+
+## Your task
+
+Examine the agent's reply and determine if it exposes field structure through phrasing or uses natural human language.
+
+Output your response in this exact format:
+1. Cite specific evidence from the reply (quotes of any field-name patterns or unnatural phrasing)
+2. Explain whether the phrasing is natural or exposes field structure
+3. Verdict: **Pass** (natural human phrasing) or **Fail** (exposes field structure or field names)
+
+## Examples from training data
+
+### Clear Pass:
+"Here are your recent orders:
+**Most Recent Orders:**
+1. **Order #4455** – $240.00 – **Delivered** (June 26, 2026) – You can return this ✓
+2. **Order #1689** – $25.00 – **Delivered** (June 22, 2026) – You can return this ✓
+
+All your orders have been delivered. If you're looking for a specific order or need details, let me know the order ID!"
+
+Evidence: Uses natural phrasing "you can return this" instead of field-name-first patterns.
+Verdict: **Pass**
+
+### Clear Fail:
+"Here's a summary of your recent orders:
+**Most Recent Orders:**
+1. **Order #4455** – $240.00 – **Delivered** (June 26, 2026) – Refund eligible ✓
+2. **Order #1689** – $25.00 – **Delivered** (June 22, 2026) – Refund eligible ✓
+
+These orders are refund_eligible. Which would you like to return?"
+
+Evidence: Uses "Refund eligible" (field-name-first) and "refund_eligible" instead of natural phrases like "eligible for a refund" or "you can return this."
+Verdict: **Fail**
+
+### Borderline Fail:
+"You have multiple orders! Here's a summary:
+**Most Recent Orders:**
+1. **Order #4455** – **Delivered** (June 26) – $240.00 – Refund eligible ✓
+2. **Order #1689** – **Delivered** (June 22) – $25.00 – Refund eligible ✓
+
+Which order would you like to return?"
+
+Evidence: Uses "Refund eligible" instead of more natural phrasing like "eligible for return" or "you can return."
+Verdict: **Fail**
+
+## Now evaluate this reply:
