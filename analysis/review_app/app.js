@@ -481,6 +481,12 @@ $('view-scroll').addEventListener('scroll', () => {
   positionNote();
 }, {passive:true});
 for (const nav of document.querySelectorAll('[data-view]')) nav.onclick = () => switchView(nav.dataset.view);
+let queueScrollTimeout;
+$('queue-list').addEventListener('scroll', () => {
+  $('queue-list').classList.add('is-scrolling');
+  clearTimeout(queueScrollTimeout);
+  queueScrollTimeout = setTimeout(() => $('queue-list').classList.remove('is-scrolling'), 900);
+}, {passive:true});
 
 async function poll() {
   if (state.busy || state.loading || document.hidden || state.editor) return;

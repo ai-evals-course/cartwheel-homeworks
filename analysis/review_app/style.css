@@ -207,6 +207,26 @@ main {
 #queue-list {
   overflow-y: auto;
   min-height: 0;
+  scrollbar-width:thin;
+  scrollbar-gutter:stable;
+  scrollbar-color:transparent transparent;
+}
+#queue-list.is-scrolling {
+  scrollbar-color:#8ca6c5 transparent;
+}
+#queue-list::-webkit-scrollbar {
+  width:8px;
+  height:8px;
+}
+#queue-list::-webkit-scrollbar-track {
+  background:transparent;
+}
+#queue-list::-webkit-scrollbar-thumb {
+  background:transparent;
+  border-radius:8px;
+}
+#queue-list.is-scrolling::-webkit-scrollbar-thumb {
+  background:#8ca6c5;
 }
 .queue-head {
   display:flex;
