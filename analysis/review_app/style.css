@@ -325,15 +325,17 @@ main {
 }
 .legend {
   display:flex;
-  gap:12px;
+  gap:16px;
   flex-wrap:wrap;
   margin:0 0 0 auto;
+  font-size:var(--text-body);
+  font-weight:600;
 }
 .legend span:before {
   content:"";
   display:inline-block;
-  width:8px;
-  height:8px;
+  width:11px;
+  height:11px;
   background:var(--role-color);
   border-radius:50%;
   margin-right:6px
@@ -694,6 +696,15 @@ td .actions button {
   margin-top:12px;
   padding-top:4px;
   border-top:1px solid var(--line);
+}
+.tool-section-title {
+  font-size:var(--text-small);
+  font-weight:600;
+  margin:12px 0 8px;
+}
+.tool-section + .tool-section {
+  border-top:1px solid var(--line);
+  margin-top:16px;
 }
 .note-card button.jump {
   background:transparent;

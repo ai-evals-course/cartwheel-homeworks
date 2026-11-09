@@ -165,9 +165,11 @@ function renderTool(block, tid) {
   if (status) heading.append(el('span', 'tool-summary-status', String(status)));
   node.append(heading);
   const body = el('div', 'tool-body');
-  const args = anchored(pretty(block.arguments), tid, block.id, 'input', true);
-  body.append(details('Arguments', args, false, key + ':arguments'));
-  body.append(details('Complete result', anchored(pretty(result), tid, block.id, 'output', true), false, key + ':result'));
+  for (const [title, field, value] of [['Arguments', 'input', block.arguments], ['Complete result', 'output', result]]) {
+    const section = el('section', 'tool-section');
+    section.append(el('h3', 'tool-section-title', title), anchored(pretty(value), tid, block.id, field, true));
+    body.append(section);
+  }
   node.append(body);
   outer.append(node);
   return outer;

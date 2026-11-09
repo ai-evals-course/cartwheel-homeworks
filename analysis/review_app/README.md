@@ -68,7 +68,8 @@ version across the conversation. Raw traces, IDs, timing, costs, prompt versions
 and Langfuse links are available in Progress under each trace's details.
 Tool calls start collapsed with the tool name and any error or action status visible;
 successful `ok` flags are not repeated beside the name. Expand
-the call to reveal Arguments and Complete result, each collapsed independently.
+the call to reveal Arguments and Complete result in full, with no additional
+expansion needed.
 The interface calls assistant messages **Agent**. A tool call sits inside a
 **Tool** bubble with pale brown styling; the nested tool bubble is white,
 including the tool name, arguments and complete result, with a brown accent.
