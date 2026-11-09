@@ -69,8 +69,8 @@ Tool calls start collapsed with the tool name and any error or action status vis
 successful `ok` flags are not repeated beside the name. Expand
 the call to reveal Arguments and Complete result, each collapsed independently.
 The interface calls assistant messages **Agent**. A tool call sits inside a
-**Tool** bubble with pale brown styling; the nested tool bubble uses a deeper
-brown tint and a dark brown accent.
+**Tool** bubble with pale brown styling; the nested tool bubble is white,
+including the tool name, arguments and complete result, with a brown accent.
 The complete result includes retrieval evidence and all original fields.
 Execution metadata stays in Progress's raw trace details. Disclosure choices
 survive note saves.

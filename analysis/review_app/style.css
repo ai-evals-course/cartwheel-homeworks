@@ -667,7 +667,7 @@ td .actions button {
 }
 .tool-disclosure {
   --role-color:var(--tool);
-  background:#ead5bf;
+  background:#fff;
   color:#654126;
   border:1px solid var(--line);
   border-left:3px solid var(--role-color);
