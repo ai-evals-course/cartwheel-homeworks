@@ -153,7 +153,7 @@ function anchored(content, traceId, blockId, field, mono = false) {
 }
 function renderTool(block, tid) {
   const outer = el('div', 'block tool-message'); outer.dataset.role = 'assistant';
-  outer.append(el('div', 'role-label', 'Agent'));
+  outer.append(el('div', 'role-label', 'Tool'));
   const node = el('details', 'tool-disclosure'); node.dataset.role = 'tool'; node.dataset.blockId = block.id;
   const key = tid + ':' + block.id;
   node.dataset.disclosure = key;
@@ -480,7 +480,6 @@ async function poll() {
 async function boot() {
   try {
     [state.catalog, state.review] = await Promise.all([get('/api/catalog'), get('/api/state')]);
-    $('source').textContent = state.catalog.source;
     const initial = new URLSearchParams(location.hash.slice(1)).get('session');
     if (state.catalog.sessions.length) await openSession(state.catalog.sessions.some(s=>s.id === initial) ? initial : state.catalog.sessions[0].id);
     else {render(); notice('No scenario traces found in this source.');}

@@ -66,8 +66,8 @@ and Langfuse links are available in Progress under each trace's details.
 Tool calls start collapsed with the tool name and any error or action status visible;
 successful `ok` flags are not repeated beside the name. Expand
 the call to reveal Arguments and Complete result, each collapsed independently.
-The interface calls assistant messages **Agent**. A tool call sits inside an
-Agent bubble that shares the agent's green accent and light green background;
+The interface calls assistant messages **Agent**. A tool call sits inside a
+**Tool** bubble that shares the agent's green accent and light green background;
 the nested tool bubble retains its amber accent.
 The complete result includes retrieval evidence and all original fields.
 Execution metadata stays in Progress's raw trace details. Disclosure choices
