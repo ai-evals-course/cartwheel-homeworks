@@ -38,7 +38,7 @@ The navigation, conversation metadata and role legend remain fixed
 above the independently scrolling reading pane, which begins with system
 instructions. Body text and secondary labels use a consistent 16px/14px scale.
 The compact header puts the role beside the scenario name and omits review
-instructions. User, agent and tool messages have blue, green and brown outer
+instructions. User, agent and tool messages have plum, taupe and brown outer
 bubbles respectively, each with a matching white inner bubble. Intermediate agent messages are
 italic and labeled Agent (In-between); the final response to each request is
 labeled Agent (Final).
