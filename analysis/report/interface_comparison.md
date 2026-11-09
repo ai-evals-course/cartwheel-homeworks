@@ -31,6 +31,9 @@ the start contains the distinct captured versions. Review controls and raw
 trace details live in Progress. The sidebar lists scenario, role, trace count and
 review status without filters or request previews,
 and larger proportional text improves readability.
+Each sidebar conversation is a bordered cell. Shopper, merchant and support have
+distinct labeled color badges, and a dark top bar emphasizes Review, Label,
+Taxonomy and Progress. Successful `ok` flags are omitted from tool headings.
 
 The new interface also separates free-text open coding from a later binary
 labeling view. Explicit completion distinguishes no failure observed from

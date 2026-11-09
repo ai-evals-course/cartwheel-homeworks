@@ -70,6 +70,11 @@ function roleLegend() {
   }
   return row;
 }
+function roleBadge(role) {
+  const badge = el('span', 'audience-badge', role || 'Unknown role');
+  badge.dataset.audience = role || 'unknown';
+  return badge;
+}
 function renderQueue() {
   const groups = state.catalog.sessions;
   $('queue-count').textContent = groups.length;
@@ -79,7 +84,9 @@ function renderQueue() {
     const first = session.traces[0], done = session.traces.filter(t => reviewed(t.id)).length;
     const item = button('', () => openSession(session.id), 'conversation' + (state.session?.id === session.id ? ' active' : ''));
     item.setAttribute('aria-current', state.session?.id === session.id ? 'true' : 'false');
-    item.append(el('strong', '', `${first.scenario || 'Unassigned scenario'} · ${first.role || 'Unknown role'}`),
+    const title = el('span', 'conversation-title');
+    title.append(el('strong', '', first.scenario || 'Unassigned scenario'), roleBadge(first.role));
+    item.append(title,
       el('span', 'quiet', `${session.traces.length} trace(s) · ${done} reviewed`));
     list.append(item);
   }
@@ -150,8 +157,8 @@ function renderTool(block, tid) {
   const result = block.result;
   const heading = el('summary', 'tool-heading');
   heading.append(el('span', 'tool-name', block.name + '()'));
-  const status = result?.error || result?.status || (result?.ok === true ? 'ok' : result?.ok === false ? 'failed' : 'result not captured');
-  heading.append(el('span', 'tool-summary-status', String(status)));
+  const status = result?.error || result?.status || (result?.ok === false ? 'failed' : null);
+  if (status) heading.append(el('span', 'tool-summary-status', String(status)));
   node.append(heading);
   const body = el('div', 'tool-body');
   const args = anchored(pretty(block.arguments), tid, block.id, 'input', true);
@@ -355,7 +362,7 @@ function render() {
     const heading = el('div', 'session-heading');
     heading.append(el('h2', '', first.meta['cartwheel.scenario_id'] || 'Conversation'));
     const metadata = el('div', 'meta');
-    metadata.append(el('span', '', `Role: ${first.meta['cartwheel.user_role'] || 'not captured'}`),
+    metadata.append(roleBadge(first.meta['cartwheel.user_role']),
       el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
     heading.append(metadata); header.append(heading);
   }
