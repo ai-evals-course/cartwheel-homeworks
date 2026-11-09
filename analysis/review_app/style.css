@@ -1,7 +1,7 @@
 :root {
   font-family:"Segoe UI",Arial,system-ui,sans-serif;
   color:#223249;
-  background:#f3f7fc;
+  background:#f6f6f5;
   font-size:16px;
   --text-body:1rem;
   --text-small:.875rem;
@@ -202,7 +202,7 @@ main {
   flex-direction: column;
   padding:22px 18px;
   border-right:1px solid var(--line);
-  background:#eaf1fa
+  background:#f0f1f1
 }
 #queue-list {
   overflow-y: auto;
@@ -280,7 +280,7 @@ main {
 }
 #session-header {
   flex-shrink:0;
-  background:#f3f7fc;
+  background:#f6f6f5;
   z-index:2;
   box-shadow:0 3px 8px #22324906;
 }

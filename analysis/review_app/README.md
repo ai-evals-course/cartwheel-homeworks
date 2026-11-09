@@ -25,7 +25,7 @@ the server to include newly recorded traces. Missing session IDs remain separate
    shopper, merchant and support roles use distinct labeled color badges.
    The prominent top navigation provides Review, Label, Taxonomy and Progress.
    The overall theme uses navy navigation, blue controls and selected cells,
-   and pale blue page surfaces; role and tool colors retain their distinct meanings.
+   with neutral gray page surfaces; role and tool colors retain their distinct meanings.
    Navigation and the conversation header stay fixed while the reading pane
    scrolls from the system instructions downward. The sidebar scrolls separately;
    on small screens its cells form a horizontal strip. Body text uses 16px and
