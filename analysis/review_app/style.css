@@ -391,7 +391,6 @@ main {
 .message-content {
   background:#fff;
   border:1px solid var(--line);
-  border-left:3px solid var(--role-color);
   border-radius:4px;
   padding:12px 14px;
 }
@@ -679,7 +678,6 @@ td .actions button {
   background:#fff;
   color:#654126;
   border:1px solid var(--line);
-  border-left:3px solid var(--role-color);
   border-radius:4px;
   padding:12px 14px;
 }
