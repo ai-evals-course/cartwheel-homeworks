@@ -1,0 +1,43 @@
+# Review interface comparison
+
+The student approved the session-based proposal after inspection of ten full
+live traces across seven sessions in the Cartwheel Dev project. The sample
+included shopper, merchant and support roles; multi-turn clarification and
+cancellation conversations; policy retrieval; an above-threshold refund;
+a missing product title; an authorization refusal; and an out-of-scope request.
+These inspections established the display structure, not human failure labels.
+
+**Retained from the reference:** tool calls and their structured results share a
+container, and selected evidence connects to readable margin notes. Role labels
+and color distinguish user, assistant and tool content. AI suggestions remain
+separate until explicitly accepted or rejected.
+
+**Changed after inspecting live traces:** navigation groups traces by
+`metadata.attributes["cartwheel.session_id"]`, because the top-level Langfuse
+`sessionId` was null in the sample. Turns retain individual trace IDs and appear
+chronologically. Generation outputs supply intermediate messages; accumulated
+model inputs and duplicate final output are not repeated. Matching uses call
+identity when captured, otherwise unique tool name and arguments, rather than
+the reference UI's adjacency-only pairing. Retrieval snippets and important tool
+status fields stay visible; complete typed JSON and raw execution remain available.
+
+The new interface also separates free-text open coding from a later binary
+labeling view. Explicit completion distinguishes no failure observed from
+unreviewed. Final taxonomy definitions link to human-selected supporting notes.
+Progress counts individual traces and missing trace/mode judgments. Accepted
+binary decisions have resumable, idempotent Langfuse synchronization and a
+separate local mirror under `analysis/state/review_app.json`.
+
+**Remaining limitation:** only captured evidence can be displayed. Uncaptured
+content and ambiguous tool matches are flagged; the interface cannot reconstruct
+them reliably. Overlapping highlights retain both notes but display one highlight
+at a time. The inventory is a startup snapshot; restart to load new traces.
+
+**Observed verification:** the live project loaded 364 scenario-bearing traces
+in 280 conversations from 373 total project records. Browser checks exercised
+three-turn grouping, anchored notes, escaped trace content, supporting taxonomy
+notes, absent labels, pending synchronization, reload persistence, suggestion
+accept/reject controls, progress and mobile layout. All synthetic mutations used
+temporary offline state; live verification performed reads only. No new model
+calls or student assessments were generated. The student's standard Langfuse
+view comparison, human review, final taxonomy and video remain pending.

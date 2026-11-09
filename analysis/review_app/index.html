@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cartwheel · Trace review</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div><h1>Cartwheel <span>/ Trace review</span></h1><p id="source">Connecting to your trace collection…</p></div>
+    <nav aria-label="Review views">
+      <button data-view="read" aria-pressed="true">Read &amp; annotate</button>
+      <button data-view="labels" aria-pressed="false">Label</button>
+      <button data-view="taxonomy" aria-pressed="false">Taxonomy</button>
+      <button data-view="progress" aria-pressed="false">Progress</button>
+    </nav>
+    <div id="save-status" role="status" aria-live="polite">Loading…</div>
+  </header>
+  <div id="notice" role="alert" hidden></div>
+  <main>
+    <aside class="queue" aria-label="Conversation queue">
+      <div class="queue-head"><h2>Conversations</h2><span id="queue-count"></span></div>
+      <label>Find a conversation<input id="search" type="search" placeholder="Request, scenario or trace ID"></label>
+      <div class="filters">
+        <label>Role<select id="role-filter"><option value="">All roles</option></select></label>
+        <label>Tool<select id="tool-filter"><option value="">All tools</option></select></label>
+      </div>
+      <label>Review status<select id="status-filter"><option value="">All conversations</option><option value="incomplete">Needs open coding</option><option value="reviewed">Open coding complete</option><option value="labels">Needs final labels</option></select></label>
+      <p class="quiet">Project inventory · no failure-based selection. Counts refer to individual traces.</p>
+      <div id="queue-list"></div>
+    </aside>
+    <section class="workspace" aria-label="Review workspace">
+      <div id="session-header"></div>
+      <div id="read-view" class="view"><p class="empty">Loading conversations…</p></div>
+      <div id="labels-view" class="view" hidden></div>
+      <div id="taxonomy-view" class="view" hidden></div>
+      <div id="progress-view" class="view" hidden></div>
+    </section>
+  </main>
+  <dialog id="note-dialog" aria-labelledby="note-title">
+    <form id="note-form">
+      <h2 id="note-title">Evidence note</h2>
+      <p class="quiet">Describe the earliest issue in your own words. Formal modes come later.</p>
+      <blockquote id="note-quote"></blockquote>
+      <label>Your observation<textarea id="note-text" rows="5" required maxlength="20000"></textarea></label>
+      <div class="actions"><button type="button" id="cancel-note">Keep draft &amp; close</button><button type="submit" class="primary">Save note</button></div>
+    </form>
+  </dialog>
+</body>
+</html>
