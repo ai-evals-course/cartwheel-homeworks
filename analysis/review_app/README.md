@@ -20,8 +20,10 @@ the server to include newly recorded traces. Missing session IDs remain separate
 1. Find a conversation by role, tool, request, scenario or trace ID. Read its
    turns in chronological order. Each turn retains its own trace identity.
 2. Select text to write an evidence note. A temporary highlight remains visible
-   while the editor is open. Notes can also apply to a whole turn. Save each
-   note; unsaved drafts are backed up in this browser and offered on reload.
+   while a compact pop-up appears beneath the selection, showing the quote and
+   a text box. Enter saves, Shift+Enter adds a line, and Escape closes without
+   saving. Notes can also apply to a whole turn. Unsaved drafts are backed up
+   in this browser and offered on reload.
 3. Stop initial reading at the first failure, then choose **First failure
    noted**. If you find none, choose **No failure observed**. Saving a note
    alone does not mark a trace reviewed. **Reopen** resets that review status.
@@ -45,6 +47,9 @@ observations supply arguments and results. Accumulated model inputs and repeated
 root output are not replayed as additional turns. Raw payloads remain available.
 Tool calls match by explicit call ID where captured, or unique name and arguments;
 ambiguous matches are flagged. Identity-specific system instructions are expandable.
+Tool calls start collapsed with the tool name and result status visible. Expand
+the call for its evidence summary and retrieval snippets, then expand arguments
+or the complete result when needed. Disclosure choices survive note saves.
 
 The separate `analysis/state/review_app.json` holds human notes, review completion,
 taxonomy decisions, suggestion decisions and binary judgments. Prior label edits

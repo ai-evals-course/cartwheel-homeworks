@@ -1,6 +1,6 @@
 /* No trace content is interpreted as HTML. Anchors refer to source fields. */
 const $ = (id) => document.getElementById(id);
-const state = {catalog: null, review: null, session: null, view: 'read', busy: false, loading: false, request: 0, editor: null};
+const state = {catalog: null, review: null, session: null, view: 'read', busy: false, loading: false, request: 0, editor: null, disclosures: new Map(), noteTarget: null};
 const allTraces = () => state.catalog.sessions.flatMap(s => s.traces);
 const finalModes = () => state.review.modes.filter(m => m.final);
 const reviewed = id => ['first_failure', 'no_failure'].includes(state.review.reviews[id]?.status);
@@ -21,9 +21,10 @@ function button(title, action, cls = '') {
   node.onclick = action;
   return node;
 }
-function details(title, content, open = false) {
+function details(title, content, open = false, key = null) {
   const node = el('details');
-  node.open = open;
+  if (key) node.dataset.disclosure = key;
+  node.open = key ? (state.disclosures.get(key) ?? open) : open;
   node.append(el('summary', '', title), content);
   return node;
 }
@@ -94,6 +95,7 @@ function renderQueue() {
   if (!groups.length) list.append(el('p', 'empty', 'No conversations match these filters.'));
 }
 async function openSession(id, traceId) {
+  if (state.editor) closeNote();
   const request = ++state.request;
   state.loading = true;
   $('session-header').textContent = 'Loading conversation…';
@@ -115,6 +117,7 @@ function jumpTrace(id) {
   openSession(session.id, id);
 }
 function switchView(view) {
+  if (state.editor) closeNote();
   state.view = view;
   for (const node of document.querySelectorAll('[data-view]')) node.setAttribute('aria-pressed', String(node.dataset.view === view));
   for (const node of document.querySelectorAll('.view')) node.hidden = node.id !== view + '-view';
@@ -129,10 +132,13 @@ function anchored(content, traceId, blockId, field, mono = false) {
   const node = el(mono ? 'pre' : 'div', mono ? 'annotatable' : 'prose annotatable');
   node.dataset.trace = traceId; node.dataset.block = blockId; node.dataset.field = field;
   const items = [...notesFor(traceId), ...pendingFor(traceId).map(s => ({...s, ai: true}))];
-  const spans = items.filter(n => anchorMatches(n.anchor, blockId, field, content)).map(n => ({...n.anchor, id: n.id, ai: n.ai}));
+  let spans = items.filter(n => anchorMatches(n.anchor, blockId, field, content)).map(n => ({...n.anchor, id: n.id, ai: n.ai}));
   const draft = state.editor;
-  if (draft?.trace_id === traceId && anchorMatches(draft.anchor, blockId, field, content)) spans.push({...draft.anchor, id: 'pending', pending: true});
-  spans.sort((a,b) => a.start - b.start);
+  if (draft?.trace_id === traceId && anchorMatches(draft.anchor, blockId, field, content)) {
+    spans = spans.filter(s => s.end <= draft.anchor.start || s.start >= draft.anchor.end);
+    spans.push({...draft.anchor, id: 'pending', pending: true});
+  }
+  spans.sort((a,b) => a.start - b.start || Number(!!b.pending) - Number(!!a.pending));
   let offset = 0;
   for (const span of spans) {
     if (span.start < offset) continue; // Both overlapping notes remain visible in the margin.
@@ -146,25 +152,34 @@ function anchored(content, traceId, blockId, field, mono = false) {
   return node;
 }
 function renderTool(block, tid) {
-  const node = el('div', 'block'); node.dataset.role = 'tool'; node.dataset.blockId = block.id;
-  node.append(el('div', 'role-label', 'Tool call + result'), el('div', 'tool-name', block.name + '()'));
-  const args = anchored(pretty(block.arguments), tid, block.id, 'input', true);
-  node.append(details('Arguments', args, true));
+  const node = el('details', 'block tool-disclosure'); node.dataset.role = 'tool'; node.dataset.blockId = block.id;
+  const key = tid + ':' + block.id;
+  node.dataset.disclosure = key;
+  node.open = state.disclosures.get(key) ?? false;
   const result = block.result;
+  const heading = el('summary', 'tool-heading');
+  heading.append(el('span', 'tool-name', block.name + '()'));
+  const status = result?.error || result?.status || (result?.ok === true ? 'ok' : result?.ok === false ? 'failed' : 'result not captured');
+  heading.append(el('span', 'tool-summary-status', String(status)));
+  node.append(heading);
+  const body = el('div', 'tool-body');
+  const args = anchored(pretty(block.arguments), tid, block.id, 'input', true);
+  body.append(details('Arguments', args, false, key + ':arguments'));
   if (result && typeof result === 'object' && !Array.isArray(result)) {
     const important = ['ok', 'error', 'reason', 'status', 'order_id', 'refund_id', 'amount_usd', 'note', 'count'];
     const summary = important.filter(k => k in result).map(k => k + ': ' + pretty(result[k])).join('\n');
-    if (summary) node.append(anchored(summary, tid, block.id, 'result_summary', true));
+    if (summary) body.append(anchored(summary, tid, block.id, 'result_summary', true));
     if (Array.isArray(result.results)) for (let i = 0; i < result.results.length; i++) {
       const hit = result.results[i], hitNode = el('div', 'retrieval');
       hitNode.append(el('strong', '', `${i+1}. ${hit.policy_id} · ${hit.title}`), el('p', 'quiet', `Retrieval score: ${hit.score}`));
       hitNode.append(anchored(hit.snippet || 'Snippet not captured', tid, block.id, `output.results.${i}.snippet`));
-      node.append(hitNode);
+      body.append(hitNode);
     }
   }
-  node.append(details('Complete result · preserves empty and null fields', anchored(pretty(result), tid, block.id, 'output', true), !result?.results));
-  node.append(el('div', 'quiet', `Observation ${block.observation_id} · match: ${block.match}${block.call_id ? ' · ' + block.call_id : ''}`));
-  if (['ambiguous', 'unmatched'].includes(block.match)) node.append(el('p', 'warning', 'No unique generation call match. The tool observation is shown as captured; check raw execution details.'));
+  body.append(details('Complete result · preserves empty and null fields', anchored(pretty(result), tid, block.id, 'output', true), false, key + ':result'));
+  body.append(el('div', 'quiet', `Observation ${block.observation_id} · match: ${block.match}${block.call_id ? ' · ' + block.call_id : ''}`));
+  if (['ambiguous', 'unmatched'].includes(block.match)) body.append(el('p', 'warning', 'No unique generation call match. The tool observation is shown as captured; check raw execution details.'));
+  node.append(body);
   return node;
 }
 function noteCard(note, kind = 'human') {
@@ -178,13 +193,14 @@ function noteCard(note, kind = 'human') {
   const actions = el('div', 'actions');
   if (kind === 'suggestion') {
     actions.append(button('Accept', () => act({action:'suggestion', id: note.id, decision:'accept'})), button('Reject', () => act({action:'suggestion', id: note.id, decision:'reject'})));
-  } else if (kind !== 'legacy') actions.append(button('Edit note', () => editNote(note)));
+  } else if (kind !== 'legacy') actions.append(button('Edit note', e => editNote(note, e.currentTarget)));
   node.append(actions);
   node.onmouseenter = () => {for (const m of document.querySelectorAll('mark')) if (m.dataset.note === note.id) m.classList.add('pending');};
   node.onmouseleave = () => {for (const m of document.querySelectorAll('mark')) if (m.dataset.note === note.id) m.classList.remove('pending');};
   return node;
 }
 function renderRead() {
+  for (const disclosure of $('read-view').querySelectorAll('[data-disclosure]')) state.disclosures.set(disclosure.dataset.disclosure, disclosure.open);
   const root = $('read-view'); root.replaceChildren();
   if (!state.session) return root.append(el('p', 'empty', 'No session selected.'));
   root.append(roleLegend(), el('p', 'quiet', 'Read chronologically. Select evidence to add a note; stop initial reading at the first failure. Tool results remain available in full.'));
@@ -224,7 +240,7 @@ function renderRead() {
     const actions = el('div', 'review-actions');
     const status = state.review.reviews[turn.id]?.status || 'unreviewed';
     actions.append(el('span', 'badge', {unreviewed:'Unreviewed', no_failure:'Reviewed · no failure observed', first_failure:'Reviewed · first failure noted'}[status]),
-      button('Add turn note', () => editNote({trace_id:turn.id, anchor:{}})),
+      button('Add turn note', e => editNote({trace_id:turn.id, anchor:{}}, e.currentTarget)),
       button('First failure noted', () => act({action:'review', trace_id:turn.id, status:'first_failure'})),
       button('No failure observed', () => act({action:'review', trace_id:turn.id, status:'no_failure'})),
       button('Reopen', () => act({action:'review', trace_id:turn.id, status:'unreviewed'})));
@@ -359,24 +375,55 @@ function stashDraft() {
   state.editor.note = $('note-text').value;
   try {localStorage.setItem(backupKey(), JSON.stringify(state.editor));} catch {notice('Browser draft storage is unavailable. Keep this window open until the note is saved.');}
 }
-function editNote(note) {
-  state.editor = {...note, id: note.id || crypto.randomUUID(), anchor:note.anchor || {}};
-  $('note-quote').textContent = state.editor.anchor.quote || 'Applies to this trace as a whole';
-  $('note-text').value = note.note || '';
-  stashDraft(); renderRead();
-  $('note-dialog').showModal(); $('note-text').focus();
+function refreshHighlights() {
+  for (const node of $('read-view').querySelectorAll('.annotatable')) {
+    node.replaceWith(anchored(node.textContent, node.dataset.trace, node.dataset.block, node.dataset.field, node.tagName === 'PRE'));
+  }
+  requestAnimationFrame(layoutNotes);
 }
-function closeNote() {stashDraft(); state.editor = null; $('note-dialog').close(); renderRead();}
+function positionNote() {
+  if (!state.editor) return;
+  const popover = $('note-popover');
+  const mark = [...$('read-view').querySelectorAll('mark')].find(m => m.dataset.note === 'pending');
+  const target = mark || state.noteTarget || $('session-header');
+  const rects = target.getClientRects();
+  const rect = rects[rects.length - 1] || target.getBoundingClientRect();
+  const left = Math.max(8, Math.min(rect.left, innerWidth - popover.offsetWidth - 8));
+  // Prefer below the evidence; flip above only when the viewport has no room.
+  const top = rect.bottom + 8 + popover.offsetHeight <= innerHeight ? rect.bottom + 8 : Math.max(8, rect.top - popover.offsetHeight - 8);
+  popover.style.left = left + scrollX + 'px';
+  popover.style.top = top + scrollY + 'px';
+}
+function editNote(note, target = null) {
+  state.editor = {...note, id: note.id || crypto.randomUUID(), anchor:note.anchor || {}};
+  state.noteTarget = target;
+  $('note-text').value = note.note || '';
+  $('note-title').textContent = note.note ? 'Edit note' : 'Add a note';
+  $('note-quote').textContent = note.anchor?.quote ? '“' + note.anchor.quote + '”' : 'Note on this turn';
+  stashDraft(); refreshHighlights();
+  const mark = [...$('read-view').querySelectorAll('mark')].find(m => m.dataset.note === 'pending');
+  for (let parent = mark?.parentElement; parent; parent = parent.parentElement) if (parent.tagName === 'DETAILS') parent.open = true;
+  $('note-popover').hidden = false;
+  positionNote(); $('note-text').focus({preventScroll:true});
+}
+function closeNote() {stashDraft(); state.editor = null; $('note-popover').hidden = true; refreshHighlights();}
 $('note-text').addEventListener('input', stashDraft);
-$('cancel-note').onclick = closeNote;
-$('note-dialog').addEventListener('cancel', e => {e.preventDefault(); closeNote();});
+$('note-text').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {e.preventDefault(); $('note-form').requestSubmit();}
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && state.editor) {e.preventDefault(); closeNote(); state.noteTarget?.focus();}
+});
+document.addEventListener('pointerdown', e => {
+  if (state.editor && !state.busy && !$('note-popover').contains(e.target)) closeNote();
+});
 $('note-form').onsubmit = async e => {
   e.preventDefault(); stashDraft();
   const saved = await act({action:'note', ...state.editor, note:$('note-text').value});
-  if (saved) {try {localStorage.removeItem(backupKey());} catch {} state.editor = null; $('note-dialog').close(); renderRead();}
+  if (saved) {try {localStorage.removeItem(backupKey());} catch {} state.editor = null; $('note-popover').hidden = true; renderRead();}
 };
 function selectEvidence() {
-  if (state.view !== 'read' || $('note-dialog').open || state.busy) return;
+  if (state.view !== 'read' || state.editor || state.busy) return;
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed || !selection.rangeCount) return;
   const range = selection.getRangeAt(0), container = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
@@ -393,13 +440,16 @@ document.addEventListener('mouseover', e => {
   const mark = e.target.closest('mark');
   for (const card of document.querySelectorAll('.note-card')) card.classList.toggle('linked', !!mark && card.dataset.noteCard === mark.dataset.note);
 });
-document.addEventListener('toggle', () => requestAnimationFrame(layoutNotes), true);
-window.addEventListener('resize', () => {for (const card of document.querySelectorAll('.note-card')) card.style.marginTop = ''; requestAnimationFrame(layoutNotes);});
+document.addEventListener('toggle', e => {
+  if (e.target.dataset.disclosure) state.disclosures.set(e.target.dataset.disclosure, e.target.open);
+  requestAnimationFrame(layoutNotes);
+}, true);
+window.addEventListener('resize', () => {for (const card of document.querySelectorAll('.note-card')) card.style.marginTop = ''; requestAnimationFrame(layoutNotes); positionNote();});
 for (const nav of document.querySelectorAll('[data-view]')) nav.onclick = () => switchView(nav.dataset.view);
 for (const id of ['search', 'role-filter', 'tool-filter', 'status-filter']) $(id).addEventListener('input', renderQueue);
 
 async function poll() {
-  if (state.busy || state.loading || document.hidden || $('note-dialog').open) return;
+  if (state.busy || state.loading || document.hidden || state.editor) return;
   try {
     const remote = await get('/api/state');
     if (JSON.stringify(remote) !== JSON.stringify(state.review)) {

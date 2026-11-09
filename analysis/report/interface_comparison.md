@@ -18,8 +18,12 @@ separate until explicitly accepted or rejected.
 chronologically. Generation outputs supply intermediate messages; accumulated
 model inputs and duplicate final output are not repeated. Matching uses call
 identity when captured, otherwise unique tool name and arguments, rather than
-the reference UI's adjacency-only pairing. Retrieval snippets and important tool
-status fields stay visible; complete typed JSON and raw execution remain available.
+the reference UI's adjacency-only pairing. Collapsed tool summaries retain the
+tool name and result status; expanding reveals evidence and retrieval snippets,
+with arguments and complete results disclosed separately. Complete typed JSON
+and raw execution remain available. Following the student's visual reference,
+selected evidence opens a compact nonmodal pop-up with a quoted excerpt, a text
+box, and keyboard save/cancel controls. The evidence stays highlighted while editing.
 
 The new interface also separates free-text open coding from a later binary
 labeling view. Explicit completion distinguishes no failure observed from

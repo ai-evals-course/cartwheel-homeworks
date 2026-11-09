@@ -513,19 +513,74 @@ td .actions button {
   padding-top:14px;
   border-top:1px solid var(--line)
 }
-dialog {
+#note-popover {
+  position: absolute;
+  z-index: 20;
+  background: #fff;
   border:1px solid #879a8d;
-  border-radius:8px;
-  width:min(550px,calc(100vw - 32px));
-  padding:24px;
-  box-shadow:0 12px 70px #10251833
+  border-radius:6px;
+  width:min(310px,calc(100vw - 16px));
+  padding:10px;
+  box-shadow:0 4px 18px #10251822
 }
-dialog::backdrop {
-  background:#152a264d
+#note-quote {
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  overflow:hidden;
+  border:0;
+  background:transparent;
+  margin:0 0 8px;
+  padding:0;
+  color:var(--muted);
+  font-size:12px;
+  font-style:italic;
+  line-height:1.45;
 }
-dialog .actions {
-  justify-content:flex-end;
-  margin-top:18px
+#note-popover textarea {
+  font-size:13px;
+  margin:0;
+  min-height:64px;
+  max-height:150px;
+  padding:8px;
+  resize:none;
+}
+#note-popover textarea:focus {
+  border-color:#b77e12;
+  outline:1px solid #b77e12;
+  outline-offset:0;
+}
+.note-hint {
+  font-size:10px;
+  color:var(--muted);
+  margin:7px 0 0;
+  line-height:1.4;
+}
+.sr-only {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap;
+  border:0;
+}
+.tool-heading {
+  padding:0;
+  line-height:1.8;
+}
+.tool-summary-status {
+  margin-left:12px;
+  font-size:11px;
+  font-weight:400;
+  color:var(--muted);
+}
+.tool-body {
+  margin-top:12px;
+  padding-top:4px;
+  border-top:1px solid var(--line);
 }
 .note-card button.jump {
   background:transparent;

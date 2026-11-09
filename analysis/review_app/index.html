@@ -39,14 +39,13 @@
       <div id="progress-view" class="view" hidden></div>
     </section>
   </main>
-  <dialog id="note-dialog" aria-labelledby="note-title">
+  <section id="note-popover" role="dialog" aria-modal="false" aria-labelledby="note-title" hidden>
     <form id="note-form">
-      <h2 id="note-title">Evidence note</h2>
-      <p class="quiet">Describe the earliest issue in your own words. Formal modes come later.</p>
       <blockquote id="note-quote"></blockquote>
-      <label>Your observation<textarea id="note-text" rows="5" required maxlength="20000"></textarea></label>
-      <div class="actions"><button type="button" id="cancel-note">Keep draft &amp; close</button><button type="submit" class="primary">Save note</button></div>
+      <label id="note-title" for="note-text" class="sr-only">Evidence note</label>
+      <textarea id="note-text" rows="3" placeholder="Describe what went wrong, in your own words" required maxlength="20000"></textarea>
+      <p class="note-hint">Enter saves · Shift+Enter new line · Esc cancels</p>
     </form>
-  </dialog>
+  </section>
 </body>
 </html>
