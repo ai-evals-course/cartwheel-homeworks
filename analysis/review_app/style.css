@@ -129,8 +129,8 @@ small,.quiet {
   justify-content:space-between;
   gap:22px;
   padding:18px 24px;
-  border-bottom:3px solid #6c9dcc;
-  background:#173b68;
+  border-bottom:3px solid #3c3c3c;
+  background:#111;
   color:#f5f9ff;
   box-shadow:0 2px 8px #173b6818;
 }
@@ -138,11 +138,11 @@ small,.quiet {
   font-size:20px;
 }
 .topbar h1 span {
-  color:#c9dbf2;
+  color:#d4d4d4;
 }
 .topbar p {
   font-size:var(--text-small);
-  color:#c9dbf2;
+  color:#d4d4d4;
   margin:0
 }
 .topbar nav {
@@ -154,24 +154,24 @@ small,.quiet {
   font-size:var(--text-small);
   font-weight:600;
   padding:10px 18px;
-  background:#204b7c;
-  border-color:#7195bf;
+  background:#252525;
+  border-color:#666;
   color:#f5f9ff;
 }
 .topbar nav button:hover {
-  background:#2d6096;
+  background:#383838;
 }
 .topbar nav button[aria-pressed=true] {
-  background:#edf5ff;
-  border-color:#edf5ff;
-  color:#173b68;
+  background:#fff;
+  border-color:#fff;
+  color:#111;
 }
 .topbar button:focus-visible {
   outline-color:#ffd898;
 }
 .topbar #save-status button {
-  background:#edf5ff;
-  color:#173b68;
+  background:#fff;
+  color:#111;
 }
 #save-status {
   font-size:var(--text-small);
