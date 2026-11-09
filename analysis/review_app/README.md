@@ -28,6 +28,9 @@ the server to include newly recorded traces. Missing session IDs remain separate
    scrolls from the system instructions downward. The sidebar scrolls separately;
    on small screens its cells form a horizontal strip. Body text uses 16px and
    secondary labels use a consistent 14px.
+   The compact header places the role beside the scenario name, with session
+   and model details below. User messages are blue, agent messages green, and
+   nested tool calls amber.
 2. Select text to write an evidence note. A temporary highlight remains visible
    while a compact pop-up appears beneath the selection, showing the quote and
    a text box. Enter saves, Shift+Enter adds a line, and Escape closes without

@@ -364,12 +364,13 @@ function render() {
   if (state.session) {
     const first = state.session.turns[0];
     const heading = el('div', 'session-heading');
-    heading.append(el('h2', '', first.meta['cartwheel.scenario_id'] || 'Conversation'));
+    const title = el('div', 'session-title');
+    title.append(el('h2', '', first.meta['cartwheel.scenario_id'] || 'Conversation'), roleBadge(first.meta['cartwheel.user_role']));
+    if (state.view === 'read') title.append(roleLegend());
+    heading.append(title);
     const metadata = el('div', 'meta');
-    metadata.append(roleBadge(first.meta['cartwheel.user_role']),
-      el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
+    metadata.append(el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
     heading.append(metadata);
-    if (state.view === 'read') heading.append(roleLegend(), el('p', 'review-guide quiet', 'Select text to add a note. Read until you identify the first failure.'));
     header.append(heading);
   }
   if (state.view === 'read') renderRead();
