@@ -372,7 +372,8 @@ main {
   --role-color:var(--user)
 }
 .block[data-role=assistant] {
-  --role-color:var(--assistant)
+  --role-color:var(--assistant);
+  background:#f3f8f5;
 }
 .block[data-role=tool] {
   --role-color:var(--tool)
@@ -648,6 +649,14 @@ td .actions button {
 .tool-heading {
   padding:0;
   line-height:1.8;
+}
+.tool-disclosure {
+  --role-color:var(--tool);
+  background:#fff;
+  border:1px solid var(--line);
+  border-left:3px solid var(--role-color);
+  border-radius:4px;
+  padding:12px 14px;
 }
 .tool-summary-status {
   margin-left:12px;

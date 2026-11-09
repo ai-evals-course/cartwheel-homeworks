@@ -63,7 +63,7 @@ function saveStatus() {
 }
 function roleLegend() {
   const row = el('div', 'legend quiet');
-  for (const [name, color] of [['User', 'user'], ['Assistant', 'assistant'], ['Tool', 'tool']]) {
+  for (const [name, color] of [['User', 'user'], ['Agent', 'assistant'], ['Tool', 'tool']]) {
     const span = el('span', '', name);
     span.style.setProperty('--role-color', `var(--${color})`);
     row.append(span);
@@ -152,7 +152,9 @@ function anchored(content, traceId, blockId, field, mono = false) {
   return node;
 }
 function renderTool(block, tid) {
-  const node = el('details', 'block tool-disclosure'); node.dataset.role = 'tool'; node.dataset.blockId = block.id;
+  const outer = el('div', 'block tool-message'); outer.dataset.role = 'assistant';
+  outer.append(el('div', 'role-label', 'Agent'));
+  const node = el('details', 'tool-disclosure'); node.dataset.role = 'tool'; node.dataset.blockId = block.id;
   const key = tid + ':' + block.id;
   node.dataset.disclosure = key;
   node.open = state.disclosures.get(key) ?? false;
@@ -167,7 +169,8 @@ function renderTool(block, tid) {
   body.append(details('Arguments', args, false, key + ':arguments'));
   body.append(details('Complete result', anchored(pretty(result), tid, block.id, 'output', true), false, key + ':result'));
   node.append(body);
-  return node;
+  outer.append(node);
+  return outer;
 }
 function noteCard(note, kind = 'human') {
   const node = el('div', 'note-card ' + (kind === 'suggestion' ? 'suggestion' : kind === 'legacy' ? 'legacy' : ''));
@@ -212,7 +215,7 @@ function renderRead() {
     for (const block of turn.blocks) {
       if (block.role === 'tool') {body.append(renderTool(block, turn.id)); continue;}
       const item = el('div', 'block'); item.dataset.role = block.role; item.dataset.blockId = block.id;
-      item.append(el('div', 'role-label', block.role), anchored(block.text, turn.id, block.id, block.field));
+      item.append(el('div', 'role-label', block.role === 'assistant' ? 'Agent' : block.role), anchored(block.text, turn.id, block.id, block.field));
       body.append(item);
     }
     notesFor(turn.id).forEach(n => notes.append(noteCard(n)));
