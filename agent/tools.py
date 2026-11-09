@@ -52,8 +52,20 @@ def get_policy(ctx: AuthContext, policy_id: str) -> dict[str, Any]:
     Implementation notes:
         agent.helpcenter.load_policy_docs() returns every parsed doc.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement get_policy")
+    for doc in load_policy_docs():
+        if doc.policy_id == policy_id:
+            return {
+                "ok": True,
+                "policy_id": doc.policy_id,
+                "title": doc.title,
+                "audience": doc.audience,
+                "body": doc.body,
+            }
+    return {
+        "ok": False,
+        "error": "not_found",
+        "reason": f"policy '{policy_id}' not found",
+    }
 
 
 def search_products(
@@ -95,8 +107,111 @@ def search_products(
         agent.db.list_products(conn, store_id) gives the candidate set.
         Use `with db.connection() as conn:` to close the database automatically.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement search_products")
+    query = query.strip()
+    if not query:
+        return {"ok": False, "error": "invalid_argument", "reason": "empty query"}
+    if max_price_usd is not None and not max_price_usd > 0:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "max_price_usd must be positive",
+        }
+
+    tokens = query.casefold().split()
+    store_id = None
+    with db.connection() as conn:
+        if store is not None:
+            matched_store = db.get_store_by_name(conn, store)
+            if matched_store is None:
+                return {
+                    "ok": False,
+                    "error": "not_found",
+                    "reason": f"store '{store}' not found",
+                }
+            store_id = matched_store.id
+
+        matches = []
+        for product in db.list_products(conn, store_id):
+            searchable = f"{product.title} {product.description}".casefold()
+            if not all(token in searchable for token in tokens):
+                continue
+            if max_price_usd is not None and product.price_usd > max_price_usd:
+                continue
+            matches.append(product)
+
+    matches.sort(key=lambda product: (product.price_usd, product.id))
+    products = [
+        {
+            "product_id": product.id,
+            "store_id": product.store_id,
+            "title": product.title,
+            "price_usd": product.price_usd,
+        }
+        for product in matches[: max(1, min(limit, MAX_SEARCH_LIMIT))]
+    ]
+    return {"ok": True, "products": products, "count": len(products)}
+
+
+def browse_products_by_category(
+    ctx: AuthContext, category: str, limit: int = 5
+) -> dict[str, Any]:
+    """Browse public catalog products by an exact stored category. Risk tier: read.
+
+    Every role may browse the public product catalog. Category matching is
+    case-insensitive but otherwise exact; this tool does not infer synonyms.
+
+    Args:
+        ctx: The caller's auth context.
+        category: A category value stored in the product catalog.
+        limit: Maximum products to return, clamped to [1, MAX_SEARCH_LIMIT].
+
+    Returns:
+        On success: {"ok": True, "products": [...], "count": <len(products)>}
+        where each product includes product_id, store_id, title, category, and
+        price_usd. Results sort by price_usd then product_id.
+        Empty or whitespace-only category returns "invalid_argument".
+        An unknown category returns "not_found".
+    """
+    category = category.strip().casefold()
+    if not category:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "empty category",
+        }
+
+    with db.connection() as conn:
+        products_in_catalog = db.list_products(conn)
+    categories = {product.category.casefold() for product in products_in_catalog}
+    if category not in categories:
+        available = ", ".join(sorted(categories))
+        return {
+            "ok": False,
+            "error": "not_found",
+            "reason": f"category '{category}' not found; available categories: {available}",
+        }
+
+    matches = [
+        product
+        for product in products_in_catalog
+        if product.category.casefold() == category
+    ]
+    matches.sort(key=lambda product: (product.price_usd, product.id))
+    result_products = [
+        {
+            "product_id": product.id,
+            "store_id": product.store_id,
+            "title": product.title,
+            "category": product.category,
+            "price_usd": product.price_usd,
+        }
+        for product in matches[: max(1, min(limit, MAX_SEARCH_LIMIT))]
+    ]
+    return {
+        "ok": True,
+        "products": result_products,
+        "count": len(result_products),
+    }
 
 
 def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
@@ -121,8 +236,21 @@ def list_my_orders(ctx: AuthContext) -> dict[str, Any]:
         scope is baked into which query you run. That is the point of the
         tool: the model cannot ask for someone else's orders through it.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement list_my_orders")
+    if ctx.role == "shopper":
+        with db.connection() as conn:
+            orders = db.list_orders_for_user(conn, ctx.user_id, DEFAULT_ORDER_LIMIT)
+    elif ctx.role == "merchant" and ctx.store_id is not None:
+        with db.connection() as conn:
+            orders = db.list_orders_for_store(conn, ctx.store_id, DEFAULT_ORDER_LIMIT)
+    else:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": "support staff do not have orders of their own; use get_order to look up a specific order",
+        }
+
+    public_orders = [order.to_public_dict() for order in orders]
+    return {"ok": True, "orders": public_orders, "count": len(public_orders)}
 
 
 def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]:
@@ -167,8 +295,27 @@ def cancel_order(ctx: AuthContext, order_id: int, reason: str) -> dict[str, Any]
     paused = kill_switch("cancel_order")
     if paused is not None:
         return {"ok": False, "error": "paused", "reason": paused}
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement cancel_order")
+    with db.connection() as conn:
+        order = db.get_order(conn, order_id)
+        if order is None:
+            return {
+                "ok": False,
+                "error": "not_found",
+                "reason": f"no order #{order_id}",
+            }
+        if not can_cancel_order(ctx, order.user_id, order.store_id):
+            return permission_denied(
+                f"role '{ctx.role}' (user {ctx.user_id}) may not cancel order #{order_id}"
+            )
+        if order.status != "placed":
+            return {
+                "ok": False,
+                "error": "not_eligible",
+                "reason": f"order #{order_id} has status '{order.status}'; orders can be cancelled only before shipment",
+            }
+        db.set_order_status(conn, order_id, "cancelled")
+
+    return {"ok": True, "order_id": order_id, "status": "cancelled"}
 
 
 def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
@@ -202,5 +349,35 @@ def find_order(ctx: AuthContext, query: str) -> dict[str, Any]:
         (at most 5), each as the dict returned by agent.db. If no orders
         match, return {"ok": True, "orders": []}.
     """
-    ### YOUR CODE HERE (HW1)
-    raise NotImplementedError("HW1: implement find_order")
+    if ctx.role == "shopper" and ctx.user_id is not None:
+        scope = {"user_id": ctx.user_id}
+    elif ctx.role == "merchant" and ctx.store_id is not None:
+        scope = {"store_id": ctx.store_id}
+    elif ctx.role == "support":
+        scope = {"all_orders": True}
+    else:
+        return {
+            "ok": False,
+            "error": "invalid_argument",
+            "reason": f"cannot search orders for role '{ctx.role}' without a valid identity",
+        }
+
+    query_text = query.casefold().strip()
+    query_tokens = set(query_text.split())
+    with db.connection() as conn:
+        candidates = db.list_order_search_candidates(conn, **scope)
+        products = {product.id: product.title for product in db.list_products(conn)}
+
+    matches = []
+    for order in candidates:
+        title = products.get(order.product_id)
+        if title is None:
+            continue
+        title_text = title.casefold()
+        title_tokens = set(title_text.split())
+        if query_text in title_text or title_text in query_text or title_tokens & query_tokens:
+            matches.append(order.to_public_dict())
+            if len(matches) == 5:
+                break
+
+    return {"ok": True, "orders": matches}

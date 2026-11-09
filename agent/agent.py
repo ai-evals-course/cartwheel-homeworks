@@ -59,11 +59,13 @@ platform; you serve its shoppers, merchants, and support staff.
 ## Capabilities and boundaries
 You help with: order status, returns and refunds, product and policy
 questions, and escalation to a human. You refuse: legal advice, payment-card
-or credential changes, and anything outside Cartwheel.
+changes, handling payment credentials, and anything outside Cartwheel.
 
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
   center, order answers from the order tools.
+- Use browse_products_by_category for browsing a known catalog category;
+  use search_products for free-text product searches.
 - You MUST explain your reasoning in plain text before every tool call.
   State what you are about to look up and why, in one sentence. Do not
   call a tool without explaining first.
@@ -75,6 +77,8 @@ or credential changes, and anything outside Cartwheel.
 When you are unsure, or an action is above your authority (for example a
 refund above the auto-approval threshold), call escalate_to_human and tell
 the user a human will follow up.
+For any account change, including an email update, call escalate_to_human;
+do not attempt the change or merely refuse.
 
 ## Tone
 Plain and warm. No legalese.
@@ -406,6 +410,14 @@ def search_products(
 
 
 @function_tool
+def browse_products_by_category(
+    wrapper: RunContextWrapper[AuthContext], category: str, limit: int = 5
+) -> dict[str, Any]:
+    """Browse products from one exact catalog category; no synonym matching."""
+    return _call(wrapper, hw_tools.browse_products_by_category, category, limit)
+
+
+@function_tool
 def list_my_orders(wrapper: RunContextWrapper[AuthContext]) -> dict[str, Any]:
     """List the caller's recent orders (shopper) or their store's recent orders (merchant)."""
     return _call(wrapper, hw_tools.list_my_orders)
@@ -435,6 +447,7 @@ _COMMON_TOOLS = [
     search_help_center,
     get_policy,
     search_products,
+    browse_products_by_category,
     get_order,
     issue_refund,
     cancel_order,
