@@ -24,6 +24,11 @@ with arguments and complete results disclosed separately. Complete typed JSON
 and raw execution remain available. Following the student's visual reference,
 selected evidence opens a compact nonmodal pop-up with a quoted excerpt, a text
 box, and keyboard save/cancel controls. The evidence stays highlighted while editing.
+The reading view now flows without numbered turn headings, trace metadata, or
+review controls between messages. A single system-instructions disclosure at
+the start contains the distinct captured versions. Review controls and raw
+trace details live in Progress. The sidebar lists conversations without filters,
+and larger proportional text improves readability.
 
 The new interface also separates free-text open coding from a later binary
 labeling view. Explicit completion distinguishes no failure observed from

@@ -22,13 +22,6 @@
   <main>
     <aside class="queue" aria-label="Conversation queue">
       <div class="queue-head"><h2>Conversations</h2><span id="queue-count"></span></div>
-      <label>Find a conversation<input id="search" type="search" placeholder="Request, scenario or trace ID"></label>
-      <div class="filters">
-        <label>Role<select id="role-filter"><option value="">All roles</option></select></label>
-        <label>Tool<select id="tool-filter"><option value="">All tools</option></select></label>
-      </div>
-      <label>Review status<select id="status-filter"><option value="">All conversations</option><option value="incomplete">Needs open coding</option><option value="reviewed">Open coding complete</option><option value="labels">Needs final labels</option></select></label>
-      <p class="quiet">Project inventory · no failure-based selection. Counts refer to individual traces.</p>
       <div id="queue-list"></div>
     </aside>
     <section class="workspace" aria-label="Review workspace">

@@ -71,16 +71,8 @@ function roleLegend() {
   return row;
 }
 function renderQueue() {
-  const query = $('search').value.trim().toLowerCase();
-  const role = $('role-filter').value, tool = $('tool-filter').value, status = $('status-filter').value;
-  const groups = state.catalog.sessions.filter(s => {
-    const done = s.traces.every(t => reviewed(t.id));
-    const incompleteLabels = s.traces.some(t => finalModes().some(m => !state.review.labels[t.id + ':' + m.id]));
-    return (!role || s.traces.some(t => t.role === role)) && (!tool || s.traces.some(t => t.tools.includes(tool))) &&
-      (!query || JSON.stringify(s).toLowerCase().includes(query)) &&
-      (!status || (status === 'reviewed' ? done : status === 'labels' ? incompleteLabels : !done));
-  });
-  $('queue-count').textContent = `${groups.length} / ${state.catalog.sessions.length}`;
+  const groups = state.catalog.sessions;
+  $('queue-count').textContent = groups.length;
   const list = $('queue-list');
   list.replaceChildren();
   for (const session of groups) {
@@ -92,7 +84,7 @@ function renderQueue() {
       el('span', 'quiet', `${session.traces.length} trace(s) · ${done} reviewed`));
     list.append(item);
   }
-  if (!groups.length) list.append(el('p', 'empty', 'No conversations match these filters.'));
+  if (!groups.length) list.append(el('p', 'empty', 'No conversations available.'));
 }
 async function openSession(id, traceId) {
   if (state.editor) closeNote();
@@ -204,23 +196,23 @@ function renderRead() {
   const root = $('read-view'); root.replaceChildren();
   if (!state.session) return root.append(el('p', 'empty', 'No session selected.'));
   root.append(roleLegend(), el('p', 'quiet', 'Read chronologically. Select evidence to add a note; stop initial reading at the first failure. Tool results remain available in full.'));
+  const systems = new Map();
+  for (const turn of state.session.turns) {
+    const captured = [...new Set((turn.raw.observations || []).filter(o => o.type === 'GENERATION').flatMap(o => (o.input?.messages || []).filter(m => m.role === 'system').flatMap(m => (m.parts || []).filter(p => p.type === 'text').map(p => p.content))))];
+    captured.forEach((content, index) => {
+      if (!systems.has(content)) systems.set(content, {traceId: turn.id, blockId: 'system-' + index});
+    });
+  }
   state.session.turns.forEach((turn, index) => {
     const article = el('article', 'trace'); article.id = 'trace-' + turn.id;
-    const heading = el('div', 'turn-heading');
-    heading.append(el('h3', '', `Turn ${index+1}`), el('span', 'wide-id', `${turn.id} · ${turn.timestamp || 'time not captured'}`));
-    if (state.catalog.langfuse_host && /^\/project\//.test(turn.raw.htmlPath || '')) {
-      const link = el('a', '', 'Open in Langfuse');
-      link.href = state.catalog.langfuse_host + turn.raw.htmlPath; link.target = '_blank'; link.rel = 'noopener noreferrer'; heading.append(link);
-    }
-    article.append(heading);
+    article.setAttribute('aria-label', 'Trace ' + turn.id);
     const grid = el('div', 'turn-grid'), body = el('div', 'evidence'), notes = el('aside', 'notes');
-    notes.setAttribute('aria-label', `Evidence notes for turn ${index+1}`);
+    notes.setAttribute('aria-label', 'Evidence notes for trace ' + turn.id);
     for (const warning of turn.warnings) body.append(el('p', 'warning', warning));
-    const systems = [...new Set((turn.raw.observations || []).filter(o => o.type === 'GENERATION').flatMap(o => (o.input?.messages || []).filter(m => m.role === 'system').flatMap(m => (m.parts || []).filter(p => p.type === 'text').map(p => p.content))))];
-    if (systems.length) {
+    if (index === 0 && systems.size) {
       const wrapper = el('div');
-      systems.forEach((s,i) => wrapper.append(anchored(s, turn.id, 'system-' + i, 'system', true)));
-      const instructions = details(`System instructions · ${systems.length} distinct captured version(s) · includes authenticated identity`, wrapper);
+      systems.forEach((source, content) => wrapper.append(anchored(content, source.traceId, source.blockId, 'system', true)));
+      const instructions = details('System instructions', wrapper, false, state.session.id + ':system');
       instructions.className = 'system'; body.append(instructions);
     }
     for (const block of turn.blocks) {
@@ -229,22 +221,11 @@ function renderRead() {
       item.append(el('div', 'role-label', block.role), anchored(block.text, turn.id, block.id, block.field));
       body.append(item);
     }
-    const raw = details('Raw trace & execution hierarchy', el('pre', '', pretty(turn.raw)));
-    body.append(raw);
-    body.append(el('p', 'quiet', `Latency: ${turn.raw.latency ?? 'not captured'} seconds · Cost: ${turn.raw.totalCost ?? 'not captured'} · Prompt: ${turn.meta['cartwheel.prompt_version'] || 'not captured'}`));
     notesFor(turn.id).forEach(n => notes.append(noteCard(n)));
     state.catalog.legacy_annotations.filter(n => n.trace_id === turn.id).forEach(n => notes.append(noteCard(n, 'legacy')));
     pendingFor(turn.id).forEach(n => notes.append(noteCard(n, 'suggestion')));
-    if (!notes.children.length) notes.append(el('p', 'quiet', 'Select text in this turn to attach an observation here.'));
     grid.append(body, notes); article.append(grid);
-    const actions = el('div', 'review-actions');
-    const status = state.review.reviews[turn.id]?.status || 'unreviewed';
-    actions.append(el('span', 'badge', {unreviewed:'Unreviewed', no_failure:'Reviewed · no failure observed', first_failure:'Reviewed · first failure noted'}[status]),
-      button('Add turn note', e => editNote({trace_id:turn.id, anchor:{}}, e.currentTarget)),
-      button('First failure noted', () => act({action:'review', trace_id:turn.id, status:'first_failure'})),
-      button('No failure observed', () => act({action:'review', trace_id:turn.id, status:'no_failure'})),
-      button('Reopen', () => act({action:'review', trace_id:turn.id, status:'unreviewed'})));
-    article.append(actions); root.append(article);
+    root.append(article);
   });
   requestAnimationFrame(layoutNotes);
 }
@@ -335,6 +316,33 @@ function renderProgress() {
     const metric = el('div', 'metric'); metric.append(el('strong', '', count), el('span', '', title)); metrics.append(metric);
   }
   root.append(el('h2', '', 'Review progress'), metrics);
+  if (state.session) {
+    const completion = el('div', 'panel');
+    completion.append(el('h3', '', 'Current conversation review'));
+    for (const turn of state.session.turns) {
+      const item = el('div', 'review-record');
+      item.append(el('p', 'quiet wide-id', turn.id));
+      const prompt = turn.blocks.find(b => b.role === 'user')?.text;
+      if (prompt) item.append(el('p', '', prompt));
+      const status = state.review.reviews[turn.id]?.status || 'unreviewed';
+      const actions = el('div', 'review-actions');
+      actions.append(el('span', 'badge', {unreviewed:'Unreviewed', no_failure:'Reviewed · no failure observed', first_failure:'Reviewed · first failure noted'}[status]),
+        button('First failure noted', () => act({action:'review', trace_id:turn.id, status:'first_failure'})),
+        button('No failure observed', () => act({action:'review', trace_id:turn.id, status:'no_failure'})),
+        button('Reopen', () => act({action:'review', trace_id:turn.id, status:'unreviewed'})));
+      item.append(actions);
+      const evidence = el('div');
+      evidence.append(el('p', 'quiet', `Recorded: ${turn.timestamp || 'not captured'} · Latency: ${turn.raw.latency ?? 'not captured'} seconds · Cost: ${turn.raw.totalCost ?? 'not captured'} · Prompt: ${turn.meta['cartwheel.prompt_version'] || 'not captured'}`));
+      if (state.catalog.langfuse_host && /^\/project\//.test(turn.raw.htmlPath || '')) {
+        const link = el('a', '', 'Open in Langfuse');
+        link.href = state.catalog.langfuse_host + turn.raw.htmlPath; link.target = '_blank'; link.rel = 'noopener noreferrer'; evidence.append(link);
+      }
+      evidence.append(el('pre', '', pretty(turn.raw)));
+      item.append(details('Trace details & raw execution', evidence));
+      completion.append(item);
+    }
+    root.append(completion);
+  }
   if (!modes.length) root.append(el('p', 'warning', 'No final modes: structured labeling has not started. Zero remaining labels does not mean this stage is complete.'));
   const panel = el('div', 'panel'); panel.append(el('h3', '', 'Incomplete judgments'));
   for (const t of traces) {
@@ -359,7 +367,7 @@ function render() {
   if (state.session) {
     const first = state.session.turns[0];
     const heading = el('div', 'session-heading');
-    heading.append(el('h2', '', `${first.meta['cartwheel.scenario_id'] || 'Conversation'} · ${state.session.turns.length} turn(s)`));
+    heading.append(el('h2', '', first.meta['cartwheel.scenario_id'] || 'Conversation'));
     const metadata = el('div', 'meta');
     metadata.append(el('span', '', `Role: ${first.meta['cartwheel.user_role'] || 'not captured'}`),
       el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
@@ -446,7 +454,6 @@ document.addEventListener('toggle', e => {
 }, true);
 window.addEventListener('resize', () => {for (const card of document.querySelectorAll('.note-card')) card.style.marginTop = ''; requestAnimationFrame(layoutNotes); positionNote();});
 for (const nav of document.querySelectorAll('[data-view]')) nav.onclick = () => switchView(nav.dataset.view);
-for (const id of ['search', 'role-filter', 'tool-filter', 'status-filter']) $(id).addEventListener('input', renderQueue);
 
 async function poll() {
   if (state.busy || state.loading || document.hidden || state.editor) return;
@@ -463,9 +470,6 @@ async function boot() {
   try {
     [state.catalog, state.review] = await Promise.all([get('/api/catalog'), get('/api/state')]);
     $('source').textContent = state.catalog.source;
-    for (const [id, values] of [['role-filter', allTraces().map(t=>t.role)], ['tool-filter', allTraces().flatMap(t=>t.tools)]]) {
-      for (const value of [...new Set(values.filter(Boolean))].sort()) {const option = el('option', '', value); option.value = value; $(id).append(option);}
-    }
     const initial = new URLSearchParams(location.hash.slice(1)).get('session');
     if (state.catalog.sessions.length) await openSession(state.catalog.sessions.some(s=>s.id === initial) ? initial : state.catalog.sessions[0].id);
     else {render(); notice('No scenario traces found in this source.');}
