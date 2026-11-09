@@ -26,10 +26,12 @@
     </aside>
     <section class="workspace" aria-label="Review workspace">
       <div id="session-header"></div>
-      <div id="read-view" class="view"><p class="empty">Loading conversations…</p></div>
-      <div id="labels-view" class="view" hidden></div>
-      <div id="taxonomy-view" class="view" hidden></div>
-      <div id="progress-view" class="view" hidden></div>
+      <div id="view-scroll" tabindex="0" aria-label="Conversation content">
+        <div id="read-view" class="view"><p class="empty">Loading conversations…</p></div>
+        <div id="labels-view" class="view" hidden></div>
+        <div id="taxonomy-view" class="view" hidden></div>
+        <div id="progress-view" class="view" hidden></div>
+      </div>
     </section>
   </main>
   <section id="note-popover" role="dialog" aria-modal="false" aria-labelledby="note-title" hidden>

@@ -34,6 +34,9 @@ and larger proportional text improves readability.
 Each sidebar conversation is a bordered cell. Shopper, merchant and support have
 distinct labeled color badges, and a dark top bar emphasizes Review, Label,
 Taxonomy and Progress. Successful `ok` flags are omitted from tool headings.
+The navigation, conversation metadata, role legend and review hint remain fixed
+above the independently scrolling reading pane, which begins with system
+instructions. Body text and secondary labels use a consistent 16px/14px scale.
 
 The new interface also separates free-text open coding from a later binary
 labeling view. Explicit completion distinguishes no failure observed from

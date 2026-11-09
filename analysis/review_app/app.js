@@ -102,6 +102,7 @@ async function openSession(id, traceId) {
     if (request !== state.request) return;
     state.session = session;
     state.loading = false;
+    $('view-scroll').scrollTop = 0;
     const hash = new URLSearchParams({session: id});
     history.replaceState(null, '', '#' + hash);
     render();
@@ -117,6 +118,7 @@ function jumpTrace(id) {
 function switchView(view) {
   if (state.editor) closeNote();
   state.view = view;
+  $('view-scroll').scrollTop = 0;
   for (const node of document.querySelectorAll('[data-view]')) node.setAttribute('aria-pressed', String(node.dataset.view === view));
   for (const node of document.querySelectorAll('.view')) node.hidden = node.id !== view + '-view';
   render();
@@ -188,7 +190,6 @@ function renderRead() {
   for (const disclosure of $('read-view').querySelectorAll('[data-disclosure]')) state.disclosures.set(disclosure.dataset.disclosure, disclosure.open);
   const root = $('read-view'); root.replaceChildren();
   if (!state.session) return root.append(el('p', 'empty', 'No session selected.'));
-  root.append(roleLegend(), el('p', 'quiet', 'Read chronologically. Select evidence to add a note; stop initial reading at the first failure. Tool results remain available in full.'));
   const systems = new Map();
   for (const turn of state.session.turns) {
     const captured = [...new Set((turn.raw.observations || []).filter(o => o.type === 'GENERATION').flatMap(o => (o.input?.messages || []).filter(m => m.role === 'system').flatMap(m => (m.parts || []).filter(p => p.type === 'text').map(p => p.content))))];
@@ -364,7 +365,9 @@ function render() {
     const metadata = el('div', 'meta');
     metadata.append(roleBadge(first.meta['cartwheel.user_role']),
       el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
-    heading.append(metadata); header.append(heading);
+    heading.append(metadata);
+    if (state.view === 'read') heading.append(roleLegend(), el('p', 'review-guide quiet', 'Select text to add a note. Read until you identify the first failure.'));
+    header.append(heading);
   }
   if (state.view === 'read') renderRead();
   if (state.view === 'labels') renderLabels();
@@ -390,8 +393,9 @@ function positionNote() {
   const rects = target.getClientRects();
   const rect = rects[rects.length - 1] || target.getBoundingClientRect();
   const left = Math.max(8, Math.min(rect.left, innerWidth - popover.offsetWidth - 8));
+  const reader = $('view-scroll').getBoundingClientRect();
   // Prefer below the evidence; flip above only when the viewport has no room.
-  const top = rect.bottom + 8 + popover.offsetHeight <= innerHeight ? rect.bottom + 8 : Math.max(8, rect.top - popover.offsetHeight - 8);
+  const top = rect.bottom + 8 + popover.offsetHeight <= reader.bottom ? rect.bottom + 8 : Math.max(reader.top + 8, rect.top - popover.offsetHeight - 8);
   popover.style.left = left + scrollX + 'px';
   popover.style.top = top + scrollY + 'px';
 }
@@ -446,6 +450,16 @@ document.addEventListener('toggle', e => {
   requestAnimationFrame(layoutNotes);
 }, true);
 window.addEventListener('resize', () => {for (const card of document.querySelectorAll('.note-card')) card.style.marginTop = ''; requestAnimationFrame(layoutNotes); positionNote();});
+$('view-scroll').addEventListener('scroll', () => {
+  // Keep the compact editor beside its source as the conversation scrolls.
+  if (!state.editor) return;
+  const mark = $('read-view').querySelector('mark.pending');
+  if (mark) {
+    const source = mark.getBoundingClientRect(), reader = $('view-scroll').getBoundingClientRect();
+    if (source.bottom < reader.top || source.top > reader.bottom) return closeNote();
+  }
+  positionNote();
+}, {passive:true});
 for (const nav of document.querySelectorAll('[data-view]')) nav.onclick = () => switchView(nav.dataset.view);
 
 async function poll() {

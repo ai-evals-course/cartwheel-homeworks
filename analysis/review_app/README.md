@@ -24,6 +24,10 @@ the server to include newly recorded traces. Missing session IDs remain separate
    repeating the user's request. Each conversation has its own bordered cell;
    shopper, merchant and support roles use distinct labeled color badges.
    The prominent top navigation provides Review, Label, Taxonomy and Progress.
+   Navigation and the conversation header stay fixed while the reading pane
+   scrolls from the system instructions downward. The sidebar scrolls separately;
+   on small screens its cells form a horizontal strip. Body text uses 16px and
+   secondary labels use a consistent 14px.
 2. Select text to write an evidence note. A temporary highlight remains visible
    while a compact pop-up appears beneath the selection, showing the quote and
    a text box. Enter saves, Shift+Enter adds a line, and Escape closes without

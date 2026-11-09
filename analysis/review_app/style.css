@@ -2,7 +2,9 @@
   font-family:"Segoe UI",Arial,system-ui,sans-serif;
   color:#202b2b;
   background:#f5f5f0;
-  font-size:15px;
+  font-size:16px;
+  --text-body:1rem;
+  --text-small:.875rem;
   --line:#d8ded8;
   --accent:#225c48;
   --muted:#57665f;
@@ -16,7 +18,12 @@
   box-sizing:border-box
 }
 body {
-  margin:0
+  margin:0;
+  height:100vh;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
 button,input,textarea,select {
   font:inherit;
@@ -62,23 +69,23 @@ h1 span {
   color:var(--muted)
 }
 h2 {
-  font-size:16px
+  font-size:var(--text-body)
 }
 h3 {
-  font-size:15px
+  font-size:var(--text-body)
 }
 p {
   line-height:1.6
 }
 pre {
-  font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
+  font:var(--text-small)/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
   margin:8px 0
 }
 label {
   display:block;
-  font-size:12px;
+  font-size:var(--text-small);
   font-weight:600;
   margin:12px 0
 }
@@ -98,7 +105,7 @@ textarea {
 summary {
   cursor:pointer;
   padding:8px 0;
-  font-size:12px;
+  font-size:var(--text-small);
   font-weight:600
 }
 blockquote {
@@ -110,11 +117,13 @@ blockquote {
   overflow-wrap:anywhere
 }
 small,.quiet {
-  font-size:12px;
+  font-size:var(--text-small);
   color:var(--muted);
   line-height:1.5
 }
 .topbar {
+  flex-shrink:0;
+  z-index:5;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -132,7 +141,7 @@ small,.quiet {
   color:#c1d7cf;
 }
 .topbar p {
-  font-size:11px;
+  font-size:var(--text-small);
   color:#c1d7cf;
   margin:0
 }
@@ -142,7 +151,7 @@ small,.quiet {
   flex-wrap:wrap
 }
 .topbar nav button {
-  font-size:13px;
+  font-size:var(--text-small);
   font-weight:600;
   padding:10px 18px;
   background:#214e42;
@@ -165,10 +174,13 @@ small,.quiet {
   color:#183d34;
 }
 #save-status {
-  font-size:12px;
+  font-size:var(--text-small);
   max-width:220px
 }
 #notice {
+  flex-shrink:0;
+  max-height:25vh;
+  overflow-y:auto;
   padding:12px 24px;
   background:#fff0d9;
   border-bottom:1px solid #c19d55
@@ -178,14 +190,14 @@ small,.quiet {
 }
 main {
   display:grid;
-  grid-template-columns:275px minmax(0,1fr);
-  min-height:calc(100vh - 88px)
+  grid-template-columns:295px minmax(0,1fr);
+  flex:1;
+  min-height:0;
+  overflow:hidden;
 }
 .queue {
-  position: sticky;
-  top: 0;
-  align-self: start;
-  max-height: 100vh;
+  min-width:0;
+  min-height:0;
   display: flex;
   flex-direction: column;
   padding:22px 18px;
@@ -202,7 +214,7 @@ main {
   justify-content:space-between
 }
 .queue-head span {
-  font-size:12px;
+  font-size:var(--text-small);
   color:var(--muted)
 }
 .conversation {
@@ -222,7 +234,7 @@ main {
 }
 .conversation strong {
   display:block;
-  font-size:13px;
+  font-size:var(--text-small);
   overflow-wrap:anywhere;
 }
 .conversation-title {
@@ -236,7 +248,7 @@ main {
   display:inline-block;
   border-radius:999px;
   padding:4px 9px;
-  font-size:11px;
+  font-size:var(--text-small);
   font-weight:600;
   line-height:1.3;
   text-transform:capitalize;
@@ -261,15 +273,36 @@ main {
 }
 .workspace {
   min-width:0;
-  padding:24px 28px 80px
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+#session-header {
+  flex-shrink:0;
+  background:#f5f5f0;
+  z-index:2;
+  box-shadow:0 3px 8px #202b2b06;
+}
+#view-scroll {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:24px 28px 64px;
+  scrollbar-gutter:stable;
+  scroll-padding-top:16px;
+}
+.view {
+  min-width:0;
 }
 .session-heading {
-  padding-bottom:18px;
+  padding:22px 28px 18px;
   border-bottom:1px solid var(--line);
-  margin-bottom:22px
+  margin-bottom:0;
 }
 .session-heading h2 {
-  font-size:23px;
+  font-size:22px;
   font-weight:600;
   margin-bottom:8px;
   letter-spacing:-.5px
@@ -278,7 +311,7 @@ main {
   display:flex;
   flex-wrap:wrap;
   gap:8px 18px;
-  font-size:11px;
+  font-size:var(--text-small);
   color:var(--muted);
   overflow-wrap:anywhere
 }
@@ -286,7 +319,10 @@ main {
   display:flex;
   gap:18px;
   flex-wrap:wrap;
-  margin:16px 0
+  margin:16px 0 8px;
+}
+.review-guide {
+  margin:0;
 }
 .legend span:before {
   content:"";
@@ -320,14 +356,14 @@ main {
 }
 .role-label {
   color:var(--role-color,#52645b);
-  font-size:10px;
+  font-size:var(--text-small);
   font-weight:750;
   letter-spacing:.7px;
   text-transform:uppercase;
   margin-bottom:9px
 }
 .prose {
-  font-size:16px;
+  font-size:var(--text-body);
   line-height:1.75;
   white-space:pre-wrap;
   overflow-wrap:anywhere
@@ -349,11 +385,11 @@ main {
 }
 .tool-name {
   font-family:ui-monospace,monospace;
-  font-size:14px;
+  font-size:var(--text-small);
   font-weight:650
 }
 .tool-state {
-  font:12px/1.6 ui-monospace,monospace;
+  font:var(--text-small)/1.6 ui-monospace,monospace;
   border-top:1px solid var(--line);
   padding-top:10px;
   margin-top:12px;
@@ -367,7 +403,7 @@ main {
 }
 .retrieval p {
   white-space:pre-wrap;
-  font-size:13px
+  font-size:var(--text-small)
 }
 .system {
   border:1px solid var(--line);
@@ -389,7 +425,7 @@ main {
   border-left:3px solid #aa8532;
   border-radius:4px;
   padding:11px;
-  font-size:12px;
+  font-size:var(--text-small);
   line-height:1.55;
   overflow-wrap:anywhere;
   margin-bottom:12px
@@ -399,7 +435,7 @@ main {
   margin:7px 0
 }
 .note-card blockquote {
-  font-size:11px;
+  font-size:var(--text-small);
   max-height:110px;
   overflow:auto;
   padding:5px 8px
@@ -413,7 +449,7 @@ main {
   border-color:#bbb
 }
 .note-card .actions button {
-  font-size:11px;
+  font-size:var(--text-small);
   padding:5px 8px
 }
 .note-card.linked {
@@ -448,21 +484,21 @@ mark.ai {
   padding-top:24px;
 }
 .review-actions button {
-  font-size:12px
+  font-size:var(--text-small)
 }
 .badge {
   display:inline-block;
   border:1px solid #bcc7bf;
   border-radius:4px;
   padding:3px 7px;
-  font-size:11px;
+  font-size:var(--text-small);
   background:#fff
 }
 .warning {
   padding:10px 12px;
   border-left:3px solid #9a6717;
   background:#fff7e8;
-  font-size:12px;
+  font-size:var(--text-small);
   line-height:1.6;
   margin-bottom:12px
 }
@@ -504,13 +540,13 @@ mark.ai {
   margin-bottom:5px
 }
 .metric span {
-  font-size:12px;
+  font-size:var(--text-small);
   color:var(--muted)
 }
 table {
   border-collapse:collapse;
   width:100%;
-  font-size:12px
+  font-size:var(--text-small)
 }
 td,th {
   padding:12px 10px;
@@ -519,7 +555,7 @@ td,th {
   vertical-align:top
 }
 th {
-  font-size:11px;
+  font-size:var(--text-small);
   color:var(--muted)
 }
 .table-wrap {
@@ -529,7 +565,7 @@ td .actions {
   min-width:200px
 }
 td .actions button {
-  font-size:11px;
+  font-size:var(--text-small);
   padding:5px 8px
 }
 .mode-form {
@@ -575,12 +611,12 @@ td .actions button {
   margin:0 0 8px;
   padding:0;
   color:var(--muted);
-  font-size:12px;
+  font-size:var(--text-small);
   font-style:italic;
   line-height:1.45;
 }
 #note-popover textarea {
-  font-size:13px;
+  font-size:var(--text-body);
   margin:0;
   min-height:64px;
   max-height:150px;
@@ -593,7 +629,7 @@ td .actions button {
   outline-offset:0;
 }
 .note-hint {
-  font-size:10px;
+  font-size:var(--text-small);
   color:var(--muted);
   margin:7px 0 0;
   line-height:1.4;
@@ -615,7 +651,7 @@ td .actions button {
 }
 .tool-summary-status {
   margin-left:12px;
-  font-size:11px;
+  font-size:var(--text-small);
   font-weight:400;
   color:var(--muted);
 }
@@ -647,11 +683,11 @@ td .actions button {
 }
 .wide-id {
   font-family:ui-monospace,monospace;
-  font-size:11px;
+  font-size:var(--text-small);
   overflow-wrap:anywhere
 }
 @media(min-width:1450px) {
-  .workspace {
+  #view-scroll,.session-heading {
     padding-left:40px;
     padding-right:40px
   }
@@ -664,7 +700,7 @@ td .actions button {
   main {
     grid-template-columns:235px minmax(0,1fr)
   }
-  .workspace {
+  #view-scroll,.session-heading {
     padding:20px
   }
   .turn-grid {
@@ -687,21 +723,47 @@ td .actions button {
 }
 @media(max-width:650px) {
   main {
-    display:block
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr);
   }
   .queue {
-    position: static;
-    max-height: none;
     border-right:0;
     border-bottom:1px solid var(--line);
-    padding:16px
+    padding:10px 14px;
+  }
+  .queue-head h2 {
+    font-size:var(--text-body);
+    margin-bottom:8px;
   }
   #queue-list {
-    max-height:220px;
-    overflow:auto
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    max-height:none;
   }
-  .workspace {
-    padding:20px 14px
+  .conversation {
+    flex:0 0 235px;
+    margin:0 0 4px;
+    padding:10px;
+  }
+  .conversation-title {
+    gap:4px;
+  }
+  .conversation .quiet {
+    margin-top:4px;
+  }
+  #view-scroll,.session-heading {
+    padding:14px;
+  }
+  .session-heading .meta {
+    gap:6px 10px;
+  }
+  .session-heading .legend {
+    margin-top:10px;
+  }
+  .session-heading .review-guide {
+    display:none;
   }
   .topbar {
     padding:16px;
