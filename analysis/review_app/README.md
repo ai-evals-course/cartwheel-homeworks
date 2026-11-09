@@ -24,14 +24,14 @@ the server to include newly recorded traces. Missing session IDs remain separate
    repeating the user's request. Each conversation has its own bordered cell;
    shopper, merchant and support roles use distinct labeled color badges.
    The prominent top navigation provides Review, Label, Taxonomy and Progress.
-   The palette pairs black navigation with plum controls, warm neutral surfaces,
+   The palette pairs black navigation with terracotta controls, warm neutral surfaces,
    taupe agent accents and muted bronze tools; role colors retain their distinct meanings.
    Navigation and the conversation header stay fixed while the reading pane
    scrolls from the system instructions downward. The sidebar scrolls separately;
    on small screens its cells form a horizontal strip. Body text uses 16px and
    secondary labels use a consistent 14px.
    The compact header places the role beside the scenario name, with session
-   and model details below. User messages use plum outer bubbles, agent messages
+   and model details below. User messages use terracotta outer bubbles, agent messages
    taupe, and tool calls brown. All three contain matching white inner bubbles.
    Intermediate
    agent text is italic and labeled **Agent (In-between)**; the final response

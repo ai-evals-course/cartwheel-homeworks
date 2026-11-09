@@ -6,10 +6,10 @@
   --text-body:1rem;
   --text-small:.875rem;
   --line:#ded9d4;
-  --accent:#72516a;
+  --accent:#8c523d;
   --muted:#71686f;
   --paper:#fff;
-  --user:#79566d;
+  --user:#98563f;
   --assistant:#6c6258;
   --tool:#8a6346;
   --system:#6b5e88
@@ -49,11 +49,11 @@ button.primary,button[aria-pressed=true] {
   border-color:var(--accent)
 }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible {
-  outline:3px solid #9d7c95;
+  outline:3px solid #b98269;
   outline-offset:3px
 }
 a {
-  color:#79536e;
+  color:#8c523d;
   text-underline-offset:3px
 }
 h1,h2,h3,p {
@@ -263,9 +263,9 @@ main {
   border-radius:5px
 }
 .conversation.active {
-  background:#eee5ec;
-  border-color:#967489;
-  box-shadow:inset 3px 0 #967489
+  background:#f2e7df;
+  border-color:#ac7962;
+  box-shadow:inset 3px 0 #ac7962
 }
 .conversation strong {
   display:block;
@@ -291,8 +291,8 @@ main {
   color:#70646d;
 }
 .audience-badge[data-audience=shopper] {
-  background:#f0e4ee;
-  color:#77536d;
+  background:#f6e6dd;
+  color:#8d4f39;
 }
 .audience-badge[data-audience=merchant] {
   background:#f5ecdd;
@@ -412,7 +412,7 @@ main {
 }
 .block[data-role=user] {
   --role-color:var(--user);
-  background:#f3eaf0;
+  background:#f7ede7;
 }
 .block[data-role=assistant] {
   --role-color:var(--assistant);
