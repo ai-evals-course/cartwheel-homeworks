@@ -212,10 +212,17 @@ function renderRead() {
       const instructions = details('System instructions', wrapper, false, state.session.id + ':system');
       instructions.className = 'system'; body.append(instructions);
     }
+    const lastActivity = turn.blocks.filter(block => block.role !== 'thinking').at(-1);
     for (const block of turn.blocks) {
       if (block.role === 'tool') {body.append(renderTool(block, turn.id)); continue;}
       const item = el('div', 'block'); item.dataset.role = block.role; item.dataset.blockId = block.id;
-      item.append(el('div', 'role-label', block.role === 'assistant' ? 'Agent' : block.role), anchored(block.text, turn.id, block.id, block.field));
+      let label = block.role;
+      if (block.role === 'assistant') {
+        const final = lastActivity?.role === 'assistant' && block.observation_id === lastActivity.observation_id;
+        item.dataset.agentPhase = final ? 'final' : 'in-between';
+        label = final ? 'Agent (Final)' : 'Agent (In-between)';
+      }
+      item.append(el('div', 'role-label', label), anchored(block.text, turn.id, block.id, block.field));
       body.append(item);
     }
     notesFor(turn.id).forEach(n => notes.append(noteCard(n)));

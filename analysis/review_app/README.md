@@ -29,8 +29,10 @@ the server to include newly recorded traces. Missing session IDs remain separate
    on small screens its cells form a horizontal strip. Body text uses 16px and
    secondary labels use a consistent 14px.
    The compact header places the role beside the scenario name, with session
-   and model details below. User messages are blue, agent messages green, and
-   nested tool calls amber.
+   and model details below. User and agent messages use white bubbles, with blue
+   and green accents respectively; tool calls use brown bubbles. Intermediate
+   agent text is italic and labeled **Agent (In-between)**; the final response
+   to each user request is labeled **Agent (Final)**.
 2. Select text to write an evidence note. A temporary highlight remains visible
    while a compact pop-up appears beneath the selection, showing the quote and
    a text box. Enter saves, Shift+Enter adds a line, and Escape closes without
@@ -67,8 +69,8 @@ Tool calls start collapsed with the tool name and any error or action status vis
 successful `ok` flags are not repeated beside the name. Expand
 the call to reveal Arguments and Complete result, each collapsed independently.
 The interface calls assistant messages **Agent**. A tool call sits inside a
-**Tool** bubble that shares the agent's green accent and light green background;
-the nested tool bubble retains its amber accent.
+**Tool** bubble with pale brown styling; the nested tool bubble uses a deeper
+brown tint and a dark brown accent.
 The complete result includes retrieval evidence and all original fields.
 Execution metadata stays in Progress's raw trace details. Disclosure choices
 survive note saves.

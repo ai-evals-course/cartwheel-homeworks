@@ -11,7 +11,7 @@
   --paper:#fff;
   --user:#226a9c;
   --assistant:#257250;
-  --tool:#925c0b;
+  --tool:#805334;
   --system:#67547e
 }
 * {
@@ -375,14 +375,23 @@ main {
 }
 .block[data-role=user] {
   --role-color:var(--user);
-  background:#edf5ff;
 }
 .block[data-role=assistant] {
   --role-color:var(--assistant);
-  background:#eef8f1;
+}
+.block[data-agent-phase] > .role-label {
+  text-transform:none;
+  letter-spacing:0;
+}
+.block[data-agent-phase=in-between] > .prose {
+  font-style:italic;
 }
 .block[data-role=tool] {
   --role-color:var(--tool)
+}
+.block.tool-message {
+  --role-color:var(--tool);
+  background:#f7f0e8;
 }
 .block[data-role=thinking] {
   --role-color:var(--system)
@@ -658,8 +667,8 @@ td .actions button {
 }
 .tool-disclosure {
   --role-color:var(--tool);
-  background:#fff5df;
-  color:#79500d;
+  background:#ead5bf;
+  color:#654126;
   border:1px solid var(--line);
   border-left:3px solid var(--role-color);
   border-radius:4px;
