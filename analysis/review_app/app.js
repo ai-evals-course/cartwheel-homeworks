@@ -222,7 +222,14 @@ function renderRead() {
         item.dataset.agentPhase = final ? 'final' : 'in-between';
         label = final ? 'Agent (Final)' : 'Agent (In-between)';
       }
-      item.append(el('div', 'role-label', label), anchored(block.text, turn.id, block.id, block.field));
+      const content = anchored(block.text, turn.id, block.id, block.field);
+      if (block.role === 'user' || block.role === 'assistant') {
+        const inner = el('div', 'message-content');
+        inner.append(content);
+        item.append(el('div', 'role-label', label), inner);
+      } else {
+        item.append(el('div', 'role-label', label), content);
+      }
       body.append(item);
     }
     notesFor(turn.id).forEach(n => notes.append(noteCard(n)));

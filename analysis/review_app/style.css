@@ -375,16 +375,25 @@ main {
 }
 .block[data-role=user] {
   --role-color:var(--user);
+  background:#edf5ff;
 }
 .block[data-role=assistant] {
   --role-color:var(--assistant);
+  background:#eef8f1;
 }
 .block[data-agent-phase] > .role-label {
   text-transform:none;
   letter-spacing:0;
 }
-.block[data-agent-phase=in-between] > .prose {
+.block[data-agent-phase=in-between] .message-content > .prose {
   font-style:italic;
+}
+.message-content {
+  background:#fff;
+  border:1px solid var(--line);
+  border-left:3px solid var(--role-color);
+  border-radius:4px;
+  padding:12px 14px;
 }
 .block[data-role=tool] {
   --role-color:var(--tool)

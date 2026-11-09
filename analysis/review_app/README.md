@@ -29,8 +29,9 @@ the server to include newly recorded traces. Missing session IDs remain separate
    on small screens its cells form a horizontal strip. Body text uses 16px and
    secondary labels use a consistent 14px.
    The compact header places the role beside the scenario name, with session
-   and model details below. User and agent messages use white bubbles, with blue
-   and green accents respectively; tool calls use brown bubbles. Intermediate
+   and model details below. User messages use blue outer bubbles, agent messages
+   green, and tool calls brown. All three contain matching white inner bubbles.
+   Intermediate
    agent text is italic and labeled **Agent (In-between)**; the final response
    to each user request is labeled **Agent (Final)**.
 2. Select text to write an evidence note. A temporary highlight remains visible
