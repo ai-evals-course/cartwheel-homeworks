@@ -80,7 +80,6 @@ function renderQueue() {
     const item = button('', () => openSession(session.id), 'conversation' + (state.session?.id === session.id ? ' active' : ''));
     item.setAttribute('aria-current', state.session?.id === session.id ? 'true' : 'false');
     item.append(el('strong', '', `${first.scenario || 'Unassigned scenario'} · ${first.role || 'Unknown role'}`),
-      el('span', 'preview', first.preview || 'Input not captured'),
       el('span', 'quiet', `${session.traces.length} trace(s) · ${done} reviewed`));
     list.append(item);
   }
@@ -157,20 +156,7 @@ function renderTool(block, tid) {
   const body = el('div', 'tool-body');
   const args = anchored(pretty(block.arguments), tid, block.id, 'input', true);
   body.append(details('Arguments', args, false, key + ':arguments'));
-  if (result && typeof result === 'object' && !Array.isArray(result)) {
-    const important = ['ok', 'error', 'reason', 'status', 'order_id', 'refund_id', 'amount_usd', 'note', 'count'];
-    const summary = important.filter(k => k in result).map(k => k + ': ' + pretty(result[k])).join('\n');
-    if (summary) body.append(anchored(summary, tid, block.id, 'result_summary', true));
-    if (Array.isArray(result.results)) for (let i = 0; i < result.results.length; i++) {
-      const hit = result.results[i], hitNode = el('div', 'retrieval');
-      hitNode.append(el('strong', '', `${i+1}. ${hit.policy_id} · ${hit.title}`), el('p', 'quiet', `Retrieval score: ${hit.score}`));
-      hitNode.append(anchored(hit.snippet || 'Snippet not captured', tid, block.id, `output.results.${i}.snippet`));
-      body.append(hitNode);
-    }
-  }
-  body.append(details('Complete result · preserves empty and null fields', anchored(pretty(result), tid, block.id, 'output', true), false, key + ':result'));
-  body.append(el('div', 'quiet', `Observation ${block.observation_id} · match: ${block.match}${block.call_id ? ' · ' + block.call_id : ''}`));
-  if (['ambiguous', 'unmatched'].includes(block.match)) body.append(el('p', 'warning', 'No unique generation call match. The tool observation is shown as captured; check raw execution details.'));
+  body.append(details('Complete result', anchored(pretty(result), tid, block.id, 'output', true), false, key + ':result'));
   node.append(body);
   return node;
 }

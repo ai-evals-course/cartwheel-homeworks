@@ -20,6 +20,8 @@ the server to include newly recorded traces. Missing session IDs remain separate
 1. Choose a conversation from the sidebar. Read its messages in chronological
    order without numbered turn headings or action bars interrupting the content.
    Each message group retains its own trace identity for annotations and scores.
+   Sidebar entries show the scenario, role, trace count and review status without
+   repeating the user's request.
 2. Select text to write an evidence note. A temporary highlight remains visible
    while a compact pop-up appears beneath the selection, showing the quote and
    a text box. Enter saves, Shift+Enter adds a line, and Escape closes without
@@ -53,8 +55,10 @@ One system-instructions disclosure at the start includes each distinct captured
 version across the conversation. Raw traces, IDs, timing, costs, prompt versions
 and Langfuse links are available in Progress under each trace's details.
 Tool calls start collapsed with the tool name and result status visible. Expand
-the call for its evidence summary and retrieval snippets, then expand arguments
-or the complete result when needed. Disclosure choices survive note saves.
+the call to reveal Arguments and Complete result, each collapsed independently.
+The complete result includes retrieval evidence and all original fields.
+Execution metadata stays in Progress's raw trace details. Disclosure choices
+survive note saves.
 
 The separate `analysis/state/review_app.json` holds human notes, review completion,
 taxonomy decisions, suggestion decisions and binary judgments. Prior label edits

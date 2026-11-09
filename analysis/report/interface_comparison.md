@@ -19,15 +19,17 @@ chronologically. Generation outputs supply intermediate messages; accumulated
 model inputs and duplicate final output are not repeated. Matching uses call
 identity when captured, otherwise unique tool name and arguments, rather than
 the reference UI's adjacency-only pairing. Collapsed tool summaries retain the
-tool name and result status; expanding reveals evidence and retrieval snippets,
-with arguments and complete results disclosed separately. Complete typed JSON
+tool name and result status; expanding reveals only Arguments and Complete result,
+disclosed separately. Retrieval evidence remains inside the complete result,
+and execution metadata remains in Progress's raw trace details. Complete typed JSON
 and raw execution remain available. Following the student's visual reference,
 selected evidence opens a compact nonmodal pop-up with a quoted excerpt, a text
 box, and keyboard save/cancel controls. The evidence stays highlighted while editing.
 The reading view now flows without numbered turn headings, trace metadata, or
 review controls between messages. A single system-instructions disclosure at
 the start contains the distinct captured versions. Review controls and raw
-trace details live in Progress. The sidebar lists conversations without filters,
+trace details live in Progress. The sidebar lists scenario, role, trace count and
+review status without filters or request previews,
 and larger proportional text improves readability.
 
 The new interface also separates free-text open coding from a later binary
