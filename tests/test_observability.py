@@ -5,12 +5,14 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from opentelemetry import trace
 from fastapi import HTTPException
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from agent.auth import AuthContext
+from observability.instrument import record_tool_result
 
 
 @pytest.fixture
@@ -42,6 +44,13 @@ def stub_runner(server_app, monkeypatch):
 
     monkeypatch.setattr(server_app.Runner, "run", run)
     return calls
+
+
+@pytest.fixture
+def tool_tracer():
+    provider = TracerProvider()
+    yield provider.get_tracer("test.tool")
+    provider.shutdown()
 
 
 def _authorized_session(server_app, session_id="test-session"):
@@ -198,3 +207,78 @@ def test_session_token_cannot_authorize_another_session(server_app, world):
         )
 
     assert exc_info.value.status_code == 403
+
+
+def test_record_tool_result_records_shopper_identity(tool_tracer):
+    context = AuthContext(user_id=37, role="shopper")
+
+    with tool_tracer.start_as_current_span("tool") as span:
+        record_tool_result(context, {"ok": True})
+
+        assert span.attributes["cartwheel.user_role"] == "shopper"
+        assert span.attributes["cartwheel.user_id"] == "37"
+        assert "cartwheel.store_id" not in span.attributes
+
+
+def test_record_tool_result_records_merchant_identity_with_string_store_id(tool_tracer):
+    context = AuthContext(user_id=82, role="merchant", store_id=901)
+
+    with tool_tracer.start_as_current_span("tool") as span:
+        record_tool_result(context, {"ok": True})
+
+        assert span.attributes["cartwheel.user_role"] == "merchant"
+        assert span.attributes["cartwheel.user_id"] == "82"
+        assert span.attributes["cartwheel.store_id"] == "901"
+        assert isinstance(span.attributes["cartwheel.store_id"], str)
+
+
+def test_record_tool_result_records_allowed_decision_without_reason(tool_tracer):
+    context = AuthContext(user_id=37, role="shopper")
+
+    with tool_tracer.start_as_current_span("tool") as span:
+        record_tool_result(context, {"ok": True})
+
+        assert span.attributes["cartwheel.permission_denied"] is False
+        assert "cartwheel.permission_denied.reason" not in span.attributes
+
+
+def test_record_tool_result_records_denial_reason(tool_tracer):
+    context = AuthContext(user_id=37, role="shopper")
+
+    with tool_tracer.start_as_current_span("tool") as span:
+        record_tool_result(
+            context,
+            {"ok": False, "error": "permission_denied", "reason": "not your order"},
+        )
+
+        assert span.attributes["cartwheel.permission_denied"] is True
+        assert span.attributes["cartwheel.permission_denied.reason"] == "not your order"
+
+
+def test_record_tool_result_defaults_missing_denial_reason_to_empty_string(tool_tracer):
+    context = AuthContext(user_id=37, role="shopper")
+
+    with tool_tracer.start_as_current_span("tool") as span:
+        record_tool_result(context, {"ok": False, "error": "permission_denied"})
+
+        assert span.attributes["cartwheel.permission_denied"] is True
+        assert span.attributes["cartwheel.permission_denied.reason"] == ""
+
+
+def test_record_tool_result_does_not_set_attributes_on_non_recording_span(monkeypatch):
+    class NonRecordingSpan:
+        def __init__(self):
+            self.attributes = []
+
+        def is_recording(self):
+            return False
+
+        def set_attribute(self, name, value):
+            self.attributes.append((name, value))
+
+    span = NonRecordingSpan()
+    monkeypatch.setattr(trace, "get_current_span", lambda: span)
+
+    record_tool_result(AuthContext(user_id=37, role="shopper"), {"ok": True})
+
+    assert span.attributes == []
