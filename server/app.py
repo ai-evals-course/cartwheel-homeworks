@@ -123,8 +123,39 @@ def create_session(body: SessionCreate) -> dict[str, Any]:
     session id and a signed token. The token payload must contain session_id,
     user_id, role, store_id, and issued_at.
     """
-    ### YOUR CODE HERE (HW2)
-    raise NotImplementedError("HW2: implement POST /sessions")
+    # Validate role
+    if body.role not in ROLES:
+        raise HTTPException(status_code=400, detail="unknown role")
+
+    # Load user and verify role matches
+    with db.connection() as conn:
+        user = db.get_user(conn, body.user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail="user not found")
+        if user.role != body.role:
+            raise HTTPException(status_code=403, detail="role mismatch")
+
+    # Create authenticated context
+    ctx = AuthContext(user_id=user.id, role=user.role, store_id=user.store_id)
+
+    # Create server-side session
+    session_id = str(uuid.uuid4())
+    session = SQLiteSession(session_id, str(db_path()))
+
+    # Store in memory for future requests
+    _SESSIONS[session_id] = (ctx, session)
+
+    # Create signed token with verified identity
+    payload = {
+        "session_id": session_id,
+        "user_id": user.id,
+        "role": user.role,
+        "store_id": user.store_id,
+        "issued_at": time.time(),
+    }
+    token = create_token(payload)
+
+    return {"session_id": session_id, "token": token}
 
 
 def _authorize(session_id: str, authorization: str | None) -> AuthContext:
@@ -158,8 +189,65 @@ async def post_message(
     gen_ai.output.messages on the root span as JSON arrays of OTel GenAI
     messages with role and parts fields.
     """
-    ### YOUR CODE HERE (HW2)
-    raise NotImplementedError("HW2: implement the traced message endpoint")
+    # Authorize the token and get the authenticated context
+    ctx = _authorize(session_id, authorization)
+
+    # Recover the session from memory
+    _, session = _SESSIONS[session_id]
+
+    # Calculate the prompt version (hash of system prompt template only)
+    version = prompt_version()
+
+    # Build the agent for this authenticated context
+    agent = build_agent(ctx)
+
+    # Create root span for the entire request
+    with _tracer.start_as_current_span("cartwheel.session_message") as span:
+        # Set application attributes
+        span.set_attribute("cartwheel.user_role", ctx.role)
+        span.set_attribute("cartwheel.user_id", str(ctx.user_id))
+        span.set_attribute("cartwheel.prompt_version", version)
+
+        # Include scenario ID if provided and non-empty
+        if body.scenario_id:
+            span.set_attribute("cartwheel.scenario_id", body.scenario_id)
+
+        # Record input message if content tracing is enabled
+        trace_content = os.environ.get("TRACELOOP_TRACE_CONTENT") == "true"
+        if trace_content:
+            input_messages = [
+                {
+                    "role": "user",
+                    "parts": [{"type": "text", "content": body.message}],
+                }
+            ]
+            span.set_attribute("gen_ai.input.messages", json.dumps(input_messages))
+
+        # Run the agent (this creates child spans for tool calls and model calls)
+        result = await Runner.run(
+            agent,
+            body.message,
+            session=session,
+            context=ctx,
+            max_turns=MAX_TURNS,
+        )
+        reply = result.final_output
+
+        # Record output message if content tracing is enabled
+        if trace_content:
+            output_messages = [
+                {
+                    "role": "assistant",
+                    "parts": [{"type": "text", "content": reply}],
+                }
+            ]
+            span.set_attribute("gen_ai.output.messages", json.dumps(output_messages))
+
+    return {
+        "session_id": session_id,
+        "reply": reply,
+        "prompt_version": version,
+    }
 
 
 @app.get("/health")

@@ -1,1 +1,931 @@
-{"annotations": []}
+{
+  "review_session": "2026-11-02T02:55:27.262Z",
+  "total_reviewed": 185,
+  "annotations": {
+    "support-0002": {
+      "scenario_id": "support-0002",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0003": {
+      "scenario_id": "support-0003",
+      "open_coding_notes": "factual_error agent says showing 20 orders but only shows 5",
+      "reviewed": true
+    },
+    "support-0004": {
+      "scenario_id": "support-0004",
+      "open_coding_notes": "factual_error says all orders have been delivered but order is still in placed state",
+      "reviewed": true
+    },
+    "support-0005": {
+      "scenario_id": "support-0005",
+      "open_coding_notes": "tone_mismatch don't say \"great!\" when customer is asking an order status question\ninternal_language agents using asterisks around order information\nfactual_error agent says order is delivered but expected behavior is that order is in shipped state",
+      "reviewed": true
+    },
+    "support-0006": {
+      "scenario_id": "support-0006",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0007": {
+      "scenario_id": "support-0007",
+      "open_coding_notes": "tone_mismatch don't say \"great!\" when they're asking about order status \nfactual_error agent says orders are delivered but expected behavior is placed state",
+      "reviewed": true
+    },
+    "support-0008": {
+      "scenario_id": "support-0008",
+      "open_coding_notes": "factual_error agent says orders are in delivered state but expected behavior is shipped state",
+      "reviewed": true
+    },
+    "support-0009": {
+      "scenario_id": "support-0009",
+      "open_coding_notes": "internal_language don't put order status in asterisks",
+      "reviewed": true
+    },
+    "support-0010": {
+      "scenario_id": "support-0010",
+      "open_coding_notes": "factual_error agent says all orders have been delivered but expected behavior is order in placed state",
+      "reviewed": true
+    },
+    "support-0011": {
+      "scenario_id": "support-0011",
+      "open_coding_notes": "factual_error agent says orders have been delivered but expected behavior is shipped state",
+      "reviewed": true
+    },
+    "support-0012": {
+      "scenario_id": "support-0012",
+      "open_coding_notes": "tone_mismatch don't say \"great!\" when answering order status questions",
+      "reviewed": true
+    },
+    "support-0013": {
+      "scenario_id": "support-0013",
+      "open_coding_notes": "factual_error agent says orders delivered but expected behavior is placed state",
+      "reviewed": true
+    },
+    "support-0014": {
+      "scenario_id": "support-0014",
+      "open_coding_notes": "factual_error agent says order has been delivered but expected behavior is shipped state",
+      "reviewed": true
+    },
+    "support-0015": {
+      "scenario_id": "support-0015",
+      "open_coding_notes": "tone_mismatch don't say great when answering order status questions\n",
+      "reviewed": true
+    },
+    "support-0016": {
+      "scenario_id": "support-0016",
+      "open_coding_notes": "tone_mismatch don't say great when answering order status\nfactual_error agent says orders have been delivered but expected behavior is order placed",
+      "reviewed": true
+    },
+    "support-0017": {
+      "scenario_id": "support-0017",
+      "open_coding_notes": "factual_error agent says delivered but expected behavior is shipped state",
+      "reviewed": true
+    },
+    "support-0018": {
+      "scenario_id": "support-0018",
+      "open_coding_notes": "excessive_verbosity no need to talk about older orders when customer is likely asking about recent orders",
+      "reviewed": true
+    },
+    "support-0019": {
+      "scenario_id": "support-0019",
+      "open_coding_notes": "factual_error agent says orders delivered but expected behavior is order placed state",
+      "reviewed": true
+    },
+    "support-0020": {
+      "scenario_id": "support-0020",
+      "open_coding_notes": "internal_language don't use asterisks around words like \"**specific order**\"\nfactual_error agent says order delivered but order is in shipped state",
+      "reviewed": true
+    },
+    "support-0021": {
+      "scenario_id": "support-0021",
+      "open_coding_notes": "excessive_verbosity don't include details on older orders when they're likely not relevant\ninternal_language don't use asterisks",
+      "reviewed": true
+    },
+    "support-0022": {
+      "scenario_id": "support-0022",
+      "open_coding_notes": "tone_mismatch don't say Great!\nfactual_error agent says delivered but expected behavior is order in placed state",
+      "reviewed": true
+    },
+    "support-0023": {
+      "scenario_id": "support-0023",
+      "open_coding_notes": "factual_error agent says recent orders delivered but expected behavior is shipped state",
+      "reviewed": true
+    },
+    "support-0026": {
+      "scenario_id": "support-0026",
+      "open_coding_notes": "tone_mismatch don't say Great when someone wants to return their order\ninternal_language humans don't say \"refund eligible\" they say \"eligible for refund\"",
+      "reviewed": true
+    },
+    "support-0027": {
+      "scenario_id": "support-0027",
+      "open_coding_notes": "internal_language humans don't say refund_eligible=true and don't use asterisks\ntone_mismatch don't say great with returns\n",
+      "reviewed": true
+    },
+    "support-0028": {
+      "scenario_id": "support-0028",
+      "open_coding_notes": "internal_language don't use asterisks and don't say refund-eligible",
+      "reviewed": true
+    },
+    "support-0029": {
+      "scenario_id": "support-0029",
+      "open_coding_notes": "internal_language don't use asterisks\nunnecessary_question don't ask user for order numbers or products if you can show them options",
+      "reviewed": true
+    },
+    "support-0030": {
+      "scenario_id": "support-0030",
+      "open_coding_notes": "internal_language don't use asterisks",
+      "reviewed": true
+    },
+    "support-0031": {
+      "scenario_id": "support-0031",
+      "open_coding_notes": "tone_mismatch don't say great! for returns\ninternal_language don't say \"refund eligible\"\nunnecessary_question don't ask which item in order to tell them if it's eligible if you already know both are eligible",
+      "reviewed": true
+    },
+    "support-0032": {
+      "scenario_id": "support-0032",
+      "open_coding_notes": "tone_mismatch don't say \"great!\" \ninternal_language don't say \"refund eligible\" and odn't use asterisks",
+      "reviewed": true
+    },
+    "support-0033": {
+      "scenario_id": "support-0033",
+      "open_coding_notes": "tone_mismatch don't say \"great!\"\ninternal_language don't say \"refund eligible\"\n",
+      "reviewed": true
+    },
+    "support-0034": {
+      "scenario_id": "support-0034",
+      "open_coding_notes": "tone_mismatch don't say \"great\"\ninternal_language don't say \"refund eligible\"\nexcessive_verbosity said \"recent orders\"t wice",
+      "reviewed": true
+    },
+    "support-0035": {
+      "scenario_id": "support-0035",
+      "open_coding_notes": "internal_language don't use asterisks around order details \nunnecessary_question don't ask for order id and product name if you know recent orders and don't need to check eligibility if you know state is within window",
+      "reviewed": true
+    },
+    "support-0036": {
+      "scenario_id": "support-0036",
+      "open_coding_notes": "tone_mismatch don't say \"good news!\" for returns\ninternal_language don't say refund eligible\nexcessive_verbosity repetitive detail on orders being refund eligible",
+      "reviewed": true
+    },
+    "support-0037": {
+      "scenario_id": "support-0037",
+      "open_coding_notes": "internal_language asterisks\nunnecessary_question don't ask for order ID",
+      "reviewed": true
+    },
+    "support-0038": {
+      "scenario_id": "support-0038",
+      "open_coding_notes": "tone_mismatch don't say great\n",
+      "reviewed": true
+    },
+    "support-0039": {
+      "scenario_id": "support-0039",
+      "open_coding_notes": "internal_language asterisks\nunnecessary questions don't askf or order if you already have order info\n",
+      "reviewed": true
+    },
+    "support-0040": {
+      "scenario_id": "support-0040",
+      "open_coding_notes": "tone_mismatch don't say great for returns\n",
+      "reviewed": true
+    },
+    "support-0042": {
+      "scenario_id": "support-0042",
+      "open_coding_notes": "internal_language don't use asterisks\nunnecessary_question don't ask for order number",
+      "reviewed": true
+    },
+    "support-0043": {
+      "scenario_id": "support-0043",
+      "open_coding_notes": "\nunnecessary_question don't ask for order number if you already have it",
+      "reviewed": true
+    },
+    "support-0044": {
+      "scenario_id": "support-0044",
+      "open_coding_notes": "internal_language don't use asterisks or say \"refund-eligible\"\nunnecessary_question don't ask for order number\ntone_mismatch don't say great",
+      "reviewed": true
+    },
+    "support-0045": {
+      "scenario_id": "support-0045",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0046": {
+      "scenario_id": "support-0046",
+      "open_coding_notes": "factual_error item bought months ago isn't eligible for refund\ninternal_language don't use asterisks ",
+      "reviewed": true
+    },
+    "support-0047": {
+      "scenario_id": "support-0047",
+      "open_coding_notes": "internal_language don't use asterisks or say \"refund-eligible\"\nexcessive_verbosity lots of messaging that doesn't help answer the question\nunnecessary_question you already know that an ancient order is likely past the window",
+      "reviewed": true
+    },
+    "support-0048": {
+      "scenario_id": "support-0048",
+      "open_coding_notes": "internal_language don't use  \"refund_eligible\" or asterisks\nunnecessary_question don't ask for order number\ntone_mismatch don't say great\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0049": {
+      "scenario_id": "support-0049",
+      "open_coding_notes": "factual_error can't help with a refund if its an old order",
+      "reviewed": true
+    },
+    "support-0050": {
+      "scenario_id": "support-0050",
+      "open_coding_notes": "factual_error old order",
+      "reviewed": true
+    },
+    "support-0051": {
+      "scenario_id": "support-0051",
+      "open_coding_notes": "factual_error can't help wtih an old order\ninternal_language",
+      "reviewed": true
+    },
+    "support-0052": {
+      "scenario_id": "support-0052",
+      "open_coding_notes": "internal_language\n",
+      "reviewed": true
+    },
+    "support-0053": {
+      "scenario_id": "support-0053",
+      "open_coding_notes": "excessive_verbosity don't talk about recent orders when customer explictly stated order was placed long ago",
+      "reviewed": true
+    },
+    "support-0054": {
+      "scenario_id": "support-0054",
+      "open_coding_notes": "tone_mismatch\ninternal_language\nfactual_error",
+      "reviewed": true
+    },
+    "support-0055": {
+      "scenario_id": "support-0055",
+      "open_coding_notes": "excessive_verbosity",
+      "reviewed": true
+    },
+    "support-0056": {
+      "scenario_id": "support-0056",
+      "open_coding_notes": "tone_mismatch\ninternal_language",
+      "reviewed": true
+    },
+    "support-0057": {
+      "scenario_id": "support-0057",
+      "open_coding_notes": "tone_mismatch\ninternal_language",
+      "reviewed": true
+    },
+    "support-0061": {
+      "scenario_id": "support-0061",
+      "open_coding_notes": "factual_error agent should have access to this order",
+      "reviewed": true
+    },
+    "support-0062": {
+      "scenario_id": "support-0062",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0063": {
+      "scenario_id": "support-0063",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0064": {
+      "scenario_id": "support-0064",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0065": {
+      "scenario_id": "support-0065",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0066": {
+      "scenario_id": "support-0066",
+      "open_coding_notes": "internal_language\nexcessive_verbosity here's the thing\n",
+      "reviewed": true
+    },
+    "support-0067": {
+      "scenario_id": "support-0067",
+      "open_coding_notes": "internal_Language",
+      "reviewed": true
+    },
+    "support-0068": {
+      "scenario_id": "support-0068",
+      "open_coding_notes": "unnecessary_question",
+      "reviewed": true
+    },
+    "support-0069": {
+      "scenario_id": "support-0069",
+      "open_coding_notes": "unnecessary_question",
+      "reviewed": true
+    },
+    "support-0070": {
+      "scenario_id": "support-0070",
+      "open_coding_notes": "unnecessary_question",
+      "reviewed": true
+    },
+    "support-0071": {
+      "scenario_id": "support-0071",
+      "open_coding_notes": "internal_language policy\n",
+      "reviewed": true
+    },
+    "support-0072": {
+      "scenario_id": "support-0072",
+      "open_coding_notes": "unnecessary_question",
+      "reviewed": true
+    },
+    "support-0073": {
+      "scenario_id": "support-0073",
+      "open_coding_notes": "factual_error item is past return eligibility",
+      "reviewed": true
+    },
+    "support-0074": {
+      "scenario_id": "support-0074",
+      "open_coding_notes": "internal_language\n",
+      "reviewed": true
+    },
+    "support-0075": {
+      "scenario_id": "support-0075",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0076": {
+      "scenario_id": "support-0076",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0077": {
+      "scenario_id": "support-0077",
+      "open_coding_notes": "internal_language\n",
+      "reviewed": true
+    },
+    "support-0078": {
+      "scenario_id": "support-0078",
+      "open_coding_notes": "factual_error disputes are handled by credit card company, not company. policy error",
+      "reviewed": true
+    },
+    "support-0079": {
+      "scenario_id": "support-0079",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0080": {
+      "scenario_id": "support-0080",
+      "open_coding_notes": "internal_language\nexcessive_verbosity customer is asking about shipping cost, not about shipping timelines",
+      "reviewed": true
+    },
+    "support-0081": {
+      "scenario_id": "support-0081",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0082": {
+      "scenario_id": "support-0082",
+      "open_coding_notes": "unnecessary_question\nfactual_error should just state policy ",
+      "reviewed": true
+    },
+    "support-0083": {
+      "scenario_id": "support-0083",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0084": {
+      "scenario_id": "support-0084",
+      "open_coding_notes": "tone_mismatch don't say good news\ninternal_language",
+      "reviewed": true
+    },
+    "support-0087": {
+      "scenario_id": "support-0087",
+      "open_coding_notes": "internal_Language",
+      "reviewed": true
+    },
+    "support-0088": {
+      "scenario_id": "support-0088",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0089": {
+      "scenario_id": "support-0089",
+      "open_coding_notes": "internal_language\nfactual_error says no lamps available and then asks to search for various types of lamps",
+      "reviewed": true
+    },
+    "support-0090": {
+      "scenario_id": "support-0090",
+      "open_coding_notes": "tone_mismatch don't say great\ninternal_language",
+      "reviewed": true
+    },
+    "support-0091": {
+      "scenario_id": "support-0091",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0092": {
+      "scenario_id": "support-0092",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0093": {
+      "scenario_id": "support-0093",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0094": {
+      "scenario_id": "support-0094",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0095": {
+      "scenario_id": "support-0095",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0096": {
+      "scenario_id": "support-0096",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0097": {
+      "scenario_id": "support-0097",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0098": {
+      "scenario_id": "support-0098",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0099": {
+      "scenario_id": "support-0099",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0100": {
+      "scenario_id": "support-0100",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0101": {
+      "scenario_id": "support-0101",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0102": {
+      "scenario_id": "support-0102",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0103": {
+      "scenario_id": "support-0103",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0104": {
+      "scenario_id": "support-0104",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0105": {
+      "scenario_id": "support-0105",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0106": {
+      "scenario_id": "support-0106",
+      "open_coding_notes": "unhandled_escalation_trigger",
+      "reviewed": true
+    },
+    "support-0107": {
+      "scenario_id": "support-0107",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0108": {
+      "scenario_id": "support-0108",
+      "open_coding_notes": "unhandled_escalation_trigger",
+      "reviewed": true
+    },
+    "support-0109": {
+      "scenario_id": "support-0109",
+      "open_coding_notes": "unhandled_escalation_trigger",
+      "reviewed": true
+    },
+    "support-0110": {
+      "scenario_id": "support-0110",
+      "open_coding_notes": "unhandled_escalation_trigger",
+      "reviewed": true
+    },
+    "support-0111": {
+      "scenario_id": "support-0111",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0112": {
+      "scenario_id": "support-0112",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0113": {
+      "scenario_id": "support-0113",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0114": {
+      "scenario_id": "support-0114",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0115": {
+      "scenario_id": "support-0115",
+      "open_coding_notes": "excessive_verbosity",
+      "reviewed": true
+    },
+    "support-0116": {
+      "scenario_id": "support-0116",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0117": {
+      "scenario_id": "support-0117",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0118": {
+      "scenario_id": "support-0118",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0119": {
+      "scenario_id": "support-0119",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0120": {
+      "scenario_id": "support-0120",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0121": {
+      "scenario_id": "support-0121",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0122": {
+      "scenario_id": "support-0122",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0123": {
+      "scenario_id": "support-0123",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0124": {
+      "scenario_id": "support-0124",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0125": {
+      "scenario_id": "support-0125",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0126": {
+      "scenario_id": "support-0126",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0127": {
+      "scenario_id": "support-0127",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0128": {
+      "scenario_id": "support-0128",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0129": {
+      "scenario_id": "support-0129",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0130": {
+      "scenario_id": "support-0130",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0131": {
+      "scenario_id": "support-0131",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0132": {
+      "scenario_id": "support-0132",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0133": {
+      "scenario_id": "support-0133",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0134": {
+      "scenario_id": "support-0134",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0135": {
+      "scenario_id": "support-0135",
+      "open_coding_notes": "factual_error order is refund eligible",
+      "reviewed": true
+    },
+    "support-0136": {
+      "scenario_id": "support-0136",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0137": {
+      "scenario_id": "support-0137",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0138": {
+      "scenario_id": "support-0138",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0139": {
+      "scenario_id": "support-0139",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0140": {
+      "scenario_id": "support-0140",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0141": {
+      "scenario_id": "support-0141",
+      "open_coding_notes": "excessive_verbosity",
+      "reviewed": true
+    },
+    "support-0142": {
+      "scenario_id": "support-0142",
+      "open_coding_notes": "factual_error state says placed but message says canceled",
+      "reviewed": true
+    },
+    "support-0143": {
+      "scenario_id": "support-0143",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0144": {
+      "scenario_id": "support-0144",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0145": {
+      "scenario_id": "support-0145",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0146": {
+      "scenario_id": "support-0146",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0147": {
+      "scenario_id": "support-0147",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0148": {
+      "scenario_id": "support-0148",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0149": {
+      "scenario_id": "support-0149",
+      "open_coding_notes": "factual_error state and message mismatch",
+      "reviewed": true
+    },
+    "support-0150": {
+      "scenario_id": "support-0150",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0151": {
+      "scenario_id": "support-0151",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0152": {
+      "scenario_id": "support-0152",
+      "open_coding_notes": "internal_language",
+      "reviewed": true
+    },
+    "support-0171": {
+      "scenario_id": "support-0171",
+      "open_coding_notes": "unhandled_escalation",
+      "reviewed": true
+    },
+    "support-0172": {
+      "scenario_id": "support-0172",
+      "open_coding_notes": "unhandled_escalation",
+      "reviewed": true
+    },
+    "support-0173": {
+      "scenario_id": "support-0173",
+      "open_coding_notes": "unhandled_escalation\ninternal_language",
+      "reviewed": true
+    },
+    "support-0174": {
+      "scenario_id": "support-0174",
+      "open_coding_notes": "unhandled_escalation\ninternal_language",
+      "reviewed": true
+    },
+    "support-0175": {
+      "scenario_id": "support-0175",
+      "open_coding_notes": "unhandled_escalation\ninternal_language",
+      "reviewed": true
+    },
+    "support-0176": {
+      "scenario_id": "support-0176",
+      "open_coding_notes": "unhandled_escalation\ninternal_language",
+      "reviewed": true
+    },
+    "support-0177": {
+      "scenario_id": "support-0177",
+      "open_coding_notes": "unhandled_escalation\ninternal_language",
+      "reviewed": true
+    },
+    "support-0186": {
+      "scenario_id": "support-0186",
+      "open_coding_notes": "unhandled_escalation duplicate product title",
+      "reviewed": true
+    },
+    "support-0187": {
+      "scenario_id": "support-0187",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0188": {
+      "scenario_id": "support-0188",
+      "open_coding_notes": "unhandled_escalation duplicate product title",
+      "reviewed": true
+    },
+    "support-0189": {
+      "scenario_id": "support-0189",
+      "open_coding_notes": "unhandled_escalation duplicate product title\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0190": {
+      "scenario_id": "support-0190",
+      "open_coding_notes": "unhandled_escalation duplicate product title",
+      "reviewed": true
+    },
+    "support-0191": {
+      "scenario_id": "support-0191",
+      "open_coding_notes": "unhandled_escalation product price",
+      "reviewed": true
+    },
+    "support-0192": {
+      "scenario_id": "support-0192",
+      "open_coding_notes": "unhandled_escalation product price",
+      "reviewed": true
+    },
+    "support-0193": {
+      "scenario_id": "support-0193",
+      "open_coding_notes": "unhandled_escalation product price",
+      "reviewed": true
+    },
+    "support-0194": {
+      "scenario_id": "support-0194",
+      "open_coding_notes": "unhandled_escalation product price",
+      "reviewed": true
+    },
+    "support-0195": {
+      "scenario_id": "support-0195",
+      "open_coding_notes": "unhandled_escalation product price",
+      "reviewed": true
+    },
+    "support-0196": {
+      "scenario_id": "support-0196",
+      "open_coding_notes": "unhandled_escalation product title",
+      "reviewed": true
+    },
+    "support-0197": {
+      "scenario_id": "support-0197",
+      "open_coding_notes": "unhandled_escalation product title",
+      "reviewed": true
+    },
+    "support-0198": {
+      "scenario_id": "support-0198",
+      "open_coding_notes": "unhandled_escalation product title\ninternal_language",
+      "reviewed": true
+    },
+    "support-0199": {
+      "scenario_id": "support-0199",
+      "open_coding_notes": "unhandled_escalation product title\ninternal_language",
+      "reviewed": true
+    },
+    "support-0200": {
+      "scenario_id": "support-0200",
+      "open_coding_notes": "unhandled_escalation product title\ninternal_language",
+      "reviewed": true
+    },
+    "support-0201": {
+      "scenario_id": "support-0201",
+      "open_coding_notes": "internal_language\nexcessive_verbosity\ntone_mismatch",
+      "reviewed": true
+    },
+    "support-0202": {
+      "scenario_id": "support-0202",
+      "open_coding_notes": "tone_mismatch\ninternal_language\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0203": {
+      "scenario_id": "support-0203",
+      "open_coding_notes": "tone_mismatch\ninternal_language\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0204": {
+      "scenario_id": "support-0204",
+      "open_coding_notes": "internal_language\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0205": {
+      "scenario_id": "support-0205",
+      "open_coding_notes": "internal_language\nexcessive_verbosity",
+      "reviewed": true
+    },
+    "support-0208": {
+      "scenario_id": "support-0208",
+      "open_coding_notes": "excessive_verbosity\nfactual_error refund not eligible",
+      "reviewed": true
+    },
+    "support-0209": {
+      "scenario_id": "support-0209",
+      "open_coding_notes": "unnecessary_question refund not eligible",
+      "reviewed": true
+    },
+    "support-0210": {
+      "scenario_id": "support-0210",
+      "open_coding_notes": "factual_error refund not eligible",
+      "reviewed": true
+    },
+    "support-0212": {
+      "scenario_id": "support-0212",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0213": {
+      "scenario_id": "support-0213",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0214": {
+      "scenario_id": "support-0214",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0215": {
+      "scenario_id": "support-0215",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0216": {
+      "scenario_id": "support-0216",
+      "open_coding_notes": "factual_error permission restricted",
+      "reviewed": true
+    },
+    "support-0217": {
+      "scenario_id": "support-0217",
+      "open_coding_notes": "factual_error permission restricted",
+      "reviewed": true
+    },
+    "support-0225": {
+      "scenario_id": "support-0225",
+      "open_coding_notes": "tone_mismatch",
+      "reviewed": true
+    },
+    "support-0234": {
+      "scenario_id": "support-0234",
+      "open_coding_notes": "unnecessary_question store name is in the customer message\nfactual_error should have checked store override of 14 days not 30",
+      "reviewed": true
+    },
+    "support-0235": {
+      "scenario_id": "support-0235",
+      "open_coding_notes": "factual_error should state store override",
+      "reviewed": true
+    },
+    "support-0243": {
+      "scenario_id": "support-0243",
+      "open_coding_notes": "No failure observed",
+      "reviewed": true
+    },
+    "support-0246": {
+      "scenario_id": "support-0246",
+      "open_coding_notes": "factual_error should escalate a dispute question",
+      "reviewed": true
+    },
+    "support-0248": {
+      "scenario_id": "support-0248",
+      "open_coding_notes": "unnecessary_question",
+      "reviewed": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{"scenario_id": "support-0137", "decision": "revise", "reason": "Message too vague - doesn't specify what customer wants help with", "change": "Revise message to 'Can you help me check order 6001 for a customer?'"}
+{"scenario_id": "support-0169", "decision": "revise", "reason": "Message has artifact '(variant 18)' and is too vague about refund", "change": "Remove artifact, change to 'I'd like to return the item I received last week.'"}
+{"scenario_id": "support-0065", "decision": "accept", "reason": "Clear message, straightforward cancellation test", "change": null}
+{"scenario_id": "support-0249", "decision": "revise", "reason": "Message is ambiguous - could be about order-specific or general policy. Intent is policy question.", "change": "Change to 'How long does shipping usually take?' to clarify asking about general policy"}
+{"scenario_id": "support-0092", "decision": "revise", "reason": "Message has artifact '- product search' and could be more specific", "change": "Remove artifact, change to 'What are your most popular pillow styles?'"}
+{"scenario_id": "support-0211", "decision": "accept", "reason": "Good permission denial test, clear message, correct expected outcome", "change": null}
+{"scenario_id": "support-0201", "decision": "accept", "reason": "Clear boundary case at day 30, realistic message, correct expected outcome", "change": null}
+{"scenario_id": "support-0221", "decision": "revise", "reason": "Expected outcome says 'agent asks for order details' but better UX is to show recent orders", "change": "Update criterion to 'agent shows recent orders with product info for customer to select'"}
+{"scenario_id": "support-0236", "decision": "revise", "reason": "Missing record_state specification. Don't know if order is within or past 30-day window", "change": "Add record_state (within-window or past-window) and update expected outcome to account for eligibility check"}

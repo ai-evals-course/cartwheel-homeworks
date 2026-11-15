@@ -12,6 +12,16 @@ from harbor_adapter.export import load_export_cases
 from replay.rollout import load_cases
 
 
+def load_trial_results(job_dir: Path, result: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return trial results, reading trial folders when result.json omits them."""
+    if result.get("trial_results"):
+        return result["trial_results"]
+    trials = [
+        json.loads(path.read_text()) for path in job_dir.glob("*/result.json")
+    ]
+    return sorted(trials, key=lambda trial: str(trial.get("started_at", "")))
+
+
 def _case_id(task_name: str, known_ids: set[str]) -> str | None:
     matches = [case_id for case_id in known_ids if task_name.endswith(case_id)]
     return max(matches, key=len) if matches else None
@@ -49,7 +59,7 @@ def summarize_job(
     result = json.loads(result_path.read_text())
     trials: dict[str, list[dict[str, Any]]] = defaultdict(list)
     unknown: list[str] = []
-    for trial in result.get("trial_results", []):
+    for trial in load_trial_results(job_dir, result):
         case_id = _case_id(str(trial.get("task_name", "")), set(by_id))
         if case_id is None:
             unknown.append(str(trial.get("task_name", "")))

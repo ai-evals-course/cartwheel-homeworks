@@ -1,0 +1,39 @@
+{
+  "review_session": "2026-11-02",
+  "total_reviewed": 185,
+  "batches": [
+    {
+      "name": "Batch 1: Initial coverage",
+      "size": 30,
+      "range": "support-0002 to support-0095",
+      "selection_method": "uniformly sampled across early scenarios",
+      "purpose": "establish baseline patterns"
+    },
+    {
+      "name": "Batch 2: Dimensional diversity",
+      "size": 30,
+      "range": "support-0100 to support-0152",
+      "selection_method": "distributed across intent types (refund, order status, policy, cancellation, product search, dispute, out of scope)",
+      "purpose": "test modes across different request types"
+    },
+    {
+      "name": "Batch 3: Depth search",
+      "size": 25,
+      "range": "support-0171 to support-0200",
+      "selection_method": "targeted review of escalation and permission scenarios",
+      "purpose": "identify complex failure patterns"
+    },
+    {
+      "name": "Batch 4: Stability check",
+      "size": 15,
+      "range": "support-0208 to support-0248",
+      "selection_method": "final scenarios reviewed, uniformly sampled from remainder",
+      "purpose": "verify taxonomy stability"
+    }
+  ],
+  "stability_assessment": {
+    "new_modes_in_final_batch": 1,
+    "mode_that_emerged": "unnecessary_question",
+    "conclusion": "Taxonomy reasonably stable; only 1 new mode emerged in final 15 scenarios"
+  }
+}

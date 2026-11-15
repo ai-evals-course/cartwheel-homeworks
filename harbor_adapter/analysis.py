@@ -8,7 +8,7 @@ from typing import Any
 
 from tests.eval.passk import pass_at_k
 
-from harbor_adapter.summary import _reward
+from harbor_adapter.summary import _reward, load_trial_results
 
 
 def analyze_capability_job(
@@ -24,7 +24,7 @@ def analyze_capability_job(
     result = json.loads(result_path.read_text())
     trials = [
         trial
-        for trial in result.get("trial_results", [])
+        for trial in load_trial_results(job_dir, result)
         if str(trial.get("task_name", "")).endswith(case_id)
     ]
     if len(trials) != expected_attempts:

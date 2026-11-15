@@ -1,1 +1,79 @@
-{"modes": []}
+{
+  "failure_modes": [
+    {
+      "id": 1,
+      "name": "unhandled_escalation_trigger",
+      "binary_definition": "The agent encounters a situation that requires escalation to human support (disputes, permission restrictions, ambiguous cases, above-threshold refunds, or unclear policy interpretation) but fails to call the escalate_to_human tool.",
+      "spec_reference": "ESC-1, ESC-2, ESC-3, ESC-4",
+      "positive_examples": ["support-0246", "support-0216", "support-0217"],
+      "close_negatives": ["Agent correctly escalates", "Agent correctly denies access with explanation"],
+      "evaluator_type": "code check + LLM judge",
+      "count": 25,
+      "percentage": "13.5%"
+    },
+    {
+      "id": 2,
+      "name": "internal_language_exposed",
+      "binary_definition": "The agent uses internal system language, jargon, or technical implementation details in customer-facing responses instead of plain conversational English.",
+      "spec_reference": "RESP-5",
+      "positive_examples": ["support-0026", "support-0027", "support-0009", "support-0020"],
+      "close_negatives": ["Clear explanation of policies", "Professional tone without jargon"],
+      "evaluator_type": "LLM judge",
+      "count": 56,
+      "percentage": "30.3%"
+    },
+    {
+      "id": 3,
+      "name": "excessive_verbosity",
+      "binary_definition": "The agent provides unnecessary information, repeats details, or goes into detail about scenarios the customer didn't ask about.",
+      "spec_reference": "RESP-5",
+      "positive_examples": ["support-0018", "support-0021", "support-0036", "support-0047"],
+      "close_negatives": ["Concise response with needed context", "Relevant order information only"],
+      "evaluator_type": "LLM judge",
+      "count": 19,
+      "percentage": "10.3%"
+    },
+    {
+      "id": 4,
+      "name": "tone_misalignment",
+      "binary_definition": "The agent uses emotionally inappropriate tone (e.g., 'great!' when customer wants to return an item, enthusiasm about refunds or complaints).",
+      "spec_reference": "RESP-5",
+      "positive_examples": ["support-0026", "support-0031", "support-0040", "support-0005"],
+      "close_negatives": ["Neutral professional response", "Respectful acknowledgment without enthusiasm"],
+      "evaluator_type": "LLM judge",
+      "count": 26,
+      "percentage": "14.1%"
+    },
+    {
+      "id": 5,
+      "name": "factual_error",
+      "binary_definition": "The agent provides incorrect information about order status, policy, eligibility, permissions, or business rules.",
+      "spec_reference": "SPEC.md",
+      "positive_examples": ["support-0004", "support-0007", "support-0046", "support-0128"],
+      "close_negatives": ["Correct status stated", "Accurate policy application"],
+      "evaluator_type": "code check + LLM judge",
+      "count": 55,
+      "percentage": "29.7%"
+    },
+    {
+      "id": 6,
+      "name": "unnecessary_question",
+      "binary_definition": "The agent asks for information the customer already provided or that the agent should already have access to.",
+      "spec_reference": "RESP-3, RESP-5",
+      "positive_examples": ["support-0031", "support-0035", "support-0234", "support-0082"],
+      "close_negatives": ["Legitimate clarification with multiple options", "Summarizing available options"],
+      "evaluator_type": "LLM judge",
+      "count": 17,
+      "percentage": "9.2%"
+    }
+  ],
+  "summary": {
+    "total_modes": 6,
+    "within_handout_requirement": true,
+    "mode_distribution": {
+      "failures_found": 139,
+      "no_failure": 46,
+      "total_scenarios": 185
+    }
+  }
+}

@@ -63,7 +63,9 @@ or credential changes, and anything outside Cartwheel.
 
 ## Tool guidance
 - Prefer a tool lookup over memory. Policy answers come from the help
-  center, order answers from the order tools.
+  center, order answers from the order tools. Always check for store-specific
+  policy overrides (call get_policy with ids like store-juniper-home-goods-policy)
+  when answering about return windows, refund eligibility, or other policies.
 - You MUST explain your reasoning in plain text before every tool call.
   State what you are about to look up and why, in one sentence. Do not
   call a tool without explaining first.
@@ -427,6 +429,14 @@ def find_order(
     return _call(wrapper, hw_tools.find_order, query)
 
 
+@function_tool
+def get_product(
+    wrapper: RunContextWrapper[AuthContext], product_id: int
+) -> dict[str, Any]:
+    """Look up one product by ID to see its name, description, and price."""
+    return _call(wrapper, hw_tools.get_product, product_id)
+
+
 # Progressive disclosure: a session exposes only the tools its role can use.
 # Fewer tools mean fewer wrong choices and cleaner evals. At dev scale the
 # only difference is that support staff, who have no orders of their own,
@@ -435,6 +445,7 @@ _COMMON_TOOLS = [
     search_help_center,
     get_policy,
     search_products,
+    get_product,
     get_order,
     issue_refund,
     cancel_order,
