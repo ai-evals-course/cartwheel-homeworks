@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Cartwheel · Trace review</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div><h1>Cartwheel <span>/ Trace review</span></h1></div>
+    <nav aria-label="Review views">
+      <button data-view="read" aria-pressed="true">Review</button>
+      <button data-view="labels" aria-pressed="false">Label</button>
+      <button data-view="taxonomy" aria-pressed="false">Taxonomy</button>
+      <button data-view="progress" aria-pressed="false">Progress</button>
+    </nav>
+    <div id="save-status" role="status" aria-live="polite">Loading…</div>
+  </header>
+  <div id="notice" role="alert" hidden></div>
+  <main>
+    <aside class="queue" aria-label="Conversation queue">
+      <div class="queue-head"><h2>Conversations</h2><span id="queue-count"></span></div>
+      <div class="sampling-controls" id="sampling-controls" hidden>
+        <label class="sampling-toggle"><input type="checkbox" id="sampling-enabled"> Sampling</label>
+        <button type="button" id="sampling-arrow" aria-label="Sampling options" aria-expanded="false" aria-controls="sampling-menu" hidden>▾</button>
+        <div id="sampling-menu" class="sampling-options" hidden>
+          <label><input type="checkbox" value="uniform"> Uniform</label>
+          <label><input type="checkbox" value="clustered"> Clustered</label>
+          <label><input type="checkbox" id="sampling-dimension"> Dimension</label>
+          <fieldset id="sampling-dimensions" hidden>
+            <legend>Dimensions</legend>
+            <label><input type="checkbox" data-dimension="authenticated role"> Authenticated role</label>
+            <label><input type="checkbox" data-dimension="intent"> Intent</label>
+            <label><input type="checkbox" data-dimension="record involved"> Record involved</label>
+            <label><input type="checkbox" data-dimension="order status"> Order status</label>
+            <label><input type="checkbox" data-dimension="age since placement"> Age since placement</label>
+            <label><input type="checkbox" data-dimension="applicable policy"> Applicable policy</label>
+            <label><input type="checkbox" data-dimension="tools needed"> Tools needed</label>
+            <label><input type="checkbox" data-dimension="difficulty"> Difficulty</label>
+            <label><input type="checkbox" data-dimension="user style"> User style</label>
+          </fieldset>
+        </div>
+      </div>
+      <div id="queue-list"></div>
+    </aside>
+    <section class="workspace" aria-label="Review workspace">
+      <div id="session-header"></div>
+      <div id="view-scroll" tabindex="0" aria-label="Conversation content">
+        <div id="read-view" class="view"><p class="empty">Loading conversations…</p></div>
+        <div id="labels-view" class="view" hidden></div>
+        <div id="taxonomy-view" class="view" hidden></div>
+        <div id="progress-view" class="view" hidden></div>
+      </div>
+    </section>
+  </main>
+  <section id="note-popover" role="dialog" aria-modal="false" aria-labelledby="note-title" hidden>
+    <form id="note-form">
+      <blockquote id="note-quote"></blockquote>
+      <label id="note-title" for="note-text" class="sr-only">Evidence note</label>
+      <textarea id="note-text" rows="3" placeholder="Describe what went wrong, in your own words" required maxlength="20000"></textarea>
+      <p class="note-hint">Enter saves · Shift+Enter new line · Esc cancels</p>
+    </form>
+  </section>
+</body>
+</html>

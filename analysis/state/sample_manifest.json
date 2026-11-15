@@ -1,0 +1,362 @@
+{
+  "source": "/home/palscruz23/cartwheel-homeworks/traces/support_traces.json",
+  "selected_at": "2026-11-10T12:57:06.209381+00:00",
+  "seed": 7,
+  "strategy": "hw4 batches",
+  "dimension": "user role",
+  "cluster_features": [
+    "turn_count",
+    "tool_call_count",
+    "distinct_tools",
+    "has_retrieval",
+    "tokens"
+  ],
+  "clusters_requested": 8,
+  "picks": [
+    {
+      "trace_id": "950681c7857f68ee333518a294694cff",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "d1764466a31934aadadaab02879315ad",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "9dcc98eee60aac9bf4147f7c326be06a",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "799e100145cfd1464b7bd85f1f0daeba",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "8b855cc69b2bc6bf6afa0089fd9c0b4f",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "7e9c42c82920bb0e4ea54a19010813a3",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "a59ecb25bcb57b6fc01fd21602698bc3",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "0da84caf6abe4aaf5fca0b5048fb8a94",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "3b324bc6a578ea899ae9c3eddc4b796f",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "ca84ff30deac591c33e3124aaa3ae51b",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "599c13ea4ab3b8c789cb6cbe210e5bc1",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "9ea7ed863fa505f8cf30dc7fe74a885b",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "fd13865682e5538ce16312ec270d480b",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "e28cb30aefd6d9ab2febf73572f98d12",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "42dc321dbe741e3a70b125bd63442a38",
+      "reason": "uniform random sample",
+      "batch": "uniform"
+    },
+    {
+      "trace_id": "e8bc274ae89679a76cf20ff1a36852b4",
+      "reason": "cluster 0 centroid representative",
+      "batch": "clustered",
+      "cluster": 0
+    },
+    {
+      "trace_id": "5a3b52da903fbc5651703b933687e2c0",
+      "reason": "cluster 1 centroid representative",
+      "batch": "clustered",
+      "cluster": 1
+    },
+    {
+      "trace_id": "3e02d9597f54c2a052bda149f882cecb",
+      "reason": "cluster 2 centroid representative",
+      "batch": "clustered",
+      "cluster": 2
+    },
+    {
+      "trace_id": "ee2da69c5f562a7d719db0c426ab0754",
+      "reason": "cluster 3 centroid representative",
+      "batch": "clustered",
+      "cluster": 3
+    },
+    {
+      "trace_id": "248e2463d6a2ecfc336ff4d331d428b2",
+      "reason": "cluster 4 centroid representative",
+      "batch": "clustered",
+      "cluster": 4
+    },
+    {
+      "trace_id": "49978c79474665f09d746781fa737b80",
+      "reason": "cluster 5 centroid representative",
+      "batch": "clustered",
+      "cluster": 5
+    },
+    {
+      "trace_id": "391d5b1013ce15fb8599220837c84eac",
+      "reason": "cluster 6 centroid representative",
+      "batch": "clustered",
+      "cluster": 6
+    },
+    {
+      "trace_id": "e3ca60f28a7f788c1397b3698ee22b42",
+      "reason": "cluster 7 centroid representative",
+      "batch": "clustered",
+      "cluster": 7
+    },
+    {
+      "trace_id": "76cc8de032dabdb1f867c20fa2d4881c",
+      "reason": "cluster 0 centroid representative",
+      "batch": "clustered",
+      "cluster": 0
+    },
+    {
+      "trace_id": "534c26f5a0ac33d80c5ca747001af37d",
+      "reason": "cluster 1 centroid representative",
+      "batch": "clustered",
+      "cluster": 1
+    },
+    {
+      "trace_id": "dd54ee274bb6ae81d62887521740aab2",
+      "reason": "cluster 2 centroid representative",
+      "batch": "clustered",
+      "cluster": 2
+    },
+    {
+      "trace_id": "eedbfb9445505b4f462f211352d2ca74",
+      "reason": "cluster 3 centroid representative",
+      "batch": "clustered",
+      "cluster": 3
+    },
+    {
+      "trace_id": "6b3e38476c2893573b6d80ddfcefc912",
+      "reason": "cluster 4 centroid representative",
+      "batch": "clustered",
+      "cluster": 4
+    },
+    {
+      "trace_id": "2059fbd7fdf781ace17b7e0031a3ac26",
+      "reason": "cluster 5 centroid representative",
+      "batch": "clustered",
+      "cluster": 5
+    },
+    {
+      "trace_id": "8807f09564b246e55df3a598865176f2",
+      "reason": "cluster 6 centroid representative",
+      "batch": "clustered",
+      "cluster": 6
+    },
+    {
+      "trace_id": "f8770ffaea957fcbe2b1fab3af09c77f",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "e70edbba38b44bda5a8dd04a2b3f14fe",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "0daf5edc2bc52dd141c264181a1110d6",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "4acd14e585e7290fdcbce2ca4250cf80",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "a38129e8c02f6085a1a8288520748318",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "903934c4abbbd6f756090099385a405a",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "96aebf9712bcf148e8acbe59d6f2a652",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "c2df49726cf37102fe96fc256669b101",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "0f62feadcc439e09d922b0d0cff37347",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "44abf87f0db34e3a9920aca1d585c16f",
+      "reason": "dimension sampling: role shopper",
+      "batch": "dimension",
+      "role": "shopper"
+    },
+    {
+      "trace_id": "fe0ded71aa6d69b7feae45e055b33c01",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "582b8e7173911e7f15a647bc5d12216e",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "12f54b9ee381aef617e63dc0a5663d95",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "2888bc124c4579dbb1f964ae150ec3c8",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "e3738d12fae2ecbd0fe20c1312559741",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "6248355156cbe98310077ec3dee025c5",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "5e29b044d9403dcfa4168c2424882f94",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "50a05333ead9c07fde114dbdba44452b",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "025edd2c3dee81abcdee8a263065b037",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "e02d8c2d02802967fbbe02615f66e59f",
+      "reason": "dimension sampling: role merchant",
+      "batch": "dimension",
+      "role": "merchant"
+    },
+    {
+      "trace_id": "e8697787f059dda87e48c2939bf9db85",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "e514a6186e748871f9458af253ebaaa6",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "665e71dc0beef5f9f8188712e3eabaa4",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "9ab1b1d382f9cecd292fdcb593b15ea0",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "c0cc0aba843679780f5851e50b0d7452",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "05f85d18c2abb3ac303268f7df0d30ef",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "30940e487e14d429b04b08048faad406",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "5c4e81ea95c7ef4a4d2d0e071a84fda8",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "b0e1775048d41eb135d191f940c99c96",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    },
+    {
+      "trace_id": "f8cfca80850da7f997f75db1a85e5c2c",
+      "reason": "dimension sampling: role support",
+      "batch": "dimension",
+      "role": "support"
+    }
+  ]
+}
