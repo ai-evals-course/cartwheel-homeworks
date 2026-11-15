@@ -17,6 +17,8 @@ dependencies = [
     "pyyaml>=6.0",
     "numpy>=1.24",
     "docetl>=0.2",
+    "raindrop-ai>=0.0.77",
+    "opentelemetry-exporter-otlp-proto-http>=1.43.0",
 ]
 
 [dependency-groups]

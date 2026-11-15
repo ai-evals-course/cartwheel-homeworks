@@ -1,0 +1,38 @@
+1
+00:00:00,000 --> 00:00:03,000
+Start in Review. Highlight the relevant text
+
+2
+00:00:03,000 --> 00:00:06,000
+to open a comment box.
+
+3
+00:00:06,000 --> 00:00:09,000
+Describe what went wrong,
+
+4
+00:00:09,000 --> 00:00:12,000
+then press Enter to save your note.
+
+5
+00:00:12,000 --> 00:00:15,000
+Next, open Taxonomy.
+
+6
+00:00:15,000 --> 00:00:19,000
+Related comments appear in groups,
+making recurring failure patterns easier to see.
+
+7
+00:00:19,000 --> 00:00:22,000
+Finally, review Agent suggestions.
+
+8
+00:00:22,000 --> 00:00:25,000
+Check the highlighted evidence
+and proposed failure group.
+
+9
+00:00:25,000 --> 00:00:29,000
+Select a candidate, then accept or reject it
+after reviewing the conversation.

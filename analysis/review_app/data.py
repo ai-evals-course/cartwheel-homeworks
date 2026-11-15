@@ -32,10 +32,24 @@ def text(value):
                      for p in m.get("parts", []) if p.get("type") == "text")
 
 
-def group_sessions(traces):
+DIMENSION_FIELDS = {
+    "authenticated role": "role", "intent": "intent", "record involved": "record_involved",
+    "order status": "order_status", "age since placement": "order_age_days_range",
+    "applicable policy": "applicable_policy", "tools needed": "tools_needed",
+    "difficulty": "difficulty", "user style": "user_style",
+}
+
+
+def group_sessions(traces, scenarios=()):
+    scenario_tuples = {s["id"]: s.get("tuple", {}) for s in scenarios}
     groups = {}
     for raw in traces:
         meta = _metadata(raw)
+        values = scenario_tuples.get(meta.get("cartwheel.scenario_id"), {})
+        dimensions = {name: str(values[key]) for name, key in DIMENSION_FIELDS.items()
+                      if values.get(key) is not None}
+        if meta.get("cartwheel.user_role"):
+            dimensions["authenticated role"] = meta["cartwheel.user_role"]
         sid = meta.get("cartwheel.session_id") or raw.get("sessionId") or "trace:" + raw["id"]
         group = groups.setdefault(sid, {"id": sid, "traces": []})
         group["traces"].append({
@@ -43,6 +57,7 @@ def group_sessions(traces):
             "scenario": meta.get("cartwheel.scenario_id"),
             "role": meta.get("cartwheel.user_role"), "user_id": meta.get("cartwheel.user_id"),
             "prompt_version": meta.get("cartwheel.prompt_version"),
+            "dimensions": dimensions,
             "preview": text(raw.get("input"))[:220],
         })
     for group in groups.values():
@@ -134,6 +149,19 @@ class ReviewStore:
         self.root, self.trace_ids, self.sync = root, trace_ids, sync
         self.path = root / "review_app.json"
         self.lock = threading.RLock()
+        with self.lock:
+            state = read_json(self.path, None)
+            if state is not None and self._mark_reviewed(state, [a["trace_id"] for a in state["annotations"]]):
+                self._persist(state)
+
+    def _mark_reviewed(self, state, trace_ids):
+        changed = False
+        for trace_id in trace_ids:
+            if (trace_id in self.trace_ids
+                    and state["reviews"].get(trace_id, {}).get("status", "unreviewed") == "unreviewed"):
+                state["reviews"][trace_id] = {"status": "reviewed", "updated_at": now()}
+                changed = True
+        return changed
 
     def read(self):
         with self.lock:
@@ -162,6 +190,21 @@ class ReviewStore:
         state["revision"] += 1
         write_json(self.path, {k: v for k, v in state.items() if k != "suggestions"})
 
+    def _link_suggestion_note(self, state, suggestion):
+        """Link an existing accepted note to its proposed mode without labeling."""
+        sid = suggestion["id"]
+        if state["decisions"].get(sid, {}).get("decision") != "accept":
+            return False
+        annotation_id = "accepted:" + sid
+        note = next((a for a in state["annotations"] if a["id"] == annotation_id
+                     and a.get("source") == "human_accepted_ai"
+                     and a["trace_id"] == suggestion.get("trace_id")), None)
+        mode = next((m for m in state["modes"] if m["id"] == suggestion.get("mode")), None)
+        if note is None or mode is None or annotation_id in mode.get("annotation_ids", []):
+            return False
+        mode.setdefault("annotation_ids", []).append(annotation_id)
+        return True
+
     def apply(self, event):
         with self.lock:
             state = self.read()
@@ -184,6 +227,7 @@ class ReviewStore:
                 annotation = {"id": aid, "trace_id": tid, "note": note,
                               "anchor": anchor, "updated_at": now(), "source": "human"}
                 state["annotations"] = [a for a in state["annotations"] if a["id"] != aid] + [annotation]
+                self._mark_reviewed(state, [tid])
             elif action == "delete_note":
                 aid = event.get("id")
                 note = next((a for a in state["annotations"] if a["id"] == aid and a["trace_id"] == tid), None)
@@ -195,6 +239,19 @@ class ReviewStore:
                 if (state["reviews"].get(tid, {}).get("status") == "first_failure"
                         and not any(a["trace_id"] == tid for a in state["annotations"])):
                     state["reviews"][tid] = {"status": "unreviewed", "updated_at": now()}
+            elif action in {"mark_reviewed", "toggle_review"}:
+                trace_ids = event.get("trace_ids")
+                if (not isinstance(trace_ids, list) or not trace_ids
+                        or any(not isinstance(tid, str) or tid not in self.trace_ids for tid in trace_ids)):
+                    raise ValueError("Choose known traces to mark reviewed")
+                has_comment = any(a["trace_id"] in trace_ids for a in state["annotations"])
+                complete = all(state["reviews"].get(tid, {}).get("status") in
+                               {"reviewed", "first_failure", "no_failure"} for tid in trace_ids)
+                if action == "toggle_review" and complete and not has_comment:
+                    for trace_id in trace_ids:
+                        state["reviews"][trace_id] = {"status": "unreviewed", "updated_at": now()}
+                else:
+                    self._mark_reviewed(state, trace_ids)
             elif action == "review":
                 status = event.get("status")
                 if status not in {"first_failure", "no_failure", "unreviewed"}:
@@ -206,13 +263,39 @@ class ReviewStore:
                 mid = str(event.get("id", ""))
                 if not re.fullmatch(r"[a-z][a-z0-9_]{0,79}", mid) or not str(event.get("definition", "")).strip():
                     raise ValueError("Use a lowercase mode_id and a nonempty definition")
-                mode = {key: str(event.get(key, ""))[:20000] for key in ("definition", "boundaries", "requirement", "examples")}
+                previous = next((m for m in state["modes"] if m["id"] == mid), {})
+                mode = {**previous, **{key: str(event.get(key, previous.get(key, "")))[:20000]
+                                      for key in ("definition", "boundaries", "requirement", "examples")}}
+                evaluator = str(event.get("evaluator_type", previous.get("evaluator_type", "")))
+                if evaluator and evaluator not in {"code_check", "llm_judge"}:
+                    raise ValueError("Choose code check or LLM judge as the evaluator type")
+                mode["evaluator_type"] = evaluator
                 supports = event.get("annotation_ids", [])
                 if not isinstance(supports, list) or any(aid not in {a["id"] for a in state["annotations"]} for aid in supports):
                     raise ValueError("Supporting annotations must refer to saved human notes")
                 mode["annotation_ids"] = list(dict.fromkeys(supports))
                 mode.update(id=mid, final=event.get("final") is True)
+                if "review_status" in event:
+                    if event["review_status"] != "approved":
+                        raise ValueError("Saving a reviewed mode requires an approved status")
+                    mode["review_status"] = "approved"
+                if mode["final"]:
+                    missing = [label for key, label in (("boundaries", "neighboring-mode boundary"),
+                                                       ("requirement", "requirement source"),
+                                                       ("evaluator_type", "evaluator type"))
+                               if not mode[key].strip()]
+                    if not supports:
+                        missing.append("originating human annotations")
+                    if missing:
+                        raise ValueError("Final modes require: " + ", ".join(missing))
                 state["modes"] = [m for m in state["modes"] if m["id"] != mid] + [mode]
+            elif action == "mode_review":
+                mode = next((m for m in state["modes"] if m["id"] == event.get("id")), None)
+                if mode is None:
+                    raise ValueError("Unknown failure mode")
+                if event.get("decision") != "rejected":
+                    raise ValueError("Choose Reject, or use the editor to approve a mode")
+                mode["review_status"] = "rejected"
             elif action == "label":
                 mode = event.get("mode")
                 if not any(m["id"] == mode and m.get("final") for m in state["modes"]):
@@ -238,6 +321,8 @@ class ReviewStore:
                 sid = suggestion["id"]
                 if sid in state["decisions"]:
                     if state["decisions"][sid]["decision"] == decision:
+                        if decision == "accept" and self._link_suggestion_note(state, suggestion):
+                            self._persist(state)
                         return state
                     raise ValueError("Suggestion already decided")
                 state["decisions"][sid] = {"decision": decision, "updated_at": now()}
@@ -246,6 +331,8 @@ class ReviewStore:
                         "trace_id": suggestion["trace_id"], "note": suggestion.get("note") or suggestion.get("reason") or "Accepted suggestion",
                         "anchor": suggestion.get("anchor") or {"quote": suggestion.get("quote", "")},
                         "source": "human_accepted_ai", "updated_at": now()})
+                    self._link_suggestion_note(state, suggestion)
+                    self._mark_reviewed(state, [suggestion["trace_id"]])
             elif action != "retry":
                 raise ValueError("Unknown review action")
             self._persist(state)  # Save before network I/O so an outage loses no judgment.

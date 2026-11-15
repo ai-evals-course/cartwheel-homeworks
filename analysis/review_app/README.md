@@ -17,6 +17,11 @@ the server to include newly recorded traces. Missing session IDs remain separate
 
 ## Review workflow
 
+The compact search beside **Conversations** matches full or partial run/trace,
+session, or scenario IDs (for example `support-0140`), ignoring case. It searches
+all turns of each conversation within the current sampling filters and keeps
+the full conversation available. Clear the field or press Escape to reset it.
+
 1. Choose a conversation from the sidebar. Read its messages in chronological
    order without numbered turn headings or action bars interrupting the content.
    Each message group retains its own trace identity for annotations and scores.
@@ -41,7 +46,17 @@ the server to include newly recorded traces. Missing session IDs remain separate
    a text box. Enter saves, Shift+Enter adds a line, and Escape closes without
    saving. Unsaved drafts are backed up
    in this browser and offered on reload.
-3. Stop initial reading at the first failure, then open **Progress** and choose
+3. Use **For review** beneath the role legend to mark the conversation's traces
+   **Reviewed**. This saves completion locally and preserves existing assessments.
+   Saving a comment automatically marks its trace reviewed, and a conversation
+   containing a comment shows **Reviewed** beneath the legend. Existing saved
+   comments receive the same completion status when the server starts; other
+   uncommented turns are counted individually in Progress.
+   Press **Space** in the reading view to toggle **For review / Reviewed**.
+   Conversations with comments stay reviewed. The shortcut is inactive while
+   editing a comment or using an input, button, or other interactive control.
+   Use **Reopen** in Progress to reset an individual trace. For HW4's explicit
+   outcome record, stop initial reading at the first failure, then open **Progress** and choose
    **First failure noted** for the relevant trace in **Current conversation
    review**. If you find none, choose **No failure observed**. Saving a note
    alone does not mark a trace reviewed. **Reopen** resets that review status.
@@ -57,6 +72,27 @@ the server to include newly recorded traces. Missing session IDs remain separate
 
 This is a project inventory, not the four homework sampling batches. The student
 still chooses the review batches and makes all assessments and taxonomy decisions.
+
+In **Sampling → Dimension**, the arrow beside each dimension opens its values.
+Select one or more values; selected values appear beneath the dimension.
+Values come from the matching `scenarios/support_scenarios.jsonl` tuple, with
+authenticated role taken from trace metadata when available. Unknown values
+are not inferred. With no values selected, a checked dimension includes all its
+known values. Multiple values within a dimension are alternatives; multiple
+dimensions must all match. Dimension filters search the full trace inventory,
+including traces in Uniform or Clustered batches and traces outside the saved
+sample manifest. Uniform and Clustered add their saved batches independently. A matching
+trace displays its entire session for context. Filtering does not change the
+sample manifest or saved judgments. On narrow screens, value choices expand
+inline to stay within the viewport. Restart the server and refresh the page
+after updating to load the dimension metadata and controls.
+
+Expand **Dimensions** beneath the conversation heading to inspect its role,
+intent, record, policy, difficulty and other scenario values. If values differ
+across traces in a session, all distinct values appear. Missing metadata is
+shown as **Not available**. While sampling is enabled, the queue count reports
+matching traces and conversations. Dimension matches are included regardless
+of their sampling batch; each matching conversation appears only once.
 
 ## Evidence and storage
 
@@ -118,6 +154,34 @@ node --check analysis/review_app/app.js
 
 Browser checks should use a temporary `--state-dir`, so synthetic test notes and
 labels never become student assessments or project scores.
+
+## Additional-instance retrieval
+
+The Agent suggestions tab reads `analysis/state/suggestions.json`. It supports
+group filtering, row selection, select all within the visible group, and bulk
+accept/reject. Retrieval matches remain suggestions until a human reviews them.
+Accepting creates an evidence note; it does not assign a binary failure label.
+There is no mock-data fallback when the queue is empty.
+
+Search an existing full trace export with:
+
+```bash
+uv run python -m analysis.search_suggestions --mode unsupported_policy_answer
+```
+
+This requires a confirmed mode by default. To search draft definitions with the
+student's agreement, add `--include-provisional`; omit `--mode` to search all
+eligible modes. Searches exclude each mode's originating traces and previous
+suggestions, preserve existing suggestions and decisions, and queue at most
+five additional candidates per mode. Each candidate records its exact evidence
+anchor and retrieval rationale. Counts are retrieval results, not failure
+counts or prevalence estimates. Human annotations, labels, and final-mode
+settings are not changed. Read the generated search report under
+`analysis/report/` for the source snapshot and search coverage.
+
+Use `--all-matches` to remove the five-per-mode cap and queue every additional
+match from the full supplied export. The search report records the exact trace
+IDs scanned. This does not establish coverage of newer live-project traces.
 
 For a fully offline run of the repository suite, prevent the existing `.env`
 loader from enabling the live trace source:

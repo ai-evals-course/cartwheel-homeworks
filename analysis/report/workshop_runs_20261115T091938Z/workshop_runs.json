@@ -1,0 +1,113 @@
+[
+  {
+    "run_id": "1813cf12874ace94d105f46a86dd6f2b",
+    "event_id": "09e418a3-1922-481f-8073-b2a2ca9c7db3",
+    "session_id": "d8642ef1-8d18-4340-bd70-8fbffb62dd42",
+    "scenario_id": "support-0001",
+    "role": "shopper",
+    "started_at": 1794734381238,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "5852ffe7fbb28a88dfaf8fe9b52c492e",
+    "event_id": "24058eb2-4361-419a-975c-6c235d83ac66",
+    "session_id": "d8642ef1-8d18-4340-bd70-8fbffb62dd42",
+    "scenario_id": "support-0001",
+    "role": "shopper",
+    "started_at": 1794734388186,
+    "span_count": 5,
+    "model_calls": 1,
+    "tool_calls": 0
+  },
+  {
+    "run_id": "569030a2dc3bac0acde729a7df9284cd",
+    "event_id": "00f89a75-e492-44e5-94be-26dbf54feda6",
+    "session_id": "d098a6a2-e837-493d-835b-dd831078c6f6",
+    "scenario_id": "support-0002",
+    "role": "merchant",
+    "started_at": 1794734390418,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "5caaf6834e4bdb51c607fa81a15f39d2",
+    "event_id": "f9b317fc-6b55-4543-8c4a-b92e2f8e6f05",
+    "session_id": "4dce8ea8-b1c2-48d5-ad78-a57f5bf9aece",
+    "scenario_id": "support-0039",
+    "role": "support",
+    "started_at": 1794734394461,
+    "span_count": 9,
+    "model_calls": 3,
+    "tool_calls": 2
+  },
+  {
+    "run_id": "d66d27e9343f1f70bc53cd4e77afd9d7",
+    "event_id": "a5001fe2-4fbc-494f-9fd9-d2518122109b",
+    "session_id": "75729707-aa23-4bf9-910a-d1056ef3f2e5",
+    "scenario_id": "support-0037",
+    "role": "shopper",
+    "started_at": 1794734400835,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "b192560cb8c572661cd9eaeba28f0da0",
+    "event_id": "bb77a5fa-ddaf-4535-96a6-8d9fd6112906",
+    "session_id": "0e5b3d01-d57a-4475-9e1b-93bd860d8a26",
+    "scenario_id": "support-0077",
+    "role": "merchant",
+    "started_at": 1794734404188,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "a98e6e8edc561cb1a6b2d5448d605cc9",
+    "event_id": "8baaf243-3792-415c-bb12-dd2f43782eb2",
+    "session_id": "d034fc16-5814-41de-b5ea-35b2ef31adbd",
+    "scenario_id": "support-0102",
+    "role": "support",
+    "started_at": 1794734407016,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "0e085293f04a2ec380c65ead1e5b38a6",
+    "event_id": "5237b2c8-0cf6-4cc4-9343-92aa9f0622e1",
+    "session_id": "85d7eeca-b151-4dba-a20f-aa3209ce2924",
+    "scenario_id": "support-0128",
+    "role": "merchant",
+    "started_at": 1794734410194,
+    "span_count": 9,
+    "model_calls": 3,
+    "tool_calls": 2
+  },
+  {
+    "run_id": "7e5ca31e52efcac2c949787ee06bcd04",
+    "event_id": "fe9f7ba2-d92f-4e89-9c93-98dbe9900eed",
+    "session_id": "a3b3c5e7-9c40-43c5-8b5b-c364a746d9f5",
+    "scenario_id": "support-0153",
+    "role": "support",
+    "started_at": 1794734418285,
+    "span_count": 7,
+    "model_calls": 2,
+    "tool_calls": 1
+  },
+  {
+    "run_id": "07d6c1492e840d9fbd8a1bd673c6debd",
+    "event_id": "7b04bc95-2e71-4e17-83f4-1954a8e8eb60",
+    "session_id": "9f533315-1b36-412e-9e22-a6a733fc217b",
+    "scenario_id": "support-0166",
+    "role": "shopper",
+    "started_at": 1794734424059,
+    "span_count": 5,
+    "model_calls": 1,
+    "tool_calls": 0
+  }
+]
+

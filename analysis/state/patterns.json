@@ -1,1 +1,233 @@
-{"modes": []}
+{
+  "modes": [
+    {
+      "id": "unsupported_policy_answer",
+      "name": "unsupported policy answer",
+      "definition": "The agent gives a substantive Cartwheel policy answer that contradicts policy or lacks supporting policy evidence anywhere in the available conversation.",
+      "boundaries": "Earlier-turn retrieval can support a later reply; absence of a new lookup alone is insufficient. Separate a grounded answer missing only a citation. A refund-eligibility flag alone does not support claims about charge-dispute rights. A stated inability to look up policy belongs here only if the reply also gives unsupported substantive policy advice; a pure lookup omission belongs in omitted_requested_action.",
+      "requirement": "`PURPOSE-1`, `SCOPE-1`, `RESP-1`",
+      "evaluator": "LLM judge with policy and tool context.",
+      "annotation_ids": [
+        "19ffd077-01ac-4ad1-a771-c0ae0568057b",
+        "fe93d863-62f4-4a32-89e3-dbf65f683a86",
+        "3031c69b-f858-47f5-a394-75514d1151d8",
+        "8073c836-cca9-4b39-aa1c-85a7ba6f1ef7",
+        "42341b62-0e9e-4082-acd3-06a954d8546d",
+        "3bb33e42-6956-45f3-a4bd-383b321643d6",
+        "ddd59f1c-9c8e-4f08-8cad-92bf477d0f19"
+      ],
+      "examples": "support-0112 — 3e02d9597f54c2a052bda149f882cecb; support-0102 — 8920d8223801c80982e5be23cc88e651; support-0119 — 63118e9dda7e8c1f6b67ae84dc958354; support-0124 — 383ef4888c490343f389d023b46e5736; support-0117 — 36cfecb50701b3d52f7e659b03997bbd; support-0163 — 5fe43136ca9ccaeb1f1efa2994cb407c; support-0164 — 947302b09d3786b86adcad4e121f9ea6",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "unnecessary_response_content",
+      "name": "unnecessary response content",
+      "definition": "The final reply contains a generic offer of further help, redundant retrieval or order narration, repeated conclusions, excessive details unrelated to the request, or an unsolicited refund assessment that adds no information needed for the requested task.",
+      "boundaries": "This reflects repeated human notes, but the prohibited content and exceptions need student agreement. Helpful next steps, required caveats, and pre-tool narration should not automatically count. Excessive detail must be assessed against the actual request, not a word-count cutoff. Necessary order disambiguation, requested dates, substantive reasons, and required approval or escalation explanations are excluded.",
+      "requirement": "Candidate refinement of `RESP-5`",
+      "evaluator": "explicit requirement revision needed before finalizing. LLM judge.",
+      "annotation_ids": [
+        "d99ea638-e663-4f3d-afdc-210deedf2a8f",
+        "22568a3c-3480-45fe-8df5-df7ecf5c7989",
+        "e08d0945-f1a6-434b-8b5b-824e4ffe241e",
+        "07d95c9c-628d-4db1-9d7e-01fb010b8fba",
+        "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
+        "34292f4d-d3e8-4d9c-af10-0bd4213988c1",
+        "d5c0d768-a9db-40f0-a4e6-2b2a293fb0a8",
+        "01da37c5-74fd-4f4c-801e-89f3c91e69af",
+        "88e87958-c219-46f2-bb2f-6df2ffd8c171",
+        "d20954bf-faa5-47b4-a607-dd242e5aa8e5",
+        "9bf24b56-7f24-4c67-a8bc-d565750d1dff",
+        "94fe4afd-0198-41c3-82d5-43af9b07474e",
+        "cae5cad9-adc6-46ba-abdd-fa5a2047c5f3",
+        "69a0ad13-beb3-481a-accb-264558e56942",
+        "63aee341-a425-4edf-a664-4af9594fff2c",
+        "0c64cf3a-382a-4ba7-abd8-d095ba28c4b1",
+        "6bc3e19d-39d5-44da-933b-ce5f6e02ed46",
+        "4c513174-363c-41ae-b51c-3efccc292808",
+        "925c1802-94d4-48ec-adb6-7a15de861bb8",
+        "fb439ea9-c9a2-4298-bc29-242c29b009ba",
+        "f3a74900-f340-4bd5-9c02-fd02a60a7cd9",
+        "2fe7bda2-31a4-43b8-8a07-fca3865305d0",
+        "e85c5d21-85fc-4a2c-b6cd-fbf7c07322f3",
+        "32d64a58-17e1-4c1b-999d-b0b84258b71e",
+        "9fa8ae35-c956-49f1-8bb1-b1e0c5189d00",
+        "9c4cd777-baff-4566-af39-6229b592ba2c",
+        "a367cc2b-63cf-4299-8948-814f61eb09eb",
+        "a0d3eb9f-4084-438a-a335-a7b12bdf0492"
+      ],
+      "examples": "pilot-0001 — a89ead3274f5c7ba346f20f604c88c0d; support-0018 — e28cb30aefd6d9ab2febf73572f98d12; support-0114 — 781e5b8b700e87ff2d1366ea9ffa501a; scenario unavailable — 732935f9da2ee47e5ef93571d23adc5a; scenario unavailable — ceede4841b9015ecc621c905d2c11641; scenario unavailable — ad8f545e094c06ee7b33d259977e28e4; support-0008 — d1764466a31934aadadaab02879315ad; support-0084 — 8b855cc69b2bc6bf6afa0089fd9c0b4f; support-0113 — 3b324bc6a578ea899ae9c3eddc4b796f; support-0121 — 42dc321dbe741e3a70b125bd63442a38; support-0226 — ca84ff30deac591c33e3124aaa3ae51b; support-0232 — a59ecb25bcb57b6fc01fd21602698bc3; support-0236 — fd13865682e5538ce16312ec270d480b; support-0236 — 0b243f127bd9afa7221b6480507ba354; support-0238 — 7e9c42c82920bb0e4ea54a19010813a3; scenario unavailable — 4fe7e8f628d328277f6e5b2f0d4c7c93; scenario unavailable — 560885f2bf8169423a83c8903cd8faf2; support-0105 — 05c0bec29fd344c5903fefca5216584d; support-0107 — 9fc27b2a646755158a3d1d9a4f26e00c; support-0108 — 8534177c687c3219c5d90a9f44edd687; support-0108 — 2530e9c957ee78b92e5d851a951d904c; support-0118 — ca4d9727afb0bf663c8e6ceba604d1b3; support-0048 — 786bc2e9746c915caab5803bcc372fcc; support-0079 — c71aba104857fd1b36c3bb3828f0d30b",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "avoidable_clarification",
+      "name": "avoidable clarification",
+      "definition": "The agent asks the user for information already supplied or unambiguously established by the conversation and tools, delaying an otherwise executable task.",
+      "boundaries": "An order total does not necessarily establish the requested refund amount. Clarification is appropriate when the user has not specified a full refund or another amount.",
+      "requirement": "`SCOPE-1` supports task completion but does not define this efficiency rule precisely",
+      "evaluator": "student specification decision needed. LLM judge.",
+      "annotation_ids": [
+        "6a603a6d-8e73-422b-a382-a8f10e722133",
+        "817f2edb-07f1-48f4-a2a1-2d727efe52c8"
+      ],
+      "examples": "support-0212 — 9dcc98eee60aac9bf4147f7c326be06a; support-0074 — c45a49546acc59f50d4315a70747a9f8",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "omitted_requested_action",
+      "name": "omitted requested action",
+      "definition": "The user requests an available lookup or clearly authorizes an available write, its prerequisites are established, and the agent ends the turn without attempting it or explaining a valid reason it cannot proceed.",
+      "boundaries": "Exclude genuine missing information, permission denial, kill switches, pending approval, and already completed actions. Keep required human escalation in its own group because its fix differs. Includes denying access to product-search tools without trying an applicable search. A failed attempted lookup with malformed arguments belongs in incorrect_tool_arguments. An attempted, correctly scoped search returning no results is not an omission.",
+      "requirement": "PURPOSE-1, SCOPE-1; relevant TOOL-1/TOOL-3/TOOL-7/TOOL-8 contract. Task-completion and clarification boundaries remain provisional.",
+      "evaluator": "task-completion boundary needs review. LLM judge plus tool checks.",
+      "annotation_ids": [
+        "c8f31b07-c1ec-470c-9a86-2e8259c451b7",
+        "f5b729da-ff9c-44ce-b31b-6646a04d07c7",
+        "3312ab5b-1788-4135-bcc5-97fbdefd1fae",
+        "5013e1d9-c4b7-4332-a9b3-f56d62c7d978"
+      ],
+      "examples": "support-0066 — 9bd873f786d40e73d25193009ea7f9b5; support-0069 — 49804473d4b34079a6929db47921de66; support-0074 — c45a49546acc59f50d4315a70747a9f8; support-0203 — 82950e902a02d2a777455af6cf82b9ed",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "missing_human_escalation",
+      "name": "missing human escalation",
+      "definition": "A request requires human handling under `ESC-1`–`ESC-4`, but no appropriate escalation or approval-queue action occurs before the turn ends.",
+      "boundaries": "An offer to open a ticket is not a tool execution. A successful above-threshold approval queue satisfies `ESC-1` without a second ticket.",
+      "requirement": "`ESC-1`–`ESC-4`",
+      "evaluator": "LLM judge for trigger plus code checks for actions/results.",
+      "annotation_ids": [
+        "67adc506-7489-4421-a093-d27d9f877abb"
+      ],
+      "examples": "support-0153 — f820bda867728400d62e82f64919334c",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "misstated_action_status",
+      "name": "misstated action status",
+      "definition": "The agent describes a write as completed when the observed tool result supports only pending approval, failure, or no executed write.",
+      "boundaries": "“I can initiate” is an offer, not a completion claim. “Successfully initiated” followed by an explicit pending-approval explanation is a disputed boundary, not an automatic positive.",
+      "requirement": "`RESP-2`, `TOOL-7`, `ESC-1`",
+      "evaluator": "LLM judge with tool results.",
+      "annotation_ids": [
+        "ea01946e-ee2d-402e-9d01-2293ed041957",
+        "d6c1db68-526c-4206-82c5-685cdf358026"
+      ],
+      "examples": "support-0047 — 358f44276b9109622faa83b93d4fa303; support-0039 — 5caaf6834e4bdb51c607fa81a15f39d2",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "incorrect_tool_arguments",
+      "name": "incorrect tool arguments",
+      "definition": "The agent supplies a tool argument inconsistent with its documented meaning, producing an avoidable error or materially changing the requested scope.",
+      "boundaries": "An ID passed where a store name/slug is expected is a candidate. A recovered read error does not necessarily violate a current product requirement; no cross-store error should be inferred if results match the requested store.",
+      "requirement": "Relevant tool contract (`TOOL-3` and `agent/tools.py`)",
+      "evaluator": "recovered-error acceptance rule needs student agreement. Code checks where deterministic, otherwise LLM judge.",
+      "annotation_ids": [
+        "a2fd55fb-793a-4497-adfb-be62d6d366c7",
+        "abb03981-fbfd-489a-b000-c11a89e5d41f"
+      ],
+      "examples": "support-0128 — d7cc90af945e09973feefd9db9260be9; support-0149 — 799e100145cfd1464b7bd85f1f0daeba",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "unexplained_refund_refusal",
+      "name": "unexplained refund refusal",
+      "definition": "The agent refuses or says it cannot initiate a requested refund but only repeats a not-eligible flag, without stating a supported concrete reason or acknowledging that the available record does not explain the reason.",
+      "boundaries": "Different from unnecessary_response_content: the corrective change is to explain the decision, not remove words. Do not require the agent to invent an eligibility reason: if tools expose only a Boolean, acknowledging that limitation satisfies this proposed boundary. Do not treat a delivered status alone as proof of ineligibility. Escalation trigger and execution are evaluated separately. Only two originating traces; a third positive and close negatives remain pending.",
+      "requirement": "RESP-5 (explain the relevant decision), RESP-3 (state missing information). The missing-reason exception needs student agreement before finalization.",
+      "evaluator": "LLM judge with order/tool context; distinguish an unexplained flag from an explicitly unavailable reason.",
+      "annotation_ids": [
+        "f30ee441-da24-4b68-bf66-b4133137805c",
+        "e845ec56-f85b-4026-af00-84b4dbd5db90"
+      ],
+      "examples": "support-0157 — 599c13ea4ab3b8c789cb6cbe210e5bc1; support-0044 — bf7e795ae9cd4d16db019ebf5d9892a4",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "policy_link_missing",
+      "name": "policy link missing",
+      "definition": "The reply names a policy identifier but does not provide a clickable link to that policy.",
+      "boundaries": "A presentation preference from the human notes. RESP-1 requires policy identifiers, not hyperlinks. Do not equate this group with an uncited or unsupported policy claim; source accuracy is evaluated separately.",
+      "requirement": "Proposed extension of RESP-1; clickable links are not currently required. Requirement decision pending.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "29fa7bd4-68e5-4e82-b28e-65986689cccf",
+        "b7f0909e-af54-4b2f-8e1b-a394051cec72",
+        "23b003ac-f12a-49e1-a014-392c45270a2e"
+      ],
+      "examples": "trace 9ea7ed863fa505f8cf30dc7fe74a885b — annotation 29fa7bd4-68e5-4e82-b28e-65986689cccf; trace 3b324bc6a578ea899ae9c3eddc4b796f — annotation b7f0909e-af54-4b2f-8e1b-a394051cec72; trace 42dc321dbe741e3a70b125bd63442a38 — annotation 23b003ac-f12a-49e1-a014-392c45270a2e",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "merchant_refund_handling",
+      "name": "merchant refund handling",
+      "definition": "The reply addresses refund processing for a merchant caller concerning an order belonging to the merchant store.",
+      "boundaries": "Organizes the human concern about merchant refund handling. AUTH-1 currently permits merchants to refund their own store orders, so membership in this group does not establish a failure. The separate note about an unsolicited refund assessment remains in unnecessary_response_content.",
+      "requirement": "AUTH-1 explicitly allows this capability. Any proposed restriction needs a student requirement decision; no authorization failure is confirmed.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "f98324c8-ee7d-4ab6-a1c4-97a8068d541a"
+      ],
+      "examples": "trace 0b243f127bd9afa7221b6480507ba354 — annotation f98324c8-ee7d-4ab6-a1c4-97a8068d541a",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "partial_refund_amount_prompt",
+      "name": "partial refund amount prompt",
+      "definition": "The reply asks the user to choose a refund amount up to the order total rather than assuming the entire order total.",
+      "boundaries": "Organizes the human concern about partial refunds. TOOL-7 and issue_refund_logic permit positive amounts up to the order total. Clarification may be appropriate when the requested amount is not explicit. Do not automatically treat a known order total as authorization for that amount.",
+      "requirement": "TOOL-7 permits partial amounts; a full-refund default or prohibition would require a student requirement decision.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "53a5d29d-6ff6-4cdc-b5f6-df0ab9023c8f"
+      ],
+      "examples": "trace ee2da69c5f562a7d719db0c426ab0754 — annotation 53a5d29d-6ff6-4cdc-b5f6-df0ab9023c8f",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "internal_identifier_in_reply",
+      "name": "internal identifier in reply",
+      "definition": "The final reply exposes an internal store identifier that the user did not request, rather than referring only to the store by its user-facing name.",
+      "boundaries": "Organizes the human presentation concern about store ID metadata. An identifier from the caller context is not by itself inaccessible information under RESP-4. A malformed tool argument in the same trace is a separate behavior and is not inferred from this note.",
+      "requirement": "Candidate presentation refinement of RESP-5. No current blanket prohibition on internal identifiers; requirement decision pending.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "953bfdbc-35e3-4812-8ac2-0b8004fafa0b"
+      ],
+      "examples": "trace 49978c79474665f09d746781fa737b80 — annotation 953bfdbc-35e3-4812-8ac2-0b8004fafa0b",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "public_policy_audience_concern",
+      "name": "public policy audience concern",
+      "definition": "The reply provides public merchant-payout policy information to a shopper caller.",
+      "boundaries": "Organizes the human concern about audience restrictions. AUTH-1 permits every role to search policy, and the observed answer cites retrieved cw-payouts. Public schedule information is distinct from private merchant financial records. This group is not a confirmed disclosure failure.",
+      "requirement": "AUTH-1 currently allows policy searches for all roles. A new audience restriction requires a student requirement decision.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "e5438829-5e33-4091-912e-800c08b04f25"
+      ],
+      "examples": "trace bcb3b68215ebb654e69210e89a636fcf — annotation e5438829-5e33-4091-912e-800c08b04f25",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    }
+  ]
+}

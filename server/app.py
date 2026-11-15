@@ -21,6 +21,7 @@ Run with:
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import binascii
 import hashlib
@@ -40,6 +41,7 @@ from agent import agent, db
 from agent.auth import ROLES, AuthContext
 from agent.config import REPO_ROOT, db_path
 from observability.instrument import load_env, setup_tracing
+from observability import workshop
 
 MAX_TURNS = 12  # cap runaway loops; keeps conversations bounded
 SESSIONS_DB = REPO_ROOT / ".sessions.db"
@@ -51,7 +53,11 @@ _tracer = trace.get_tracer("cartwheel.server")
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     load_env()
     setup_tracing()  # no-op with a warning if LANGFUSE_PUBLIC_KEY is unset
-    yield
+    workshop.setup_span_export()
+    try:
+        yield
+    finally:
+        await asyncio.to_thread(workshop.shutdown)
 
 
 app = FastAPI(title="Cartwheel support agent", lifespan=lifespan)
@@ -212,14 +218,23 @@ async def post_message(
         if capture_content:
             span.set_attribute("gen_ai.input.messages", json.dumps(input_messages))
 
-        result = await Runner.run(
-            support_agent,
-            body.message,
-            session=session,
-            context=ctx,
-            max_turns=MAX_TURNS,
+        interaction = workshop.begin_turn(
+            ctx, session_id, body.message, version, body.scenario_id,
+            body.model or os.environ.get("CARTWHEEL_MODEL") or agent.DEFAULT_MODEL,
         )
+        try:
+            result = await Runner.run(
+                support_agent,
+                body.message,
+                session=session,
+                context=ctx,
+                max_turns=MAX_TURNS,
+            )
+        except BaseException as exc:
+            workshop.finish_turn(interaction, "Error: " + type(exc).__name__)
+            raise
         reply = str(result.final_output)
+        workshop.finish_turn(interaction, reply)
 
         output_messages = [
             {"role": "assistant", "parts": [{"type": "text", "content": reply}]}

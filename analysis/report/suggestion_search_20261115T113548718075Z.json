@@ -1,0 +1,64 @@
+{
+  "created_at": "2026-11-15T11:35:48.718019+00:00",
+  "source": "traces/support_traces.json",
+  "exported_at": "2026-11-09T11:01:40.615424+00:00",
+  "traces_scanned": 324,
+  "modes": {
+    "unsupported_policy_answer": {
+      "retrieved": 36,
+      "queued": 5
+    },
+    "unnecessary_response_content": {
+      "retrieved": 194,
+      "queued": 5
+    },
+    "avoidable_clarification": {
+      "retrieved": 0,
+      "queued": 0
+    },
+    "omitted_requested_action": {
+      "retrieved": 2,
+      "queued": 2
+    },
+    "missing_human_escalation": {
+      "retrieved": 25,
+      "queued": 5
+    },
+    "misstated_action_status": {
+      "retrieved": 10,
+      "queued": 5
+    },
+    "incorrect_tool_arguments": {
+      "retrieved": 4,
+      "queued": 4
+    },
+    "unexplained_refund_refusal": {
+      "retrieved": 49,
+      "queued": 5
+    },
+    "policy_link_missing": {
+      "retrieved": 26,
+      "queued": 5
+    },
+    "merchant_refund_handling": {
+      "retrieved": 48,
+      "queued": 5
+    },
+    "partial_refund_amount_prompt": {
+      "retrieved": 14,
+      "queued": 5
+    },
+    "internal_identifier_in_reply": {
+      "retrieved": 7,
+      "queued": 5
+    },
+    "public_policy_audience_concern": {
+      "retrieved": 0,
+      "queued": 0
+    }
+  },
+  "suggestions_added": 51,
+  "confirmed_modes": [],
+  "scope": "Saved export only; live Langfuse unavailable (URLError / OS error 1).",
+  "human_validation": "Pending. Matches are retrieval signals, not labels or accept/reject decisions."
+}
