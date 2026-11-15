@@ -517,19 +517,11 @@ function renderTaxonomy() {
       tile.dataset.color = index % 6;
       tile.dataset.unassigned = String(mode.id === '__unassigned');
       tile.dataset.selected = String(state.taxonomyMode === mode.id);
-      const titleRow = el('div', 'taxonomy-tile-heading');
-      const reviewStatus = mode.review_status || (mode.final ? 'approved' : '');
-      if (['approved', 'rejected'].includes(reviewStatus)) {
-        const badge = el('span', 'taxonomy-review-status', reviewStatus === 'approved' ? 'Approved' : 'Rejected');
-        badge.dataset.status = reviewStatus;
-        titleRow.append(badge);
-      }
       const choose = button(mode.name || mode.id.replaceAll('_', ' '), () => selectMode(mode.id), 'taxonomy-select');
       choose.setAttribute('aria-pressed', String(state.taxonomyMode === mode.id));
       choose.setAttribute('aria-controls', 'taxonomy-summary');
       const heading = el('h3'); heading.append(choose);
-      titleRow.prepend(heading);
-      tile.append(titleRow, el('p', 'taxonomy-count', `${notes.length} ${notes.length === 1 ? 'comment' : 'comments'}`));
+      tile.append(heading, el('p', 'taxonomy-count', `${uniqueNotes.length} ${uniqueNotes.length === 1 ? 'comment' : 'comments'}`));
       const previews = el('div', 'taxonomy-previews');
       previews.tabIndex = 0;
       previews.setAttribute('role', 'region');
@@ -606,11 +598,7 @@ function renderTaxonomy() {
   }
   const summaryHeading = el('div', 'taxonomy-summary-heading');
   if (selected) {
-    summaryHeading.append(el('h3', '', 'Conversations in this group'));
-    const modeActions = el('div', 'taxonomy-mode-actions');
-    if (selected.mode.id !== '__unassigned') modeActions.append(edit);
-    modeActions.append(button('Show all comments', () => {state.taxonomyMode = null; renderTaxonomy();}));
-    summaryHeading.append(modeActions);
+    summaryHeading.append(el('h3', '', 'Conversations in this group'), button('Show all comments', () => {state.taxonomyMode = null; renderTaxonomy();}));
     panel.append(summaryHeading);
   }
   panel.append(el('p', 'quiet', selected

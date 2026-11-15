@@ -331,7 +331,6 @@ class ReviewStore:
                         "trace_id": suggestion["trace_id"], "note": suggestion.get("note") or suggestion.get("reason") or "Accepted suggestion",
                         "anchor": suggestion.get("anchor") or {"quote": suggestion.get("quote", "")},
                         "source": "human_accepted_ai", "updated_at": now()})
-                    self._link_suggestion_note(state, suggestion)
                     self._mark_reviewed(state, [suggestion["trace_id"]])
             elif action != "retry":
                 raise ValueError("Unknown review action")

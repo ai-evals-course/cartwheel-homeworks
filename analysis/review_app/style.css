@@ -983,11 +983,8 @@ main.taxonomy-layout {
 }
 #taxonomy-view:not([hidden]) { display:flex; flex-direction:column; }
 #taxonomy-view > :not(#taxonomy-summary) { flex-shrink:0; }
-.taxonomy-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
-.taxonomy-heading h2 { margin:0; font-size:var(--text-heading); }
-.taxonomy-mode-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
-.taxonomy-mode-actions button { font-size:var(--text-small); }
-.taxonomy-heading + .quiet { margin-top:0; }
+#taxonomy-view > h2 { margin-bottom:6px; }
+#taxonomy-view > h2 + .quiet { margin-top:0; }
 @media(max-width:1100px) {
   #taxonomy-view { width:90%; }
 }
@@ -1030,11 +1027,6 @@ main.taxonomy-layout {
 .taxonomy-tile[data-color="4"] { --group-accent:#a0604e; --group-paper:#f8efeb; }
 .taxonomy-tile[data-color="5"] { --group-accent:#8a7d40; --group-paper:#f5f3e8; }
 .taxonomy-tile[data-unassigned="true"] { --group-accent:#827b76; --group-paper:#f0eeeb; }
-.taxonomy-tile-heading { display:flex; align-items:flex-start; gap:6px; flex-shrink:0; }
-.taxonomy-tile-heading h3 { flex:1; }
-.taxonomy-review-status { flex-shrink:0; padding:2px 6px; border-radius:4px; font-size:10px; line-height:1.25; font-weight:600; white-space:nowrap; }
-.taxonomy-review-status[data-status="approved"] { background:#e2eee3; color:#315738; }
-.taxonomy-review-status[data-status="rejected"] { background:#f5e4df; color:#803f31; }
 .taxonomy-tile h3 { flex-shrink:0; margin:0; min-width:0; font-size:clamp(.75rem, .5rem + 4cqi, var(--text-heading)); letter-spacing:-.015em; line-height:1.25; text-wrap:balance; }
 .taxonomy-count { flex-shrink:0; margin:1px 0 10px; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
 .taxonomy-tile .jump { display:block; margin-top:6px; text-align:left; }
@@ -1060,8 +1052,6 @@ main.taxonomy-layout {
 .taxonomy-excerpt { display:block; white-space:pre-wrap; }
 .taxonomy-note { display:inline-block; max-width:100%; vertical-align:top; }
 .taxonomy-comment-label { text-decoration:underline; text-underline-offset:2px; }
-#mode-editor { width:min(720px, calc(100vw - 32px)); max-height:85dvh; overflow-y:auto; padding:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); color:inherit; }
-#mode-editor::backdrop { background:#302b2f66; }
 #taxonomy-summary { display:flex; flex-direction:column; flex:1; min-height:0; }
 .taxonomy-tabs { display:flex; flex-shrink:0; gap:20px; margin:24px 0 16px; border-bottom:1px solid var(--line); }
 .taxonomy-tabs [role="tab"] { padding:10px 0; border:0; border-bottom:2px solid transparent; border-radius:0; background:transparent; color:var(--muted); font-weight:600; }
