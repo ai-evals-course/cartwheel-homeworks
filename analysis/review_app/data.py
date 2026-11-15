@@ -190,6 +190,21 @@ class ReviewStore:
         state["revision"] += 1
         write_json(self.path, {k: v for k, v in state.items() if k != "suggestions"})
 
+    def _link_suggestion_note(self, state, suggestion):
+        """Link an existing accepted note to its proposed mode without labeling."""
+        sid = suggestion["id"]
+        if state["decisions"].get(sid, {}).get("decision") != "accept":
+            return False
+        annotation_id = "accepted:" + sid
+        note = next((a for a in state["annotations"] if a["id"] == annotation_id
+                     and a.get("source") == "human_accepted_ai"
+                     and a["trace_id"] == suggestion.get("trace_id")), None)
+        mode = next((m for m in state["modes"] if m["id"] == suggestion.get("mode")), None)
+        if note is None or mode is None or annotation_id in mode.get("annotation_ids", []):
+            return False
+        mode.setdefault("annotation_ids", []).append(annotation_id)
+        return True
+
     def apply(self, event):
         with self.lock:
             state = self.read()
@@ -248,13 +263,39 @@ class ReviewStore:
                 mid = str(event.get("id", ""))
                 if not re.fullmatch(r"[a-z][a-z0-9_]{0,79}", mid) or not str(event.get("definition", "")).strip():
                     raise ValueError("Use a lowercase mode_id and a nonempty definition")
-                mode = {key: str(event.get(key, ""))[:20000] for key in ("definition", "boundaries", "requirement", "examples")}
+                previous = next((m for m in state["modes"] if m["id"] == mid), {})
+                mode = {**previous, **{key: str(event.get(key, previous.get(key, "")))[:20000]
+                                      for key in ("definition", "boundaries", "requirement", "examples")}}
+                evaluator = str(event.get("evaluator_type", previous.get("evaluator_type", "")))
+                if evaluator and evaluator not in {"code_check", "llm_judge"}:
+                    raise ValueError("Choose code check or LLM judge as the evaluator type")
+                mode["evaluator_type"] = evaluator
                 supports = event.get("annotation_ids", [])
                 if not isinstance(supports, list) or any(aid not in {a["id"] for a in state["annotations"]} for aid in supports):
                     raise ValueError("Supporting annotations must refer to saved human notes")
                 mode["annotation_ids"] = list(dict.fromkeys(supports))
                 mode.update(id=mid, final=event.get("final") is True)
+                if "review_status" in event:
+                    if event["review_status"] != "approved":
+                        raise ValueError("Saving a reviewed mode requires an approved status")
+                    mode["review_status"] = "approved"
+                if mode["final"]:
+                    missing = [label for key, label in (("boundaries", "neighboring-mode boundary"),
+                                                       ("requirement", "requirement source"),
+                                                       ("evaluator_type", "evaluator type"))
+                               if not mode[key].strip()]
+                    if not supports:
+                        missing.append("originating human annotations")
+                    if missing:
+                        raise ValueError("Final modes require: " + ", ".join(missing))
                 state["modes"] = [m for m in state["modes"] if m["id"] != mid] + [mode]
+            elif action == "mode_review":
+                mode = next((m for m in state["modes"] if m["id"] == event.get("id")), None)
+                if mode is None:
+                    raise ValueError("Unknown failure mode")
+                if event.get("decision") != "rejected":
+                    raise ValueError("Choose Reject, or use the editor to approve a mode")
+                mode["review_status"] = "rejected"
             elif action == "label":
                 mode = event.get("mode")
                 if not any(m["id"] == mode and m.get("final") for m in state["modes"]):
@@ -280,6 +321,8 @@ class ReviewStore:
                 sid = suggestion["id"]
                 if sid in state["decisions"]:
                     if state["decisions"][sid]["decision"] == decision:
+                        if decision == "accept" and self._link_suggestion_note(state, suggestion):
+                            self._persist(state)
                         return state
                     raise ValueError("Suggestion already decided")
                 state["decisions"][sid] = {"decision": decision, "updated_at": now()}

@@ -469,7 +469,18 @@ function field(form, label, name, value = '', multiline = false) {
 }
 function renderTaxonomy() {
   const root = $('taxonomy-view'); root.replaceChildren();
-  root.append(el('h2', '', 'Failure taxonomy'));
+  const heading = el('div', 'taxonomy-heading');
+  const edit = button('Edit mode', () => {
+    const mode = state.review.modes.find(item => item.id === state.taxonomyMode);
+    if (mode) editMode(mode);
+  });
+  edit.id = 'edit-taxonomy-mode';
+  edit.disabled = !state.review.modes.some(mode => mode.id === state.taxonomyMode);
+  edit.title = edit.disabled ? 'Select a failure group in the treemap first' : 'Edit and finalise the selected failure mode';
+  edit.setAttribute('aria-haspopup', 'dialog');
+  edit.setAttribute('aria-controls', 'mode-editor');
+  heading.append(el('h2', '', 'Failure taxonomy'));
+  root.append(heading);
   if (!state.review.modes.length) {
     root.append(el('p', 'empty', 'No failure modes recorded yet.'));
   }
@@ -533,7 +544,8 @@ function renderTaxonomy() {
       });
       return tile;
     }
-    const weight = item => Math.max(1, item.notes.length);
+    // Compress large counts and reserve space for small groups to stay readable.
+    const weight = item => Math.max(2, Math.sqrt(item.notes.length));
     const total = items.reduce((sum, item) => sum + weight(item), 0);
     let sum = 0, split = 0;
     while (split < items.length - 1 && (sum < total / 2 || split === 0)) sum += weight(items[split++]);
@@ -747,24 +759,72 @@ function renderTaxonomySuggestions(panel, runName) {
   if (!pending.length) panel.append(el('p', 'empty', state.taxonomyMode ? 'No pending suggestions in this group.' : 'No pending agent suggestions.'));
 }
 function editMode(mode = {}) {
-  const slot = $('mode-editor'); slot.replaceChildren();
-  const form = el('form', 'mode-form'); form.append(el('h3', '', mode.id ? 'Edit mode' : 'Define a mode'));
-  const id = field(form, 'Mode ID (lowercase_with_underscores)', 'id', mode.id); id.required = true; id.pattern = '[a-z][a-z0-9_]{0,79}'; id.readOnly = !!mode.id;
-  field(form, 'Binary definition', 'definition', mode.definition, true).required = true;
-  field(form, 'Requirement ID or missing requirement', 'requirement', mode.requirement);
-  field(form, 'Boundaries and close negatives', 'boundaries', mode.boundaries, true);
-  field(form, 'Examples', 'examples', mode.examples, true);
-  const support = el('div', 'support-picker'); support.append(el('p', 'quiet', 'Supporting human observations'));
-  for (const note of state.review.annotations) {
-    const label = el('label', 'check', note.note), checkbox = el('input'); checkbox.type = 'checkbox'; checkbox.name = 'annotation_ids'; checkbox.value = note.id; checkbox.checked = (mode.annotation_ids || []).includes(note.id); label.prepend(checkbox); support.append(label);
+  let slot = $('mode-editor');
+  if (!slot) {
+    slot = el('dialog'); slot.id = 'mode-editor';
+    slot.setAttribute('aria-labelledby', 'mode-editor-title');
+    document.body.append(slot);
   }
-  form.append(support);
+  slot.replaceChildren();
+  const form = el('form', 'mode-form');
+  const title = el('h3', '', mode.id ? 'Edit mode' : 'Define a mode'); title.id = 'mode-editor-title';
+  form.append(title);
+  form.append(el('p', 'quiet', 'Complete all six fields before confirming a final mode. Incomplete modes can be saved as drafts.'));
+  const id = field(form, 'Failure mode name (snake_case)', 'id', mode.id); id.required = true; id.pattern = '[a-z][a-z0-9_]{0,79}'; id.readOnly = !!mode.id;
+  field(form, 'Binary definition (when the failure is present or absent)', 'definition', mode.definition, true).required = true;
+  const supportGroup = el('fieldset', 'mode-origin');
+  supportGroup.append(el('legend', '', 'Human annotations from which this mode originated'));
+  const support = el('div', 'support-picker');
+  const supportChecks = [];
+  for (const note of state.review.annotations) {
+    const label = el('label', 'check'), checkbox = el('input'); checkbox.type = 'checkbox'; checkbox.name = 'annotation_ids'; checkbox.value = note.id; checkbox.checked = (mode.annotation_ids || []).includes(note.id);
+    const evidence = el('span', 'mode-origin-note');
+    if (note.anchor?.quote) evidence.append(el('em', 'taxonomy-excerpt', `"${note.anchor.quote}"`));
+    evidence.append(el('span', 'taxonomy-excerpt', note.note), el('small', 'taxonomy-run', note.trace_id));
+    label.append(checkbox, evidence); support.append(label); supportChecks.push(checkbox);
+    checkbox.addEventListener('change', () => updateFinalRequirements());
+  }
+  if (!supportChecks.length) support.append(el('p', 'quiet', 'No human annotations yet. Add an evidence note before finalising this mode.'));
+  supportGroup.append(support); form.append(supportGroup);
+  const boundaries = field(form, 'Boundary separating this mode from its nearest neighboring mode (include close negatives)', 'boundaries', mode.boundaries, true);
+  boundaries.rows = 8;
+  const evaluatorLabel = el('label', '', 'Likely evaluator type');
+  const evaluator = el('select'); evaluator.name = 'evaluator_type';
+  for (const [value, text] of [['', 'Select an evaluator type'], ['code_check', 'Code check'], ['llm_judge', 'LLM judge']]) {
+    const option = el('option', '', text); option.value = value; evaluator.append(option);
+  }
+  const oldEvaluator = String(mode.evaluator || '');
+  const hasJudge = /LLM|judge/i.test(oldEvaluator), hasCode = /code checks?/i.test(oldEvaluator);
+  evaluator.value = mode.evaluator_type || (hasJudge && !hasCode ? 'llm_judge' : hasCode && !hasJudge ? 'code_check' : '');
+  evaluatorLabel.append(evaluator); form.append(evaluatorLabel);
+  const requirement = field(form, 'Requirement source (SPEC.md identifier or recorded specification revision)', 'requirement', mode.requirement);
   const confirm = el('label', 'check', 'I confirm this definition as a final mode for structured labeling'), check = el('input');
   check.type = 'checkbox'; check.name = 'final'; check.checked = !!mode.final; confirm.prepend(check); form.append(confirm);
-  const save = el('button', 'primary', 'Save mode'); save.type = 'submit'; form.append(save);
-  form.onsubmit = async e => {e.preventDefault(); const data = new FormData(form);
-    await act({action:'mode', ...Object.fromEntries(data), final:data.has('final'), annotation_ids:data.getAll('annotation_ids')});};
+  const updateFinalRequirements = () => {
+    for (const input of [boundaries, evaluator, requirement]) input.required = check.checked;
+    check.setCustomValidity(check.checked && !supportChecks.some(input => input.checked)
+      ? 'Select at least one originating human annotation before confirming this mode.' : '');
+  };
+  check.addEventListener('change', updateFinalRequirements);
+  updateFinalRequirements();
+  const save = el('button', 'primary', 'Approve'); save.type = 'submit';
+  const reject = button('Reject', async () => {
+    if (!mode.id) {slot.close(); return;}
+    save.disabled = reject.disabled = true;
+    const saved = await act({action:'mode_review', id:mode.id, decision:'rejected'});
+    save.disabled = reject.disabled = false;
+    if (saved) slot.close();
+  });
+  const actions = el('div', 'actions'); actions.append(save, reject); form.append(actions);
+  form.onsubmit = async e => {e.preventDefault(); updateFinalRequirements(); if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    save.disabled = reject.disabled = true;
+    const saved = await act({action:'mode', ...Object.fromEntries(data), review_status:'approved', final:data.has('final'), annotation_ids:data.getAll('annotation_ids')});
+    save.disabled = reject.disabled = false;
+    if (saved) slot.close();
+  };
   slot.append(form);
+  if (!slot.open) slot.showModal();
 }
 function renderProgress() {
   const root = $('progress-view'); root.replaceChildren();
@@ -976,7 +1036,7 @@ $('queue-list').addEventListener('scroll', () => {
 }, {passive:true});
 
 async function poll() {
-  if (state.busy || state.loading || document.hidden || state.editor) return;
+  if (state.busy || state.loading || document.hidden || state.editor || $('mode-editor')?.open) return;
   try {
     const remote = await get('/api/state');
     if (JSON.stringify(remote) !== JSON.stringify(state.review)) {

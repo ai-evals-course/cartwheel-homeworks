@@ -726,6 +726,11 @@ td .actions button {
   align-items:center;
   gap:9px
 }
+.mode-origin { min-width:0; margin:16px 0; padding:12px; border:1px solid var(--line); }
+.mode-origin legend { font-weight:600; padding-inline:4px; }
+.mode-origin .check { align-items:flex-start; }
+.mode-origin input { flex-shrink:0; margin-top:4px; }
+.mode-origin-note { min-width:0; overflow-wrap:anywhere; }
 .check input {
   width:auto;
   margin:0
