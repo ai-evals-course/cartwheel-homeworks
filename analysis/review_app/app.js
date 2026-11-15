@@ -1,10 +1,11 @@
 /* No trace content is interpreted as HTML. Anchors refer to source fields. */
 const $ = (id) => document.getElementById(id);
-const state = {catalog: null, review: null, session: null, view: 'read', busy: false, loading: false, request: 0, editor: null, disclosures: new Map(), noteTarget: null};
+const state = {catalog: null, review: null, session: null, view: 'read', busy: false, loading: false, request: 0, editor: null, disclosures: new Map(), noteTarget: null, taxonomyMode: null, taxonomyTab: 'summary', selectedSuggestions: new Set(), suggestionBatchBusy: false, suggestionFeedback: ''};
 const allTraces = () => state.catalog.sessions.flatMap(s => s.traces);
 const finalModes = () => state.review.modes.filter(m => m.final);
-const reviewed = id => ['first_failure', 'no_failure'].includes(state.review.reviews[id]?.status);
+const reviewed = id => ['reviewed', 'first_failure', 'no_failure'].includes(state.review.reviews[id]?.status);
 const notesFor = id => state.review.annotations.filter(n => n.trace_id === id);
+const conversationReviewed = ids => ids.some(id => notesFor(id).length > 0) || (ids.length > 0 && ids.every(reviewed));
 const pendingFor = id => state.review.suggestions.filter(s => s.trace_id === id && !state.review.decisions[s.id]);
 const pretty = value => value === undefined || value === null ? 'Not captured' : JSON.stringify(value, null, 2);
 const backupKey = () => 'cartwheel-review-draft:' + location.origin + ':' + state.catalog.namespace;
@@ -82,6 +83,79 @@ function roleBadge(role) {
 function setSamplingMenu(open) {
   $('sampling-menu').hidden = !open;
   $('sampling-arrow').setAttribute('aria-expanded', String(open));
+  if (!open) closeDimensionOptions();
+}
+function closeDimensionOptions() {
+  for (const button of document.querySelectorAll('.dimension-arrow')) {
+    button.setAttribute('aria-expanded', 'false');
+    $(button.getAttribute('aria-controls')).hidden = true;
+  }
+}
+function positionDimensionOptions(panel, row) {
+  panel.removeAttribute('style');
+  if (window.innerWidth <= 650) return;
+  const rect = row.getBoundingClientRect();
+  panel.style.left = Math.max(8, Math.min(rect.right, window.innerWidth - panel.offsetWidth - 12)) + 'px';
+  panel.style.top = Math.max(8, Math.min(rect.top, window.innerHeight - panel.offsetHeight - 12)) + 'px';
+}
+window.addEventListener('resize', closeDimensionOptions);
+function initDimensionOptions() {
+  for (const input of $('sampling-dimensions').querySelectorAll('input[data-dimension]')) {
+    const name = input.dataset.dimension, label = input.closest('label');
+    const row = el('div', 'dimension-row');
+    label.replaceWith(row);
+    const arrow = button('▸', () => {
+      const open = panel.hidden;
+      closeDimensionOptions();
+      panel.hidden = !open;
+      arrow.setAttribute('aria-expanded', String(open));
+      if (open) {
+        positionDimensionOptions(panel, row);
+        panel.querySelector('input')?.focus();
+      }
+    }, 'dimension-arrow');
+    const panel = el('fieldset', 'dimension-options');
+    panel.id = 'dimension-options-' + name.replaceAll(' ', '-');
+    panel.hidden = true;
+    panel.append(el('legend', '', label.textContent.trim()));
+    arrow.setAttribute('aria-label', 'Choose ' + name + ' values');
+    arrow.setAttribute('aria-expanded', 'false');
+    arrow.setAttribute('aria-controls', panel.id);
+    const values = dimensionValues(allTraces(), name);
+    for (const value of values) {
+      const option = el('label'), checkbox = el('input');
+      checkbox.type = 'checkbox';
+      checkbox.dataset.dimensionValue = value;
+      option.append(checkbox, document.createTextNode(value.replaceAll('_', ' ')));
+      checkbox.addEventListener('change', () => {
+        input.checked = true;
+        updateDimensionSummary(row);
+        positionDimensionOptions(panel, row);
+      });
+      panel.append(option);
+    }
+    if (!values.length) panel.append(el('p', 'quiet', 'No values available in this trace source.'));
+    const summary = el('div', 'dimension-selected');
+    summary.setAttribute('aria-live', 'polite');
+    summary.hidden = true;
+    row.append(label, arrow, summary, panel);
+    input.addEventListener('change', () => updateDimensionSummary(row));
+    arrow.addEventListener('keydown', event => {
+      if (event.key === 'ArrowRight' && panel.hidden) {event.preventDefault(); arrow.click();}
+    });
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+        event.preventDefault(); event.stopPropagation();
+        closeDimensionOptions(); arrow.focus();
+      }
+    });
+  }
+}
+function updateDimensionSummary(row) {
+  const summary = row.querySelector('.dimension-selected');
+  const values = [...row.querySelectorAll('input[data-dimension-value]:checked')];
+  summary.replaceChildren(...values.map(input => el('span', 'dimension-chip', input.dataset.dimensionValue.replaceAll('_', ' '))));
+  summary.hidden = !row.querySelector('input[data-dimension]').checked || !values.length;
 }
 $('sampling-enabled').addEventListener('change', () => {
   const enabled = $('sampling-enabled').checked;
@@ -92,6 +166,7 @@ $('sampling-enabled').addEventListener('change', () => {
 $('sampling-arrow').addEventListener('click', () => setSamplingMenu($('sampling-menu').hidden));
 $('sampling-menu').addEventListener('change', () => {
   $('sampling-dimensions').hidden = !$('sampling-dimension').checked;
+  if ($('sampling-dimensions').hidden) closeDimensionOptions();
   renderQueue();
 });
 document.addEventListener('pointerdown', event => {
@@ -107,20 +182,27 @@ document.addEventListener('keydown', event => {
 });
 function renderQueue() {
   const enabled = $('sampling-enabled').checked;
-  const selected = [...$('sampling-menu').querySelectorAll('input[value]:checked')].map(input => input.value);
-  const dimensions = $('sampling-dimension').checked ? [...$('sampling-menu').querySelectorAll('input[data-dimension]:checked')].map(input => input.dataset.dimension) : [];
+  const selected = [...$('sampling-menu').querySelectorAll(':scope > label input[value]:checked')].map(input => input.value);
+  const dimensions = {};
+  if ($('sampling-dimension').checked) {
+    for (const input of $('sampling-dimensions').querySelectorAll('input[data-dimension]:checked')) {
+      dimensions[input.dataset.dimension] = [...input.closest('.dimension-row').querySelectorAll('input[data-dimension-value]:checked')].map(option => option.dataset.dimensionValue);
+    }
+  }
   const manifest = state.catalog.sample_manifest || {};
-  const picks = Array.isArray(manifest.picks) ? manifest.picks : [];
-  const matches = new Set(picks.filter(pick => {
-    const reason = String(pick.reason || pick.strategy || manifest.strategy || '').toLowerCase();
-    let dimension = String(pick.dimension || manifest.dimension || '').toLowerCase().replaceAll('_', ' ');
-    if (dimension === 'user role' || dimension === 'role') dimension = 'authenticated role';
-    return (selected.includes('uniform') && /random|uniform/.test(reason)) ||
-      (selected.includes('clustered') && /cluster/.test(reason)) ||
-      (/dimension|stratif/.test(reason) && dimensions.includes(dimension));
-  }).map(pick => pick.trace_id));
-  const groups = enabled ? state.catalog.sessions.filter(session => session.traces.some(trace => matches.has(trace.id))) : state.catalog.sessions;
-  $('queue-count').textContent = `${allTraces().length} traces · ${state.review.annotations.length} comments`;
+  const matches = sampleMatches(manifest, allTraces(), selected, dimensions);
+  const query = $('queue-search').value.trim();
+  const sampledGroups = enabled ? state.catalog.sessions.filter(session => session.traces.some(trace => matches.has(trace.id))) : state.catalog.sessions;
+  const groups = sampledGroups.filter(session => conversationMatchesSearch(session, query));
+  const totalReviewed = state.catalog.sessions.filter(session => conversationReviewed(session.traces.map(trace => trace.id))).length;
+  $('total-reviews').textContent = `${totalReviewed} reviewed`;
+  $('total-reviews').title = `${totalReviewed} reviewed conversations across the full list`;
+  $('total-reviews').setAttribute('aria-label', `${totalReviewed} reviewed conversations across the full list`);
+  $('queue-count').textContent = query
+    ? `${groups.reduce((count, session) => count + session.traces.length, 0)} traces · ${groups.length} conversations`
+    : enabled
+    ? `${allTraces().filter(trace => matches.has(trace.id)).length} matching traces · ${groups.length} conversations`
+    : `${allTraces().length} traces · ${state.review.annotations.length} comments`;
   const list = $('queue-list');
   list.replaceChildren();
   for (const session of groups) {
@@ -134,15 +216,33 @@ function renderQueue() {
     commentCount.setAttribute('aria-label', `${comments} comments`);
     commentCount.title = `${comments} comments`;
     status.append(roleBadge(first.role));
-    title.append(el('strong', '', first.scenario || 'Unassigned scenario'), status);
+    const name = el('span', 'conversation-name');
+    name.append(el('strong', '', first.scenario || 'Unassigned scenario'));
+    if (conversationReviewed(session.traces.map(trace => trace.id))) {
+      const indicator = el('span', 'reviewed-indicator', 'R');
+      indicator.setAttribute('aria-label', 'Reviewed');
+      indicator.title = 'Reviewed';
+      name.append(indicator);
+    }
+    title.append(name, status);
     const counts = el('span', 'conversation-counts quiet');
     counts.append(el('span', '', `${session.traces.length} ${session.traces.length === 1 ? 'trace' : 'traces'}`));
     if (comments) counts.append(commentCount);
     item.append(title, counts);
     list.append(item);
   }
-  if (!groups.length) list.append(el('p', 'empty', enabled ? (selected.length || dimensions.length ? 'No saved samples match these selections.' : 'Choose one or more sampling methods or dimensions.') : 'No conversations available.'));
+  if (!groups.length) list.append(el('p', 'empty', query ? 'No conversations match this ID in the current filters.' : enabled ? (selected.length || Object.keys(dimensions).length ? 'No traces match these selections.' : 'Choose one or more sampling methods or dimensions.') : 'No conversations available.'));
 }
+$('queue-search').addEventListener('input', () => {
+  if (state.catalog && state.review) renderQueue();
+});
+$('queue-search').addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    $('queue-search').value = '';
+    if (state.catalog && state.review) renderQueue();
+  }
+});
 async function openSession(id, traceId) {
   if (state.editor) closeNote();
   const request = ++state.request;
@@ -168,6 +268,7 @@ function jumpTrace(id) {
 }
 function switchView(view) {
   if (state.editor) closeNote();
+  setSamplingMenu(false);
   state.view = view;
   $('view-scroll').scrollTop = 0;
   for (const node of document.querySelectorAll('[data-view]')) node.setAttribute('aria-pressed', String(node.dataset.view === view));
@@ -371,20 +472,65 @@ function renderTaxonomy() {
   root.append(el('h2', '', 'Failure taxonomy'));
   if (!state.review.modes.length) {
     root.append(el('p', 'empty', 'No failure modes recorded yet.'));
-    return;
   }
   const modes = state.review.modes.map((mode, index) => ({
     mode, index, notes: state.review.annotations.filter(n => (mode.annotation_ids || []).includes(n.id))
   })).sort((a, b) => b.notes.length - a.notes.length);
+  const assignedIds = new Set(modes.flatMap(item => item.notes.map(note => note.id)));
+  const unassigned = state.review.annotations.filter(note => !assignedIds.has(note.id));
+  const mapGroups = [...modes];
+  if (unassigned.length) mapGroups.push({mode: {id: '__unassigned', name: 'Unassigned'}, index: 0, notes: unassigned});
+  mapGroups.sort((a, b) => b.notes.length - a.notes.length);
+  const traceById = new Map(allTraces().map(trace => [trace.id, trace]));
+  const runName = note => traceById.get(note.trace_id)?.scenario || note.trace_id;
+  if (!mapGroups.some(item => item.mode.id === state.taxonomyMode)) state.taxonomyMode = null;
+  const selectMode = id => {
+    state.taxonomyMode = state.taxonomyMode === id ? null : id;
+    state.suggestionFeedback = '';
+    renderTaxonomy();
+    document.querySelector('.taxonomy-tile[data-selected="true"] .taxonomy-select')?.focus({preventScroll: true});
+  };
+  root.append(el('p', 'quiet', 'Groups link observations to proposed failure modes. Select a group to list its conversations below; these links are not confirmed failure labels.'));
   const map = el('div', 'taxonomy-map');
   function buildTiles(items, depth = 0) {
     if (items.length === 1) {
       const {mode, index, notes} = items[0];
+      const seenComments = new Set();
+      const uniqueNotes = notes.filter(note => {
+        const key = note.note.trim().replace(/\s+/g, ' ').replace(/[.,!;:]+$/g, '').toLowerCase();
+        if (seenComments.has(key)) return false;
+        seenComments.add(key);
+        return true;
+      });
       const tile = el('section', 'taxonomy-tile');
       tile.dataset.color = index % 6;
-      tile.append(el('h3', '', mode.name || mode.id.replaceAll('_', ' ')),
-        el('p', 'taxonomy-count', `${notes.length} ${notes.length === 1 ? 'comment' : 'comments'}`));
-      notes.forEach(note => tile.append(button(note.note, () => jumpTrace(note.trace_id), 'jump')));
+      tile.dataset.unassigned = String(mode.id === '__unassigned');
+      tile.dataset.selected = String(state.taxonomyMode === mode.id);
+      const choose = button(mode.name || mode.id.replaceAll('_', ' '), () => selectMode(mode.id), 'taxonomy-select');
+      choose.setAttribute('aria-pressed', String(state.taxonomyMode === mode.id));
+      choose.setAttribute('aria-controls', 'taxonomy-summary');
+      const heading = el('h3'); heading.append(choose);
+      tile.append(heading, el('p', 'taxonomy-count', `${uniqueNotes.length} ${uniqueNotes.length === 1 ? 'comment' : 'comments'}`));
+      const previews = el('div', 'taxonomy-previews');
+      previews.tabIndex = 0;
+      previews.setAttribute('role', 'region');
+      previews.setAttribute('aria-label', `${mode.name || mode.id.replaceAll('_', ' ')} comments`);
+      uniqueNotes.forEach(note => {
+        const preview = el('div', 'taxonomy-comment');
+        const excerpt = el('span', 'taxonomy-excerpt');
+        const quote = note.anchor?.quote;
+        if (quote) excerpt.append(el('em', 'taxonomy-quote', `"${quote}"`), document.createTextNode(' '));
+        const comment = el('span', 'taxonomy-note');
+        comment.append(el('span', 'taxonomy-comment-label', 'Comment:'), document.createTextNode(` ${note.note}`));
+        excerpt.append(comment);
+        preview.append(el('span', 'taxonomy-run', runName(note)), excerpt);
+        preview.title = `${runName(note)}: ${quote ? `"${quote}"\n` : ''}Comment: ${note.note}`;
+        previews.append(preview);
+      });
+      tile.append(previews);
+      tile.addEventListener('click', event => {
+        if (!event.target.closest('button')) selectMode(mode.id);
+      });
       return tile;
     }
     const weight = item => Math.max(1, item.notes.length);
@@ -395,13 +541,210 @@ function renderTaxonomy() {
     group.style.flexDirection = depth % 2 ? 'column' : 'row';
     const left = buildTiles(items.slice(0, split), depth + 1);
     const right = buildTiles(items.slice(split), depth + 1);
-    left.style.flex = `${sum} 1 0`;
-    right.style.flex = `${total - sum} 1 0`;
+    const basis = depth % 2 ? 'auto' : '0px';
+    left.style.flex = `${sum} 1 ${basis}`;
+    right.style.flex = `${total - sum} 1 ${basis}`;
     group.append(left, right);
     return group;
   }
-  map.append(buildTiles(modes));
-  root.append(map);
+  if (mapGroups.length) {
+    map.append(buildTiles(mapGroups));
+    root.append(map);
+  }
+  const selected = mapGroups.find(item => item.mode.id === state.taxonomyMode);
+  const summary = el('section'); summary.id = 'taxonomy-summary';
+  const tabs = el('div', 'taxonomy-tabs');
+  tabs.setAttribute('role', 'tablist');
+  tabs.setAttribute('aria-label', 'Taxonomy details');
+  const tabOptions = [{id: 'summary', title: 'Failure mode summary'}, {id: 'suggestions', title: 'Agent suggestions'}];
+  const activateTab = id => {
+    state.taxonomyTab = id;
+    renderTaxonomy();
+    $(`taxonomy-tab-${id}`).focus({preventScroll: true});
+  };
+  for (const [index, option] of tabOptions.entries()) {
+    const tab = button(option.title, () => activateTab(option.id));
+    tab.id = `taxonomy-tab-${option.id}`;
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-selected', String(state.taxonomyTab === option.id));
+    tab.setAttribute('aria-controls', 'taxonomy-tab-panel');
+    tab.tabIndex = state.taxonomyTab === option.id ? 0 : -1;
+    tab.addEventListener('keydown', event => {
+      const next = {ArrowRight: (index + 1) % 2, ArrowLeft: (index + 1) % 2, Home: 0, End: 1}[event.key];
+      if (next !== undefined) {event.preventDefault(); activateTab(tabOptions[next].id);}
+    });
+    tabs.append(tab);
+  }
+  const panel = el('div', 'taxonomy-tab-panel'); panel.id = 'taxonomy-tab-panel';
+  panel.setAttribute('role', 'tabpanel');
+  panel.setAttribute('aria-labelledby', `taxonomy-tab-${state.taxonomyTab}`);
+  summary.append(tabs, panel);
+  root.append(summary);
+  if (state.taxonomyTab === 'suggestions') {
+    renderTaxonomySuggestions(panel, runName);
+    return;
+  }
+  const summaryHeading = el('div', 'taxonomy-summary-heading');
+  if (selected) {
+    summaryHeading.append(el('h3', '', 'Conversations in this group'), button('Show all comments', () => {state.taxonomyMode = null; renderTaxonomy();}));
+    panel.append(summaryHeading);
+  }
+  panel.append(el('p', 'quiet', selected
+    ? `${selected.notes.length} comments in this group`
+    : `${state.review.annotations.length} comments · ${assignedIds.size} grouped · ${state.review.annotations.length - assignedIds.size} unassigned`));
+  const table = el('table', 'taxonomy-summary-table');
+  const head = el('thead'), header = el('tr');
+  ['Run', 'Failure taxonomy', 'Comment'].forEach(title => {const cell = el('th', '', title); cell.scope = 'col'; header.append(cell);});
+  head.append(header); table.append(head);
+  const body = el('tbody');
+  for (const note of selected ? selected.notes : state.review.annotations) {
+      const groups = modes.filter(item => item.notes.some(linked => linked.id === note.id));
+      const row = el('tr'); row.dataset.mode = selected?.mode.id || groups.map(item => item.mode.id).join(' '); row.dataset.trace = note.trace_id;
+      row.dataset.annotation = note.id;
+      row.tabIndex = 0;
+      row.setAttribute('aria-label', `Open ${runName(note)}: ${note.note}`);
+      row.addEventListener('click', () => jumpTrace(note.trace_id));
+      row.addEventListener('keydown', event => {
+        if (event.target === row && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          jumpTrace(note.trace_id);
+        }
+      });
+      const run = el('td'), taxonomy = el('td');
+      row.title = `Open conversation · ${note.trace_id}`;
+      run.append(el('span', 'taxonomy-run', runName(note)));
+      if (groups.length) {
+        for (const {mode, index} of groups) {
+          const label = el('span', 'taxonomy-label', mode.name || mode.id.replaceAll('_', ' '));
+          label.dataset.color = index % 6;
+          taxonomy.append(label);
+        }
+      } else taxonomy.append(el('span', 'taxonomy-unassigned', 'Unassigned'));
+      row.append(run, taxonomy, el('td', '', note.note)); body.append(row);
+  }
+  const tableScroll = el('div', 'taxonomy-table-scroll');
+  tableScroll.tabIndex = 0;
+  tableScroll.setAttribute('role', 'region');
+  tableScroll.setAttribute('aria-label', 'Failure taxonomy comments');
+  table.append(body); tableScroll.append(table); panel.append(tableScroll);
+  if (!body.children.length) panel.append(el('p', 'empty', selected ? 'No linked conversations yet.' : 'No comments recorded yet.'));
+}
+function renderTaxonomySuggestions(panel, runName) {
+  const pending = state.review.suggestions.filter(suggestion => !state.review.decisions[suggestion.id]
+    && (!state.taxonomyMode || (suggestion.mode || '__unassigned') === state.taxonomyMode));
+  const pendingIds = new Set(pending.map(suggestion => suggestion.id));
+  for (const id of state.selectedSuggestions) if (!pendingIds.has(id)) state.selectedSuggestions.delete(id);
+  if (state.taxonomyMode) {
+    const mode = state.review.modes.find(item => item.id === state.taxonomyMode);
+    const heading = el('div', 'taxonomy-summary-heading');
+    heading.append(el('h3', '', mode?.name || state.taxonomyMode.replaceAll('_', ' ')), button('Show all suggestions', () => {
+      state.taxonomyMode = null;
+      state.suggestionFeedback = '';
+      renderTaxonomy();
+    }));
+    panel.append(heading);
+  }
+  panel.append(el('p', 'quiet', 'Search candidates for your review. Retrieval matches are not failure labels.'));
+  const toolbar = el('div', 'suggestion-toolbar');
+  toolbar.setAttribute('aria-label', 'Suggestion selection actions');
+  const count = el('span', 'suggestion-selected-count');
+  count.setAttribute('role', 'status');
+  const actions = el('div', 'suggestion-bulk-actions');
+  const decide = async decision => {
+    if (state.suggestionBatchBusy || state.busy || !state.selectedSuggestions.size) return;
+    const ids = [...state.selectedSuggestions];
+    state.suggestionBatchBusy = true;
+    state.suggestionFeedback = '';
+    renderTaxonomy();
+    let completed = 0;
+    try {
+      for (const id of ids) {
+        if (!await act({action: 'suggestion', id, decision})) break;
+        state.selectedSuggestions.delete(id);
+        completed++;
+      }
+      state.suggestionFeedback = `${decision === 'accept' ? 'Accepted' : 'Rejected'} ${completed} ${completed === 1 ? 'suggestion' : 'suggestions'}.`;
+    } finally {
+      state.suggestionBatchBusy = false;
+      renderTaxonomy();
+    }
+  };
+  const accept = button('Accept selected', () => decide('accept'), 'primary');
+  const reject = button('Reject selected', () => decide('reject'));
+  actions.append(accept, reject); toolbar.append(count, actions); panel.append(toolbar);
+  if (state.suggestionFeedback) {
+    const feedback = el('p', 'quiet', state.suggestionFeedback);
+    feedback.setAttribute('role', 'status'); panel.append(feedback);
+  }
+  const table = el('table', 'taxonomy-summary-table taxonomy-suggestions-table');
+  const head = el('thead'), header = el('tr');
+  const selectHeading = el('th', 'suggestion-select-cell'); selectHeading.scope = 'col';
+  const selectAll = el('input'); selectAll.type = 'checkbox';
+  selectAll.setAttribute('aria-label', 'Select all suggestions');
+  selectHeading.append(selectAll); header.append(selectHeading);
+  ['Run', 'Failure taxonomy', 'Trace info'].forEach(title => {
+    const cell = el('th', '', title); cell.scope = 'col'; header.append(cell);
+  });
+  head.append(header); table.append(head);
+  const body = el('tbody');
+  const selections = [];
+  const updateSelection = () => {
+    const selectedCount = pending.filter(suggestion => state.selectedSuggestions.has(suggestion.id)).length;
+    count.textContent = `${selectedCount} selected`;
+    selectAll.checked = pending.length > 0 && selectedCount === pending.length;
+    selectAll.indeterminate = selectedCount > 0 && selectedCount < pending.length;
+    selectAll.disabled = !pending.length || state.suggestionBatchBusy || state.busy;
+    accept.disabled = reject.disabled = !selectedCount || state.suggestionBatchBusy || state.busy;
+    for (const {checkbox, row, id} of selections) {
+      checkbox.checked = state.selectedSuggestions.has(id);
+      checkbox.disabled = state.suggestionBatchBusy || state.busy;
+      row.dataset.selected = String(checkbox.checked);
+    }
+  };
+  selectAll.addEventListener('change', () => {
+    for (const suggestion of pending) {
+      if (selectAll.checked) state.selectedSuggestions.add(suggestion.id);
+      else state.selectedSuggestions.delete(suggestion.id);
+    }
+    updateSelection();
+  });
+  for (const suggestion of pending) {
+    const row = el('tr');
+    const selectCell = el('td', 'suggestion-select-cell');
+    const checkbox = el('input'); checkbox.type = 'checkbox';
+    checkbox.setAttribute('aria-label', `Select suggestion for ${runName(suggestion)}`);
+    selectCell.addEventListener('click', event => event.stopPropagation());
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) state.selectedSuggestions.add(suggestion.id);
+      else state.selectedSuggestions.delete(suggestion.id);
+      updateSelection();
+    });
+    selectCell.append(checkbox);
+    selections.push({checkbox, row, id: suggestion.id});
+    const run = el('td'), taxonomy = el('td'), info = el('td');
+    run.append(el('span', 'taxonomy-run', runName(suggestion)));
+    const mode = state.review.modes.find(item => item.id === suggestion.mode);
+    taxonomy.append(el('span', 'taxonomy-label', mode?.name || (suggestion.mode || 'Unassigned').replaceAll('_', ' ')));
+    info.append(el('em', 'taxonomy-suggestion-quote', `"${suggestion.anchor?.quote || suggestion.quote || 'No highlighted text'}"`));
+    const comment = el('div', 'taxonomy-suggestion-comment');
+    comment.append(el('span', 'taxonomy-comment-label', 'Comment:'), document.createTextNode(` ${suggestion.note || suggestion.reason || 'No comment'}`));
+    info.append(comment);
+    row.append(selectCell, run, taxonomy, info);
+    row.tabIndex = 0;
+    row.setAttribute('aria-label', `Open suggestion for ${runName(suggestion)}`);
+    row.addEventListener('click', () => jumpTrace(suggestion.trace_id));
+    row.addEventListener('keydown', event => {
+      if (event.target === row && (event.key === 'Enter' || event.key === ' ')) {event.preventDefault(); jumpTrace(suggestion.trace_id);}
+    });
+    body.append(row);
+  }
+  updateSelection();
+  const tableScroll = el('div', 'taxonomy-table-scroll');
+  tableScroll.tabIndex = 0;
+  tableScroll.setAttribute('role', 'region');
+  tableScroll.setAttribute('aria-label', 'Agent suggestions');
+  table.append(body); tableScroll.append(table); panel.append(tableScroll);
+  if (!pending.length) panel.append(el('p', 'empty', state.taxonomyMode ? 'No pending suggestions in this group.' : 'No pending agent suggestions.'));
 }
 function editMode(mode = {}) {
   const slot = $('mode-editor'); slot.replaceChildren();
@@ -428,7 +771,7 @@ function renderProgress() {
   const traces = allTraces(), modes = finalModes(), labels = traces.flatMap(t => modes.map(m => state.review.labels[t.id + ':' + m.id])).filter(Boolean);
   const reviewedCount = traces.filter(t => reviewed(t.id)).length;
   const metrics = el('div', 'metrics');
-  for (const [count,title] of [[`${reviewedCount}/${traces.length}`,'Traces open coded'], [state.review.annotations.length,'Human observations'], [traces.length * modes.length-labels.length,'Final judgments remaining'], [labels.filter(l => l.sync === 'pending').length,'Labels pending sync']]) {
+  for (const [count,title] of [[`${reviewedCount}/${traces.length}`,'Traces reviewed'], [state.review.annotations.length,'Human observations'], [traces.length * modes.length-labels.length,'Final judgments remaining'], [labels.filter(l => l.sync === 'pending').length,'Labels pending sync']]) {
     const metric = el('div', 'metric'); metric.append(el('strong', '', count), el('span', '', title)); metrics.append(metric);
   }
   root.append(el('h2', '', 'Review progress'), metrics);
@@ -442,7 +785,7 @@ function renderProgress() {
       if (prompt) item.append(el('p', '', prompt));
       const status = state.review.reviews[turn.id]?.status || 'unreviewed';
       const actions = el('div', 'review-actions');
-      actions.append(el('span', 'badge', {unreviewed:'Unreviewed', no_failure:'Reviewed · no failure observed', first_failure:'Reviewed · first failure noted'}[status]),
+      actions.append(el('span', 'badge', {unreviewed:'Unreviewed', reviewed:'Reviewed · outcome not recorded', no_failure:'Reviewed · no failure observed', first_failure:'Reviewed · first failure noted'}[status]),
         button('First failure noted', () => act({action:'review', trace_id:turn.id, status:'first_failure'})),
         button('No failure observed', () => act({action:'review', trace_id:turn.id, status:'no_failure'})),
         button('Reopen', () => act({action:'review', trace_id:turn.id, status:'unreviewed'})));
@@ -477,20 +820,53 @@ function renderProgress() {
   if (decided.length) root.append(details('Suggestion decision history', el('pre', '', pretty(state.review.decisions))));
 }
 function render() {
+  document.querySelector('main').classList.toggle('taxonomy-layout', state.view === 'taxonomy');
   $('sampling-controls').hidden = state.view !== 'read';
   if (!state.review || !state.catalog) return;
   renderQueue(); saveStatus();
   const header = $('session-header'); header.replaceChildren();
-  if (state.session) {
+  if (state.session && state.view !== 'taxonomy') {
     const first = state.session.turns[0];
     const heading = el('div', 'session-heading');
     const title = el('div', 'session-title');
     title.append(el('h2', '', first.meta['cartwheel.scenario_id'] || 'Conversation'), roleBadge(first.meta['cartwheel.user_role']));
-    if (state.view === 'read') title.append(roleLegend());
     heading.append(title);
+    if (state.view === 'read') {
+      const controls = el('div', 'conversation-review-controls');
+      const traceIds = state.session.turns.map(turn => turn.id);
+      const hasComment = traceIds.some(id => notesFor(id).length > 0);
+      const complete = conversationReviewed(traceIds);
+      const reviewButton = button(complete ? 'Reviewed' : 'For review', async () => {
+        reviewButton.disabled = true;
+        const saved = await act({action: 'toggle_review', trace_ids: traceIds});
+        if (!saved) reviewButton.disabled = false;
+      }, 'conversation-review-button');
+      reviewButton.disabled = hasComment;
+      reviewButton.setAttribute('aria-keyshortcuts', 'Space');
+      reviewButton.dataset.reviewed = String(complete);
+      reviewButton.title = hasComment ? 'Conversations with comments stay reviewed' : 'Toggle review status (Space)';
+      controls.append(roleLegend(), reviewButton);
+      heading.append(controls);
+    }
     const metadata = el('div', 'meta');
     metadata.append(el('span', '', `Session: ${state.session.id}`), el('span', '', `Model: ${[...new Set(state.session.turns.flatMap(t=>t.models))].join(', ') || 'not captured'}`));
     heading.append(metadata);
+    const session = state.catalog.sessions.find(session => session.id === state.session.id);
+    const dimensionContent = el('div', 'conversation-dimensions');
+    const dimensionList = el('dl');
+    const names = [...$('sampling-dimensions').querySelectorAll('input[data-dimension]')].map(input => input.dataset.dimension);
+    const traces = session?.traces || [];
+    for (const name of names) {
+      const values = dimensionValues(traces, name);
+      const item = el('div', 'conversation-dimension');
+      item.append(el('dt', '', name), el('dd', '', values.length ? values.map(value => value.replaceAll('_', ' ')).join(', ') : 'Not available'));
+      dimensionList.append(item);
+    }
+    dimensionContent.append(dimensionList);
+    const key = state.session.id + ':dimensions';
+    const dimensionDisclosure = details('Dimensions', dimensionContent, false, key);
+    dimensionDisclosure.addEventListener('toggle', () => state.disclosures.set(key, dimensionDisclosure.open));
+    heading.append(dimensionDisclosure);
     header.append(heading);
   }
   if (state.view === 'read') renderRead();
@@ -498,6 +874,13 @@ function render() {
   if (state.view === 'taxonomy') renderTaxonomy();
   if (state.view === 'progress') renderProgress();
 }
+document.addEventListener('keydown', event => {
+  if (state.view !== 'read' || !state.session || state.editor || state.busy || state.loading || !isReviewShortcut(event)) return;
+  const control = document.querySelector('.conversation-review-button');
+  if (!control) return;
+  event.preventDefault();
+  control.click();
+});
 function stashDraft() {
   if (!state.editor) return;
   state.editor.note = $('note-text').value;
@@ -606,6 +989,7 @@ async function poll() {
 async function boot() {
   try {
     [state.catalog, state.review] = await Promise.all([get('/api/catalog'), get('/api/state')]);
+    initDimensionOptions();
     const initial = new URLSearchParams(location.hash.slice(1)).get('session');
     if (state.catalog.sessions.length) await openSession(state.catalog.sessions.some(s=>s.id === initial) ? initial : state.catalog.sessions[0].id);
     else {render(); notice('No scenario traces found in this source.');}

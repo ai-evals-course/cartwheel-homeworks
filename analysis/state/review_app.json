@@ -1,5 +1,5 @@
 {
-  "revision": 33,
+  "revision": 133,
   "annotations": [
     {
       "id": "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
@@ -125,20 +125,6 @@
         "end": 212
       },
       "updated_at": "2026-11-10T13:14:08.964097+00:00",
-      "source": "human"
-    },
-    {
-      "id": "c5c52ea0-5a5c-40df-a1c0-4052b61cf48e",
-      "trace_id": "0da84caf6abe4aaf5fca0b5048fb8a94",
-      "note": "Are you not sure?",
-      "anchor": {
-        "block_id": "40ea2fc4995b3e5c:output:0:0",
-        "field": "output.0.parts.0.content",
-        "quote": "It looks like ",
-        "start": 0,
-        "end": 14
-      },
-      "updated_at": "2026-11-10T13:14:42.347253+00:00",
       "source": "human"
     },
     {
@@ -350,10 +336,1078 @@
       },
       "updated_at": "2026-11-10T14:09:04.958532+00:00",
       "source": "human"
+    },
+    {
+      "id": "925c1802-94d4-48ec-adb6-7a15de861bb8",
+      "trace_id": "4fe7e8f628d328277f6e5b2f0d4c7c93",
+      "note": "Too much information.",
+      "anchor": {
+        "block_id": "9d93839282cf9e2f:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Here are the details:\n\n- **Order ID:** 1\n- **Status:** Refunded\n- **Ordered At:** December 17, 2025\n- **Shipped At:** December 20, 2025\n- **Delivered At:** December 22, 2025\n\nIf you need further assistance, let me know!",
+        "start": 78,
+        "end": 297
+      },
+      "updated_at": "2026-11-15T03:54:44.065179+00:00",
+      "source": "human"
+    },
+    {
+      "id": "fb439ea9-c9a2-4298-bc29-242c29b009ba",
+      "trace_id": "560885f2bf8169423a83c8903cd8faf2",
+      "note": "This part is unnecessary.",
+      "anchor": {
+        "block_id": "2ad922928b2fb26c:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I found the order 105 for the Midnight Mechanical Keyboard from Bright Socket Electronics.",
+        "start": 0,
+        "end": 90
+      },
+      "updated_at": "2026-11-15T03:55:08.284255+00:00",
+      "source": "human"
+    },
+    {
+      "id": "f3a74900-f340-4bd5-9c02-fd02a60a7cd9",
+      "trace_id": "560885f2bf8169423a83c8903cd8faf2",
+      "note": "This is redundant.",
+      "anchor": {
+        "block_id": "2ad922928b2fb26c:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "which means it has already been canceled",
+        "start": 126,
+        "end": 166
+      },
+      "updated_at": "2026-11-15T03:55:23.062038+00:00",
+      "source": "human"
+    },
+    {
+      "id": "53a5d29d-6ff6-4cdc-b5f6-df0ab9023c8f",
+      "trace_id": "ee2da69c5f562a7d719db0c426ab0754",
+      "note": "there is no partial refund in the policy.",
+      "anchor": {
+        "block_id": "8d547c4dee89c04e:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "please let me know the amount you would like to refund (up to the total of $98.50)",
+        "start": 129,
+        "end": 211
+      },
+      "updated_at": "2026-11-15T04:03:17.133970+00:00",
+      "source": "human"
+    },
+    {
+      "id": "19ffd077-01ac-4ad1-a771-c0ae0568057b",
+      "trace_id": "3e02d9597f54c2a052bda149f882cecb",
+      "note": "Information is not from policy document. No tool call performed.",
+      "anchor": {
+        "block_id": "9f981a8f482efee0:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "The time it takes for an approved refund to show up in your account can vary depending on your bank or payment method. Typically, it can take anywhere from 3 to 10 business days.",
+        "start": 0,
+        "end": 178
+      },
+      "updated_at": "2026-11-15T04:07:19.954414+00:00",
+      "source": "human"
+    },
+    {
+      "id": "953bfdbc-35e3-4812-8ac2-0b8004fafa0b",
+      "trace_id": "49978c79474665f09d746781fa737b80",
+      "note": "It should not provide metadata.",
+      "anchor": {
+        "block_id": "128ce9577edfa3be:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "under store ID \"1.\"",
+        "start": 75,
+        "end": 94
+      },
+      "updated_at": "2026-11-15T04:09:34.956008+00:00",
+      "source": "human"
+    },
+    {
+      "id": "fe93d863-62f4-4a32-89e3-dbf65f683a86",
+      "trace_id": "8920d8223801c80982e5be23cc88e651",
+      "note": "No tool call",
+      "anchor": {
+        "block_id": "0bf63778af3c7078:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Refunds typically take 3-5 business days to process after approval.",
+        "start": 0,
+        "end": 67
+      },
+      "updated_at": "2026-11-15T07:57:32.235000+00:00",
+      "source": "human"
+    },
+    {
+      "id": "2fe7bda2-31a4-43b8-8a07-fca3865305d0",
+      "trace_id": "05c0bec29fd344c5903fefca5216584d",
+      "note": "No need for this.",
+      "anchor": {
+        "block_id": "ee33f165ac7251fa:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "If you need further assistance, feel free to ask!",
+        "start": 284,
+        "end": 333
+      },
+      "updated_at": "2026-11-15T07:59:53.927695+00:00",
+      "source": "human"
+    },
+    {
+      "id": "e5438829-5e33-4091-912e-800c08b04f25",
+      "trace_id": "bcb3b68215ebb654e69210e89a636fcf",
+      "note": "This information should not be provided by the agent.",
+      "anchor": {
+        "block_id": "5b43dde50a0f884b:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Merchants on Cartwheel receive their payouts on a weekly basis, specifically on Fridays. Once the payout is processed, it takes an additional 2 business days for the funds to be available. ",
+        "start": 0,
+        "end": 189
+      },
+      "updated_at": "2026-11-15T08:01:07.393012+00:00",
+      "source": "human"
+    },
+    {
+      "id": "e85c5d21-85fc-4a2c-b6cd-fbf7c07322f3",
+      "trace_id": "9fc27b2a646755158a3d1d9a4f26e00c",
+      "note": "No need for this,",
+      "anchor": {
+        "block_id": "6bdc149f0761eb2e:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "If you have any further questions or need assistance, feel free to ask!",
+        "start": 173,
+        "end": 244
+      },
+      "updated_at": "2026-11-15T08:01:37.916601+00:00",
+      "source": "human"
+    },
+    {
+      "id": "32d64a58-17e1-4c1b-999d-b0b84258b71e",
+      "trace_id": "8534177c687c3219c5d90a9f44edd687",
+      "note": "This is unnecessary output to start the answer.",
+      "anchor": {
+        "block_id": "fcfd3536b0a49309:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I found relevant information about restocking fees for returned items. ",
+        "start": 0,
+        "end": 71
+      },
+      "updated_at": "2026-11-15T08:02:08.154569+00:00",
+      "source": "human"
+    },
+    {
+      "id": "9fa8ae35-c956-49f1-8bb1-b1e0c5189d00",
+      "trace_id": "2530e9c957ee78b92e5d851a951d904c",
+      "note": "No need for this,.",
+      "anchor": {
+        "block_id": "c88f22db9bea3052:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Let me know if you need any adjustments or additional information!",
+        "start": 463,
+        "end": 529
+      },
+      "updated_at": "2026-11-15T08:02:27.870831+00:00",
+      "source": "human"
+    },
+    {
+      "id": "07d95c9c-628d-4db1-9d7e-01fb010b8fba",
+      "trace_id": "781e5b8b700e87ff2d1366ea9ffa501a",
+      "note": "This is unnecessary output to start the answer.",
+      "anchor": {
+        "block_id": "c1d437ebd2011124:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I found the shipping policy, which outlines the handling and shipping timeframes. ",
+        "start": 0,
+        "end": 82
+      },
+      "updated_at": "2026-11-15T08:04:04.706222+00:00",
+      "source": "human"
+    },
+    {
+      "id": "42341b62-0e9e-4082-acd3-06a954d8546d",
+      "trace_id": "36cfecb50701b3d52f7e659b03997bbd",
+      "note": "This information should be retrieved from the policy via tool call.",
+      "anchor": {
+        "block_id": "59b134b64fb4eab5:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I currently don't have access to specific response timeframes for escalated cases. ",
+        "start": 0,
+        "end": 83
+      },
+      "updated_at": "2026-11-15T08:05:34.908487+00:00",
+      "source": "human"
+    },
+    {
+      "id": "9c4cd777-baff-4566-af39-6229b592ba2c",
+      "trace_id": "ca4d9727afb0bf663c8e6ceba604d1b3",
+      "note": "No need for this.",
+      "anchor": {
+        "block_id": "b3b49082327db6c1:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "If you want to check if a specific store has this fee, feel free to ask!",
+        "start": 355,
+        "end": 427
+      },
+      "updated_at": "2026-11-15T08:05:59.555349+00:00",
+      "source": "human"
+    },
+    {
+      "id": "3031c69b-f858-47f5-a394-75514d1151d8",
+      "trace_id": "63118e9dda7e8c1f6b67ae84dc958354",
+      "note": "There should be a tool call to get this information.",
+      "anchor": {
+        "block_id": "b64d3efa8ebb0c84:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "You cannot set your own return window as a merchant on Cartwheel. ",
+        "start": 0,
+        "end": 66
+      },
+      "updated_at": "2026-11-15T08:06:22.287429+00:00",
+      "source": "human"
+    },
+    {
+      "id": "8073c836-cca9-4b39-aa1c-85a7ba6f1ef7",
+      "trace_id": "383ef4888c490343f389d023b46e5736",
+      "note": "There should be a tool call to retrieve the policy.",
+      "anchor": {
+        "block_id": "e565a97b1534b0a3:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Shipping and handling times can vary based on the specific store and the shipping method selected. Generally, handling can take 1-3 business days, and shipping can take anywhere from 2-10 business days, depending on your location and the carrier used.",
+        "start": 0,
+        "end": 251
+      },
+      "updated_at": "2026-11-15T08:07:31.251864+00:00",
+      "source": "human"
+    },
+    {
+      "id": "e845ec56-f85b-4026-af00-84b4dbd5db90",
+      "trace_id": "bf7e795ae9cd4d16db019ebf5d9892a4",
+      "note": "no reason provided for ineligibility.",
+      "anchor": {
+        "block_id": "27193de995f85f9c:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "refund at this time",
+        "start": 95,
+        "end": 114
+      },
+      "updated_at": "2026-11-15T08:11:23.862516+00:00",
+      "source": "human"
+    },
+    {
+      "id": "ea01946e-ee2d-402e-9d01-2293ed041957",
+      "trace_id": "358f44276b9109622faa83b93d4fa303",
+      "note": "the refund should be for approval since it is above the threshold.",
+      "anchor": {
+        "block_id": "4358323358900e72:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "issuing the refund for the total amount of $102.50. ",
+        "start": 78,
+        "end": 130
+      },
+      "updated_at": "2026-11-15T08:12:18.914974+00:00",
+      "source": "human"
+    },
+    {
+      "id": "a367cc2b-63cf-4299-8948-814f61eb09eb",
+      "trace_id": "786bc2e9746c915caab5803bcc372fcc",
+      "note": "provided the reason for ineligbility but it is fairly redundant above. it can be more concise answer.",
+      "anchor": {
+        "block_id": "0f4f835696486b04:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Since the order has already been delivered and is marked as \"not eligible,\" I cannot initiate a refund request.",
+        "start": 141,
+        "end": 252
+      },
+      "updated_at": "2026-11-15T08:13:09.788469+00:00",
+      "source": "human"
+    },
+    {
+      "id": "5013e1d9-c4b7-4332-a9b3-f56d62c7d978",
+      "trace_id": "82950e902a02d2a777455af6cf82b9ed",
+      "note": "this should be checked via tool call. but no tool call is provided.",
+      "anchor": {
+        "block_id": "8d9c106eca853111:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I don't have direct access to specific listings or store inventories. ",
+        "start": 0,
+        "end": 70
+      },
+      "updated_at": "2026-11-15T08:14:57.082302+00:00",
+      "source": "human"
+    },
+    {
+      "id": "a0d3eb9f-4084-438a-a335-a7b12bdf0492",
+      "trace_id": "c71aba104857fd1b36c3bb3828f0d30b",
+      "note": "No need for this,.",
+      "anchor": {
+        "block_id": "0cddb29b7e19b689:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "If you have any other questions or need further assistance, feel free to ask!",
+        "start": 48,
+        "end": 125
+      },
+      "updated_at": "2026-11-15T08:16:22.231560+00:00",
+      "source": "human"
+    },
+    {
+      "id": "3bb33e42-6956-45f3-a4bd-383b321643d6",
+      "trace_id": "5fe43136ca9ccaeb1f1efa2994cb407c",
+      "note": "This info should be taken from a policy but no policy tool call was performed.",
+      "anchor": {
+        "block_id": "56f8ea3a82a4bd4c:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "Since this order is marked as not eligible for a refund, disputing the charge may involve contacting your payment provider or bank directly rather than handling it through us.",
+        "start": 245,
+        "end": 420
+      },
+      "updated_at": "2026-11-15T08:18:40.728631+00:00",
+      "source": "human"
+    },
+    {
+      "id": "ddd59f1c-9c8e-4f08-8cad-92bf477d0f19",
+      "trace_id": "947302b09d3786b86adcad4e121f9ea6",
+      "note": "This information should be taken from policy but no tool call for policy search.",
+      "anchor": {
+        "block_id": "13335228cb152d34:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "The order has been delivered and is not eligible for a refund, so it cannot be disputed directly through the refund process.",
+        "start": 41,
+        "end": 165
+      },
+      "updated_at": "2026-11-15T08:19:36.002406+00:00",
+      "source": "human"
+    },
+    {
+      "id": "c8f31b07-c1ec-470c-9a86-2e8259c451b7",
+      "trace_id": "9bd873f786d40e73d25193009ea7f9b5",
+      "note": "there is no refund initiated - no tool call",
+      "anchor": {
+        "block_id": "d40eafcf52637461:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I can initiate the process for you.",
+        "start": 144,
+        "end": 179
+      },
+      "updated_at": "2026-11-15T08:21:34.014494+00:00",
+      "source": "human"
+    },
+    {
+      "id": "f5b729da-ff9c-44ce-b31b-6646a04d07c7",
+      "trace_id": "49804473d4b34079a6929db47921de66",
+      "note": "no refund tool call was performed.",
+      "anchor": {
+        "block_id": "2bdf3c5f90901e46:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "The order 2313 is eligible for a refund,",
+        "start": 0,
+        "end": 40
+      },
+      "updated_at": "2026-11-15T08:22:24.891796+00:00",
+      "source": "human"
+    },
+    {
+      "id": "817f2edb-07f1-48f4-a2a1-2d727efe52c8",
+      "trace_id": "c45a49546acc59f50d4315a70747a9f8",
+      "note": "This information is already present in the get_order tool call. no need to ask this.",
+      "anchor": {
+        "block_id": "58d6ca981bebe5cc:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "specify the refund amount",
+        "start": 148,
+        "end": 173
+      },
+      "updated_at": "2026-11-15T08:23:15.010099+00:00",
+      "source": "human"
+    },
+    {
+      "id": "3312ab5b-1788-4135-bcc5-97fbdefd1fae",
+      "trace_id": "c45a49546acc59f50d4315a70747a9f8",
+      "note": "refund tool call should be called already,",
+      "anchor": {
+        "block_id": "58d6ca981bebe5cc:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "the refund process can proceed.",
+        "start": 93,
+        "end": 124
+      },
+      "updated_at": "2026-11-15T08:23:38.016186+00:00",
+      "source": "human"
+    },
+    {
+      "id": "67adc506-7489-4421-a093-d27d9f877abb",
+      "trace_id": "f820bda867728400d62e82f64919334c",
+      "note": "required human escalation is deferred to another user turn. ESC-3 says disputes go to a human.",
+      "anchor": {
+        "block_id": "2932ca867b732ba8:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "it's usually best for the customer to contact their payment provider directly",
+        "start": 161,
+        "end": 238
+      },
+      "updated_at": "2026-11-15T10:26:00.677945+00:00",
+      "source": "human"
+    },
+    {
+      "id": "a2fd55fb-793a-4497-adfb-be62d6d366c7",
+      "trace_id": "d7cc90af945e09973feefd9db9260be9",
+      "note": "an avoidable failed call followed by a broader search.",
+      "anchor": {
+        "block_id": "7b78f1d429730727:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "I found two \"Sturdy Tray\" listings in your store, Juniper Home Goods.",
+        "start": 0,
+        "end": 69
+      },
+      "updated_at": "2026-11-15T10:27:02.896166+00:00",
+      "source": "human"
+    },
+    {
+      "id": "d6c1db68-526c-4206-82c5-685cdf358026",
+      "trace_id": "5caaf6834e4bdb51c607fa81a15f39d2",
+      "note": "This sounded like the money has moved already for refund.",
+      "anchor": {
+        "block_id": "be2e996f4e129c8f:output:0:0",
+        "field": "output.0.parts.0.content",
+        "quote": "The refund for order 6998 has been successfully initiated",
+        "start": 0,
+        "end": 57
+      },
+      "updated_at": "2026-11-15T10:29:37.018869+00:00",
+      "source": "human"
     }
   ],
-  "reviews": {},
+  "reviews": {
+    "732935f9da2ee47e5ef93571d23adc5a": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017294+00:00"
+    },
+    "a89ead3274f5c7ba346f20f604c88c0d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017313+00:00"
+    },
+    "ceede4841b9015ecc621c905d2c11641": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017318+00:00"
+    },
+    "ad8f545e094c06ee7b33d259977e28e4": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017321+00:00"
+    },
+    "d1764466a31934aadadaab02879315ad": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017324+00:00"
+    },
+    "e28cb30aefd6d9ab2febf73572f98d12": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017326+00:00"
+    },
+    "0da84caf6abe4aaf5fca0b5048fb8a94": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017329+00:00"
+    },
+    "8b855cc69b2bc6bf6afa0089fd9c0b4f": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017332+00:00"
+    },
+    "9ea7ed863fa505f8cf30dc7fe74a885b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017335+00:00"
+    },
+    "3b324bc6a578ea899ae9c3eddc4b796f": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017338+00:00"
+    },
+    "42dc321dbe741e3a70b125bd63442a38": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017341+00:00"
+    },
+    "799e100145cfd1464b7bd85f1f0daeba": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017344+00:00"
+    },
+    "599c13ea4ab3b8c789cb6cbe210e5bc1": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017346+00:00"
+    },
+    "9dcc98eee60aac9bf4147f7c326be06a": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017349+00:00"
+    },
+    "ca84ff30deac591c33e3124aaa3ae51b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017351+00:00"
+    },
+    "a59ecb25bcb57b6fc01fd21602698bc3": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017354+00:00"
+    },
+    "fd13865682e5538ce16312ec270d480b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017356+00:00"
+    },
+    "0b243f127bd9afa7221b6480507ba354": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017359+00:00"
+    },
+    "7e9c42c82920bb0e4ea54a19010813a3": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017361+00:00"
+    },
+    "4fe7e8f628d328277f6e5b2f0d4c7c93": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017364+00:00"
+    },
+    "560885f2bf8169423a83c8903cd8faf2": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017366+00:00"
+    },
+    "ee2da69c5f562a7d719db0c426ab0754": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017369+00:00"
+    },
+    "3e02d9597f54c2a052bda149f882cecb": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017372+00:00"
+    },
+    "49978c79474665f09d746781fa737b80": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:22:02.017375+00:00"
+    },
+    "950681c7857f68ee333518a294694cff": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:24:45.904356+00:00"
+    },
+    "eedbfb9445505b4f462f211352d2ca74": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:24:52.104938+00:00"
+    },
+    "14fd7c3d57c2709727759a3327aa9693": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:24:52.104949+00:00"
+    },
+    "391d5b1013ce15fb8599220837c84eac": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:24:56.793676+00:00"
+    },
+    "6b3e38476c2893573b6d80ddfcefc912": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:01.752612+00:00"
+    },
+    "d9072ba31a36103a1e6692b6e759a53e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:01.752624+00:00"
+    },
+    "534c26f5a0ac33d80c5ca747001af37d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:03.751637+00:00"
+    },
+    "5a3b52da903fbc5651703b933687e2c0": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:05.787759+00:00"
+    },
+    "2059fbd7fdf781ace17b7e0031a3ac26": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:07.477322+00:00"
+    },
+    "442c5df155b99c5adef867af968f2a6b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:07.477381+00:00"
+    },
+    "8807f09564b246e55df3a598865176f2": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:09.051973+00:00"
+    },
+    "248e2463d6a2ecfc336ff4d331d428b2": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:10.505262+00:00"
+    },
+    "0edee9eaa4ea8c75ee375bb03f4b7ac4": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:10.505296+00:00"
+    },
+    "dd54ee274bb6ae81d62887521740aab2": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:11.972295+00:00"
+    },
+    "e3ca60f28a7f788c1397b3698ee22b42": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:13.832437+00:00"
+    },
+    "e8bc274ae89679a76cf20ff1a36852b4": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:15.196504+00:00"
+    },
+    "76cc8de032dabdb1f867c20fa2d4881c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:16.534233+00:00"
+    },
+    "0b3b48a081e9fe62b7cc7ed649fa1822": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:25:16.534244+00:00"
+    },
+    "e3738d12fae2ecbd0fe20c1312559741": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T04:26:43.086046+00:00"
+    },
+    "f4500db3fad0ce862304b951e8fa83b9": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T07:55:50.351346+00:00"
+    },
+    "8920d8223801c80982e5be23cc88e651": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T07:57:32.235019+00:00"
+    },
+    "125a45cd08d90db893cb3377a511a655": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T07:59:04.758611+00:00"
+    },
+    "a681266953182afd65b77e4812e22f85": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T07:59:30.541145+00:00"
+    },
+    "05c0bec29fd344c5903fefca5216584d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T07:59:53.927768+00:00"
+    },
+    "bcb3b68215ebb654e69210e89a636fcf": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:00:42.506086+00:00"
+    },
+    "9fc27b2a646755158a3d1d9a4f26e00c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:01:37.916621+00:00"
+    },
+    "8534177c687c3219c5d90a9f44edd687": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:02:08.154587+00:00"
+    },
+    "2530e9c957ee78b92e5d851a951d904c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:02:27.870888+00:00"
+    },
+    "023cad99520525cc52d78caea7f9eec5": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:03:28.279258+00:00"
+    },
+    "6bccf755d3e7f11110c6a3c1e3cf12ee": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:03:28.600076+00:00"
+    },
+    "3eae6447043723eb835f5b9f1a6a026d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:03:29.016967+00:00"
+    },
+    "781e5b8b700e87ff2d1366ea9ffa501a": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:04:04.706240+00:00"
+    },
+    "d166076bd8038d46e4063d2312146324": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:04:39.221028+00:00"
+    },
+    "da7f905b566322b983f0744b312c5308": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:04:39.221046+00:00"
+    },
+    "3e3cb0b49dd9a7be9afe489b15667eb0": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:04:46.776889+00:00"
+    },
+    "36cfecb50701b3d52f7e659b03997bbd": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:05:34.908506+00:00"
+    },
+    "ca4d9727afb0bf663c8e6ceba604d1b3": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:05:59.555366+00:00"
+    },
+    "63118e9dda7e8c1f6b67ae84dc958354": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:06:22.287449+00:00"
+    },
+    "ae904ad4420fa7b7c232e81fe43ae84d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:06:36.438914+00:00"
+    },
+    "50a05333ead9c07fde114dbdba44452b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:02.314942+00:00"
+    },
+    "bbd762d45342c737f369587fe8466b67": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:02.314957+00:00"
+    },
+    "05f85d18c2abb3ac303268f7df0d30ef": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:14.504750+00:00"
+    },
+    "383ef4888c490343f389d023b46e5736": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:31.251888+00:00"
+    },
+    "95b708dbc49c49b45bd7544da2acd0c8": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:48.704755+00:00"
+    },
+    "6c74b14ae76458113d876805e753d20e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:07:56.155429+00:00"
+    },
+    "f0125ab05596f5b7e75a4d64008dbf18": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:08:14.470579+00:00"
+    },
+    "e42f27dcb9a38239ddee0f79e861f7d0": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:09:16.934519+00:00"
+    },
+    "69a03480d2a5fabb1cc5b9ef1ca91e20": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:09:16.934540+00:00"
+    },
+    "e2130a153769e42fffc543f0a4da37bd": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:09:40.705465+00:00"
+    },
+    "2c006c009dd55e2bb95c491c4e31773c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:10:01.151792+00:00"
+    },
+    "6f8e191bf974c46f1c962182a8f0d11d": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:10:23.466752+00:00"
+    },
+    "c9fa1d11dc20a359de83ee9790cb7f4a": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:10:45.642155+00:00"
+    },
+    "8606e0a3699805438cd2ccdfb988769a": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:11:01.380588+00:00"
+    },
+    "bf7e795ae9cd4d16db019ebf5d9892a4": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:11:23.862552+00:00"
+    },
+    "bfba3ea72b96c1d3ee5e059ac918febb": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:11:35.242670+00:00"
+    },
+    "388f9ead74ed4a4db2b31c7e52f8cbdb": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:11:47.667586+00:00"
+    },
+    "866ac5c11f9b0ab1dd295437eb623807": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:11:47.667603+00:00"
+    },
+    "358f44276b9109622faa83b93d4fa303": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:12:18.914991+00:00"
+    },
+    "786bc2e9746c915caab5803bcc372fcc": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:13:09.788508+00:00"
+    },
+    "1a312fe5d0b6bde5f98cee90055711ad": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:13:20.024925+00:00"
+    },
+    "0ab17756fabb28cd31d2f627d6dabd5e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:13:36.883711+00:00"
+    },
+    "9ce20b6538afa0e87aebf86c0fdd4b8b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:13:53.754684+00:00"
+    },
+    "8963fdb3685951deb3112b844bd2a492": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:13:53.754698+00:00"
+    },
+    "c0cc0aba843679780f5851e50b0d7452": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:14:18.579318+00:00"
+    },
+    "193e04b798a496fcdbe8c02517f84318": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:14:25.193321+00:00"
+    },
+    "82950e902a02d2a777455af6cf82b9ed": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:14:57.082325+00:00"
+    },
+    "c04fc2994a9a56d1b234f0f57a372363": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:15:06.107533+00:00"
+    },
+    "16c97af3d52c1373a8b6bf5527d3d550": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:15:22.402190+00:00"
+    },
+    "79f1509fed2334c28ce952eb24942c1e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:15:22.402219+00:00"
+    },
+    "14799e4f125e3f4379769ed95908be49": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:15:56.860440+00:00"
+    },
+    "582f6fc9c056d5172fe6f597184b0af3": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:15:56.860466+00:00"
+    },
+    "7bdba5c26b371fbceed0fc325f5c4f51": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:16:06.079061+00:00"
+    },
+    "e514a6186e748871f9458af253ebaaa6": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:16:12.363140+00:00"
+    },
+    "c71aba104857fd1b36c3bb3828f0d30b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:16:22.231582+00:00"
+    },
+    "3b9aff1784b13b17ab39b9e8d1b0288b": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:16:28.211234+00:00"
+    },
+    "e08218449ab9a2529465aad67a6e884e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:16:39.233939+00:00"
+    },
+    "5fe43136ca9ccaeb1f1efa2994cb407c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:17:42.644652+00:00"
+    },
+    "e64ff77deb764d7500481d64f40d66cb": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:17:42.644669+00:00"
+    },
+    "947302b09d3786b86adcad4e121f9ea6": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:19:36.002422+00:00"
+    },
+    "4736500261cea8a734cecccf94090c40": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:19:53.561208+00:00"
+    },
+    "e432eeddb7b1223b1c27d94b33ba8b2f": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:20:00.768313+00:00"
+    },
+    "aa97677f4e1ba2c69fd89fe00dbdbc8e": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:20:25.294935+00:00"
+    },
+    "45fb453677bf81cb7cecb1d82ffac7f0": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:20:25.294961+00:00"
+    },
+    "9bd873f786d40e73d25193009ea7f9b5": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:21:34.014517+00:00"
+    },
+    "0f62feadcc439e09d922b0d0cff37347": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:21:40.237360+00:00"
+    },
+    "49804473d4b34079a6929db47921de66": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:22:24.891815+00:00"
+    },
+    "c45a49546acc59f50d4315a70747a9f8": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:23:15.010118+00:00"
+    },
+    "a7f5d2e0bbb2e2be069b1f549c618f8c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:23:55.101165+00:00"
+    },
+    "b8acc94e12dd549c58c633729d229dd7": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:24:30.202442+00:00"
+    },
+    "52e5980c64e79b1b26cc23edcc08bde3": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:24:30.202460+00:00"
+    },
+    "ebb934e6529e26a2e850d077218bb858": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:24:38.833338+00:00"
+    },
+    "8b9411bb084126b818bed9f2faf01ed6": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:24:46.791061+00:00"
+    },
+    "278e9ad5118361e22778762edb3e9c62": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T08:24:53.829236+00:00"
+    },
+    "f820bda867728400d62e82f64919334c": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T10:26:00.677973+00:00"
+    },
+    "d7cc90af945e09973feefd9db9260be9": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T10:27:02.896187+00:00"
+    },
+    "5caaf6834e4bdb51c607fa81a15f39d2": {
+      "status": "reviewed",
+      "updated_at": "2026-11-15T10:29:37.018897+00:00"
+    }
+  },
   "labels": {},
-  "modes": [],
+  "modes": [
+    {
+      "id": "unsupported_policy_answer",
+      "name": "unsupported policy answer",
+      "definition": "The agent gives a substantive Cartwheel policy answer that contradicts policy or lacks supporting policy evidence anywhere in the available conversation.",
+      "boundaries": "Earlier-turn retrieval can support a later reply; absence of a new lookup alone is insufficient. Separate a grounded answer missing only a citation. A refund-eligibility flag alone does not support claims about charge-dispute rights. A stated inability to look up policy belongs here only if the reply also gives unsupported substantive policy advice; a pure lookup omission belongs in omitted_requested_action.",
+      "requirement": "`PURPOSE-1`, `SCOPE-1`, `RESP-1`",
+      "evaluator": "LLM judge with policy and tool context.",
+      "annotation_ids": [
+        "19ffd077-01ac-4ad1-a771-c0ae0568057b",
+        "fe93d863-62f4-4a32-89e3-dbf65f683a86",
+        "3031c69b-f858-47f5-a394-75514d1151d8",
+        "8073c836-cca9-4b39-aa1c-85a7ba6f1ef7",
+        "42341b62-0e9e-4082-acd3-06a954d8546d",
+        "3bb33e42-6956-45f3-a4bd-383b321643d6",
+        "ddd59f1c-9c8e-4f08-8cad-92bf477d0f19"
+      ],
+      "examples": "support-0112 — 3e02d9597f54c2a052bda149f882cecb; support-0102 — 8920d8223801c80982e5be23cc88e651; support-0119 — 63118e9dda7e8c1f6b67ae84dc958354; support-0124 — 383ef4888c490343f389d023b46e5736; support-0117 — 36cfecb50701b3d52f7e659b03997bbd; support-0163 — 5fe43136ca9ccaeb1f1efa2994cb407c; support-0164 — 947302b09d3786b86adcad4e121f9ea6",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "unnecessary_response_content",
+      "name": "unnecessary response content",
+      "definition": "The final reply contains a generic offer of further help, redundant retrieval or order narration, repeated conclusions, excessive details unrelated to the request, or an unsolicited refund assessment that adds no information needed for the requested task.",
+      "boundaries": "This reflects repeated human notes, but the prohibited content and exceptions need student agreement. Helpful next steps, required caveats, and pre-tool narration should not automatically count. Excessive detail must be assessed against the actual request, not a word-count cutoff. Necessary order disambiguation, requested dates, substantive reasons, and required approval or escalation explanations are excluded.",
+      "requirement": "Candidate refinement of `RESP-5`",
+      "evaluator": "explicit requirement revision needed before finalizing. LLM judge.",
+      "annotation_ids": [
+        "d99ea638-e663-4f3d-afdc-210deedf2a8f",
+        "22568a3c-3480-45fe-8df5-df7ecf5c7989",
+        "e08d0945-f1a6-434b-8b5b-824e4ffe241e",
+        "07d95c9c-628d-4db1-9d7e-01fb010b8fba",
+        "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
+        "34292f4d-d3e8-4d9c-af10-0bd4213988c1",
+        "d5c0d768-a9db-40f0-a4e6-2b2a293fb0a8",
+        "01da37c5-74fd-4f4c-801e-89f3c91e69af",
+        "88e87958-c219-46f2-bb2f-6df2ffd8c171",
+        "d20954bf-faa5-47b4-a607-dd242e5aa8e5",
+        "9bf24b56-7f24-4c67-a8bc-d565750d1dff",
+        "94fe4afd-0198-41c3-82d5-43af9b07474e",
+        "cae5cad9-adc6-46ba-abdd-fa5a2047c5f3",
+        "69a0ad13-beb3-481a-accb-264558e56942",
+        "63aee341-a425-4edf-a664-4af9594fff2c",
+        "0c64cf3a-382a-4ba7-abd8-d095ba28c4b1",
+        "6bc3e19d-39d5-44da-933b-ce5f6e02ed46",
+        "4c513174-363c-41ae-b51c-3efccc292808",
+        "925c1802-94d4-48ec-adb6-7a15de861bb8",
+        "fb439ea9-c9a2-4298-bc29-242c29b009ba",
+        "f3a74900-f340-4bd5-9c02-fd02a60a7cd9",
+        "2fe7bda2-31a4-43b8-8a07-fca3865305d0",
+        "e85c5d21-85fc-4a2c-b6cd-fbf7c07322f3",
+        "32d64a58-17e1-4c1b-999d-b0b84258b71e",
+        "9fa8ae35-c956-49f1-8bb1-b1e0c5189d00",
+        "9c4cd777-baff-4566-af39-6229b592ba2c",
+        "a367cc2b-63cf-4299-8948-814f61eb09eb",
+        "a0d3eb9f-4084-438a-a335-a7b12bdf0492"
+      ],
+      "examples": "pilot-0001 — a89ead3274f5c7ba346f20f604c88c0d; support-0018 — e28cb30aefd6d9ab2febf73572f98d12; support-0114 — 781e5b8b700e87ff2d1366ea9ffa501a; scenario unavailable — 732935f9da2ee47e5ef93571d23adc5a; scenario unavailable — ceede4841b9015ecc621c905d2c11641; scenario unavailable — ad8f545e094c06ee7b33d259977e28e4; support-0008 — d1764466a31934aadadaab02879315ad; support-0084 — 8b855cc69b2bc6bf6afa0089fd9c0b4f; support-0113 — 3b324bc6a578ea899ae9c3eddc4b796f; support-0121 — 42dc321dbe741e3a70b125bd63442a38; support-0226 — ca84ff30deac591c33e3124aaa3ae51b; support-0232 — a59ecb25bcb57b6fc01fd21602698bc3; support-0236 — fd13865682e5538ce16312ec270d480b; support-0236 — 0b243f127bd9afa7221b6480507ba354; support-0238 — 7e9c42c82920bb0e4ea54a19010813a3; scenario unavailable — 4fe7e8f628d328277f6e5b2f0d4c7c93; scenario unavailable — 560885f2bf8169423a83c8903cd8faf2; support-0105 — 05c0bec29fd344c5903fefca5216584d; support-0107 — 9fc27b2a646755158a3d1d9a4f26e00c; support-0108 — 8534177c687c3219c5d90a9f44edd687; support-0108 — 2530e9c957ee78b92e5d851a951d904c; support-0118 — ca4d9727afb0bf663c8e6ceba604d1b3; support-0048 — 786bc2e9746c915caab5803bcc372fcc; support-0079 — c71aba104857fd1b36c3bb3828f0d30b",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "avoidable_clarification",
+      "name": "avoidable clarification",
+      "definition": "The agent asks the user for information already supplied or unambiguously established by the conversation and tools, delaying an otherwise executable task.",
+      "boundaries": "An order total does not necessarily establish the requested refund amount. Clarification is appropriate when the user has not specified a full refund or another amount.",
+      "requirement": "`SCOPE-1` supports task completion but does not define this efficiency rule precisely",
+      "evaluator": "student specification decision needed. LLM judge.",
+      "annotation_ids": [
+        "6a603a6d-8e73-422b-a382-a8f10e722133",
+        "817f2edb-07f1-48f4-a2a1-2d727efe52c8"
+      ],
+      "examples": "support-0212 — 9dcc98eee60aac9bf4147f7c326be06a; support-0074 — c45a49546acc59f50d4315a70747a9f8",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "omitted_requested_action",
+      "name": "omitted requested action",
+      "definition": "The user requests an available lookup or clearly authorizes an available write, its prerequisites are established, and the agent ends the turn without attempting it or explaining a valid reason it cannot proceed.",
+      "boundaries": "Exclude genuine missing information, permission denial, kill switches, pending approval, and already completed actions. Keep required human escalation in its own group because its fix differs. Includes denying access to product-search tools without trying an applicable search. A failed attempted lookup with malformed arguments belongs in incorrect_tool_arguments. An attempted, correctly scoped search returning no results is not an omission.",
+      "requirement": "PURPOSE-1, SCOPE-1; relevant TOOL-1/TOOL-3/TOOL-7/TOOL-8 contract. Task-completion and clarification boundaries remain provisional.",
+      "evaluator": "task-completion boundary needs review. LLM judge plus tool checks.",
+      "annotation_ids": [
+        "c8f31b07-c1ec-470c-9a86-2e8259c451b7",
+        "f5b729da-ff9c-44ce-b31b-6646a04d07c7",
+        "3312ab5b-1788-4135-bcc5-97fbdefd1fae",
+        "5013e1d9-c4b7-4332-a9b3-f56d62c7d978"
+      ],
+      "examples": "support-0066 — 9bd873f786d40e73d25193009ea7f9b5; support-0069 — 49804473d4b34079a6929db47921de66; support-0074 — c45a49546acc59f50d4315a70747a9f8; support-0203 — 82950e902a02d2a777455af6cf82b9ed",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "missing_human_escalation",
+      "name": "missing human escalation",
+      "definition": "A request requires human handling under `ESC-1`–`ESC-4`, but no appropriate escalation or approval-queue action occurs before the turn ends.",
+      "boundaries": "An offer to open a ticket is not a tool execution. A successful above-threshold approval queue satisfies `ESC-1` without a second ticket.",
+      "requirement": "`ESC-1`–`ESC-4`",
+      "evaluator": "LLM judge for trigger plus code checks for actions/results.",
+      "annotation_ids": [
+        "67adc506-7489-4421-a093-d27d9f877abb"
+      ],
+      "examples": "support-0153 — f820bda867728400d62e82f64919334c",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "misstated_action_status",
+      "name": "misstated action status",
+      "definition": "The agent describes a write as completed when the observed tool result supports only pending approval, failure, or no executed write.",
+      "boundaries": "“I can initiate” is an offer, not a completion claim. “Successfully initiated” followed by an explicit pending-approval explanation is a disputed boundary, not an automatic positive.",
+      "requirement": "`RESP-2`, `TOOL-7`, `ESC-1`",
+      "evaluator": "LLM judge with tool results.",
+      "annotation_ids": [
+        "ea01946e-ee2d-402e-9d01-2293ed041957",
+        "d6c1db68-526c-4206-82c5-685cdf358026"
+      ],
+      "examples": "support-0047 — 358f44276b9109622faa83b93d4fa303; support-0039 — 5caaf6834e4bdb51c607fa81a15f39d2",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "incorrect_tool_arguments",
+      "name": "incorrect tool arguments",
+      "definition": "The agent supplies a tool argument inconsistent with its documented meaning, producing an avoidable error or materially changing the requested scope.",
+      "boundaries": "An ID passed where a store name/slug is expected is a candidate. A recovered read error does not necessarily violate a current product requirement; no cross-store error should be inferred if results match the requested store.",
+      "requirement": "Relevant tool contract (`TOOL-3` and `agent/tools.py`)",
+      "evaluator": "recovered-error acceptance rule needs student agreement. Code checks where deterministic, otherwise LLM judge.",
+      "annotation_ids": [
+        "a2fd55fb-793a-4497-adfb-be62d6d366c7",
+        "abb03981-fbfd-489a-b000-c11a89e5d41f"
+      ],
+      "examples": "support-0128 — d7cc90af945e09973feefd9db9260be9; support-0149 — 799e100145cfd1464b7bd85f1f0daeba",
+      "source": "coding_agent_proposal",
+      "final": false
+    },
+    {
+      "id": "unexplained_refund_refusal",
+      "name": "unexplained refund refusal",
+      "definition": "The agent refuses or says it cannot initiate a requested refund but only repeats a not-eligible flag, without stating a supported concrete reason or acknowledging that the available record does not explain the reason.",
+      "boundaries": "Different from unnecessary_response_content: the corrective change is to explain the decision, not remove words. Do not require the agent to invent an eligibility reason: if tools expose only a Boolean, acknowledging that limitation satisfies this proposed boundary. Do not treat a delivered status alone as proof of ineligibility. Escalation trigger and execution are evaluated separately. Only two originating traces; a third positive and close negatives remain pending.",
+      "requirement": "RESP-5 (explain the relevant decision), RESP-3 (state missing information). The missing-reason exception needs student agreement before finalization.",
+      "evaluator": "LLM judge with order/tool context; distinguish an unexplained flag from an explicitly unavailable reason.",
+      "annotation_ids": [
+        "f30ee441-da24-4b68-bf66-b4133137805c",
+        "e845ec56-f85b-4026-af00-84b4dbd5db90"
+      ],
+      "examples": "support-0157 — 599c13ea4ab3b8c789cb6cbe210e5bc1; support-0044 — bf7e795ae9cd4d16db019ebf5d9892a4",
+      "source": "coding_agent_proposal",
+      "final": false
+    }
+  ],
   "decisions": {}
 }

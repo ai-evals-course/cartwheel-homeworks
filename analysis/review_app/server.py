@@ -40,7 +40,9 @@ class ReviewServer(ThreadingHTTPServer):
         self.records = {r["id"]: r for r in records}
         if len(self.records) != len(records):
             raise ValueError("Duplicate trace IDs in source")
-        self.sessions = group_sessions(records)
+        scenario_path = HERE.parents[1] / "scenarios" / "support_scenarios.jsonl"
+        scenarios = [json.loads(line) for line in scenario_path.read_text().splitlines() if line.strip()] if scenario_path.exists() else []
+        self.sessions = group_sessions(records, scenarios)
         self.source = source
         self.langfuse_host = os.environ.get("LANGFUSE_HOST", "").rstrip("/") if sync is None else ""
         self.namespace = ":".join(sorted({str(r.get("projectId", "offline")) for r in records})) or "empty"
@@ -90,6 +92,8 @@ class ReviewHandler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         static = {"/": ("index.html", "text/html; charset=utf-8"),
                   "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+                  "/sampling.js": ("sampling.js", "text/javascript; charset=utf-8"),
+                  "/review-controls.js": ("review-controls.js", "text/javascript; charset=utf-8"),
                   "/style.css": ("style.css", "text/css; charset=utf-8")}
         if url.path in static:
             filename, mime = static[url.path]

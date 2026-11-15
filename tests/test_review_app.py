@@ -21,6 +21,16 @@ def test_sessions_use_nested_identity_and_never_merge_scenario_repeats():
     assert len(group_sessions([trace("x", None), trace("y", None)])) == 2
 
 
+def test_session_dimensions_use_scenario_tuple_and_authenticated_trace_role():
+    scenarios = [{"id": "same-scenario", "tuple": {"role": "merchant", "intent": "refund",
+                  "order_age_days_range": "8–14", "tools_needed": "several_calls"}}]
+    groups = group_sessions([trace("a"), trace("b", "other", scenario="missing")], scenarios)
+    dims = next(g for g in groups if g["id"] == "session-a")["traces"][0]["dimensions"]
+    assert dims == {"authenticated role": "shopper", "intent": "refund",
+                    "age since placement": "8–14", "tools needed": "several_calls"}
+    assert next(g for g in groups if g["id"] == "other")["traces"][0]["dimensions"] == {"authenticated role": "shopper"}
+
+
 def test_turn_sorts_observations_and_does_not_repeat_history_or_final():
     raw = trace("a")
     raw["observations"] = [
@@ -51,13 +61,66 @@ def test_missing_capture_is_not_an_empty_successful_conversation():
     assert turn["warnings"]
 
 
-def test_note_and_review_are_separate_and_survive_restart(tmp_path):
+def test_note_marks_trace_reviewed_and_explicit_outcome_survives_restart(tmp_path):
     store = ReviewStore(tmp_path, {"a"})
     store.apply({"action": "note", "trace_id": "a", "id": "n", "note": "First issue", "anchor": {"block_id": "b", "field": "text", "quote": "Done", "start": 0, "end": 4}})
-    assert store.read()["reviews"] == {}
+    assert store.read()["reviews"]["a"]["status"] == "reviewed"
     store.apply({"action": "review", "trace_id": "a", "status": "first_failure"})
     assert ReviewStore(tmp_path, {"a"}).read()["reviews"]["a"]["status"] == "first_failure"
     assert store.read()["annotations"][0]["anchor"]["quote"] == "Done"
+
+
+def test_existing_comments_are_marked_reviewed_without_changing_assessments(tmp_path):
+    from analysis.helpers._state import write_json
+    state = {"revision": 3, "annotations": [
+        {"id": "n1", "trace_id": "a", "note": "Observation"},
+        {"id": "n2", "trace_id": "b", "note": "Another observation"}],
+        "reviews": {"b": {"status": "no_failure"}}, "labels": {}, "modes": [], "decisions": {}}
+    write_json(tmp_path / "review_app.json", state)
+    store = ReviewStore(tmp_path, {"a", "b"})
+    saved = store.read()
+    assert saved["reviews"]["a"]["status"] == "reviewed"
+    assert saved["reviews"]["b"]["status"] == "no_failure"
+    assert saved["annotations"] == state["annotations"]
+    assert saved["labels"] == {}
+    assert ReviewStore(tmp_path, {"a", "b"}).read()["revision"] == saved["revision"]
+
+
+def test_mark_conversation_reviewed_persists_all_turns_and_preserves_assessments(tmp_path):
+    store = ReviewStore(tmp_path, {"a", "b", "c"})
+    store.apply({"action": "review", "trace_id": "a", "status": "no_failure"})
+    store.apply({"action": "review", "trace_id": "b", "status": "unreviewed"})
+    store.apply({"action": "mark_reviewed", "trace_ids": ["a", "b", "c"]})
+    saved = ReviewStore(tmp_path, {"a", "b", "c"}).read()
+    assert saved["reviews"]["a"]["status"] == "no_failure"
+    assert saved["reviews"]["b"]["status"] == "reviewed"
+    assert saved["reviews"]["c"]["status"] == "reviewed"
+    assert saved["labels"] == {}
+    assert saved["annotations"] == []
+    store.apply({"action": "review", "trace_id": "c", "status": "unreviewed"})
+    assert store.read()["reviews"]["c"]["status"] == "unreviewed"
+
+
+@pytest.mark.parametrize("trace_ids", [[], ["a", "unknown"], "a", None])
+def test_mark_reviewed_rejects_invalid_trace_lists_without_partial_writes(tmp_path, trace_ids):
+    store = ReviewStore(tmp_path, {"a"})
+    with pytest.raises(ValueError):
+        store.apply({"action": "mark_reviewed", "trace_ids": trace_ids})
+    assert store.read()["reviews"] == {}
+
+
+def test_toggle_review_round_trip_and_comment_pins_reviewed_state(tmp_path):
+    store = ReviewStore(tmp_path, {"a", "b"})
+    event = {"action": "toggle_review", "trace_ids": ["a", "b"]}
+    assert store.apply(event)["reviews"]["a"]["status"] == "reviewed"
+    saved = store.apply(event)
+    assert all(r["status"] == "unreviewed" for r in saved["reviews"].values())
+    store.apply({"action": "note", "trace_id": "a", "note": "Observation"})
+    store.apply({"action": "review", "trace_id": "a", "status": "first_failure"})
+    for _ in range(2):
+        saved = store.apply(event)
+        assert saved["reviews"]["a"]["status"] == "first_failure"
+        assert saved["reviews"]["b"]["status"] == "reviewed"
 
 
 def test_invalid_label_never_calls_langfuse_and_pending_can_retry(tmp_path):

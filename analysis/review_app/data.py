@@ -32,10 +32,24 @@ def text(value):
                      for p in m.get("parts", []) if p.get("type") == "text")
 
 
-def group_sessions(traces):
+DIMENSION_FIELDS = {
+    "authenticated role": "role", "intent": "intent", "record involved": "record_involved",
+    "order status": "order_status", "age since placement": "order_age_days_range",
+    "applicable policy": "applicable_policy", "tools needed": "tools_needed",
+    "difficulty": "difficulty", "user style": "user_style",
+}
+
+
+def group_sessions(traces, scenarios=()):
+    scenario_tuples = {s["id"]: s.get("tuple", {}) for s in scenarios}
     groups = {}
     for raw in traces:
         meta = _metadata(raw)
+        values = scenario_tuples.get(meta.get("cartwheel.scenario_id"), {})
+        dimensions = {name: str(values[key]) for name, key in DIMENSION_FIELDS.items()
+                      if values.get(key) is not None}
+        if meta.get("cartwheel.user_role"):
+            dimensions["authenticated role"] = meta["cartwheel.user_role"]
         sid = meta.get("cartwheel.session_id") or raw.get("sessionId") or "trace:" + raw["id"]
         group = groups.setdefault(sid, {"id": sid, "traces": []})
         group["traces"].append({
@@ -43,6 +57,7 @@ def group_sessions(traces):
             "scenario": meta.get("cartwheel.scenario_id"),
             "role": meta.get("cartwheel.user_role"), "user_id": meta.get("cartwheel.user_id"),
             "prompt_version": meta.get("cartwheel.prompt_version"),
+            "dimensions": dimensions,
             "preview": text(raw.get("input"))[:220],
         })
     for group in groups.values():
@@ -134,6 +149,19 @@ class ReviewStore:
         self.root, self.trace_ids, self.sync = root, trace_ids, sync
         self.path = root / "review_app.json"
         self.lock = threading.RLock()
+        with self.lock:
+            state = read_json(self.path, None)
+            if state is not None and self._mark_reviewed(state, [a["trace_id"] for a in state["annotations"]]):
+                self._persist(state)
+
+    def _mark_reviewed(self, state, trace_ids):
+        changed = False
+        for trace_id in trace_ids:
+            if (trace_id in self.trace_ids
+                    and state["reviews"].get(trace_id, {}).get("status", "unreviewed") == "unreviewed"):
+                state["reviews"][trace_id] = {"status": "reviewed", "updated_at": now()}
+                changed = True
+        return changed
 
     def read(self):
         with self.lock:
@@ -184,6 +212,7 @@ class ReviewStore:
                 annotation = {"id": aid, "trace_id": tid, "note": note,
                               "anchor": anchor, "updated_at": now(), "source": "human"}
                 state["annotations"] = [a for a in state["annotations"] if a["id"] != aid] + [annotation]
+                self._mark_reviewed(state, [tid])
             elif action == "delete_note":
                 aid = event.get("id")
                 note = next((a for a in state["annotations"] if a["id"] == aid and a["trace_id"] == tid), None)
@@ -195,6 +224,19 @@ class ReviewStore:
                 if (state["reviews"].get(tid, {}).get("status") == "first_failure"
                         and not any(a["trace_id"] == tid for a in state["annotations"])):
                     state["reviews"][tid] = {"status": "unreviewed", "updated_at": now()}
+            elif action in {"mark_reviewed", "toggle_review"}:
+                trace_ids = event.get("trace_ids")
+                if (not isinstance(trace_ids, list) or not trace_ids
+                        or any(not isinstance(tid, str) or tid not in self.trace_ids for tid in trace_ids)):
+                    raise ValueError("Choose known traces to mark reviewed")
+                has_comment = any(a["trace_id"] in trace_ids for a in state["annotations"])
+                complete = all(state["reviews"].get(tid, {}).get("status") in
+                               {"reviewed", "first_failure", "no_failure"} for tid in trace_ids)
+                if action == "toggle_review" and complete and not has_comment:
+                    for trace_id in trace_ids:
+                        state["reviews"][trace_id] = {"status": "unreviewed", "updated_at": now()}
+                else:
+                    self._mark_reviewed(state, trace_ids)
             elif action == "review":
                 status = event.get("status")
                 if status not in {"first_failure", "no_failure", "unreviewed"}:
@@ -246,6 +288,7 @@ class ReviewStore:
                         "trace_id": suggestion["trace_id"], "note": suggestion.get("note") or suggestion.get("reason") or "Accepted suggestion",
                         "anchor": suggestion.get("anchor") or {"quote": suggestion.get("quote", "")},
                         "source": "human_accepted_ai", "updated_at": now()})
+                    self._mark_reviewed(state, [suggestion["trace_id"]])
             elif action != "retry":
                 raise ValueError("Unknown review action")
             self._persist(state)  # Save before network I/O so an outage loses no judgment.

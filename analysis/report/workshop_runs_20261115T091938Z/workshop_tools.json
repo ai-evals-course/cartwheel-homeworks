@@ -1,0 +1,73 @@
+[
+  {
+    "run_id": "1813cf12874ace94d105f46a86dd6f2b",
+    "span_id": "fdbf82ab8e1e4b2c",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"shopper\",\"cartwheel.user_id\":\"37\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":3684}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 3684, \\\"store_id\\\": 4, \\\"product_id\\\": 143, \\\"quantity\\\": 1, \\\"total_usd\\\": 173.25, \\\"status\\\": \\\"placed\\\", \\\"ordered_at\\\": \\\"2026-07-01\\\", \\\"shipped_at\\\": null, \\\"delivered_at\\\": null, \\\"refund_eligible\\\": false, \\\"store_name\\\": \\\"Copperline Tools\\\"}}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "569030a2dc3bac0acde729a7df9284cd",
+    "span_id": "cea9d7b622597499",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"merchant\",\"cartwheel.store_id\":12,\"cartwheel.user_id\":\"9012\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":4722}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 4722, \\\"store_id\\\": 12, \\\"product_id\\\": 476, \\\"quantity\\\": 1, \\\"total_usd\\\": 222.5, \\\"status\\\": \\\"shipped\\\", \\\"ordered_at\\\": \\\"2026-06-25\\\", \\\"shipped_at\\\": \\\"2026-06-28\\\", \\\"delivered_at\\\": null, \\\"refund_eligible\\\": false, \\\"store_name\\\": \\\"Wooden Whale Workshop\\\"}}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "5caaf6834e4bdb51c607fa81a15f39d2",
+    "span_id": "320e9b687a9abd5a",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"support\",\"cartwheel.user_id\":\"9504\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":6998}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 6998, \\\"store_id\\\": 3, \\\"product_id\\\": 108, \\\"quantity\\\": 1, \\\"total_usd\\\": 265.75, \\\"status\\\": \\\"delivered\\\", \\\"ordered_at\\\": \\\"2026-06-01\\\", \\\"shipped_at\\\": \\\"2026-06-02\\\", \\\"delivered_at\\\": \\\"2026-06-09\\\", \\\"refund_eligible\\\": true, \\\"store_name\\\": \\\"Petal & Stem\\\"}}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "5caaf6834e4bdb51c607fa81a15f39d2",
+    "span_id": "7c6b08c9a5eecc58",
+    "name": "issue_refund",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"issue_refund\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"support\",\"cartwheel.user_id\":\"9504\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":6998,\\\"amount_usd\\\":265.75,\\\"reason\\\":\\\"Customer requested a refund.\\\"}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"status\\\": \\\"queued_for_approval\\\", \\\"refund_id\\\": 597, \\\"order_id\\\": 6998, \\\"amount_usd\\\": 265.75, \\\"note\\\": \\\"amount is above the $100 auto-approval threshold; a human support agent will review it\\\"}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "d66d27e9343f1f70bc53cd4e77afd9d7",
+    "span_id": "e85b2549bd446859",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"shopper\",\"cartwheel.user_id\":\"443\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":6926}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 6926, \\\"store_id\\\": 9, \\\"product_id\\\": 353, \\\"quantity\\\": 1, \\\"total_usd\\\": 63.0, \\\"status\\\": \\\"refunded\\\", \\\"ordered_at\\\": \\\"2026-06-11\\\", \\\"shipped_at\\\": \\\"2026-06-12\\\", \\\"delivered_at\\\": \\\"2026-06-19\\\", \\\"refund_eligible\\\": true, \\\"store_name\\\": \\\"Trailhead Supply\\\"}}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "b192560cb8c572661cd9eaeba28f0da0",
+    "span_id": "f512f5dd871f84c6",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"merchant\",\"cartwheel.store_id\":18,\"cartwheel.user_id\":\"9018\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":6552}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 6552, \\\"store_id\\\": 18, \\\"product_id\\\": 708, \\\"quantity\\\": 2, \\\"total_usd\\\": 437.0, \\\"status\\\": \\\"cancelled\\\", \\\"ordered_at\\\": \\\"2026-07-01\\\", \\\"shipped_at\\\": null, \\\"delivered_at\\\": null, \\\"refund_eligible\\\": false, \\\"store_name\\\": \\\"Clover Field Naturals\\\"}}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "a98e6e8edc561cb1a6b2d5448d605cc9",
+    "span_id": "e7103dbb1081fe44",
+    "name": "search_help_center",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"search_help_center\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"support\",\"cartwheel.user_id\":\"9502\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"query\\\":\\\"refund processing time\\\"}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"results\\\": [{\\\"policy_id\\\": \\\"cw-refunds\\\", \\\"title\\\": \\\"Cartwheel refund policy\\\", \\\"snippet\\\": \\\"# Cartwheel refund policy\\\\n\\\\nApproved refunds go back to the original payment method and arrive in 5 to 10 business days. Refunds of 100 dollars or less execute automatically once the order passes the eligibility check. Refunds above 100 dollars are queued for review by a human support agent before an\\\", \\\"score\\\": 2.567}, {\\\"policy_id\\\": \\\"cw-cancellations\\\", \\\"title\\\": \\\"Cartwheel order cancellation policy\\\", \\\"snippet\\\": \\\"# Cartwheel order cancellation policy\\\\n\\\\nAn order can be cancelled at no cost any time before the store ships it. Once an order has shipped it can no longer be cancelled; the buyer should instead wait for delivery and request a return under the Cartwheel return policy.\\\", \\\"score\\\": 2.401}, {\\\"policy_id\\\": \\\"cw-disputes\\\", \\\"title\\\": \\\"Cartwheel dispute policy\\\", \\\"snippet\\\": \\\"# Cartwheel dispute policy\\\\n\\\\nBuyers can dispute a charge for up to 60 days after delivery. Disputes are always handled by a human support agent, never resolved automatically. Opening a dispute pauses any pending refund on the same order.\\\", \\\"score\\\": 2.012}]}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "0e085293f04a2ec380c65ead1e5b38a6",
+    "span_id": "7de587029b33423a",
+    "name": "search_products",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"search_products\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"merchant\",\"cartwheel.store_id\":2,\"cartwheel.user_id\":\"9002\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"query\\\":\\\"Sturdy Tray\\\",\\\"store\\\":\\\"2\\\",\\\"max_price_usd\\\":null,\\\"limit\\\":5}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": false, \\\"error\\\": \\\"not_found\\\", \\\"reason\\\": \\\"no store '2'\\\"}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "0e085293f04a2ec380c65ead1e5b38a6",
+    "span_id": "61dc257481c0f7fb",
+    "name": "search_products",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"search_products\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"merchant\",\"cartwheel.store_id\":2,\"cartwheel.user_id\":\"9002\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"query\\\":\\\"Sturdy Tray\\\",\\\"store\\\":null,\\\"max_price_usd\\\":null,\\\"limit\\\":5}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"products\\\": [{\\\"product_id\\\": 48, \\\"store_id\\\": 2, \\\"title\\\": \\\"Sturdy Tray\\\", \\\"price_usd\\\": 127.75}, {\\\"product_id\\\": 67, \\\"store_id\\\": 2, \\\"title\\\": \\\"Sturdy Tray\\\", \\\"price_usd\\\": 143.25}], \\\"count\\\": 2}\",\"otel.status.code\":1}"
+  },
+  {
+    "run_id": "7e5ca31e52efcac2c949787ee06bcd04",
+    "span_id": "ed457a3f60851cf6",
+    "name": "get_order",
+    "status": "OK",
+    "attributes": "{\"traceloop.span.kind\":\"tool\",\"gen_ai.tool.name\":\"get_order\",\"gen_ai.tool.type\":\"function\",\"gen_ai.provider.name\":\"openai\",\"gen_ai.operation.name\":\"execute_tool\",\"cartwheel.user_role\":\"support\",\"cartwheel.user_id\":\"9503\",\"cartwheel.permission_denied\":false,\"gen_ai.tool.call.arguments\":\"{\\\"order_id\\\":3785}\",\"gen_ai.tool.call.result\":\"{\\\"ok\\\": true, \\\"order\\\": {\\\"order_id\\\": 3785, \\\"store_id\\\": 18, \\\"product_id\\\": 702, \\\"quantity\\\": 1, \\\"total_usd\\\": 201.0, \\\"status\\\": \\\"delivered\\\", \\\"ordered_at\\\": \\\"2026-02-13\\\", \\\"shipped_at\\\": \\\"2026-02-16\\\", \\\"delivered_at\\\": \\\"2026-02-22\\\", \\\"refund_eligible\\\": false, \\\"store_name\\\": \\\"Clover Field Naturals\\\"}}\",\"otel.status.code\":1}"
+  }
+]
+

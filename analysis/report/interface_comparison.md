@@ -63,3 +63,12 @@ accept/reject controls, progress and mobile layout. All synthetic mutations used
 temporary offline state; live verification performed reads only. No new model
 calls or student assessments were generated. The student's standard Langfuse
 view comparison, human review, final taxonomy and video remain pending.
+
+**Additional-instance search, 2026-11-15:** live Langfuse access from this
+sandbox failed with `URLError`, OS error 1 (`Operation not permitted`). The
+user authorized provisional searches, so this search used the existing full
+trace export (`traces/support_traces.json`, exported 2026-11-09) as an offline
+fallback. Its 324 captured traces do not establish coverage of the current
+live project. The Agent suggestions tab contains 51 anchored retrieval
+candidates, not labels. Mock rows were removed. See
+[the search report](additional_instance_search.md) for scope and limitations.

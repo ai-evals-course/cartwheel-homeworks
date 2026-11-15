@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Cartwheel · Trace review</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/sampling.js" defer></script>
+  <script src="/review-controls.js" defer></script>
   <script src="/app.js" defer></script>
 </head>
 <body>
@@ -21,10 +23,17 @@
   <div id="notice" role="alert" hidden></div>
   <main>
     <aside class="queue" aria-label="Conversation queue">
-      <div class="queue-head"><h2>Conversations</h2><span id="queue-count"></span></div>
+      <div class="queue-head">
+        <div class="queue-title-row">
+          <h2>Conversations</h2>
+          <input id="queue-search" type="search" placeholder="Search IDs" aria-label="Search conversations by run or scenario ID" title="Search a run ID or scenario, e.g. support-0140" autocomplete="off" spellcheck="false">
+        </div>
+        <span id="queue-count" role="status" aria-live="polite"></span>
+      </div>
       <div class="sampling-controls" id="sampling-controls" hidden>
         <label class="sampling-toggle"><input type="checkbox" id="sampling-enabled"> Sampling</label>
         <button type="button" id="sampling-arrow" aria-label="Sampling options" aria-expanded="false" aria-controls="sampling-menu" hidden>▾</button>
+        <span id="total-reviews" role="status" aria-live="polite"></span>
         <div id="sampling-menu" class="sampling-options" hidden>
           <label><input type="checkbox" value="uniform"> Uniform</label>
           <label><input type="checkbox" value="clustered"> Clustered</label>
