@@ -22,6 +22,27 @@
   <main>
     <aside class="queue" aria-label="Conversation queue">
       <div class="queue-head"><h2>Conversations</h2><span id="queue-count"></span></div>
+      <div class="sampling-controls" id="sampling-controls" hidden>
+        <label class="sampling-toggle"><input type="checkbox" id="sampling-enabled"> Sampling</label>
+        <button type="button" id="sampling-arrow" aria-label="Sampling options" aria-expanded="false" aria-controls="sampling-menu" hidden>▾</button>
+        <div id="sampling-menu" class="sampling-options" hidden>
+          <label><input type="checkbox" value="uniform"> Uniform</label>
+          <label><input type="checkbox" value="clustered"> Clustered</label>
+          <label><input type="checkbox" id="sampling-dimension"> Dimension</label>
+          <fieldset id="sampling-dimensions" hidden>
+            <legend>Dimensions</legend>
+            <label><input type="checkbox" data-dimension="authenticated role"> Authenticated role</label>
+            <label><input type="checkbox" data-dimension="intent"> Intent</label>
+            <label><input type="checkbox" data-dimension="record involved"> Record involved</label>
+            <label><input type="checkbox" data-dimension="order status"> Order status</label>
+            <label><input type="checkbox" data-dimension="age since placement"> Age since placement</label>
+            <label><input type="checkbox" data-dimension="applicable policy"> Applicable policy</label>
+            <label><input type="checkbox" data-dimension="tools needed"> Tools needed</label>
+            <label><input type="checkbox" data-dimension="difficulty"> Difficulty</label>
+            <label><input type="checkbox" data-dimension="user style"> User style</label>
+          </fieldset>
+        </div>
+      </div>
       <div id="queue-list"></div>
     </aside>
     <section class="workspace" aria-label="Review workspace">

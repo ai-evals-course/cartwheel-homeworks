@@ -168,7 +168,7 @@ class ReviewStore:
             if "revision" in event and event["revision"] != state["revision"]:
                 raise ValueError("Review state changed in another tab; reload before saving. Your draft is retained.")
             action, tid = event.get("action"), event.get("trace_id")
-            if action in {"note", "review", "label"} and tid not in self.trace_ids:
+            if action in {"note", "delete_note", "review", "label"} and tid not in self.trace_ids:
                 raise ValueError("Unknown trace")
             if action == "note":
                 note = str(event.get("note", "")).strip()
@@ -184,6 +184,17 @@ class ReviewStore:
                 annotation = {"id": aid, "trace_id": tid, "note": note,
                               "anchor": anchor, "updated_at": now(), "source": "human"}
                 state["annotations"] = [a for a in state["annotations"] if a["id"] != aid] + [annotation]
+            elif action == "delete_note":
+                aid = event.get("id")
+                note = next((a for a in state["annotations"] if a["id"] == aid and a["trace_id"] == tid), None)
+                if note is None:
+                    raise ValueError("Comment not found for this trace")
+                if any(aid in mode.get("annotation_ids", []) for mode in state["modes"]):
+                    raise ValueError("This comment supports a failure mode and cannot be deleted while it is linked")
+                state["annotations"] = [a for a in state["annotations"] if a["id"] != aid]
+                if (state["reviews"].get(tid, {}).get("status") == "first_failure"
+                        and not any(a["trace_id"] == tid for a in state["annotations"])):
+                    state["reviews"][tid] = {"status": "unreviewed", "updated_at": now()}
             elif action == "review":
                 status = event.get("status")
                 if status not in {"first_failure", "no_failure", "unreviewed"}:

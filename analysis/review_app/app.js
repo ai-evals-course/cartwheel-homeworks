@@ -46,7 +46,11 @@ async function act(event) {
     const response = await fetch('/api/action', {method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({...event, revision: state.review.revision})});
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Save failed');
+    if (!response.ok) {
+      if (event.action === 'delete_note' && data.error === 'Unknown review action')
+        throw new Error('Restart the review server to enable comment deletion.');
+      throw new Error(data.error || 'Save failed');
+    }
     state.review = data;
     render();
     return true;
@@ -75,22 +79,69 @@ function roleBadge(role) {
   badge.dataset.audience = role || 'unknown';
   return badge;
 }
+function setSamplingMenu(open) {
+  $('sampling-menu').hidden = !open;
+  $('sampling-arrow').setAttribute('aria-expanded', String(open));
+}
+$('sampling-enabled').addEventListener('change', () => {
+  const enabled = $('sampling-enabled').checked;
+  $('sampling-arrow').hidden = !enabled;
+  setSamplingMenu(enabled);
+  renderQueue();
+});
+$('sampling-arrow').addEventListener('click', () => setSamplingMenu($('sampling-menu').hidden));
+$('sampling-menu').addEventListener('change', () => {
+  $('sampling-dimensions').hidden = !$('sampling-dimension').checked;
+  renderQueue();
+});
+document.addEventListener('pointerdown', event => {
+  if (!$('sampling-menu').contains(event.target) &&
+      !$('sampling-arrow').contains(event.target) &&
+      !$('sampling-enabled').closest('label').contains(event.target)) setSamplingMenu(false);
+}, true);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !$('sampling-menu').hidden) {
+    setSamplingMenu(false);
+    $('sampling-arrow').focus();
+  }
+});
 function renderQueue() {
-  const groups = state.catalog.sessions;
-  $('queue-count').textContent = groups.length;
+  const enabled = $('sampling-enabled').checked;
+  const selected = [...$('sampling-menu').querySelectorAll('input[value]:checked')].map(input => input.value);
+  const dimensions = $('sampling-dimension').checked ? [...$('sampling-menu').querySelectorAll('input[data-dimension]:checked')].map(input => input.dataset.dimension) : [];
+  const manifest = state.catalog.sample_manifest || {};
+  const picks = Array.isArray(manifest.picks) ? manifest.picks : [];
+  const matches = new Set(picks.filter(pick => {
+    const reason = String(pick.reason || pick.strategy || manifest.strategy || '').toLowerCase();
+    let dimension = String(pick.dimension || manifest.dimension || '').toLowerCase().replaceAll('_', ' ');
+    if (dimension === 'user role' || dimension === 'role') dimension = 'authenticated role';
+    return (selected.includes('uniform') && /random|uniform/.test(reason)) ||
+      (selected.includes('clustered') && /cluster/.test(reason)) ||
+      (/dimension|stratif/.test(reason) && dimensions.includes(dimension));
+  }).map(pick => pick.trace_id));
+  const groups = enabled ? state.catalog.sessions.filter(session => session.traces.some(trace => matches.has(trace.id))) : state.catalog.sessions;
+  $('queue-count').textContent = `${allTraces().length} traces · ${state.review.annotations.length} comments`;
   const list = $('queue-list');
   list.replaceChildren();
   for (const session of groups) {
-    const first = session.traces[0], done = session.traces.filter(t => reviewed(t.id)).length;
+    const first = session.traces[0];
+    const comments = session.traces.reduce((count, trace) => count + notesFor(trace.id).length, 0);
     const item = button('', () => openSession(session.id), 'conversation' + (state.session?.id === session.id ? ' active' : ''));
     item.setAttribute('aria-current', state.session?.id === session.id ? 'true' : 'false');
     const title = el('span', 'conversation-title');
-    title.append(el('strong', '', first.scenario || 'Unassigned scenario'), roleBadge(first.role));
-    item.append(title,
-      el('span', 'quiet', `${session.traces.length} trace(s) · ${done} reviewed`));
+    const status = el('span', 'conversation-status');
+    const commentCount = el('span', 'reviewed-count', comments);
+    commentCount.setAttribute('aria-label', `${comments} comments`);
+    commentCount.title = `${comments} comments`;
+    status.append(roleBadge(first.role));
+    title.append(el('strong', '', first.scenario || 'Unassigned scenario'), status);
+    const counts = el('span', 'conversation-counts quiet');
+    counts.append(el('span', '', `${session.traces.length} ${session.traces.length === 1 ? 'trace' : 'traces'}`));
+    if (comments) counts.append(commentCount);
+    item.append(title, counts);
     list.append(item);
   }
-  if (!groups.length) list.append(el('p', 'empty', 'No conversations available.'));
+  if (!groups.length) list.append(el('p', 'empty', enabled ? (selected.length || dimensions.length ? 'No saved samples match these selections.' : 'Choose one or more sampling methods or dimensions.') : 'No conversations available.'));
 }
 async function openSession(id, traceId) {
   if (state.editor) closeNote();
@@ -177,7 +228,8 @@ function renderTool(block, tid) {
 function noteCard(note, kind = 'human') {
   const node = el('div', 'note-card ' + (kind === 'suggestion' ? 'suggestion' : kind === 'legacy' ? 'legacy' : ''));
   node.dataset.noteCard = note.id;
-  node.append(el('strong', '', kind === 'suggestion' ? 'AI suggestion · unaccepted' : kind === 'legacy' ? 'Existing annotation · read only' : note.source === 'human_accepted_ai' ? 'Human accepted · AI origin' : 'Human observation'));
+  const label = kind === 'suggestion' ? 'AI suggestion · unaccepted' : kind === 'legacy' ? 'Existing annotation · read only' : note.source === 'human_accepted_ai' ? 'Human accepted · AI origin' : '';
+  if (label) node.append(el('strong', '', label));
   const quote = note.anchor?.quote || note.quote;
   if (quote) node.append(el('blockquote', '', quote));
   node.append(el('p', '', note.note || note.reason || 'No note text'));
@@ -185,12 +237,34 @@ function noteCard(note, kind = 'human') {
   const actions = el('div', 'actions');
   if (kind === 'suggestion') {
     actions.append(button('Accept', () => act({action:'suggestion', id: note.id, decision:'accept'})), button('Reject', () => act({action:'suggestion', id: note.id, decision:'reject'})));
-  } else if (kind !== 'legacy') actions.append(button('Edit note', e => editNote(note, e.currentTarget)));
+  } else if (kind !== 'legacy') {
+    actions.hidden = true;
+    actions.classList.add('note-edit-actions');
+    node.tabIndex = 0;
+    node.setAttribute('aria-label', 'Comment. Activate to show edit action.');
+    const reveal = () => { actions.hidden = false; requestAnimationFrame(layoutNotes); };
+    node.addEventListener('click', reveal);
+    node.addEventListener('keydown', e => {
+      if (e.target === node && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); reveal(); }
+    });
+    const remove = button('×', () => act({action:'delete_note', trace_id:note.trace_id, id:note.id}), 'delete-note');
+    remove.setAttribute('aria-label', 'Delete comment');
+    remove.title = 'Delete comment';
+    actions.append(button('Edit note', e => editNote(note, e.currentTarget)), remove);
+  }
   node.append(actions);
   node.onmouseenter = () => {for (const m of document.querySelectorAll('mark')) if (m.dataset.note === note.id) m.classList.add('pending');};
   node.onmouseleave = () => {for (const m of document.querySelectorAll('mark')) if (m.dataset.note === note.id) m.classList.remove('pending');};
   return node;
 }
+document.addEventListener('click', event => {
+  for (const actions of document.querySelectorAll('.note-edit-actions')) {
+    if (!actions.closest('.note-card').contains(event.target) && !actions.hidden) {
+      actions.hidden = true;
+      requestAnimationFrame(layoutNotes);
+    }
+  }
+});
 function renderRead() {
   for (const disclosure of $('read-view').querySelectorAll('[data-disclosure]')) state.disclosures.set(disclosure.dataset.disclosure, disclosure.open);
   const root = $('read-view'); root.replaceChildren();
@@ -245,14 +319,22 @@ function renderRead() {
 function layoutNotes() {
   for (const article of document.querySelectorAll('.trace')) {
     const column = article.querySelector('.notes');
-    if (!column || getComputedStyle(column).display === 'flex') continue;
-    let lastBottom = 0;
-    for (const card of column.querySelectorAll('.note-card')) {
-      const mark = [...article.querySelectorAll('mark')].find(m => m.dataset.note === card.dataset.noteCard);
-      const target = mark ? mark.getBoundingClientRect().top - column.getBoundingClientRect().top : lastBottom;
-      const currentTop = card.offsetTop;
-      card.style.marginTop = Math.max(0, target - currentTop) + 'px';
-      lastBottom = card.offsetTop + card.offsetHeight + 12;
+    if (!column) continue;
+    const cards = [...column.querySelectorAll('.note-card')];
+    cards.forEach(card => { card.style.marginTop = ''; });
+    if (getComputedStyle(column).display === 'flex') continue;
+    const marks = [...article.querySelectorAll('mark')];
+    const columnTop = column.getBoundingClientRect().top;
+    const targets = new Map(cards.map(card => {
+      const mark = marks.find(m => m.dataset.note === card.dataset.noteCard);
+      return [card, mark ? mark.getBoundingClientRect().top - columnTop : Infinity];
+    }));
+    cards.sort((a, b) => targets.get(a) - targets.get(b));
+    cards.forEach(card => column.append(card));
+    for (const card of cards) {
+      const target = targets.get(card);
+      const current = card.getBoundingClientRect().top - columnTop;
+      if (Number.isFinite(target)) card.style.marginTop = Math.max(0, target - current) + 'px';
     }
   }
 }
@@ -286,19 +368,40 @@ function field(form, label, name, value = '', multiline = false) {
 }
 function renderTaxonomy() {
   const root = $('taxonomy-view'); root.replaceChildren();
-  root.append(el('h2', '', 'Failure taxonomy'), el('p', 'quiet', 'Group human observations after open coding. You decide the definitions, boundaries and final modes. Existing taxonomy suggestions remain provisional until you confirm them.'));
-  for (const mode of state.review.modes) {
-    const panel = el('div', 'panel');
-    panel.append(el('h3', '', mode.id + (mode.final ? ' · Final' : ' · Draft')), el('p', 'mode-definition', mode.definition || 'Definition pending'),
-      el('p', 'quiet', 'Requirement: ' + (mode.requirement || 'Not recorded')), el('p', 'mode-definition', 'Boundaries: ' + (mode.boundaries || 'Not recorded')),
-      el('p', 'mode-definition', 'Examples: ' + (mode.examples || 'Not recorded')), button('Edit definition & supporting notes', () => editMode(mode)));
-    const supporting = state.review.annotations.filter(n => (mode.annotation_ids || []).includes(n.id));
-    const notes = el('div', 'mode-notes');
-    notes.append(el('p', 'quiet', `${supporting.length} supporting human observation(s)`));
-    supporting.forEach(n => notes.append(button(n.note, () => jumpTrace(n.trace_id), 'jump')));
-    panel.append(notes); root.append(panel);
+  root.append(el('h2', '', 'Failure taxonomy'));
+  if (!state.review.modes.length) {
+    root.append(el('p', 'empty', 'No failure modes recorded yet.'));
+    return;
   }
-  const slot = el('div', 'panel'); slot.id = 'mode-editor'; root.append(slot); editMode();
+  const modes = state.review.modes.map((mode, index) => ({
+    mode, index, notes: state.review.annotations.filter(n => (mode.annotation_ids || []).includes(n.id))
+  })).sort((a, b) => b.notes.length - a.notes.length);
+  const map = el('div', 'taxonomy-map');
+  function buildTiles(items, depth = 0) {
+    if (items.length === 1) {
+      const {mode, index, notes} = items[0];
+      const tile = el('section', 'taxonomy-tile');
+      tile.dataset.color = index % 6;
+      tile.append(el('h3', '', mode.name || mode.id.replaceAll('_', ' ')),
+        el('p', 'taxonomy-count', `${notes.length} ${notes.length === 1 ? 'comment' : 'comments'}`));
+      notes.forEach(note => tile.append(button(note.note, () => jumpTrace(note.trace_id), 'jump')));
+      return tile;
+    }
+    const weight = item => Math.max(1, item.notes.length);
+    const total = items.reduce((sum, item) => sum + weight(item), 0);
+    let sum = 0, split = 0;
+    while (split < items.length - 1 && (sum < total / 2 || split === 0)) sum += weight(items[split++]);
+    const group = el('div', 'taxonomy-group');
+    group.style.flexDirection = depth % 2 ? 'column' : 'row';
+    const left = buildTiles(items.slice(0, split), depth + 1);
+    const right = buildTiles(items.slice(split), depth + 1);
+    left.style.flex = `${sum} 1 0`;
+    right.style.flex = `${total - sum} 1 0`;
+    group.append(left, right);
+    return group;
+  }
+  map.append(buildTiles(modes));
+  root.append(map);
 }
 function editMode(mode = {}) {
   const slot = $('mode-editor'); slot.replaceChildren();
@@ -374,6 +477,7 @@ function renderProgress() {
   if (decided.length) root.append(details('Suggestion decision history', el('pre', '', pretty(state.review.decisions))));
 }
 function render() {
+  $('sampling-controls').hidden = state.view !== 'read';
   if (!state.review || !state.catalog) return;
   renderQueue(); saveStatus();
   const header = $('session-header'); header.replaceChildren();

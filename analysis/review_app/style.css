@@ -244,9 +244,13 @@ main {
 }
 .queue-head {
   display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  padding-right:18px;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:3px;
+  padding:0 18px 8px 0;
+}
+.queue-head h2 {
+  margin:0;
 }
 .queue-head span {
   font-size:var(--text-small);
@@ -256,8 +260,8 @@ main {
   display:block;
   text-align:left;
   width:100%;
-  padding:13px 11px;
-  margin:8px 0;
+  padding:8px 10px;
+  margin:4px 0;
   background:#fff;
   border:1px solid #ded7dc;
   border-radius:5px
@@ -275,9 +279,27 @@ main {
 .conversation-title {
   display:flex;
   flex-wrap:wrap;
-  align-items:center;
+  align-items:flex-start;
   justify-content:space-between;
-  gap:8px;
+  gap:4px;
+}
+.conversation-status {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+.reviewed-count {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:24px;
+  height:24px;
+  padding:0 4px;
+  border:1px solid #ac7962;
+  border-radius:999px;
+  font-size:var(--text-small);
+  line-height:1;
 }
 .audience-badge {
   display:inline-block;
@@ -303,8 +325,14 @@ main {
   color:#78617f;
 }
 .conversation .quiet {
-  display:block;
-  margin-top:7px
+  margin-top:4px;
+}
+.conversation-counts {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  white-space:nowrap;
 }
 .workspace {
   min-width:0;
@@ -497,6 +525,7 @@ main {
   margin:7px 0
 }
 .note-card blockquote {
+  font-style:italic;
   font-size:var(--text-small);
   max-height:110px;
   overflow:auto;
@@ -818,7 +847,6 @@ td .actions button {
   }
   .queue-head h2 {
     font-size:var(--text-body);
-    margin-bottom:8px;
   }
   #queue-list {
     display:flex;
@@ -869,3 +897,69 @@ td .actions button {
     font-size:20px
   }
 }
+
+.note-card .actions[hidden] { display:none; }
+
+.taxonomy-map {
+  height:420px;
+  min-width:0;
+}
+.taxonomy-group {
+  display:flex;
+  gap:4px;
+  min-width:0;
+  min-height:0;
+  height:100%;
+}
+.taxonomy-tile {
+  box-sizing:border-box;
+  min-width:0;
+  min-height:0;
+  overflow:auto;
+  padding:10px;
+  border:1px solid #a3b5cc;
+  border-radius:4px;
+  background:#eaf0f8;
+  overflow-wrap:anywhere;
+}
+.taxonomy-tile[data-color="1"] { background:#f4f1ed; border-color:#c9bfb5; }
+.taxonomy-tile[data-color="2"] { background:#edf4ee; border-color:#a8c3aa; }
+.taxonomy-tile[data-color="3"] { background:#f4edf3; border-color:#c6a8bf; }
+.taxonomy-tile[data-color="4"] { background:#f8efed; border-color:#d4b1aa; }
+.taxonomy-tile[data-color="5"] { background:#f5f3e8; border-color:#c8c39e; }
+.taxonomy-tile h3 { margin:0; font-size:var(--text-small); }
+.taxonomy-count { margin:4px 0; font-size:var(--text-small); color:var(--muted); }
+.taxonomy-tile .jump { display:block; margin-top:6px; text-align:left; }
+
+ .sampling-controls {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:0;
+  padding:2px 14px 8px 0;
+  font-size:var(--text-small);
+}
+.sampling-controls[hidden], #sampling-menu[hidden], #sampling-arrow[hidden] { display:none; }
+.sampling-controls label { display:flex; align-items:center; gap:7px; margin:0; font-weight:400; cursor:pointer; }
+.sampling-controls input { display:inline-block; width:auto; margin:0; accent-color:var(--accent); }
+#sampling-arrow { padding:2px 2px; border:0; background:transparent; color:var(--accent); }
+#sampling-arrow:disabled { opacity:.45; cursor:default; }
+.sampling-options {
+  position:absolute;
+  left:0;
+  top:100%;
+  z-index:5;
+  min-width:150px;
+  padding:5px;
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:5px;
+  box-shadow:0 4px 12px #302b2f1f;
+}
+.sampling-options label { padding:7px; border-radius:3px; }
+.sampling-options label:hover { background:#f2eeeb; }
+
+.sampling-options fieldset { margin:3px 0 3px 14px; padding:3px 0 0 8px; border:0; border-left:1px solid var(--line); }
+.sampling-options fieldset[hidden] { display:none; }
+.sampling-options legend { padding:0 4px; color:var(--muted); font-size:var(--text-small); }

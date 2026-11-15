@@ -98,7 +98,8 @@ class ReviewHandler(BaseHTTPRequestHandler):
             self.respond({"sessions": self.server.sessions, "source": self.server.source,
                           "namespace": self.server.namespace,
                           "langfuse_host": self.server.langfuse_host,
-                          "legacy_annotations": self.server.legacy_notes})
+                          "legacy_annotations": self.server.legacy_notes,
+                          "sample_manifest": read_json(self.server.store.root / "sample_manifest.json", {})})
         elif url.path == "/api/state":
             self.respond(self.server.store.read())
         elif url.path == "/api/session":

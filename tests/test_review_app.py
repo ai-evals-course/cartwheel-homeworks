@@ -147,3 +147,24 @@ def test_http_session_state_validation_and_origin_protection(tmp_path):
         server.shutdown()
         server.server_close()
         worker.join()
+
+
+def test_deleting_comment_keeps_other_comments_and_resets_empty_failure_review(tmp_path):
+    store = ReviewStore(tmp_path, {'a', 'b'}, sync=lambda *_: None)
+    store.apply({'action': 'note', 'trace_id': 'a', 'id': 'n1', 'note': 'Issue'})
+    store.apply({'action': 'note', 'trace_id': 'b', 'id': 'n2', 'note': 'Another issue'})
+    store.apply({'action': 'review', 'trace_id': 'a', 'status': 'first_failure'})
+    result = store.apply({'action': 'delete_note', 'trace_id': 'a', 'id': 'n1'})
+    assert [note['id'] for note in result['annotations']] == ['n2']
+    assert result['reviews']['a']['status'] == 'unreviewed'
+    with pytest.raises(ValueError):
+        store.apply({'action': 'delete_note', 'trace_id': 'a', 'id': 'n2'})
+
+
+def test_cannot_delete_comment_supporting_a_mode(tmp_path):
+    store = ReviewStore(tmp_path, {'a'}, sync=lambda *_: None)
+    store.apply({'action': 'note', 'trace_id': 'a', 'id': 'n1', 'note': 'Issue'})
+    store.apply({'action': 'mode', 'id': 'issue', 'definition': 'An issue', 'annotation_ids': ['n1']})
+    with pytest.raises(ValueError, match='supports a failure mode'):
+        store.apply({'action': 'delete_note', 'trace_id': 'a', 'id': 'n1'})
+    assert store.read()['annotations'][0]['id'] == 'n1'
