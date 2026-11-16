@@ -1,5 +1,5 @@
 {
-  "revision": 133,
+  "revision": 561,
   "annotations": [
     {
       "id": "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
@@ -1254,69 +1254,43 @@
       "updated_at": "2026-11-15T10:29:37.018897+00:00"
     }
   },
-  "labels": {},
+  "labels": {
+    "a89ead3274f5c7ba346f20f604c88c0d:missing_human_escalation": {
+      "trace_id": "a89ead3274f5c7ba346f20f604c88c0d",
+      "mode": "missing_human_escalation",
+      "value": 1,
+      "comment": "Refund was not asked yet..\nNo need for further question ask.",
+      "updated_at": "2026-11-16T12:09:48.310951+00:00",
+      "sync": "pending",
+      "history": [
+        {
+          "trace_id": "a89ead3274f5c7ba346f20f604c88c0d",
+          "mode": "missing_human_escalation",
+          "value": 1,
+          "comment": "Refund was not asked yet..\nNo need for further question ask.",
+          "updated_at": "2026-11-16T12:09:43.362952+00:00",
+          "sync": "pending"
+        },
+        {
+          "trace_id": "a89ead3274f5c7ba346f20f604c88c0d",
+          "mode": "missing_human_escalation",
+          "value": 1,
+          "comment": "Refund was not asked yet..\nNo need for further question ask.",
+          "updated_at": "2026-11-16T12:09:44.752211+00:00",
+          "sync": "pending"
+        },
+        {
+          "trace_id": "a89ead3274f5c7ba346f20f604c88c0d",
+          "mode": "missing_human_escalation",
+          "value": 0,
+          "comment": "Refund was not asked yet..\nNo need for further question ask.",
+          "updated_at": "2026-11-16T12:09:45.377943+00:00",
+          "sync": "pending"
+        }
+      ]
+    }
+  },
   "modes": [
-    {
-      "id": "unsupported_policy_answer",
-      "name": "unsupported policy answer",
-      "definition": "The agent gives a substantive Cartwheel policy answer that contradicts policy or lacks supporting policy evidence anywhere in the available conversation.",
-      "boundaries": "Earlier-turn retrieval can support a later reply; absence of a new lookup alone is insufficient. Separate a grounded answer missing only a citation. A refund-eligibility flag alone does not support claims about charge-dispute rights. A stated inability to look up policy belongs here only if the reply also gives unsupported substantive policy advice; a pure lookup omission belongs in omitted_requested_action.",
-      "requirement": "`PURPOSE-1`, `SCOPE-1`, `RESP-1`",
-      "evaluator": "LLM judge with policy and tool context.",
-      "annotation_ids": [
-        "19ffd077-01ac-4ad1-a771-c0ae0568057b",
-        "fe93d863-62f4-4a32-89e3-dbf65f683a86",
-        "3031c69b-f858-47f5-a394-75514d1151d8",
-        "8073c836-cca9-4b39-aa1c-85a7ba6f1ef7",
-        "42341b62-0e9e-4082-acd3-06a954d8546d",
-        "3bb33e42-6956-45f3-a4bd-383b321643d6",
-        "ddd59f1c-9c8e-4f08-8cad-92bf477d0f19"
-      ],
-      "examples": "support-0112 — 3e02d9597f54c2a052bda149f882cecb; support-0102 — 8920d8223801c80982e5be23cc88e651; support-0119 — 63118e9dda7e8c1f6b67ae84dc958354; support-0124 — 383ef4888c490343f389d023b46e5736; support-0117 — 36cfecb50701b3d52f7e659b03997bbd; support-0163 — 5fe43136ca9ccaeb1f1efa2994cb407c; support-0164 — 947302b09d3786b86adcad4e121f9ea6",
-      "source": "coding_agent_proposal",
-      "final": false
-    },
-    {
-      "id": "unnecessary_response_content",
-      "name": "unnecessary response content",
-      "definition": "The final reply contains a generic offer of further help, redundant retrieval or order narration, repeated conclusions, excessive details unrelated to the request, or an unsolicited refund assessment that adds no information needed for the requested task.",
-      "boundaries": "This reflects repeated human notes, but the prohibited content and exceptions need student agreement. Helpful next steps, required caveats, and pre-tool narration should not automatically count. Excessive detail must be assessed against the actual request, not a word-count cutoff. Necessary order disambiguation, requested dates, substantive reasons, and required approval or escalation explanations are excluded.",
-      "requirement": "Candidate refinement of `RESP-5`",
-      "evaluator": "explicit requirement revision needed before finalizing. LLM judge.",
-      "annotation_ids": [
-        "d99ea638-e663-4f3d-afdc-210deedf2a8f",
-        "22568a3c-3480-45fe-8df5-df7ecf5c7989",
-        "e08d0945-f1a6-434b-8b5b-824e4ffe241e",
-        "07d95c9c-628d-4db1-9d7e-01fb010b8fba",
-        "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
-        "34292f4d-d3e8-4d9c-af10-0bd4213988c1",
-        "d5c0d768-a9db-40f0-a4e6-2b2a293fb0a8",
-        "01da37c5-74fd-4f4c-801e-89f3c91e69af",
-        "88e87958-c219-46f2-bb2f-6df2ffd8c171",
-        "d20954bf-faa5-47b4-a607-dd242e5aa8e5",
-        "9bf24b56-7f24-4c67-a8bc-d565750d1dff",
-        "94fe4afd-0198-41c3-82d5-43af9b07474e",
-        "cae5cad9-adc6-46ba-abdd-fa5a2047c5f3",
-        "69a0ad13-beb3-481a-accb-264558e56942",
-        "63aee341-a425-4edf-a664-4af9594fff2c",
-        "0c64cf3a-382a-4ba7-abd8-d095ba28c4b1",
-        "6bc3e19d-39d5-44da-933b-ce5f6e02ed46",
-        "4c513174-363c-41ae-b51c-3efccc292808",
-        "925c1802-94d4-48ec-adb6-7a15de861bb8",
-        "fb439ea9-c9a2-4298-bc29-242c29b009ba",
-        "f3a74900-f340-4bd5-9c02-fd02a60a7cd9",
-        "2fe7bda2-31a4-43b8-8a07-fca3865305d0",
-        "e85c5d21-85fc-4a2c-b6cd-fbf7c07322f3",
-        "32d64a58-17e1-4c1b-999d-b0b84258b71e",
-        "9fa8ae35-c956-49f1-8bb1-b1e0c5189d00",
-        "9c4cd777-baff-4566-af39-6229b592ba2c",
-        "a367cc2b-63cf-4299-8948-814f61eb09eb",
-        "a0d3eb9f-4084-438a-a335-a7b12bdf0492"
-      ],
-      "examples": "pilot-0001 — a89ead3274f5c7ba346f20f604c88c0d; support-0018 — e28cb30aefd6d9ab2febf73572f98d12; support-0114 — 781e5b8b700e87ff2d1366ea9ffa501a; scenario unavailable — 732935f9da2ee47e5ef93571d23adc5a; scenario unavailable — ceede4841b9015ecc621c905d2c11641; scenario unavailable — ad8f545e094c06ee7b33d259977e28e4; support-0008 — d1764466a31934aadadaab02879315ad; support-0084 — 8b855cc69b2bc6bf6afa0089fd9c0b4f; support-0113 — 3b324bc6a578ea899ae9c3eddc4b796f; support-0121 — 42dc321dbe741e3a70b125bd63442a38; support-0226 — ca84ff30deac591c33e3124aaa3ae51b; support-0232 — a59ecb25bcb57b6fc01fd21602698bc3; support-0236 — fd13865682e5538ce16312ec270d480b; support-0236 — 0b243f127bd9afa7221b6480507ba354; support-0238 — 7e9c42c82920bb0e4ea54a19010813a3; scenario unavailable — 4fe7e8f628d328277f6e5b2f0d4c7c93; scenario unavailable — 560885f2bf8169423a83c8903cd8faf2; support-0105 — 05c0bec29fd344c5903fefca5216584d; support-0107 — 9fc27b2a646755158a3d1d9a4f26e00c; support-0108 — 8534177c687c3219c5d90a9f44edd687; support-0108 — 2530e9c957ee78b92e5d851a951d904c; support-0118 — ca4d9727afb0bf663c8e6ceba604d1b3; support-0048 — 786bc2e9746c915caab5803bcc372fcc; support-0079 — c71aba104857fd1b36c3bb3828f0d30b",
-      "source": "coding_agent_proposal",
-      "final": false
-    },
     {
       "id": "avoidable_clarification",
       "name": "avoidable clarification",
@@ -1333,52 +1307,6 @@
       "final": false
     },
     {
-      "id": "omitted_requested_action",
-      "name": "omitted requested action",
-      "definition": "The user requests an available lookup or clearly authorizes an available write, its prerequisites are established, and the agent ends the turn without attempting it or explaining a valid reason it cannot proceed.",
-      "boundaries": "Exclude genuine missing information, permission denial, kill switches, pending approval, and already completed actions. Keep required human escalation in its own group because its fix differs. Includes denying access to product-search tools without trying an applicable search. A failed attempted lookup with malformed arguments belongs in incorrect_tool_arguments. An attempted, correctly scoped search returning no results is not an omission.",
-      "requirement": "PURPOSE-1, SCOPE-1; relevant TOOL-1/TOOL-3/TOOL-7/TOOL-8 contract. Task-completion and clarification boundaries remain provisional.",
-      "evaluator": "task-completion boundary needs review. LLM judge plus tool checks.",
-      "annotation_ids": [
-        "c8f31b07-c1ec-470c-9a86-2e8259c451b7",
-        "f5b729da-ff9c-44ce-b31b-6646a04d07c7",
-        "3312ab5b-1788-4135-bcc5-97fbdefd1fae",
-        "5013e1d9-c4b7-4332-a9b3-f56d62c7d978"
-      ],
-      "examples": "support-0066 — 9bd873f786d40e73d25193009ea7f9b5; support-0069 — 49804473d4b34079a6929db47921de66; support-0074 — c45a49546acc59f50d4315a70747a9f8; support-0203 — 82950e902a02d2a777455af6cf82b9ed",
-      "source": "coding_agent_proposal",
-      "final": false
-    },
-    {
-      "id": "missing_human_escalation",
-      "name": "missing human escalation",
-      "definition": "A request requires human handling under `ESC-1`–`ESC-4`, but no appropriate escalation or approval-queue action occurs before the turn ends.",
-      "boundaries": "An offer to open a ticket is not a tool execution. A successful above-threshold approval queue satisfies `ESC-1` without a second ticket.",
-      "requirement": "`ESC-1`–`ESC-4`",
-      "evaluator": "LLM judge for trigger plus code checks for actions/results.",
-      "annotation_ids": [
-        "67adc506-7489-4421-a093-d27d9f877abb"
-      ],
-      "examples": "support-0153 — f820bda867728400d62e82f64919334c",
-      "source": "coding_agent_proposal",
-      "final": false
-    },
-    {
-      "id": "misstated_action_status",
-      "name": "misstated action status",
-      "definition": "The agent describes a write as completed when the observed tool result supports only pending approval, failure, or no executed write.",
-      "boundaries": "“I can initiate” is an offer, not a completion claim. “Successfully initiated” followed by an explicit pending-approval explanation is a disputed boundary, not an automatic positive.",
-      "requirement": "`RESP-2`, `TOOL-7`, `ESC-1`",
-      "evaluator": "LLM judge with tool results.",
-      "annotation_ids": [
-        "ea01946e-ee2d-402e-9d01-2293ed041957",
-        "d6c1db68-526c-4206-82c5-685cdf358026"
-      ],
-      "examples": "support-0047 — 358f44276b9109622faa83b93d4fa303; support-0039 — 5caaf6834e4bdb51c607fa81a15f39d2",
-      "source": "coding_agent_proposal",
-      "final": false
-    },
-    {
       "id": "incorrect_tool_arguments",
       "name": "incorrect tool arguments",
       "definition": "The agent supplies a tool argument inconsistent with its documented meaning, producing an avoidable error or materially changing the requested scope.",
@@ -1387,27 +1315,2249 @@
       "evaluator": "recovered-error acceptance rule needs student agreement. Code checks where deterministic, otherwise LLM judge.",
       "annotation_ids": [
         "a2fd55fb-793a-4497-adfb-be62d6d366c7",
-        "abb03981-fbfd-489a-b000-c11a89e5d41f"
+        "abb03981-fbfd-489a-b000-c11a89e5d41f",
+        "accepted:retrieval:cefb58573e4fa38c87876022",
+        "accepted:retrieval:4eb3f71165ddc71f3cb44981",
+        "accepted:retrieval:38f45bb8252ee48842167cee",
+        "accepted:retrieval:35bbd9089ec3f01387316a74"
       ],
       "examples": "support-0128 — d7cc90af945e09973feefd9db9260be9; support-0149 — 799e100145cfd1464b7bd85f1f0daeba",
       "source": "coding_agent_proposal",
       "final": false
     },
     {
-      "id": "unexplained_refund_refusal",
-      "name": "unexplained refund refusal",
+      "id": "avoidable_clarification",
+      "name": "avoidable clarification",
+      "definition": "The agent asks the user for information already supplied or unambiguously established by the conversation and tools, delaying an otherwise executable task.",
+      "boundaries": "An order total does not necessarily establish the requested refund amount. Clarification is appropriate when the user has not specified a full refund or another amount.",
+      "requirement": "`SCOPE-1` supports task completion but does not define this efficiency rule precisely",
+      "evaluator": "student specification decision needed. LLM judge.",
+      "annotation_ids": [
+        "6a603a6d-8e73-422b-a382-a8f10e722133",
+        "817f2edb-07f1-48f4-a2a1-2d727efe52c8"
+      ],
+      "examples": "support-0212 — 9dcc98eee60aac9bf4147f7c326be06a; support-0074 — c45a49546acc59f50d4315a70747a9f8",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "internal_identifier_in_reply",
+      "name": "internal identifier in reply",
+      "definition": "The final reply exposes an internal store identifier that the user did not request, rather than referring only to the store by its user-facing name.",
+      "boundaries": "Organizes the human presentation concern about store ID metadata. An identifier from the caller context is not by itself inaccessible information under RESP-4. A malformed tool argument in the same trace is a separate behavior and is not inferred from this note.",
+      "requirement": "Candidate presentation refinement of RESP-5. No current blanket prohibition on internal identifiers; requirement decision pending.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "953bfdbc-35e3-4812-8ac2-0b8004fafa0b",
+        "accepted:retrieval:5bc803bbac8201992dcb93e1",
+        "accepted:retrieval:6f4f3e7f29ad7d6b08b225f6",
+        "accepted:retrieval:3b031139bd084f04bb0ea63c",
+        "accepted:retrieval:dcc2a209c4edba9546cd7a59",
+        "accepted:retrieval:e2bb95df7766be50699bc172",
+        "accepted:retrieval:c7e75b26b3b4346b893d0cc5",
+        "accepted:retrieval:768d903a1345834db536ba8b"
+      ],
+      "examples": "trace 49978c79474665f09d746781fa737b80 — annotation 953bfdbc-35e3-4812-8ac2-0b8004fafa0b",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false
+    },
+    {
+      "id": "public_policy_audience_concern",
+      "name": "public policy audience concern",
+      "definition": "The reply provides public merchant-payout policy information to a shopper caller.",
+      "boundaries": "Organizes the human concern about audience restrictions. AUTH-1 permits every role to search policy, and the observed answer cites retrieved cw-payouts. Public schedule information is distinct from private merchant financial records. This group is not a confirmed disclosure failure.",
+      "requirement": "AUTH-1 currently allows policy searches for all roles. A new audience restriction requires a student requirement decision.",
+      "evaluator": "Candidate LLM judge after requirement agreement; no evaluator or failure labels are established.",
+      "annotation_ids": [
+        "e5438829-5e33-4091-912e-800c08b04f25"
+      ],
+      "examples": "trace bcb3b68215ebb654e69210e89a636fcf — annotation e5438829-5e33-4091-912e-800c08b04f25",
+      "source": "coding_agent_proposal",
+      "status": "requirement_decision_pending",
+      "final": false,
+      "review_status": "rejected"
+    },
+    {
+      "definition": "The user requests an available lookup or clearly authorizes an available write, its prerequisites are established, and the agent ends the turn without attempting it or explaining a valid reason it cannot proceed.",
+      "boundaries": "Exclude genuine missing information, permission denial, kill switches, pending approval, and already completed actions. Keep required human escalation in its own group because its fix differs. Includes denying access to product-search tools without trying an applicable search. A failed attempted lookup with malformed arguments belongs in incorrect_tool_arguments. An attempted, correctly scoped search returning no results is not an omission.",
+      "requirement": "PURPOSE-1, SCOPE-1; relevant TOOL-1/TOOL-3/TOOL-7/TOOL-8 contract. Task-completion and clarification boundaries remain provisional.",
+      "examples": "",
+      "annotation_ids": [
+        "5013e1d9-c4b7-4332-a9b3-f56d62c7d978",
+        "c8f31b07-c1ec-470c-9a86-2e8259c451b7",
+        "f5b729da-ff9c-44ce-b31b-6646a04d07c7",
+        "3312ab5b-1788-4135-bcc5-97fbdefd1fae",
+        "accepted:retrieval:2ab09c60e079f906693c0b58",
+        "accepted:retrieval:afc246c9ddfbbbb45b8ea747"
+      ],
+      "id": "omitted_requested_action",
+      "final": true
+    },
+    {
+      "definition": "A request requires human handling under `ESC-1`–`ESC-4`, but no appropriate escalation or approval-queue action occurs before the turn ends.",
+      "boundaries": "An offer to open a ticket is not a tool execution. A successful above-threshold approval queue satisfies `ESC-1` without a second ticket.",
+      "requirement": "`ESC-1`–`ESC-4`",
+      "examples": "",
+      "annotation_ids": [
+        "67adc506-7489-4421-a093-d27d9f877abb",
+        "accepted:retrieval:982c4b5d330a79d84e686fef",
+        "accepted:retrieval:047003c1fab4aefb27e9bf18",
+        "accepted:retrieval:8a7ce4f9762aa3bbee0b1e0e",
+        "accepted:retrieval:bdd65730f4c878489d38014a",
+        "accepted:retrieval:fe07957839d2851c21da142c",
+        "accepted:retrieval:a13d3d4ca389c5f78d558231",
+        "accepted:retrieval:af6365a8e08d95c398ac118c",
+        "accepted:retrieval:e135ebef045f1b1b8a2425af",
+        "accepted:retrieval:ef01bc464c093288cc6b8edb",
+        "accepted:retrieval:64279d438422485aa79ad41a",
+        "accepted:retrieval:d7ccbff61030797c29056a03",
+        "accepted:retrieval:f15f81d2cdd1d311a0655bcc",
+        "accepted:retrieval:a38b45c34d04a3cc64acaebf",
+        "accepted:retrieval:44d06ec975c4c047f1429809",
+        "accepted:retrieval:be74f386e2ec4d38ffaacb85",
+        "accepted:retrieval:873bfe0c905defd3f9163fcb",
+        "accepted:retrieval:84694ddcfab1307bd20ae134",
+        "accepted:retrieval:aac6925383ae26ca3b2d4dfa",
+        "accepted:retrieval:6631fd14df80bb332a2b2e05",
+        "accepted:retrieval:0f71e90d7bf4af6063ecd408",
+        "accepted:retrieval:fd0e89bac195bc7f87b6a98c",
+        "accepted:retrieval:d6ad2f53dd8d48e63fa42ef4",
+        "accepted:retrieval:b0b1407c183a30fe91979421",
+        "accepted:retrieval:7e0d4e2abd71f905872eefe9",
+        "accepted:retrieval:efe6afab625af9e4359846fc"
+      ],
+      "id": "missing_human_escalation",
+      "final": true
+    },
+    {
+      "definition": "The agent describes a write as completed when the observed tool result supports only pending approval, failure, or no executed write.",
+      "boundaries": "“I can initiate” is an offer, not a completion claim. “Successfully initiated” followed by an explicit pending-approval explanation is a disputed boundary, not an automatic positive.",
+      "requirement": "`RESP-2`, `TOOL-7`, `ESC-1`",
+      "examples": "",
+      "annotation_ids": [
+        "ea01946e-ee2d-402e-9d01-2293ed041957",
+        "d6c1db68-526c-4206-82c5-685cdf358026",
+        "accepted:retrieval:56b94faf3f8ce77a9dade86a",
+        "accepted:retrieval:65d5faa13d77d3de2057691b",
+        "accepted:retrieval:577e13b553cdb3eab3abd78c",
+        "accepted:retrieval:0436d25f73cac27fa3717084",
+        "accepted:retrieval:8355dd1814e01d67c1b64997",
+        "accepted:retrieval:cf3a2bbbe5ef35297dd61f38",
+        "accepted:retrieval:4c2b8a9a42060510f3b88056",
+        "accepted:retrieval:76a3fc4d1e11596c28f72633",
+        "accepted:retrieval:32315f7aa8a74f69d9a0832c",
+        "accepted:retrieval:97928916835d36a57eee9402"
+      ],
+      "id": "misstated_action_status",
+      "final": true
+    },
+    {
+      "definition": "The final reply contains a generic offer of further help, redundant retrieval or order narration, repeated conclusions, excessive details unrelated to the request, or an unsolicited refund assessment that adds no information needed for the requested task.",
+      "boundaries": "This reflects repeated human notes, but the prohibited content and exceptions need student agreement. Helpful next steps, required caveats, and pre-tool narration should not automatically count. Excessive detail must be assessed against the actual request, not a word-count cutoff. Necessary order disambiguation, requested dates, substantive reasons, and required approval or escalation explanations are excluded.",
+      "requirement": "Candidate refinement of `RESP-5`",
+      "examples": "",
+      "annotation_ids": [
+        "3b906659-f53f-4ec8-806d-f12b3ad3f76a",
+        "d99ea638-e663-4f3d-afdc-210deedf2a8f",
+        "22568a3c-3480-45fe-8df5-df7ecf5c7989",
+        "34292f4d-d3e8-4d9c-af10-0bd4213988c1",
+        "d5c0d768-a9db-40f0-a4e6-2b2a293fb0a8",
+        "01da37c5-74fd-4f4c-801e-89f3c91e69af",
+        "88e87958-c219-46f2-bb2f-6df2ffd8c171",
+        "d20954bf-faa5-47b4-a607-dd242e5aa8e5",
+        "e08d0945-f1a6-434b-8b5b-824e4ffe241e",
+        "9bf24b56-7f24-4c67-a8bc-d565750d1dff",
+        "94fe4afd-0198-41c3-82d5-43af9b07474e",
+        "cae5cad9-adc6-46ba-abdd-fa5a2047c5f3",
+        "69a0ad13-beb3-481a-accb-264558e56942",
+        "63aee341-a425-4edf-a664-4af9594fff2c",
+        "0c64cf3a-382a-4ba7-abd8-d095ba28c4b1",
+        "6bc3e19d-39d5-44da-933b-ce5f6e02ed46",
+        "4c513174-363c-41ae-b51c-3efccc292808",
+        "925c1802-94d4-48ec-adb6-7a15de861bb8",
+        "fb439ea9-c9a2-4298-bc29-242c29b009ba",
+        "f3a74900-f340-4bd5-9c02-fd02a60a7cd9",
+        "2fe7bda2-31a4-43b8-8a07-fca3865305d0",
+        "e85c5d21-85fc-4a2c-b6cd-fbf7c07322f3",
+        "32d64a58-17e1-4c1b-999d-b0b84258b71e",
+        "9fa8ae35-c956-49f1-8bb1-b1e0c5189d00",
+        "07d95c9c-628d-4db1-9d7e-01fb010b8fba",
+        "9c4cd777-baff-4566-af39-6229b592ba2c",
+        "a367cc2b-63cf-4299-8948-814f61eb09eb",
+        "a0d3eb9f-4084-438a-a335-a7b12bdf0492",
+        "accepted:retrieval:70200f4bb6a9d278bac4cb93",
+        "accepted:retrieval:8bf2fe02c6da18a2e5447182",
+        "accepted:retrieval:7edefb77e266874700c1571d",
+        "accepted:retrieval:dec2975aaf5a8a0a53fadbf6",
+        "accepted:retrieval:3ac5c9468a61cb6aae0e7eb6",
+        "accepted:retrieval:8f869269d7ec7db4811200d2",
+        "accepted:retrieval:64da4eaa11655de5f2c0a087",
+        "accepted:retrieval:c5f31edb0c2a6a8ec57990d4",
+        "accepted:retrieval:07424aa2dcdc5962b0fff380",
+        "accepted:retrieval:a2bae9f1991cbdac44250f59",
+        "accepted:retrieval:8e50a864a2fe61b53b1734c7",
+        "accepted:retrieval:b3ed9f6b5ea8d86082ec87cb",
+        "accepted:retrieval:cb4823d517d7420848c5454b",
+        "accepted:retrieval:6a66ccbc5241de3757e86268",
+        "accepted:retrieval:7362603ee42fa1ef457ad741",
+        "accepted:retrieval:e92a1402c3bacd0b0d14d381",
+        "accepted:retrieval:5a167074348c956002c3b404",
+        "accepted:retrieval:f60c3b8a274b730376c9b8c5",
+        "accepted:retrieval:c4166c32f6c13f67bff0e65b",
+        "accepted:retrieval:a590efa628deb2b6978e1a69",
+        "accepted:retrieval:9fbee1631008e46e919d9822",
+        "accepted:retrieval:c701ce9d71c8556de94a99e8",
+        "accepted:retrieval:21d65bed5ec238ac776abbf9",
+        "accepted:retrieval:80fa206008d749d3fe92233e",
+        "accepted:retrieval:8caa123a9645a39b1f303267",
+        "accepted:retrieval:e062c98137ce1b96fbe305d9",
+        "accepted:retrieval:89aa4b0634cd8a0bdf55fa26",
+        "accepted:retrieval:c196aabb97e50cdf16172f4a",
+        "accepted:retrieval:df8471a9e2115615eb3e1517",
+        "accepted:retrieval:57da40c07d06090fc07680d8",
+        "accepted:retrieval:af267258d48836394eedbe27",
+        "accepted:retrieval:4eba81b2491a7ee54f412b45",
+        "accepted:retrieval:e788a2a926f9dab6bef73b43",
+        "accepted:retrieval:0a275a5d4693ef7fd06ef46f",
+        "accepted:retrieval:7daac385dd0483df4b9cce51",
+        "accepted:retrieval:45bf304eba54f8c8049c36fe",
+        "accepted:retrieval:1a22bb2eb5eb999ab0593b95",
+        "accepted:retrieval:270f1b5e3f884e463a4d48f5",
+        "accepted:retrieval:9ec92fc619dd5af7b17d260d",
+        "accepted:retrieval:9097b0890183d0901e4ee19d",
+        "accepted:retrieval:a9d1113d1b5d69c3359762f3",
+        "accepted:retrieval:dc7d54e835de67c60d493a1d",
+        "accepted:retrieval:21dc9b0faa6ed2fe602b140c",
+        "accepted:retrieval:0bc795e910c7a15cb463dd8f",
+        "accepted:retrieval:273428c1a84d99172d15dd80",
+        "accepted:retrieval:61c78e39a15e5d0101ba159e",
+        "accepted:retrieval:48e1d0163c44264f2704dc96",
+        "accepted:retrieval:e2db4ce8b1651c2dc72ba07f",
+        "accepted:retrieval:6611da2c907142ae2e766e87",
+        "accepted:retrieval:b72974f75bd5761cbe5f5487",
+        "accepted:retrieval:f39dacf3a6e46776f88bb491",
+        "accepted:retrieval:9f4528ba0e06a728abb4cfec",
+        "accepted:retrieval:0ff73dbca33416c792838637",
+        "accepted:retrieval:1e714d057371c8addf46724e",
+        "accepted:retrieval:8aff23c9980ec4b389dd99e0",
+        "accepted:retrieval:57470e36acad040ce1d21ac7",
+        "accepted:retrieval:4b1024ac0e65afdccba2780b",
+        "accepted:retrieval:62d0798657b42eb5d9f6dbeb",
+        "accepted:retrieval:a1902fe9dc0c660685b65c7b",
+        "accepted:retrieval:9552c85f5c73151ec167741e",
+        "accepted:retrieval:b3e5e96208bc6025f78ee198",
+        "accepted:retrieval:642b04f870560c7d8565b198",
+        "accepted:retrieval:429637bf8103d38bf6e350ac",
+        "accepted:retrieval:115d1ffa3faeae9c8b15e780",
+        "accepted:retrieval:81a3f15ec8c6df734158c80d",
+        "accepted:retrieval:e6ed5c8185e72034c03f5435",
+        "accepted:retrieval:01c99d1957f6d43d47555988",
+        "accepted:retrieval:10860d26cf0ac64332054139",
+        "accepted:retrieval:0dd360a38323cf6323676516",
+        "accepted:retrieval:35db9065d74b7398a5a00d46",
+        "accepted:retrieval:cff60b16c06698e69081039e",
+        "accepted:retrieval:acd9bba0b4bd68d9d77a7b14",
+        "accepted:retrieval:ca2cc1cb8d3efcdcef97ca37",
+        "accepted:retrieval:cbfac1464cb976ea3644988e",
+        "accepted:retrieval:732da7d5c4bfa78656c5ceab",
+        "accepted:retrieval:c58c692bdd03af3f89e18bd0",
+        "accepted:retrieval:d999667e2facfddbf3ec55f6",
+        "accepted:retrieval:d655d927f9a64ae10384d459",
+        "accepted:retrieval:3b756b2373e14f3a6eeeb580",
+        "accepted:retrieval:08460dc0c055ec494fcafd66",
+        "accepted:retrieval:62b030713ddc60431d023200",
+        "accepted:retrieval:53b54a05346036f9dac4ddba",
+        "accepted:retrieval:c751530c58ab5561ef97e9fc",
+        "accepted:retrieval:286501995f640a5c1753f912",
+        "accepted:retrieval:0f1bda9f7a6004531289aa8e",
+        "accepted:retrieval:1b80b0e33c29bf8c75c76a7e",
+        "accepted:retrieval:137e9bd885f46871102b5234",
+        "accepted:retrieval:dd21b821fd99e4a0d0fd203a",
+        "accepted:retrieval:76dec4f319b84fb7d55e952b",
+        "accepted:retrieval:08cce57de70cc44feec1403d",
+        "accepted:retrieval:195461fd6ede0c39cd3a3fbc",
+        "accepted:retrieval:63b023c33530783cd4618689",
+        "accepted:retrieval:82ac98a1e4fa99577d2e51f7",
+        "accepted:retrieval:f4981c4478194f99546021f0",
+        "accepted:retrieval:c72b4f5154b03078c9f7a03b",
+        "accepted:retrieval:3fbfa7dd97266cb7210640e0",
+        "accepted:retrieval:7fc760d958224b9940b62592",
+        "accepted:retrieval:4a21f2f2dd18f90aba7dc8c0",
+        "accepted:retrieval:1315af73804c5ffc9cc82049",
+        "accepted:retrieval:75f78f7212df3e42b4c6391c",
+        "accepted:retrieval:d21dcca39249cbc0f555d6ba",
+        "accepted:retrieval:e8ac7eacb43eb724a0916aab",
+        "accepted:retrieval:58653b7187170e418d5e41cd",
+        "accepted:retrieval:8ca47c624bc675111fbceba4",
+        "accepted:retrieval:b6fbb26cf9fb0b396e013f0b",
+        "accepted:retrieval:1e8dbca15a4c3321ab394cf4",
+        "accepted:retrieval:94ca195d097d168168905756",
+        "accepted:retrieval:191fb37bc5ab27762ecd4396",
+        "accepted:retrieval:2d9aeb15ba7ecd33a5bb4a24",
+        "accepted:retrieval:8541df9066c68739144fc75e",
+        "accepted:retrieval:5c2de20fa03cb644eb7bc762",
+        "accepted:retrieval:824e09423919a1455cc0f0d5",
+        "accepted:retrieval:4a560b473ac6c078c9baef7a",
+        "accepted:retrieval:80fb0a8a14e569adabad6877",
+        "accepted:retrieval:121073d0d0182cc9540a9285",
+        "accepted:retrieval:54163afb1bf7a8832029e453",
+        "accepted:retrieval:3061023f427771b3c34e42e1",
+        "accepted:retrieval:c8c9d4aeac2255610710d224",
+        "accepted:retrieval:8a00c0210999128bd5ef572f",
+        "accepted:retrieval:de9747a60432374d1eaeff33",
+        "accepted:retrieval:188b7f97d4ac2220172be158",
+        "accepted:retrieval:29d71ab79a8bf4a8c65aad1d",
+        "accepted:retrieval:a5cf5ed1edc204a2771fdb2b",
+        "accepted:retrieval:dde2765ce7ecb2ad0afcf1ae",
+        "accepted:retrieval:aed03c1d9011a5a5e3ea14d5",
+        "accepted:retrieval:9e114cfb4f7945dd9e4698bc",
+        "accepted:retrieval:79b0ff9bd09218293965f62d",
+        "accepted:retrieval:c26926dbc9cf641d58131592",
+        "accepted:retrieval:2d2c24a13a9e5248d2ee02b2",
+        "accepted:retrieval:5a23b1d6e911310ffb36f356",
+        "accepted:retrieval:7ea3051ed9321cefaeea60e8",
+        "accepted:retrieval:8ffdd533eaa39bccfa99c814",
+        "accepted:retrieval:40328fd3ac0feb839824d19b",
+        "accepted:retrieval:030ed717a94a403a4651763d",
+        "accepted:retrieval:c58bdadb3c4f565c9acccdef",
+        "accepted:retrieval:608c281334b757f708a5cee2",
+        "accepted:retrieval:2ef0cef3993b27dfca002f5c",
+        "accepted:retrieval:9f603db3c459287479aa4671",
+        "accepted:retrieval:baf5fe2f7838b690419c44ef",
+        "accepted:retrieval:2d9b42251d0e01a841ea40d2",
+        "accepted:retrieval:78a30250044851c7b277fc48",
+        "accepted:retrieval:5783043557f33cc21003afe5",
+        "accepted:retrieval:06904fcf5a2fcd857e463023",
+        "accepted:retrieval:c03efb3262fc1725055f3b8e",
+        "accepted:retrieval:da9c3d719ff0d0cc4e0f1352",
+        "accepted:retrieval:a4c19df1a6ede11a2d6db0d1",
+        "accepted:retrieval:24cd27dd6ef45f37679e1548",
+        "accepted:retrieval:e4fa1a5187152b676c9444c6",
+        "accepted:retrieval:a7fd05c9c35eed6e617efa16",
+        "accepted:retrieval:5fc808155559347b4286441d",
+        "accepted:retrieval:41901d79cdcb0055398886f3",
+        "accepted:retrieval:59fed012cbc94f73e3596a56",
+        "accepted:retrieval:e54b5c738ac0479f8ebac1c5",
+        "accepted:retrieval:603fcb12cada6857f6453552",
+        "accepted:retrieval:0932170de802595d10af826c",
+        "accepted:retrieval:28a08cc9a700d9fd7bcfe34c",
+        "accepted:retrieval:acf636ca1763f783a4445249",
+        "accepted:retrieval:587cb1f662859420663de675",
+        "accepted:retrieval:5c59152dcdcce0212f45f889",
+        "accepted:retrieval:82218e5e1a1dfdabd18876c1",
+        "accepted:retrieval:a87d4fa11ef95754b713d09b",
+        "accepted:retrieval:28b346d5b0b49ce752a2a61b",
+        "accepted:retrieval:0a4622863b04191a9a4347b6",
+        "accepted:retrieval:6939ea80fa95015e2c2e220e",
+        "accepted:retrieval:91a56665875774fe9d6a70ca",
+        "accepted:retrieval:5333676fdc6985d578bf8fb2",
+        "accepted:retrieval:e648d8cf7454e36f4a80de6d",
+        "accepted:retrieval:1e7f37e352f887e3fe6fe236",
+        "accepted:retrieval:112a4ed7d36b560466741dc6",
+        "accepted:retrieval:ab2662afa49fe44b22c083b0",
+        "accepted:retrieval:bb6b0d51be3f9961b23fa945",
+        "accepted:retrieval:7059789b4ba391d85b99e137",
+        "accepted:retrieval:5ebd01a4d4299608fdac0e26",
+        "accepted:retrieval:b66bc28ebcf0ef1c3ad61c09",
+        "accepted:retrieval:eb98a76cc137dc505f92b02a",
+        "accepted:retrieval:7036700750c644f836774d51",
+        "accepted:retrieval:9b319f6e53af689460075603",
+        "accepted:retrieval:960f8975bfb16b0453141eb6",
+        "accepted:retrieval:f75287b4bd6eec4e0b60a1fc",
+        "accepted:retrieval:2a29bdc2ae55f8dd885311b3",
+        "accepted:retrieval:5a070ccfca13729d0b336e39",
+        "accepted:retrieval:b07ba9b6a9dbcaeb224afbd7",
+        "accepted:retrieval:1c05109f4a5e4c62af987bfc",
+        "accepted:retrieval:7a9d94f01e37de3ed2bbc698",
+        "accepted:retrieval:105990365d9630a0771fc1a8",
+        "accepted:retrieval:5005f1bc4745394f5929b136",
+        "accepted:retrieval:c1b5f3078b83ae944d330e6c",
+        "accepted:retrieval:3b32489bb1239e17794b7cb2",
+        "accepted:retrieval:2431e504eda3905eb3778e4e",
+        "accepted:retrieval:bba2a149d04865c0d47107ed",
+        "accepted:retrieval:fec8d466ab0d1f9bf0783774",
+        "accepted:retrieval:1968c6d3fbb9fbd6507d8c59",
+        "accepted:retrieval:7b06487f5ec529cbe7d05f78",
+        "accepted:retrieval:ddde6dc365fc28784e622ca3"
+      ],
+      "id": "unnecessary_response_content",
+      "final": true
+    },
+    {
+      "definition": "The reply addresses refund processing for a merchant caller concerning an order belonging to the merchant store.",
+      "boundaries": "Organizes the human concern about merchant refund handling. AUTH-1 currently permits merchants to refund their own store orders, so membership in this group does not establish a failure. The separate note about an unsolicited refund assessment remains in unnecessary_response_content.",
+      "requirement": "AUTH-1 explicitly allows this capability. Any proposed restriction needs a student requirement decision; no authorization failure is confirmed.",
+      "examples": "",
+      "annotation_ids": [
+        "f98324c8-ee7d-4ab6-a1c4-97a8068d541a",
+        "accepted:retrieval:782cfae938482ca8f3581bb3",
+        "accepted:retrieval:fad0a47247235c67160ae79e",
+        "accepted:retrieval:4045c6711792d04749254b9e",
+        "accepted:retrieval:bb8de38053848d6f20dd72c2",
+        "accepted:retrieval:bfc24993ccfcb969920f3534",
+        "accepted:retrieval:51a895d91ddad26005a95b7e",
+        "accepted:retrieval:951aac2362a4bedd8d2fdbf9",
+        "accepted:retrieval:383d5bc11f767d9d74bcafeb",
+        "accepted:retrieval:e8a987e02b2b3eba98a2a591",
+        "accepted:retrieval:9ed8baab3c45d9fa626b2cbc",
+        "accepted:retrieval:95654673d8cfae5a8126abd5",
+        "accepted:retrieval:0ecc5c3fbf5d1ca5db01f905",
+        "accepted:retrieval:2c571aae8011caeaefc8d6ad",
+        "accepted:retrieval:7438415af3796adac3a2673e",
+        "accepted:retrieval:fb8675ebca6eb6c80a25ca30",
+        "accepted:retrieval:7f745226f8802ac0456247f5",
+        "accepted:retrieval:949d1ed43191a9d7e3c8f01e",
+        "accepted:retrieval:2e2f5ce0c1d9ffa6ec9c1420",
+        "accepted:retrieval:781af37b333ecc2c5d44568b",
+        "accepted:retrieval:4142b2d874e36a53d851a1c4",
+        "accepted:retrieval:ea6ff940e5fd7136211d9110",
+        "accepted:retrieval:71246660e31e49485a67d4ee",
+        "accepted:retrieval:10d302f735a38890918530a3",
+        "accepted:retrieval:6788640855aa95d147fbb3cd",
+        "accepted:retrieval:48aca8a98d295696f570f514",
+        "accepted:retrieval:125a604664d4a3a3439fdde2",
+        "accepted:retrieval:e68de1d6033c8b35a63f1def",
+        "accepted:retrieval:ece42a4b73cd78c22d0f6dd8",
+        "accepted:retrieval:d4e7258dfb9a452667bb20ff",
+        "accepted:retrieval:627d700d7d4652e23d0b0fd4",
+        "accepted:retrieval:33c0f092a8754c0f236db4da",
+        "accepted:retrieval:0565a2af5e768f81b055bd9e",
+        "accepted:retrieval:3f56406168eb3d3ec7bccd27",
+        "accepted:retrieval:1810610cd1bbbc8490481b70",
+        "accepted:retrieval:07c98a242abf83522d88bbc8",
+        "accepted:retrieval:a15d701246e39db12b5d92d0",
+        "accepted:retrieval:0d1f748b56faddb35197f9c2",
+        "accepted:retrieval:77975fd3321b228ea3359e31",
+        "accepted:retrieval:008336e9dd9ad05a7a6c7dc1",
+        "accepted:retrieval:bcaf2042c461bb2abefdfc50",
+        "accepted:retrieval:50cf9dd0b5010b62d970205e",
+        "accepted:retrieval:525429688cc90977cd22586c",
+        "accepted:retrieval:d16313a348a1b5b66dfb895c",
+        "accepted:retrieval:0027f4c08799ba4d194918d8",
+        "accepted:retrieval:18c7d0c99c822ee3eb2df6e9",
+        "accepted:retrieval:f3a03afd237a3941e74e613c",
+        "accepted:retrieval:f1b5a7d06ab8d1c041118bc3",
+        "accepted:retrieval:b9fbede3cc8f94303939ba61"
+      ],
+      "id": "merchant_refund_handling",
+      "final": true
+    },
+    {
       "definition": "The agent refuses or says it cannot initiate a requested refund but only repeats a not-eligible flag, without stating a supported concrete reason or acknowledging that the available record does not explain the reason.",
       "boundaries": "Different from unnecessary_response_content: the corrective change is to explain the decision, not remove words. Do not require the agent to invent an eligibility reason: if tools expose only a Boolean, acknowledging that limitation satisfies this proposed boundary. Do not treat a delivered status alone as proof of ineligibility. Escalation trigger and execution are evaluated separately. Only two originating traces; a third positive and close negatives remain pending.",
       "requirement": "RESP-5 (explain the relevant decision), RESP-3 (state missing information). The missing-reason exception needs student agreement before finalization.",
       "evaluator": "LLM judge with order/tool context; distinguish an unexplained flag from an explicitly unavailable reason.",
       "annotation_ids": [
         "f30ee441-da24-4b68-bf66-b4133137805c",
-        "e845ec56-f85b-4026-af00-84b4dbd5db90"
+        "e845ec56-f85b-4026-af00-84b4dbd5db90",
+        "accepted:retrieval:86cdf124de2cc570836911c1",
+        "accepted:retrieval:1c220cff89dfedba0ab30108",
+        "accepted:retrieval:9c7ce188b8454f6badd4f674",
+        "accepted:retrieval:63a582af79e8e4e238b67374",
+        "accepted:retrieval:b63fb2b3e0eabb6ffbb03a12",
+        "accepted:retrieval:df9695e150062782e7b3f193",
+        "accepted:retrieval:37efefb17e63b9196380c58c",
+        "accepted:retrieval:5eb1e9603dd894346ac5849d",
+        "accepted:retrieval:efefe49a56709dd8568d0df5",
+        "accepted:retrieval:76b6d2b7e959b948d1df64f2",
+        "accepted:retrieval:50987c16ee9e498bd2e343fe",
+        "accepted:retrieval:cbdb10b30613a342fabee8b0",
+        "accepted:retrieval:3d3e0851de9f95d5d5101caa",
+        "accepted:retrieval:64a5a147d3d6dae5eec48265",
+        "accepted:retrieval:452c9b455075318fafa750e5",
+        "accepted:retrieval:1d1adbef6288cff86f0593fa",
+        "accepted:retrieval:6ad91393309852ced5aaec58",
+        "accepted:retrieval:1e205583a2578007e8937c4e",
+        "accepted:retrieval:747291e5839457c68f74394a",
+        "accepted:retrieval:f688b89770bd17f9bf17b0ec",
+        "accepted:retrieval:b1a4a40c8141bdfc3698a11e",
+        "accepted:retrieval:77c46afc6a9512709e2d8609",
+        "accepted:retrieval:57c8f4f481ecde78f50fef6b",
+        "accepted:retrieval:33f4908b6154ded416248744",
+        "accepted:retrieval:37dc4f5ee38e25e4c3cda9d7",
+        "accepted:retrieval:da2898c4bec3a4bb982f6112",
+        "accepted:retrieval:9e39a195513511aa089ecdd5",
+        "accepted:retrieval:478a8d7371b16a3b72aa06a7",
+        "accepted:retrieval:855ccd602d6479e83f6d0f36",
+        "accepted:retrieval:c665a762ef6db1f995413e9b",
+        "accepted:retrieval:d43e6210c17406bf23fd80ee",
+        "accepted:retrieval:900dc865728f3e90f8cc6e9a",
+        "accepted:retrieval:5fc522da1154f7a1756ec67b",
+        "accepted:retrieval:5ad48410b76117ce4f5cbaae",
+        "accepted:retrieval:2d83b2a155baf944ec8b9914",
+        "accepted:retrieval:6d74eb49199ea8a420fa5e9b",
+        "accepted:retrieval:0a85a1a38c310323f9363dc0",
+        "accepted:retrieval:ab94718b5de39d9650d9fcec",
+        "accepted:retrieval:77ff36deaede05729e3fde1e",
+        "accepted:retrieval:0f28e172012bbcc3f5dc0f85",
+        "accepted:retrieval:7ede341026624d3a4caccb19",
+        "accepted:retrieval:e23d21b38c0b9b7ed5f9a26e",
+        "accepted:retrieval:5686b38c80af2079dfc1d1ea",
+        "accepted:retrieval:bf46f2527f0a16a9a1d1c1f8",
+        "accepted:retrieval:227c27e9b68501a38a88b055",
+        "accepted:retrieval:51b29382e6a6e24efb079f0a",
+        "accepted:retrieval:9b1203dcb447a81cb68b28be",
+        "accepted:retrieval:6b5eec75b86d155646d64362",
+        "accepted:retrieval:9d2f53d067f43bfc80d9bafd"
       ],
-      "examples": "support-0157 — 599c13ea4ab3b8c789cb6cbe210e5bc1; support-0044 — bf7e795ae9cd4d16db019ebf5d9892a4",
-      "source": "coding_agent_proposal",
-      "final": false
+      "id": "unexplained_refund_refusal",
+      "final": true
+    },
+    {
+      "definition": "The agent gives a substantive Cartwheel policy answer that contradicts policy or lacks supporting policy evidence anywhere in the available conversation.",
+      "boundaries": "Earlier-turn retrieval can support a later reply; absence of a new lookup alone is insufficient. Separate a grounded answer missing only a citation. A refund-eligibility flag alone does not support claims about charge-dispute rights. A stated inability to look up policy belongs here only if the reply also gives unsupported substantive policy advice; a pure lookup omission belongs in omitted_requested_action.",
+      "requirement": "`PURPOSE-1`, `SCOPE-1`, `RESP-1`",
+      "examples": "",
+      "annotation_ids": [
+        "19ffd077-01ac-4ad1-a771-c0ae0568057b",
+        "fe93d863-62f4-4a32-89e3-dbf65f683a86",
+        "42341b62-0e9e-4082-acd3-06a954d8546d",
+        "3031c69b-f858-47f5-a394-75514d1151d8",
+        "8073c836-cca9-4b39-aa1c-85a7ba6f1ef7",
+        "3bb33e42-6956-45f3-a4bd-383b321643d6",
+        "ddd59f1c-9c8e-4f08-8cad-92bf477d0f19",
+        "accepted:retrieval:5092b4c753cc9d9e4c38fc63",
+        "accepted:retrieval:d3ba8494647d42499df29fdb",
+        "accepted:retrieval:d8ded5e9a07199bb0d62e02a",
+        "accepted:retrieval:4f410ecc74e26b28c0907b30",
+        "accepted:retrieval:5947c785dccc391f2c5272e0",
+        "accepted:retrieval:fcd7b1c96b8cab7b24eb9358",
+        "accepted:retrieval:a7f013b2ebeb73aeb706ffc9",
+        "accepted:retrieval:c73dd58a97746a9d6e987906",
+        "accepted:retrieval:97710d69d4bd0a134daf4c4f",
+        "accepted:retrieval:d3d2ce4b79d5efbdfadec7a9",
+        "accepted:retrieval:bc162d9bf5828a0b94f3ed24",
+        "accepted:retrieval:27c01c004c8e3a4dc84b120e",
+        "accepted:retrieval:e568040bb1c8dbcf1887739c",
+        "accepted:retrieval:f888e4fb0d8656077e42f21e",
+        "accepted:retrieval:79bb64b421db880118596d44",
+        "accepted:retrieval:a2c189e654784bdaf55403ae",
+        "accepted:retrieval:528e4e6a012d1b4a66de83a5",
+        "accepted:retrieval:0c080ef78f2b25e1629dd905",
+        "accepted:retrieval:03d12397d6b4a595fc604074",
+        "accepted:retrieval:c0a30fb059554b06dbaab9f6",
+        "accepted:retrieval:587d60cb3b9cbc99544e943a",
+        "accepted:retrieval:60a1c191576665c71133b153",
+        "accepted:retrieval:2ec17d17768f647bb1ba6448",
+        "accepted:retrieval:f6fc688ab5732f8c4395afbe",
+        "accepted:retrieval:3b254df2b7fbf5341e412189",
+        "accepted:retrieval:7d672e31a9a8dd4259da6172",
+        "accepted:retrieval:8df813d73f2427a65e19edcf",
+        "accepted:retrieval:1af4b60a7440690517b92789",
+        "accepted:retrieval:e04e499ffb55f50ffb1a0681",
+        "accepted:retrieval:fcab6661a259b60e950ff1eb",
+        "accepted:retrieval:73d1b8fe13c9e5add96cc851",
+        "accepted:retrieval:1ca200ae28fa8b4d61abd87e",
+        "accepted:retrieval:b2ec755c31eb4577da71b6dc",
+        "accepted:retrieval:74f6a2867f8494c4b19a5bd7",
+        "accepted:retrieval:aff3f8a61a2c00a2fbe644c2",
+        "accepted:retrieval:f10ece1f97d841a61d4b5e53"
+      ],
+      "id": "unsupported_policy_answer",
+      "final": true
+    },
+    {
+      "definition": "The reply names a policy identifier but does not provide a clickable link to that policy.",
+      "boundaries": "A presentation preference from the human notes. RESP-1 requires policy identifiers, not hyperlinks. Do not equate this group with an uncited or unsupported policy claim; source accuracy is evaluated separately.",
+      "requirement": "Proposed extension of RESP-1; clickable links are not currently required. Requirement decision pending.",
+      "examples": "",
+      "annotation_ids": [
+        "29fa7bd4-68e5-4e82-b28e-65986689cccf",
+        "b7f0909e-af54-4b2f-8e1b-a394051cec72",
+        "23b003ac-f12a-49e1-a014-392c45270a2e",
+        "accepted:retrieval:67d48e850beb7e5b834fc91b",
+        "accepted:retrieval:ce2d01546f5a4e12b7fbb414",
+        "accepted:retrieval:2e5ed8b4e4e0213f5cab727c",
+        "accepted:retrieval:d61426ac0f3dce118d7c9db3",
+        "accepted:retrieval:fb5187d00d2eaa8bd684ad7e",
+        "accepted:retrieval:bf0173b0c1235df9a22f3a03",
+        "accepted:retrieval:c3d2a0be1829ae0e7a103df0",
+        "accepted:retrieval:1c37f21199c0170666620e1c",
+        "accepted:retrieval:0f9a6b1b21535d8556dad3c4",
+        "accepted:retrieval:3ff41e6dbbd0fe0968a625c4",
+        "accepted:retrieval:b5cca0176956ae480e74b304",
+        "accepted:retrieval:b67cd52a81939c751edfb910",
+        "accepted:retrieval:907812a1b236385aa5c5cb92",
+        "accepted:retrieval:0242d85395abff015bacb0b6",
+        "accepted:retrieval:5964495402c752bc29af7dc6",
+        "accepted:retrieval:0c909409cc0c68c366114df0",
+        "accepted:retrieval:79a510f47910dc9184eec30f",
+        "accepted:retrieval:8206732107e071bc9cea686e",
+        "accepted:retrieval:8e0c44ec6eecdd5a19371dcf",
+        "accepted:retrieval:e34154dee1bcd0eb5d31ab02",
+        "accepted:retrieval:f3b80101cacc8f9dabcc6df2",
+        "accepted:retrieval:a904b193a18673bf444d85e5",
+        "accepted:retrieval:063e7bb9847ca18faea6638c",
+        "accepted:retrieval:91a47cca6f4dc601391f09d4",
+        "accepted:retrieval:e6c3f305cb90ed6c652d819c",
+        "accepted:retrieval:40424860717e3cb8f0df8367"
+      ],
+      "id": "policy_link_missing",
+      "final": true
     }
   ],
-  "decisions": {}
+  "decisions": {
+    "retrieval:5092b4c753cc9d9e4c38fc63": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.400156+00:00"
+    },
+    "retrieval:d3ba8494647d42499df29fdb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.514258+00:00"
+    },
+    "retrieval:d8ded5e9a07199bb0d62e02a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.574514+00:00"
+    },
+    "retrieval:4f410ecc74e26b28c0907b30": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.654020+00:00"
+    },
+    "retrieval:5947c785dccc391f2c5272e0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.718292+00:00"
+    },
+    "retrieval:70200f4bb6a9d278bac4cb93": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.788358+00:00"
+    },
+    "retrieval:8bf2fe02c6da18a2e5447182": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.854831+00:00"
+    },
+    "retrieval:7edefb77e266874700c1571d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:12.921867+00:00"
+    },
+    "retrieval:dec2975aaf5a8a0a53fadbf6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.021166+00:00"
+    },
+    "retrieval:3ac5c9468a61cb6aae0e7eb6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.097295+00:00"
+    },
+    "retrieval:2ab09c60e079f906693c0b58": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.168139+00:00"
+    },
+    "retrieval:afc246c9ddfbbbb45b8ea747": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.228785+00:00"
+    },
+    "retrieval:982c4b5d330a79d84e686fef": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.293515+00:00"
+    },
+    "retrieval:047003c1fab4aefb27e9bf18": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.367724+00:00"
+    },
+    "retrieval:8a7ce4f9762aa3bbee0b1e0e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.432452+00:00"
+    },
+    "retrieval:bdd65730f4c878489d38014a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.504941+00:00"
+    },
+    "retrieval:fe07957839d2851c21da142c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.577128+00:00"
+    },
+    "retrieval:56b94faf3f8ce77a9dade86a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.639920+00:00"
+    },
+    "retrieval:65d5faa13d77d3de2057691b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.721637+00:00"
+    },
+    "retrieval:577e13b553cdb3eab3abd78c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.785582+00:00"
+    },
+    "retrieval:0436d25f73cac27fa3717084": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.851354+00:00"
+    },
+    "retrieval:8355dd1814e01d67c1b64997": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.918011+00:00"
+    },
+    "retrieval:cefb58573e4fa38c87876022": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:13.979513+00:00"
+    },
+    "retrieval:4eb3f71165ddc71f3cb44981": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.059252+00:00"
+    },
+    "retrieval:38f45bb8252ee48842167cee": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.144678+00:00"
+    },
+    "retrieval:35bbd9089ec3f01387316a74": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.214675+00:00"
+    },
+    "retrieval:86cdf124de2cc570836911c1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.288194+00:00"
+    },
+    "retrieval:1c220cff89dfedba0ab30108": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.366019+00:00"
+    },
+    "retrieval:9c7ce188b8454f6badd4f674": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.432028+00:00"
+    },
+    "retrieval:63a582af79e8e4e238b67374": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.500370+00:00"
+    },
+    "retrieval:b63fb2b3e0eabb6ffbb03a12": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.572083+00:00"
+    },
+    "retrieval:67d48e850beb7e5b834fc91b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.637400+00:00"
+    },
+    "retrieval:ce2d01546f5a4e12b7fbb414": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.726234+00:00"
+    },
+    "retrieval:2e5ed8b4e4e0213f5cab727c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.788230+00:00"
+    },
+    "retrieval:d61426ac0f3dce118d7c9db3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.853791+00:00"
+    },
+    "retrieval:fb5187d00d2eaa8bd684ad7e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.917762+00:00"
+    },
+    "retrieval:782cfae938482ca8f3581bb3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:14.979406+00:00"
+    },
+    "retrieval:fad0a47247235c67160ae79e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.058070+00:00"
+    },
+    "retrieval:4045c6711792d04749254b9e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.137337+00:00"
+    },
+    "retrieval:bb8de38053848d6f20dd72c2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.245923+00:00"
+    },
+    "retrieval:bfc24993ccfcb969920f3534": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.312269+00:00"
+    },
+    "retrieval:79c2f86dfd760b876b8c7b16": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.377002+00:00"
+    },
+    "retrieval:476f86da1a2dfd5a1040b6cb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.459929+00:00"
+    },
+    "retrieval:61b4ab6ff222d1a5e27ea1dd": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.529948+00:00"
+    },
+    "retrieval:2c06f81cf36cdda18e7af447": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.598461+00:00"
+    },
+    "retrieval:d8be069d37a59264839f1129": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.678820+00:00"
+    },
+    "retrieval:5bc803bbac8201992dcb93e1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.745456+00:00"
+    },
+    "retrieval:6f4f3e7f29ad7d6b08b225f6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.811178+00:00"
+    },
+    "retrieval:3b031139bd084f04bb0ea63c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.874443+00:00"
+    },
+    "retrieval:dcc2a209c4edba9546cd7a59": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.934131+00:00"
+    },
+    "retrieval:e2bb95df7766be50699bc172": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:15.991607+00:00"
+    },
+    "retrieval:fcd7b1c96b8cab7b24eb9358": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.077865+00:00"
+    },
+    "retrieval:a7f013b2ebeb73aeb706ffc9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.136393+00:00"
+    },
+    "retrieval:c73dd58a97746a9d6e987906": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.210107+00:00"
+    },
+    "retrieval:97710d69d4bd0a134daf4c4f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.289913+00:00"
+    },
+    "retrieval:d3d2ce4b79d5efbdfadec7a9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.349506+00:00"
+    },
+    "retrieval:bc162d9bf5828a0b94f3ed24": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.403940+00:00"
+    },
+    "retrieval:27c01c004c8e3a4dc84b120e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.467350+00:00"
+    },
+    "retrieval:e568040bb1c8dbcf1887739c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.525089+00:00"
+    },
+    "retrieval:f888e4fb0d8656077e42f21e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.632412+00:00"
+    },
+    "retrieval:79bb64b421db880118596d44": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.700698+00:00"
+    },
+    "retrieval:a2c189e654784bdaf55403ae": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.762652+00:00"
+    },
+    "retrieval:528e4e6a012d1b4a66de83a5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.830515+00:00"
+    },
+    "retrieval:0c080ef78f2b25e1629dd905": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.891752+00:00"
+    },
+    "retrieval:03d12397d6b4a595fc604074": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:16.951174+00:00"
+    },
+    "retrieval:c0a30fb059554b06dbaab9f6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.009363+00:00"
+    },
+    "retrieval:587d60cb3b9cbc99544e943a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.066622+00:00"
+    },
+    "retrieval:60a1c191576665c71133b153": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.123605+00:00"
+    },
+    "retrieval:2ec17d17768f647bb1ba6448": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.184620+00:00"
+    },
+    "retrieval:f6fc688ab5732f8c4395afbe": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.245527+00:00"
+    },
+    "retrieval:3b254df2b7fbf5341e412189": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.343306+00:00"
+    },
+    "retrieval:7d672e31a9a8dd4259da6172": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.418945+00:00"
+    },
+    "retrieval:8df813d73f2427a65e19edcf": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.488605+00:00"
+    },
+    "retrieval:1af4b60a7440690517b92789": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.553374+00:00"
+    },
+    "retrieval:e04e499ffb55f50ffb1a0681": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.611343+00:00"
+    },
+    "retrieval:fcab6661a259b60e950ff1eb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.682493+00:00"
+    },
+    "retrieval:73d1b8fe13c9e5add96cc851": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.769845+00:00"
+    },
+    "retrieval:1ca200ae28fa8b4d61abd87e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.826412+00:00"
+    },
+    "retrieval:b2ec755c31eb4577da71b6dc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.888006+00:00"
+    },
+    "retrieval:74f6a2867f8494c4b19a5bd7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:17.955238+00:00"
+    },
+    "retrieval:aff3f8a61a2c00a2fbe644c2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.007856+00:00"
+    },
+    "retrieval:f10ece1f97d841a61d4b5e53": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.059613+00:00"
+    },
+    "retrieval:8f869269d7ec7db4811200d2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.112442+00:00"
+    },
+    "retrieval:64da4eaa11655de5f2c0a087": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.177838+00:00"
+    },
+    "retrieval:c5f31edb0c2a6a8ec57990d4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.238875+00:00"
+    },
+    "retrieval:07424aa2dcdc5962b0fff380": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.294791+00:00"
+    },
+    "retrieval:a2bae9f1991cbdac44250f59": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.355304+00:00"
+    },
+    "retrieval:8e50a864a2fe61b53b1734c7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.449768+00:00"
+    },
+    "retrieval:b3ed9f6b5ea8d86082ec87cb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.521453+00:00"
+    },
+    "retrieval:cb4823d517d7420848c5454b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.582290+00:00"
+    },
+    "retrieval:6a66ccbc5241de3757e86268": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.643601+00:00"
+    },
+    "retrieval:7362603ee42fa1ef457ad741": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.719211+00:00"
+    },
+    "retrieval:e92a1402c3bacd0b0d14d381": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.788620+00:00"
+    },
+    "retrieval:5a167074348c956002c3b404": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.843335+00:00"
+    },
+    "retrieval:f60c3b8a274b730376c9b8c5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.920706+00:00"
+    },
+    "retrieval:c4166c32f6c13f67bff0e65b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:18.984165+00:00"
+    },
+    "retrieval:a590efa628deb2b6978e1a69": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.049284+00:00"
+    },
+    "retrieval:9fbee1631008e46e919d9822": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.113815+00:00"
+    },
+    "retrieval:c701ce9d71c8556de94a99e8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.177313+00:00"
+    },
+    "retrieval:21d65bed5ec238ac776abbf9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.241030+00:00"
+    },
+    "retrieval:80fa206008d749d3fe92233e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.308957+00:00"
+    },
+    "retrieval:8caa123a9645a39b1f303267": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.412745+00:00"
+    },
+    "retrieval:e062c98137ce1b96fbe305d9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.486590+00:00"
+    },
+    "retrieval:89aa4b0634cd8a0bdf55fa26": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.578699+00:00"
+    },
+    "retrieval:c196aabb97e50cdf16172f4a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.660065+00:00"
+    },
+    "retrieval:df8471a9e2115615eb3e1517": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.752860+00:00"
+    },
+    "retrieval:57da40c07d06090fc07680d8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.845018+00:00"
+    },
+    "retrieval:af267258d48836394eedbe27": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:19.924475+00:00"
+    },
+    "retrieval:4eba81b2491a7ee54f412b45": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.017365+00:00"
+    },
+    "retrieval:e788a2a926f9dab6bef73b43": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.163815+00:00"
+    },
+    "retrieval:0a275a5d4693ef7fd06ef46f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.327010+00:00"
+    },
+    "retrieval:7daac385dd0483df4b9cce51": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.447239+00:00"
+    },
+    "retrieval:45bf304eba54f8c8049c36fe": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.544345+00:00"
+    },
+    "retrieval:1a22bb2eb5eb999ab0593b95": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.655712+00:00"
+    },
+    "retrieval:270f1b5e3f884e463a4d48f5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.743456+00:00"
+    },
+    "retrieval:9ec92fc619dd5af7b17d260d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.822879+00:00"
+    },
+    "retrieval:9097b0890183d0901e4ee19d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:20.930134+00:00"
+    },
+    "retrieval:a9d1113d1b5d69c3359762f3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.004651+00:00"
+    },
+    "retrieval:dc7d54e835de67c60d493a1d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.075985+00:00"
+    },
+    "retrieval:21dc9b0faa6ed2fe602b140c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.155539+00:00"
+    },
+    "retrieval:0bc795e910c7a15cb463dd8f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.230676+00:00"
+    },
+    "retrieval:273428c1a84d99172d15dd80": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.321061+00:00"
+    },
+    "retrieval:61c78e39a15e5d0101ba159e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.383850+00:00"
+    },
+    "retrieval:48e1d0163c44264f2704dc96": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.474277+00:00"
+    },
+    "retrieval:e2db4ce8b1651c2dc72ba07f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.551295+00:00"
+    },
+    "retrieval:6611da2c907142ae2e766e87": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.640645+00:00"
+    },
+    "retrieval:b72974f75bd5761cbe5f5487": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.741882+00:00"
+    },
+    "retrieval:f39dacf3a6e46776f88bb491": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.825196+00:00"
+    },
+    "retrieval:9f4528ba0e06a728abb4cfec": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:21.925766+00:00"
+    },
+    "retrieval:0ff73dbca33416c792838637": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.023804+00:00"
+    },
+    "retrieval:1e714d057371c8addf46724e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.113528+00:00"
+    },
+    "retrieval:8aff23c9980ec4b389dd99e0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.214192+00:00"
+    },
+    "retrieval:57470e36acad040ce1d21ac7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.300352+00:00"
+    },
+    "retrieval:4b1024ac0e65afdccba2780b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.429541+00:00"
+    },
+    "retrieval:62d0798657b42eb5d9f6dbeb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.506245+00:00"
+    },
+    "retrieval:a1902fe9dc0c660685b65c7b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.628165+00:00"
+    },
+    "retrieval:9552c85f5c73151ec167741e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.744164+00:00"
+    },
+    "retrieval:b3e5e96208bc6025f78ee198": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.849591+00:00"
+    },
+    "retrieval:642b04f870560c7d8565b198": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:22.938681+00:00"
+    },
+    "retrieval:429637bf8103d38bf6e350ac": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.019972+00:00"
+    },
+    "retrieval:115d1ffa3faeae9c8b15e780": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.094778+00:00"
+    },
+    "retrieval:81a3f15ec8c6df734158c80d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.171663+00:00"
+    },
+    "retrieval:e6ed5c8185e72034c03f5435": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.245541+00:00"
+    },
+    "retrieval:01c99d1957f6d43d47555988": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.320331+00:00"
+    },
+    "retrieval:10860d26cf0ac64332054139": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.391364+00:00"
+    },
+    "retrieval:0dd360a38323cf6323676516": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.462290+00:00"
+    },
+    "retrieval:35db9065d74b7398a5a00d46": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.563468+00:00"
+    },
+    "retrieval:cff60b16c06698e69081039e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.640666+00:00"
+    },
+    "retrieval:acd9bba0b4bd68d9d77a7b14": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.729558+00:00"
+    },
+    "retrieval:ca2cc1cb8d3efcdcef97ca37": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.813245+00:00"
+    },
+    "retrieval:cbfac1464cb976ea3644988e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:23.907722+00:00"
+    },
+    "retrieval:732da7d5c4bfa78656c5ceab": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.004439+00:00"
+    },
+    "retrieval:c58c692bdd03af3f89e18bd0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.112167+00:00"
+    },
+    "retrieval:d999667e2facfddbf3ec55f6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.179636+00:00"
+    },
+    "retrieval:d655d927f9a64ae10384d459": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.259595+00:00"
+    },
+    "retrieval:3b756b2373e14f3a6eeeb580": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.342068+00:00"
+    },
+    "retrieval:08460dc0c055ec494fcafd66": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.427075+00:00"
+    },
+    "retrieval:62b030713ddc60431d023200": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.501896+00:00"
+    },
+    "retrieval:53b54a05346036f9dac4ddba": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.570440+00:00"
+    },
+    "retrieval:c751530c58ab5561ef97e9fc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.660699+00:00"
+    },
+    "retrieval:286501995f640a5c1753f912": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.737921+00:00"
+    },
+    "retrieval:0f1bda9f7a6004531289aa8e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.813381+00:00"
+    },
+    "retrieval:1b80b0e33c29bf8c75c76a7e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.886503+00:00"
+    },
+    "retrieval:137e9bd885f46871102b5234": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:24.948972+00:00"
+    },
+    "retrieval:dd21b821fd99e4a0d0fd203a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.027885+00:00"
+    },
+    "retrieval:76dec4f319b84fb7d55e952b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.104301+00:00"
+    },
+    "retrieval:08cce57de70cc44feec1403d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.192167+00:00"
+    },
+    "retrieval:195461fd6ede0c39cd3a3fbc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.275810+00:00"
+    },
+    "retrieval:63b023c33530783cd4618689": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.356781+00:00"
+    },
+    "retrieval:82ac98a1e4fa99577d2e51f7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.430560+00:00"
+    },
+    "retrieval:f4981c4478194f99546021f0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.496857+00:00"
+    },
+    "retrieval:c72b4f5154b03078c9f7a03b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.560522+00:00"
+    },
+    "retrieval:3fbfa7dd97266cb7210640e0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.622020+00:00"
+    },
+    "retrieval:7fc760d958224b9940b62592": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.703320+00:00"
+    },
+    "retrieval:4a21f2f2dd18f90aba7dc8c0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.797080+00:00"
+    },
+    "retrieval:1315af73804c5ffc9cc82049": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.862178+00:00"
+    },
+    "retrieval:75f78f7212df3e42b4c6391c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.925514+00:00"
+    },
+    "retrieval:d21dcca39249cbc0f555d6ba": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:25.999786+00:00"
+    },
+    "retrieval:e8ac7eacb43eb724a0916aab": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.084577+00:00"
+    },
+    "retrieval:58653b7187170e418d5e41cd": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.161903+00:00"
+    },
+    "retrieval:8ca47c624bc675111fbceba4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.231742+00:00"
+    },
+    "retrieval:b6fbb26cf9fb0b396e013f0b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.296346+00:00"
+    },
+    "retrieval:1e8dbca15a4c3321ab394cf4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.397050+00:00"
+    },
+    "retrieval:94ca195d097d168168905756": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.469483+00:00"
+    },
+    "retrieval:191fb37bc5ab27762ecd4396": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.544534+00:00"
+    },
+    "retrieval:2d9aeb15ba7ecd33a5bb4a24": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.630234+00:00"
+    },
+    "retrieval:8541df9066c68739144fc75e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.699361+00:00"
+    },
+    "retrieval:5c2de20fa03cb644eb7bc762": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.767865+00:00"
+    },
+    "retrieval:824e09423919a1455cc0f0d5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.833354+00:00"
+    },
+    "retrieval:4a560b473ac6c078c9baef7a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.893698+00:00"
+    },
+    "retrieval:80fb0a8a14e569adabad6877": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:26.955809+00:00"
+    },
+    "retrieval:121073d0d0182cc9540a9285": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.039138+00:00"
+    },
+    "retrieval:54163afb1bf7a8832029e453": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.105961+00:00"
+    },
+    "retrieval:3061023f427771b3c34e42e1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.188433+00:00"
+    },
+    "retrieval:c8c9d4aeac2255610710d224": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.288637+00:00"
+    },
+    "retrieval:8a00c0210999128bd5ef572f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.368307+00:00"
+    },
+    "retrieval:de9747a60432374d1eaeff33": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.433228+00:00"
+    },
+    "retrieval:188b7f97d4ac2220172be158": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.508382+00:00"
+    },
+    "retrieval:29d71ab79a8bf4a8c65aad1d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.600773+00:00"
+    },
+    "retrieval:a5cf5ed1edc204a2771fdb2b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.675069+00:00"
+    },
+    "retrieval:dde2765ce7ecb2ad0afcf1ae": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.754357+00:00"
+    },
+    "retrieval:aed03c1d9011a5a5e3ea14d5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.832402+00:00"
+    },
+    "retrieval:9e114cfb4f7945dd9e4698bc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:27.939746+00:00"
+    },
+    "retrieval:79b0ff9bd09218293965f62d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.043717+00:00"
+    },
+    "retrieval:c26926dbc9cf641d58131592": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.144294+00:00"
+    },
+    "retrieval:2d2c24a13a9e5248d2ee02b2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.237356+00:00"
+    },
+    "retrieval:5a23b1d6e911310ffb36f356": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.359490+00:00"
+    },
+    "retrieval:7ea3051ed9321cefaeea60e8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.501442+00:00"
+    },
+    "retrieval:8ffdd533eaa39bccfa99c814": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.617146+00:00"
+    },
+    "retrieval:40328fd3ac0feb839824d19b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.720125+00:00"
+    },
+    "retrieval:030ed717a94a403a4651763d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.828291+00:00"
+    },
+    "retrieval:c58bdadb3c4f565c9acccdef": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:28.935293+00:00"
+    },
+    "retrieval:608c281334b757f708a5cee2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.051609+00:00"
+    },
+    "retrieval:2ef0cef3993b27dfca002f5c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.144009+00:00"
+    },
+    "retrieval:9f603db3c459287479aa4671": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.231000+00:00"
+    },
+    "retrieval:baf5fe2f7838b690419c44ef": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.324758+00:00"
+    },
+    "retrieval:2d9b42251d0e01a841ea40d2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.434142+00:00"
+    },
+    "retrieval:78a30250044851c7b277fc48": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.561220+00:00"
+    },
+    "retrieval:5783043557f33cc21003afe5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.661713+00:00"
+    },
+    "retrieval:06904fcf5a2fcd857e463023": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.773890+00:00"
+    },
+    "retrieval:c03efb3262fc1725055f3b8e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.886584+00:00"
+    },
+    "retrieval:da9c3d719ff0d0cc4e0f1352": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:29.996950+00:00"
+    },
+    "retrieval:a4c19df1a6ede11a2d6db0d1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.123112+00:00"
+    },
+    "retrieval:24cd27dd6ef45f37679e1548": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.248940+00:00"
+    },
+    "retrieval:e4fa1a5187152b676c9444c6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.364214+00:00"
+    },
+    "retrieval:a7fd05c9c35eed6e617efa16": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.499103+00:00"
+    },
+    "retrieval:5fc808155559347b4286441d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.673218+00:00"
+    },
+    "retrieval:41901d79cdcb0055398886f3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.784639+00:00"
+    },
+    "retrieval:59fed012cbc94f73e3596a56": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.883985+00:00"
+    },
+    "retrieval:e54b5c738ac0479f8ebac1c5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:30.974555+00:00"
+    },
+    "retrieval:603fcb12cada6857f6453552": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.062831+00:00"
+    },
+    "retrieval:0932170de802595d10af826c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.161116+00:00"
+    },
+    "retrieval:28a08cc9a700d9fd7bcfe34c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.257505+00:00"
+    },
+    "retrieval:acf636ca1763f783a4445249": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.362946+00:00"
+    },
+    "retrieval:587cb1f662859420663de675": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.452371+00:00"
+    },
+    "retrieval:5c59152dcdcce0212f45f889": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.550275+00:00"
+    },
+    "retrieval:82218e5e1a1dfdabd18876c1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.657149+00:00"
+    },
+    "retrieval:a87d4fa11ef95754b713d09b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.748951+00:00"
+    },
+    "retrieval:28b346d5b0b49ce752a2a61b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.848966+00:00"
+    },
+    "retrieval:0a4622863b04191a9a4347b6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:31.991942+00:00"
+    },
+    "retrieval:6939ea80fa95015e2c2e220e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.095769+00:00"
+    },
+    "retrieval:91a56665875774fe9d6a70ca": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.221138+00:00"
+    },
+    "retrieval:5333676fdc6985d578bf8fb2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.350639+00:00"
+    },
+    "retrieval:e648d8cf7454e36f4a80de6d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.464419+00:00"
+    },
+    "retrieval:1e7f37e352f887e3fe6fe236": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.604672+00:00"
+    },
+    "retrieval:112a4ed7d36b560466741dc6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.743239+00:00"
+    },
+    "retrieval:ab2662afa49fe44b22c083b0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.874669+00:00"
+    },
+    "retrieval:bb6b0d51be3f9961b23fa945": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:32.978873+00:00"
+    },
+    "retrieval:7059789b4ba391d85b99e137": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.108171+00:00"
+    },
+    "retrieval:5ebd01a4d4299608fdac0e26": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.221876+00:00"
+    },
+    "retrieval:b66bc28ebcf0ef1c3ad61c09": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.314074+00:00"
+    },
+    "retrieval:eb98a76cc137dc505f92b02a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.420693+00:00"
+    },
+    "retrieval:7036700750c644f836774d51": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.520586+00:00"
+    },
+    "retrieval:9b319f6e53af689460075603": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.621356+00:00"
+    },
+    "retrieval:960f8975bfb16b0453141eb6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.713591+00:00"
+    },
+    "retrieval:f75287b4bd6eec4e0b60a1fc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.828618+00:00"
+    },
+    "retrieval:2a29bdc2ae55f8dd885311b3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:33.943684+00:00"
+    },
+    "retrieval:5a070ccfca13729d0b336e39": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.039149+00:00"
+    },
+    "retrieval:b07ba9b6a9dbcaeb224afbd7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.122605+00:00"
+    },
+    "retrieval:1c05109f4a5e4c62af987bfc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.199324+00:00"
+    },
+    "retrieval:7a9d94f01e37de3ed2bbc698": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.266910+00:00"
+    },
+    "retrieval:105990365d9630a0771fc1a8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.335283+00:00"
+    },
+    "retrieval:5005f1bc4745394f5929b136": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.416711+00:00"
+    },
+    "retrieval:c1b5f3078b83ae944d330e6c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.507631+00:00"
+    },
+    "retrieval:3b32489bb1239e17794b7cb2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.611620+00:00"
+    },
+    "retrieval:2431e504eda3905eb3778e4e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.702133+00:00"
+    },
+    "retrieval:bba2a149d04865c0d47107ed": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.797484+00:00"
+    },
+    "retrieval:fec8d466ab0d1f9bf0783774": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.880735+00:00"
+    },
+    "retrieval:1968c6d3fbb9fbd6507d8c59": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:34.976401+00:00"
+    },
+    "retrieval:7b06487f5ec529cbe7d05f78": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.089702+00:00"
+    },
+    "retrieval:ddde6dc365fc28784e622ca3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.183464+00:00"
+    },
+    "retrieval:a13d3d4ca389c5f78d558231": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.270336+00:00"
+    },
+    "retrieval:af6365a8e08d95c398ac118c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.356339+00:00"
+    },
+    "retrieval:e135ebef045f1b1b8a2425af": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.465284+00:00"
+    },
+    "retrieval:ef01bc464c093288cc6b8edb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.595446+00:00"
+    },
+    "retrieval:64279d438422485aa79ad41a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.728733+00:00"
+    },
+    "retrieval:d7ccbff61030797c29056a03": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.852479+00:00"
+    },
+    "retrieval:f15f81d2cdd1d311a0655bcc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:35.969512+00:00"
+    },
+    "retrieval:a38b45c34d04a3cc64acaebf": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.104855+00:00"
+    },
+    "retrieval:44d06ec975c4c047f1429809": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.192662+00:00"
+    },
+    "retrieval:be74f386e2ec4d38ffaacb85": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.291395+00:00"
+    },
+    "retrieval:873bfe0c905defd3f9163fcb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.402015+00:00"
+    },
+    "retrieval:84694ddcfab1307bd20ae134": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.549325+00:00"
+    },
+    "retrieval:aac6925383ae26ca3b2d4dfa": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.678358+00:00"
+    },
+    "retrieval:6631fd14df80bb332a2b2e05": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.790140+00:00"
+    },
+    "retrieval:0f71e90d7bf4af6063ecd408": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:36.947057+00:00"
+    },
+    "retrieval:fd0e89bac195bc7f87b6a98c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.045611+00:00"
+    },
+    "retrieval:d6ad2f53dd8d48e63fa42ef4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.152738+00:00"
+    },
+    "retrieval:b0b1407c183a30fe91979421": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.246191+00:00"
+    },
+    "retrieval:7e0d4e2abd71f905872eefe9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.332251+00:00"
+    },
+    "retrieval:efe6afab625af9e4359846fc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.406879+00:00"
+    },
+    "retrieval:cf3a2bbbe5ef35297dd61f38": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.487597+00:00"
+    },
+    "retrieval:4c2b8a9a42060510f3b88056": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.587469+00:00"
+    },
+    "retrieval:76a3fc4d1e11596c28f72633": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.671407+00:00"
+    },
+    "retrieval:32315f7aa8a74f69d9a0832c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.769873+00:00"
+    },
+    "retrieval:97928916835d36a57eee9402": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.854938+00:00"
+    },
+    "retrieval:df9695e150062782e7b3f193": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:37.927293+00:00"
+    },
+    "retrieval:37efefb17e63b9196380c58c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.003564+00:00"
+    },
+    "retrieval:5eb1e9603dd894346ac5849d": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.101515+00:00"
+    },
+    "retrieval:efefe49a56709dd8568d0df5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.221537+00:00"
+    },
+    "retrieval:76b6d2b7e959b948d1df64f2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.323774+00:00"
+    },
+    "retrieval:50987c16ee9e498bd2e343fe": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.422292+00:00"
+    },
+    "retrieval:cbdb10b30613a342fabee8b0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.512621+00:00"
+    },
+    "retrieval:3d3e0851de9f95d5d5101caa": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.597461+00:00"
+    },
+    "retrieval:64a5a147d3d6dae5eec48265": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.687884+00:00"
+    },
+    "retrieval:452c9b455075318fafa750e5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.785978+00:00"
+    },
+    "retrieval:1d1adbef6288cff86f0593fa": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.898790+00:00"
+    },
+    "retrieval:6ad91393309852ced5aaec58": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:38.993372+00:00"
+    },
+    "retrieval:1e205583a2578007e8937c4e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.249193+00:00"
+    },
+    "retrieval:747291e5839457c68f74394a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.352396+00:00"
+    },
+    "retrieval:f688b89770bd17f9bf17b0ec": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.473863+00:00"
+    },
+    "retrieval:b1a4a40c8141bdfc3698a11e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.609436+00:00"
+    },
+    "retrieval:77c46afc6a9512709e2d8609": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.732531+00:00"
+    },
+    "retrieval:57c8f4f481ecde78f50fef6b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.836874+00:00"
+    },
+    "retrieval:33f4908b6154ded416248744": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:39.945970+00:00"
+    },
+    "retrieval:37dc4f5ee38e25e4c3cda9d7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.056804+00:00"
+    },
+    "retrieval:da2898c4bec3a4bb982f6112": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.178641+00:00"
+    },
+    "retrieval:9e39a195513511aa089ecdd5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.348769+00:00"
+    },
+    "retrieval:478a8d7371b16a3b72aa06a7": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.455072+00:00"
+    },
+    "retrieval:855ccd602d6479e83f6d0f36": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.564176+00:00"
+    },
+    "retrieval:c665a762ef6db1f995413e9b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.690328+00:00"
+    },
+    "retrieval:d43e6210c17406bf23fd80ee": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.802710+00:00"
+    },
+    "retrieval:900dc865728f3e90f8cc6e9a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:40.959447+00:00"
+    },
+    "retrieval:5fc522da1154f7a1756ec67b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.061099+00:00"
+    },
+    "retrieval:5ad48410b76117ce4f5cbaae": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.157001+00:00"
+    },
+    "retrieval:2d83b2a155baf944ec8b9914": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.258713+00:00"
+    },
+    "retrieval:6d74eb49199ea8a420fa5e9b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.360526+00:00"
+    },
+    "retrieval:0a85a1a38c310323f9363dc0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.459253+00:00"
+    },
+    "retrieval:ab94718b5de39d9650d9fcec": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.558793+00:00"
+    },
+    "retrieval:77ff36deaede05729e3fde1e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.650326+00:00"
+    },
+    "retrieval:0f28e172012bbcc3f5dc0f85": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.748630+00:00"
+    },
+    "retrieval:7ede341026624d3a4caccb19": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.894082+00:00"
+    },
+    "retrieval:e23d21b38c0b9b7ed5f9a26e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:41.982072+00:00"
+    },
+    "retrieval:5686b38c80af2079dfc1d1ea": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.087192+00:00"
+    },
+    "retrieval:bf46f2527f0a16a9a1d1c1f8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.186080+00:00"
+    },
+    "retrieval:227c27e9b68501a38a88b055": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.300723+00:00"
+    },
+    "retrieval:51b29382e6a6e24efb079f0a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.449032+00:00"
+    },
+    "retrieval:9b1203dcb447a81cb68b28be": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.591353+00:00"
+    },
+    "retrieval:6b5eec75b86d155646d64362": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.692567+00:00"
+    },
+    "retrieval:9d2f53d067f43bfc80d9bafd": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.789385+00:00"
+    },
+    "retrieval:bf0173b0c1235df9a22f3a03": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:42.877987+00:00"
+    },
+    "retrieval:c3d2a0be1829ae0e7a103df0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.029250+00:00"
+    },
+    "retrieval:1c37f21199c0170666620e1c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.155380+00:00"
+    },
+    "retrieval:0f9a6b1b21535d8556dad3c4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.287207+00:00"
+    },
+    "retrieval:3ff41e6dbbd0fe0968a625c4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.409116+00:00"
+    },
+    "retrieval:b5cca0176956ae480e74b304": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.505334+00:00"
+    },
+    "retrieval:b67cd52a81939c751edfb910": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.612933+00:00"
+    },
+    "retrieval:907812a1b236385aa5c5cb92": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.699796+00:00"
+    },
+    "retrieval:0242d85395abff015bacb0b6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.795003+00:00"
+    },
+    "retrieval:5964495402c752bc29af7dc6": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.875836+00:00"
+    },
+    "retrieval:0c909409cc0c68c366114df0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:43.964466+00:00"
+    },
+    "retrieval:79a510f47910dc9184eec30f": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.061242+00:00"
+    },
+    "retrieval:8206732107e071bc9cea686e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.182880+00:00"
+    },
+    "retrieval:8e0c44ec6eecdd5a19371dcf": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.271222+00:00"
+    },
+    "retrieval:e34154dee1bcd0eb5d31ab02": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.363540+00:00"
+    },
+    "retrieval:f3b80101cacc8f9dabcc6df2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.454572+00:00"
+    },
+    "retrieval:a904b193a18673bf444d85e5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.527520+00:00"
+    },
+    "retrieval:063e7bb9847ca18faea6638c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.612482+00:00"
+    },
+    "retrieval:91a47cca6f4dc601391f09d4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.704093+00:00"
+    },
+    "retrieval:e6c3f305cb90ed6c652d819c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.790259+00:00"
+    },
+    "retrieval:40424860717e3cb8f0df8367": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.874193+00:00"
+    },
+    "retrieval:51a895d91ddad26005a95b7e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:44.952991+00:00"
+    },
+    "retrieval:951aac2362a4bedd8d2fdbf9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.025485+00:00"
+    },
+    "retrieval:383d5bc11f767d9d74bcafeb": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.139427+00:00"
+    },
+    "retrieval:e8a987e02b2b3eba98a2a591": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.242651+00:00"
+    },
+    "retrieval:9ed8baab3c45d9fa626b2cbc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.332883+00:00"
+    },
+    "retrieval:95654673d8cfae5a8126abd5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.420982+00:00"
+    },
+    "retrieval:0ecc5c3fbf5d1ca5db01f905": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.506384+00:00"
+    },
+    "retrieval:2c571aae8011caeaefc8d6ad": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.603660+00:00"
+    },
+    "retrieval:7438415af3796adac3a2673e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.696423+00:00"
+    },
+    "retrieval:fb8675ebca6eb6c80a25ca30": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.806491+00:00"
+    },
+    "retrieval:7f745226f8802ac0456247f5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.882439+00:00"
+    },
+    "retrieval:949d1ed43191a9d7e3c8f01e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:45.961364+00:00"
+    },
+    "retrieval:2e2f5ce0c1d9ffa6ec9c1420": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.051187+00:00"
+    },
+    "retrieval:781af37b333ecc2c5d44568b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.136214+00:00"
+    },
+    "retrieval:4142b2d874e36a53d851a1c4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.227096+00:00"
+    },
+    "retrieval:ea6ff940e5fd7136211d9110": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.310952+00:00"
+    },
+    "retrieval:71246660e31e49485a67d4ee": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.395401+00:00"
+    },
+    "retrieval:10d302f735a38890918530a3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.481561+00:00"
+    },
+    "retrieval:6788640855aa95d147fbb3cd": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.564995+00:00"
+    },
+    "retrieval:48aca8a98d295696f570f514": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.660753+00:00"
+    },
+    "retrieval:125a604664d4a3a3439fdde2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.758607+00:00"
+    },
+    "retrieval:e68de1d6033c8b35a63f1def": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.831332+00:00"
+    },
+    "retrieval:ece42a4b73cd78c22d0f6dd8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.908840+00:00"
+    },
+    "retrieval:d4e7258dfb9a452667bb20ff": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:46.995954+00:00"
+    },
+    "retrieval:627d700d7d4652e23d0b0fd4": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.065684+00:00"
+    },
+    "retrieval:33c0f092a8754c0f236db4da": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.164936+00:00"
+    },
+    "retrieval:0565a2af5e768f81b055bd9e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.270431+00:00"
+    },
+    "retrieval:3f56406168eb3d3ec7bccd27": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.348176+00:00"
+    },
+    "retrieval:1810610cd1bbbc8490481b70": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.437469+00:00"
+    },
+    "retrieval:07c98a242abf83522d88bbc8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.524207+00:00"
+    },
+    "retrieval:a15d701246e39db12b5d92d0": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.622652+00:00"
+    },
+    "retrieval:0d1f748b56faddb35197f9c2": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.721259+00:00"
+    },
+    "retrieval:77975fd3321b228ea3359e31": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.814567+00:00"
+    },
+    "retrieval:008336e9dd9ad05a7a6c7dc1": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.898885+00:00"
+    },
+    "retrieval:bcaf2042c461bb2abefdfc50": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:47.988714+00:00"
+    },
+    "retrieval:50cf9dd0b5010b62d970205e": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.109044+00:00"
+    },
+    "retrieval:525429688cc90977cd22586c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.205155+00:00"
+    },
+    "retrieval:d16313a348a1b5b66dfb895c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.316141+00:00"
+    },
+    "retrieval:0027f4c08799ba4d194918d8": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.405050+00:00"
+    },
+    "retrieval:18c7d0c99c822ee3eb2df6e9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.492745+00:00"
+    },
+    "retrieval:f3a03afd237a3941e74e613c": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.616392+00:00"
+    },
+    "retrieval:f1b5a7d06ab8d1c041118bc3": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.696413+00:00"
+    },
+    "retrieval:b9fbede3cc8f94303939ba61": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.774272+00:00"
+    },
+    "retrieval:33df46fc760a9b32d25db32b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.853301+00:00"
+    },
+    "retrieval:5a41cee51b8b2e9ba8d55d54": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:48.928383+00:00"
+    },
+    "retrieval:7a344323c74cafd4e0e494fc": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.004652+00:00"
+    },
+    "retrieval:dc2f753ac696efa412f21d72": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.078326+00:00"
+    },
+    "retrieval:a1e92ae490ca7639695576de": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.154235+00:00"
+    },
+    "retrieval:e557254140ce4debc0f6ee62": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.230266+00:00"
+    },
+    "retrieval:922e2086e954918a685c8b8a": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.337112+00:00"
+    },
+    "retrieval:e360d8b14c9b1b2e8757aae9": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.414394+00:00"
+    },
+    "retrieval:7ae510df7a5523efcbf88177": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.490474+00:00"
+    },
+    "retrieval:c7e75b26b3b4346b893d0cc5": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.588100+00:00"
+    },
+    "retrieval:768d903a1345834db536ba8b": {
+      "decision": "accept",
+      "updated_at": "2026-11-15T12:51:49.695190+00:00"
+    }
+  }
 }

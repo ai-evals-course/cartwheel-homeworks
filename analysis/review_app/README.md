@@ -10,6 +10,17 @@ Open **http://127.0.0.1:8021**. The server reads `LANGFUSE_HOST`,
 `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY` from the existing `.env`.
 Credentials stay on the server. No model calls are made by this application.
 
+Live trace reads allow 30 seconds per request and retry network failures up to
+three attempts. For a slow Langfuse instance, increase the timeout:
+
+```bash
+uv run python -m analysis.review_app.server --langfuse-timeout 60
+```
+
+If reads still fail, check that the configured `LANGFUSE_HOST` is reachable and
+Langfuse is running. An existing full trace export can be opened explicitly with
+`--source` as described below; the app never silently switches to offline data.
+
 At startup it paginates the live project and loads complete records carrying
 `cartwheel.scenario_id`. It groups them by `cartwheel.session_id`, rather than
 the nullable Langfuse `sessionId` or a scenario ID reused across runs. Restart
