@@ -536,13 +536,6 @@ function renderTaxonomy() {
   function buildTiles(items, depth = 0) {
     if (items.length === 1) {
       const {mode, index, notes} = items[0];
-      const seenComments = new Set();
-      const uniqueNotes = notes.filter(note => {
-        const key = note.note.trim().replace(/\s+/g, ' ').replace(/[.,!;:]+$/g, '').toLowerCase();
-        if (seenComments.has(key)) return false;
-        seenComments.add(key);
-        return true;
-      });
       const tile = el('section', 'taxonomy-tile');
       tile.dataset.color = index % 6;
       tile.dataset.unassigned = String(mode.id === '__unassigned');
@@ -551,12 +544,12 @@ function renderTaxonomy() {
       choose.setAttribute('aria-pressed', String(state.taxonomyMode === mode.id));
       choose.setAttribute('aria-controls', 'taxonomy-summary');
       const heading = el('h3'); heading.append(choose);
-      tile.append(heading, el('p', 'taxonomy-count', `${uniqueNotes.length} ${uniqueNotes.length === 1 ? 'comment' : 'comments'}`));
+      tile.append(heading, el('p', 'taxonomy-count', `${notes.length} ${notes.length === 1 ? 'comment' : 'comments'}`));
       const previews = el('div', 'taxonomy-previews');
       previews.tabIndex = 0;
       previews.setAttribute('role', 'region');
       previews.setAttribute('aria-label', `${mode.name || mode.id.replaceAll('_', ' ')} comments`);
-      uniqueNotes.forEach(note => {
+      notes.forEach(note => {
         const preview = el('div', 'taxonomy-comment');
         const excerpt = el('span', 'taxonomy-excerpt');
         const quote = note.anchor?.quote;
