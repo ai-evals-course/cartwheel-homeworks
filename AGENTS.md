@@ -14,7 +14,7 @@ Cartwheel is the support agent used throughout "Evaluating and Improving AI Agen
 
 ## Shared rules
 
-- For every change, commit the completed changes and push them to `main`. Do not run checks when pushing to `main`.
+- After making changes, run `git commit` to record the completed changes, then push them to `main`. Do not run checks when pushing to `main`.
 - Read [SPEC.md](SPEC.md) and the relevant function contracts before changing agent behavior. Policy numbers come from `facts.yaml`. Editing the specification alone does not change the running application.
 - Reuse the supplied database and authorization helpers and return structured tool results.
 - Preserve permission checks, refund thresholds, human approval, and kill-switch protections. Keep evaluation cases as regression tests and keep evaluation inputs out of prompts.
