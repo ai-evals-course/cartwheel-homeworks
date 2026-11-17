@@ -56,7 +56,8 @@ const EvaluatorPanel = (() => {
     card.append(title, el('p', 'evaluator-description', mode.definition || 'No saved definition.'));
     const columns = el('div', 'evaluator-card-columns');
     const prompt = el('section', 'evaluator-card-section evaluator-prompt-column');
-    prompt.append(el('h4', '', 'Judge prompt'));
+    const promptHeading = el('h4', '', 'Judge prompt');
+    prompt.append(promptHeading);
     const data = el('div', 'evaluator-data-column');
     columns.append(prompt, data); card.append(columns);
     const setsHeading = el('header', 'evaluator-set-heading');
@@ -75,12 +76,11 @@ const EvaluatorPanel = (() => {
     }
     const judge = mode.judges.find(j => j.judge_id === selectedJudges.get(mode.id)) || mode.judges[0];
     selectedJudges.set(mode.id, judge.judge_id);
+    promptHeading.textContent = `Judge prompt (v${judge.version})`;
     prompt.append(judge.prompt_text ? el('pre', 'evaluator-prompt', judge.prompt_text)
       : el('p', 'quiet', 'No judge prompt saved yet.'));
     if (mode.judges.length > 1) results.append(selector('Judge version', 'evaluator-judge-' + encodeURIComponent(mode.id),
       mode.judges.map(j => [j.judge_id, j.judge_id]), judge.judge_id, value => selectedJudges.set(mode.id, value)));
-    else results.append(el('p', 'quiet evaluator-version', judge.judge_id));
-    results.append(el('p', 'quiet', `Model: ${judge.model || 'Not saved'} · Status: ${judge.status || 'Not saved'}`));
     const metric = (split, format) => judge[split] ? format(judge[split]) : split === 'test' && judge.status !== 'frozen' ? 'Locked until frozen' : 'Pending';
     const matrices = el('div', 'evaluator-confusion-matrices');
     for (const [split, title] of [['dev', 'Development'], ['test', 'Test']]) {
