@@ -39,7 +39,7 @@ the full conversation available. Clear the field or press Escape to reset it.
    Sidebar entries show the scenario, role, trace count and review status without
    repeating the user's request. Each conversation has its own bordered cell;
    shopper, merchant and support roles use distinct labeled color badges.
-   The prominent top navigation provides Review, Label, Taxonomy and Progress.
+   The prominent top navigation provides Review, Taxonomy, Label, Evaluator and Progress.
    The palette pairs black navigation with terracotta controls, warm neutral surfaces,
    taupe agent accents and muted bronze tools; role colors retain their distinct meanings.
    Navigation and the conversation header stay fixed while the reading pane
@@ -77,7 +77,21 @@ the full conversation available. Clear the field or press Escape to reset it.
 5. In **Label**, record Present (1) or Absent (0) for each trace and final mode.
    Unreviewed cells are not interpreted as Absent. Each explicit decision is
    saved locally before a synchronous Langfuse score write and readback.
-6. Use **Progress** to see distinct traces reviewed, missing judgments, pending
+6. Open **Evaluator** between Label and Progress to inspect saved HW5 artifacts.
+   This full-width view hides the conversation sidebar and header. Select the
+   failure mode to see its definition and boundary, training/development/test
+   Pass and Fail counts, planned shares, seed, and expandable trace IDs. IDs
+   available in the current trace source open their original conversations.
+   Select a judge version to compare development and test confusion counts,
+   TPR, TNR, and 95% Wilson intervals, or expand its saved prompt. Results are
+   read from `analysis/state/judges/` and `analysis/report/`; labels and splits
+   come from `hw5_labels/` and `splits.json`. The `--state-dir` override applies
+   to these artifacts too, with reports read from its sibling `report/` folder.
+   **Refresh results** rereads saved artifacts without running a judge or changing
+   labels. Missing runs show Pending, and test results stay locked until their
+   judge is frozen. The original HW4 labeling view remains separate from the
+   confirmed HW5 export (HW5 uses 1 = Pass and 0 = Fail).
+7. Use **Progress** to see distinct traces reviewed, missing judgments, pending
    synchronization, and AI suggestions. Accepting a suggestion creates a
    human-confirmed note with AI provenance; it never silently creates a label.
 
@@ -159,8 +173,9 @@ processes against the same state directory. Tabs in one process use revision
 checks to prevent overwriting each other's changes.
 
 ```bash
-uv run pytest tests/test_review_app.py tests/test_normalization_metadata.py -q
+uv run pytest tests/test_review_app.py tests/test_review_evaluator.py tests/test_normalization_metadata.py -q
 node --check analysis/review_app/app.js
+node --check analysis/review_app/evaluator.js
 ```
 
 Browser checks should use a temporary `--state-dir`, so synthetic test notes and

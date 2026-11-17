@@ -280,6 +280,7 @@ function switchView(view) {
   for (const node of document.querySelectorAll('[data-view]')) node.setAttribute('aria-pressed', String(node.dataset.view === view));
   for (const node of document.querySelectorAll('.view')) node.hidden = node.id !== view + '-view';
   render();
+  if (view === 'evaluator') EvaluatorPanel.refresh();
 }
 function anchorMatches(anchor, blockId, field, content) {
   return anchor && anchor.block_id === blockId && anchor.field === field && Number.isInteger(anchor.start) &&
@@ -913,6 +914,7 @@ function renderProgress() {
 function render() {
   document.querySelector('main').classList.toggle('taxonomy-layout', state.view === 'taxonomy');
   document.querySelector('main').classList.toggle('labels-layout', state.view === 'labels');
+  document.querySelector('main').classList.toggle('evaluator-layout', state.view === 'evaluator');
   $('sampling-controls').hidden = state.view !== 'read';
   if (!state.review || !state.catalog) return;
   renderQueue(); saveStatus();
@@ -965,6 +967,7 @@ function render() {
   if (state.view === 'labels') renderLabels();
   if (state.view === 'taxonomy') renderTaxonomy();
   if (state.view === 'progress') renderProgress();
+  if (state.view === 'evaluator') EvaluatorPanel.render();
 }
 document.addEventListener('keydown', event => {
   if (state.view !== 'read' || !state.session || state.editor || state.busy || state.loading || !isReviewShortcut(event)) return;
