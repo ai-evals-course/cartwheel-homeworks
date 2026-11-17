@@ -152,9 +152,12 @@ def test_critique_comments_persist_per_judge_trace_and_preserve_artifacts(tmp_pa
         save_critique_comment(root, 'content-v0', 'b', 'Stale edit', 0)
     edited = save_critique_comment(root, 'content-v0', 'b', 'Useful context was overlooked.', 1)
     assert edited['revision'] == 2
-    history = json.loads((root / 'evaluator_comments.json').read_text())['content-v0']['b']['history']
+    report_path = tmp_path / 'report/dev-content-v0.json'
+    history = json.loads(report_path.read_text())['critique_comments']['b']['history']
     assert history[0]['comment'] == saved['comment']
-    assert all(p.read_bytes() == contents for p, contents in before.items())
+    assert all(p.read_bytes() == contents for p, contents in before.items() if p != report_path)
+    original_metrics = json.loads(before[report_path])
+    assert all(json.loads(report_path.read_text())[key] == value for key, value in original_metrics.items())
     second = json.loads((root / 'judges/content-v0.json').read_text())
     second.update(judge_id='content-v1', version=1)
     put(root / 'judges/content-v1.json', second)

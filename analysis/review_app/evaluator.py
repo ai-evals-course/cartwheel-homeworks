@@ -31,7 +31,9 @@ def validation_traces(root: Path, judge_id: str) -> dict:
     prompt_hash = judge.get('prompt_hash')
     predictions = judge.get('predictions', {}).get(prompt_hash, {})
     critiques = judge.get('critiques', {}).get(prompt_hash, {})
-    comments = read_json(root / 'evaluator_comments.json', {}).get(judge_id, {})
+    legacy_comments = read_json(root / 'evaluator_comments.json', {}).get(judge_id, {})
+    report = read_json(root.parent / 'report' / f'dev-{judge_id}.json', {})
+    comments = {**legacy_comments, **report.get('critique_comments', {})}
     traces = []
     for tid in ids:
         prediction = predictions.get(tid)
@@ -59,10 +61,13 @@ def save_critique_comment(root: Path, judge_id: str, trace_id: str, comment: str
     records = validation_traces(root, judge_id)['traces']
     if not any(record['trace_id'] == trace_id for record in records):
         raise ValueError('Comments require a validation trace from this judge')
-    path = root / 'evaluator_comments.json'
-    comments = read_json(path, {})
-    mode_comments = comments.setdefault(judge_id, {})
-    prior = mode_comments.get(trace_id, {})
+    path = root.parent / 'report' / f'dev-{judge_id}.json'
+    report = read_json(path, {})
+    if report.get('judge_id') != judge_id or report.get('split') != 'dev':
+        raise ValueError('Save the validation run results before adding comments')
+    legacy_comments = read_json(root / 'evaluator_comments.json', {}).get(judge_id, {})
+    comments = {**legacy_comments, **report.get('critique_comments', {})}
+    prior = comments.get(trace_id, {})
     if revision != prior.get('revision', 0):
         raise ValueError('Comment changed in another tab; reopen the trace before saving')
     saved = {'comment': comment, 'revision': revision + 1,
@@ -70,8 +75,9 @@ def save_critique_comment(root: Path, judge_id: str, trace_id: str, comment: str
     history = prior.get('history', [])
     if prior:
         history = history + [{key: prior[key] for key in ('comment', 'revision', 'updated_at')}]
-    mode_comments[trace_id] = {**saved, 'history': history}
-    write_json(path, comments)
+    comments[trace_id] = {**saved, 'history': history}
+    report['critique_comments'] = comments
+    write_json(path, report)
     return saved
 
 

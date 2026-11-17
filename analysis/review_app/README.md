@@ -103,7 +103,9 @@ the full conversation available. Clear the field or press Escape to reset it.
    final reply appear below. **Close** or Escape returns focus to the button.
    Under **Judge critique**, use **Comment on judge critique** and **Save comment**
    to record your assessment. Comments persist per judge version and trace in
-   `analysis/state/evaluator_comments.json` (under `--state-dir` when provided).
+   `analysis/report/dev-<judge_id>.json` under `critique_comments`, keyed by trace
+   ID (the report folder beside `--state-dir` when provided). Existing comments
+   in the earlier `evaluator_comments.json` are preserved and imported on save.
    Edits preserve prior comments in history, and stale saves from another tab
    are rejected. Unsaved drafts are retained in browser storage while navigating
    or reopening the popup. Comments do not change your human labels or the

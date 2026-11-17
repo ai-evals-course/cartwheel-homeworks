@@ -127,6 +127,7 @@ const EvaluatorPanel = (() => {
                                   comment, revision: trace.comment?.revision || 0}),
           });
           const result = await response.json();
+          if (response.status === 404) throw new Error('Restart the review server to enable saving critique comments');
           if (!response.ok) throw new Error(result.error || 'Could not save comment');
           trace.comment = result;
           if (commentDrafts.get(key) === comment) commentDrafts.delete(key);

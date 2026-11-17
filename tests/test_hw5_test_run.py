@@ -105,7 +105,12 @@ def test_development_reuses_registered_judge_and_never_calls_test(tmp_path, monk
     assert result['tpr'] == 1 and result['tnr'] == 0
     assert result['disagreements'] == ['d0']
     assert result['class_counts'] == {'Pass': 1, 'Fail': 1}
-    run_development('unnecessary_response_content', prompt, approved=True)
+    report_path = state.parent / 'report' / f'dev-{judge_id}.json'
+    saved = json.loads(report_path.read_text())
+    saved['critique_comments'] = {'d0': {'comment': 'Keep my review note.', 'revision': 1}}
+    report_path.write_text(json.dumps(saved))
+    resumed = run_development('unnecessary_response_content', prompt, approved=True)
+    assert resumed['critique_comments'] == saved['critique_comments']
     assert calls == ['d1', 'd0']
     history = json.loads((state / 'judges/_history_unnecessary_response_content.json').read_text())
     assert len(history['versions']) == 1

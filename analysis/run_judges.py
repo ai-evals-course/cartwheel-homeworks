@@ -241,7 +241,11 @@ def run_development(mode: str, prompt_path: str | Path, *, approved: bool = Fals
     metrics = judge_alignment(judge_id, split='dev')
     metrics['class_counts'] = dict(Counter('Pass' if labels[tid]['label'] else 'Fail'
                                          for tid in assignment['dev']))
-    write_json(state_path('..', 'report', f'dev-{judge_id}.json'), metrics)
+    report_path = state_path('..', 'report', f'dev-{judge_id}.json')
+    prior = read_json(report_path, {})
+    if 'critique_comments' in prior:
+        metrics['critique_comments'] = prior['critique_comments']
+    write_json(report_path, metrics)
     return metrics
 
 
