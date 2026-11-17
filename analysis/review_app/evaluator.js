@@ -58,7 +58,7 @@ const EvaluatorPanel = (() => {
     const card = el('article', 'panel evaluator-card');
     const titleId = 'evaluator-title-' + encodeURIComponent(mode.id);
     card.setAttribute('aria-labelledby', titleId);
-    const title = el('h3', '', mode.name); title.id = titleId;
+    const title = el('h3', '', `${mode.name} (LLM judge)`); title.id = titleId;
     card.append(title, el('p', 'evaluator-description', mode.definition || 'No saved definition.'));
     const columns = el('div', 'evaluator-card-columns');
     const sets = el('section', 'evaluator-card-section'); sets.append(el('h4', '', 'Train / development / test'));
