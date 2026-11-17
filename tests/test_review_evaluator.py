@@ -69,6 +69,15 @@ def test_evaluator_http_endpoint_uses_server_state_directory(tmp_path):
             data = json.load(response)
             assert data['split'] == 'dev'
             assert [row['trace_id'] for row in data['traces']] == ['b']
+        request = urllib.request.Request(
+            f'http://127.0.0.1:{server.server_port}/api/evaluator/comment',
+            data=json.dumps({'judge_id': 'content-v0', 'trace_id': 'b',
+                             'comment': 'Reviewing the critique.', 'revision': 0}).encode(),
+            headers={'Content-Type': 'application/json'})
+        with urllib.request.urlopen(request) as response:
+            assert json.load(response)['revision'] == 1
+        with urllib.request.urlopen(f'http://127.0.0.1:{server.server_port}/api/evaluator/traces?judge_id=content-v0') as response:
+            assert json.load(response)['traces'][0]['comment']['comment'] == 'Reviewing the critique.'
     finally:
         server.shutdown(); server.server_close(); worker.join()
 
@@ -128,3 +137,35 @@ def test_validation_trace_browser_handles_pending_and_rejects_paths(tmp_path):
     for judge_id in ('../content-v0', 'missing', '/tmp/secret', ''):
         with pytest.raises(ValueError):
             validation_traces(root, judge_id)
+
+
+def test_critique_comments_persist_per_judge_trace_and_preserve_artifacts(tmp_path):
+    import pytest
+    from analysis.review_app.evaluator import save_critique_comment, validation_traces
+    root = artifacts(tmp_path)
+    before = {p: p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()}
+    saved = save_critique_comment(root, 'content-v0', 'b', 'The critique misses the closing.', 0)
+    assert saved['comment'] == 'The critique misses the closing.'
+    assert saved['revision'] == 1
+    assert validation_traces(root, 'content-v0')['traces'][0]['comment'] == saved
+    with pytest.raises(ValueError, match='changed'):
+        save_critique_comment(root, 'content-v0', 'b', 'Stale edit', 0)
+    edited = save_critique_comment(root, 'content-v0', 'b', 'Useful context was overlooked.', 1)
+    assert edited['revision'] == 2
+    history = json.loads((root / 'evaluator_comments.json').read_text())['content-v0']['b']['history']
+    assert history[0]['comment'] == saved['comment']
+    assert all(p.read_bytes() == contents for p, contents in before.items())
+    second = json.loads((root / 'judges/content-v0.json').read_text())
+    second.update(judge_id='content-v1', version=1)
+    put(root / 'judges/content-v1.json', second)
+    assert validation_traces(root, 'content-v1')['traces'][0]['comment']['comment'] == ''
+
+
+def test_critique_comments_reject_test_traces_and_invalid_content(tmp_path):
+    import pytest
+    from analysis.review_app.evaluator import save_critique_comment
+    root = artifacts(tmp_path)
+    for tid, comment in [('c', 'Test comment'), ('missing', 'Unknown trace'), ('b', 'x' * 20001), ('b', {'bad': 'shape'})]:
+        with pytest.raises(ValueError):
+            save_critique_comment(root, 'content-v0', tid, comment, 0)
+    assert not (root / 'evaluator_comments.json').exists()

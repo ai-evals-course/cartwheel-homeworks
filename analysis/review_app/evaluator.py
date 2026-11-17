@@ -1,9 +1,10 @@
-"""Read-only projections of saved HW5 evaluator artifacts for the review UI."""
+"""Saved HW5 evaluator projections and separate human critique comments."""
 import hashlib
 import re
 from pathlib import Path
+from datetime import datetime, timezone
 
-from analysis.helpers._state import read_json, read_jsonl
+from analysis.helpers._state import read_json, read_jsonl, write_json
 
 METRIC_FIELDS = ('judge_id', 'split', 'n', 'tp', 'fn', 'tn', 'fp', 'tpr', 'tnr',
                  'tpr_interval', 'tnr_interval', 'class_counts')
@@ -30,6 +31,7 @@ def validation_traces(root: Path, judge_id: str) -> dict:
     prompt_hash = judge.get('prompt_hash')
     predictions = judge.get('predictions', {}).get(prompt_hash, {})
     critiques = judge.get('critiques', {}).get(prompt_hash, {})
+    comments = read_json(root / 'evaluator_comments.json', {}).get(judge_id, {})
     traces = []
     for tid in ids:
         prediction = predictions.get(tid)
@@ -42,8 +44,35 @@ def validation_traces(root: Path, judge_id: str) -> dict:
             'human_verdict': ('Pass' if label else 'Fail') if label in (0, 1) else None,
             'disagreement': prediction in (0, 1) and label in (0, 1) and prediction != label,
             'critique': critiques.get(tid, ''),
+            'comment': {key: comments.get(tid, {}).get(key, default)
+                        for key, default in [('comment', ''), ('revision', 0), ('updated_at', None)]},
         })
     return {'judge_id': judge_id, 'mode': mode, 'split': 'dev', 'traces': traces}
+
+
+def save_critique_comment(root: Path, judge_id: str, trace_id: str, comment: str, revision: int) -> dict:
+    """Save a human comment atomically; caller holds the review store's lock."""
+    if not isinstance(comment, str) or len(comment) > 20000:
+        raise ValueError('Comments must be text with at most 20000 characters')
+    if not isinstance(revision, int) or revision < 0:
+        raise ValueError('Invalid comment revision')
+    records = validation_traces(root, judge_id)['traces']
+    if not any(record['trace_id'] == trace_id for record in records):
+        raise ValueError('Comments require a validation trace from this judge')
+    path = root / 'evaluator_comments.json'
+    comments = read_json(path, {})
+    mode_comments = comments.setdefault(judge_id, {})
+    prior = mode_comments.get(trace_id, {})
+    if revision != prior.get('revision', 0):
+        raise ValueError('Comment changed in another tab; reopen the trace before saving')
+    saved = {'comment': comment, 'revision': revision + 1,
+             'updated_at': datetime.now(timezone.utc).isoformat()}
+    history = prior.get('history', [])
+    if prior:
+        history = history + [{key: prior[key] for key in ('comment', 'revision', 'updated_at')}]
+    mode_comments[trace_id] = {**saved, 'history': history}
+    write_json(path, comments)
+    return saved
 
 
 def evaluator_summary(root: Path) -> dict:

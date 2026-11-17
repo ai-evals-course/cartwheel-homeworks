@@ -101,8 +101,14 @@ the full conversation available. Clear the field or press Escape to reset it.
    Left/Right arrow keys. The run ID has Judge and Human verdict badges beside
    it; the saved critique, conversation history, tool evidence, and highlighted
    final reply appear below. **Close** or Escape returns focus to the button.
-   This view reads the fixed HW5 inputs and cached predictions; it never changes
-   labels, calls a model, or serves test traces through its data endpoint.
+   Under **Judge critique**, use **Comment on judge critique** and **Save comment**
+   to record your assessment. Comments persist per judge version and trace in
+   `analysis/state/evaluator_comments.json` (under `--state-dir` when provided).
+   Edits preserve prior comments in history, and stale saves from another tab
+   are rejected. Unsaved drafts are retained in browser storage while navigating
+   or reopening the popup. Comments do not change your human labels or the
+   judge's critique. This view reads fixed HW5 inputs and cached predictions;
+   it never calls a model or serves test traces through its data endpoint.
 7. Use **Progress** to see distinct traces reviewed, missing judgments, pending
    synchronization, and AI suggestions. Accepting a suggestion creates a
    human-confirmed note with AI provenance; it never silently creates a label.

@@ -16,7 +16,7 @@ from analysis.helpers._state import read_json, state_root
 from analysis.helpers.langfuse_io import _client
 from analysis.helpers.normalization import _metadata
 from analysis.review_app.data import ReviewStore, build_turn, group_sessions
-from analysis.review_app.evaluator import evaluator_summary, validation_traces
+from analysis.review_app.evaluator import evaluator_summary, validation_traces, save_critique_comment
 from observability.instrument import load_env
 from scenarios.export_langfuse import _jsonable
 
@@ -154,7 +154,7 @@ class ReviewHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.local_request():
             return
-        if self.path != "/api/action":
+        if self.path not in {"/api/action", "/api/evaluator/comment"}:
             self.respond({"error": "Not found"}, 404)
             return
         if self.headers.get_content_type() != "application/json":
@@ -167,7 +167,14 @@ class ReviewHandler(BaseHTTPRequestHandler):
             event = json.loads(self.rfile.read(size))
             if not isinstance(event, dict):
                 raise ValueError("Expected a review action object")
-            self.respond(self.server.store.apply(event))
+            if self.path == '/api/evaluator/comment':
+                with self.server.store.lock:
+                    result = save_critique_comment(self.server.store.root, event.get('judge_id', ''),
+                                                  event.get('trace_id'), event.get('comment'),
+                                                  event.get('revision'))
+                self.respond(result)
+            else:
+                self.respond(self.server.store.apply(event))
         except (ValueError, TypeError) as exc:
             self.respond({"error": str(exc)}, 409 if "changed" in str(exc) else 400)
         except Exception:

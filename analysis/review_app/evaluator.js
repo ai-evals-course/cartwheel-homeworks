@@ -1,7 +1,8 @@
-/* Saved evaluator artifacts are read-only. Content is always rendered as text. */
+/* Judge artifacts remain read-only; human critique comments are stored separately. */
 const EvaluatorPanel = (() => {
   let snapshot = null, loading = false, error = '';
   const selectedJudges = new Map();
+  const commentDrafts = new Map();
   const percent = value => Number.isFinite(value) ? (value * 100).toFixed(1) + '%' : 'Not available';
   function table(caption, headings, rows) {
     const wrap = el('div', 'table-wrap'), grid = el('table', 'evaluator-table');
@@ -77,7 +78,7 @@ const EvaluatorPanel = (() => {
       }
       const critique = el('section', 'evaluator-critique');
       critique.append(el('h3', '', 'Judge critique'), el('p', '', trace.critique || 'No saved critique.'));
-      body.append(critique);
+      body.append(critique, commentEditor(trace));
       if (!trace.trace.length) body.append(el('p', 'empty', 'The saved input for this trace is unavailable.'));
       const lastAssistant = trace.trace.findLastIndex(message => message.role === 'assistant');
       trace.trace.forEach((message, i) => {
@@ -93,6 +94,50 @@ const EvaluatorPanel = (() => {
         block.append(el('h3', '', role), el('div', 'prose', message.text ?? message.content ?? ''));
         body.append(block);
       });
+    }
+    function commentEditor(trace) {
+      const section = el('section', 'evaluator-critique-comment');
+      const label = el('label', '', 'Comment on judge critique');
+      const input = el('textarea'); input.rows = 3; input.maxLength = 20000;
+      input.placeholder = 'Add your assessment of the judge’s reasoning…';
+      const key = `cartwheel-critique-comment:${location.origin}:${judge.judge_id}:${trace.trace_id}`;
+      let draft = commentDrafts.get(key);
+      try {draft = draft ?? localStorage.getItem(key);} catch { /* In-memory drafts still work. */ }
+      input.value = draft ?? trace.comment?.comment ?? '';
+      label.append(input);
+      const actions = el('div', 'evaluator-comment-actions');
+      const status = el('span', 'quiet'); status.setAttribute('role', 'status');
+      const updateStatus = () => {
+        status.textContent = input.value !== (trace.comment?.comment || '') ? 'Unsaved comment'
+          : trace.comment?.revision ? 'Saved' : 'No comment yet';
+      };
+      updateStatus();
+      input.addEventListener('input', () => {
+        commentDrafts.set(key, input.value); updateStatus();
+        try {localStorage.setItem(key, input.value);}
+        catch {status.textContent += ' · browser draft storage unavailable';}
+      });
+      const save = button('Save comment', async () => {
+        const comment = input.value;
+        save.disabled = true; status.textContent = 'Saving…';
+        try {
+          const response = await fetch('/api/evaluator/comment', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({judge_id: judge.judge_id, trace_id: trace.trace_id,
+                                  comment, revision: trace.comment?.revision || 0}),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Could not save comment');
+          trace.comment = result;
+          if (commentDrafts.get(key) === comment) commentDrafts.delete(key);
+          try {if (localStorage.getItem(key) === comment) localStorage.removeItem(key);} catch { /* Server save succeeded. */ }
+          updateStatus();
+        } catch (failure) {
+          status.textContent = failure.message + ' · draft retained';
+        } finally {save.disabled = false;}
+      });
+      actions.append(save, status); section.append(label, actions);
+      return section;
     }
     filter.onchange = () => {index = 0; draw();};
     dialog.addEventListener('keydown', event => {
