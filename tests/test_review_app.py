@@ -5,6 +5,66 @@ import pytest
 from analysis.review_app.data import build_turn, group_sessions, ReviewStore
 
 
+def test_rejected_final_mode_cannot_receive_new_labels(tmp_path):
+    from analysis.helpers._state import write_json
+    write_json(tmp_path / "review_app.json", {
+        "revision": 0, "annotations": [], "reviews": {}, "labels": {},
+        "modes": [{"id": "issue", "definition": "Rejected failure mode",
+                   "final": True, "review_status": "rejected"}], "decisions": {},
+    })
+    synced = []
+    store = ReviewStore(tmp_path, {"a"}, sync=lambda *args: synced.append(args))
+    with pytest.raises(ValueError, match="Confirm this mode"):
+        store.apply({"action": "label", "trace_id": "a", "mode": "issue", "value": 1})
+    assert store.read()["labels"] == {}
+    assert synced == []
+
+
+def test_live_reads_retry_listing_and_details_without_losing_records(monkeypatch):
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    import httpx
+    from analysis.review_app import server
+
+    first_page = SimpleNamespace(data=[SimpleNamespace(id=str(i)) for i in range(100)])
+    last_page = SimpleNamespace(data=[SimpleNamespace(id="100")])
+    listing = Mock(side_effect=[httpx.ReadTimeout("slow"), first_page, last_page])
+    failed = False
+
+    def get(tid, **kwargs):
+        nonlocal failed
+        if tid == "0" and not failed:
+            failed = True
+            raise httpx.ReadTimeout("slow detail")
+        return trace(tid, scenario=None if tid == "100" else "scenario")
+
+    details = Mock(side_effect=get)
+    monkeypatch.setattr(server, "_client", lambda: SimpleNamespace(
+        api=SimpleNamespace(trace=SimpleNamespace(list=listing, get=details))))
+    monkeypatch.setattr(server.time, "sleep", lambda _: None)
+    records = server.load_live(timeout=60)
+    assert {r["id"] for r in records} == {str(i) for i in range(100)}
+    assert [call.kwargs["page"] for call in listing.call_args_list] == [1, 1, 2]
+    for call in listing.call_args_list + details.call_args_list:
+        assert call.kwargs["request_options"] == {"timeout_in_seconds": 60, "max_retries": 0}
+    assert details.call_count == 102
+
+
+def test_live_read_failure_is_bounded_and_explains_recovery(monkeypatch):
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    import httpx
+    from analysis.review_app import server
+
+    listing = Mock(side_effect=httpx.ReadTimeout("slow"))
+    monkeypatch.setattr(server, "_client", lambda: SimpleNamespace(
+        api=SimpleNamespace(trace=SimpleNamespace(list=listing))))
+    monkeypatch.setattr(server.time, "sleep", lambda _: None)
+    with pytest.raises(RuntimeError, match="after 3 attempts.*--langfuse-timeout.*--source"):
+        server.load_live()
+    assert listing.call_count == 3
+
+
 def trace(tid, session="session-a", scenario="same-scenario", timestamp="2026-01-01"):
     return {"id": tid, "timestamp": timestamp, "sessionId": None,
             "metadata": {"attributes": {"cartwheel.session_id": session,

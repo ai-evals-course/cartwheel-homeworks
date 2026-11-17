@@ -4,10 +4,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
+
+import httpx
 
 from analysis.helpers._state import read_json, state_root
 from analysis.helpers.langfuse_io import _client
@@ -19,18 +22,38 @@ from scenarios.export_langfuse import _jsonable
 HERE = Path(__file__).resolve().parent
 
 
-def load_live():
+def load_live(timeout=30):
     client = _client()
+
+    def read(operation, description, *args, **kwargs):
+        for attempt in range(3):
+            try:
+                return operation(*args, **kwargs, request_options={
+                    "timeout_in_seconds": timeout, "max_retries": 0,
+                })
+            except (httpx.TimeoutException, httpx.NetworkError) as exc:
+                if attempt == 2:
+                    raise RuntimeError(
+                        f"Could not load {description} from Langfuse after 3 attempts "
+                        f"({timeout}s timeout per request). Check LANGFUSE_HOST and "
+                        "that Langfuse is running and reachable. Try a larger "
+                        "--langfuse-timeout, or use --source with an existing full "
+                        "trace export for offline review."
+                    ) from exc
+                print(f"Langfuse read failed for {description}; retrying ({attempt + 2}/3)…", flush=True)
+                time.sleep(2 ** attempt)
+
     summaries, page = [], 1
     while True:
-        batch = list(client.api.trace.list(page=page, limit=100).data or [])
+        print(f"Listing Langfuse traces, page {page}…", flush=True)
+        batch = list(read(client.api.trace.list, f"trace page {page}", page=page, limit=100).data or [])
         summaries.extend(batch)
         if len(batch) < 100:
             break
         page += 1
     print(f"Loading {len(summaries)} trace records from Langfuse…", flush=True)
     with ThreadPoolExecutor(max_workers=6) as pool:
-        records = list(pool.map(lambda s: _jsonable(client.api.trace.get(s.id)), summaries))
+        records = list(pool.map(lambda s: _jsonable(read(client.api.trace.get, "trace " + s.id, s.id)), summaries))
     return [r for r in records if _metadata(r).get("cartwheel.scenario_id")]
 
 
@@ -146,7 +169,11 @@ def main():
     parser.add_argument("--port", type=int, default=8021)
     parser.add_argument("--state-dir", type=Path, help="Override analysis state (use a temporary directory for testing)")
     parser.add_argument("--source", type=Path, help="Explicit offline JSON export; live Langfuse is the default")
+    parser.add_argument("--langfuse-timeout", type=int, default=30, metavar="SECONDS",
+                        help="Timeout per live trace request (default: 30; up to 3 attempts)")
     args = parser.parse_args()
+    if args.langfuse_timeout <= 0:
+        parser.error("--langfuse-timeout must be positive")
     load_env()
     if args.source:
         records = json.loads(args.source.read_text())
@@ -157,7 +184,10 @@ def main():
             raise RuntimeError("Offline mode")
         sync = offline_sync
     else:
-        records = load_live()
+        try:
+            records = load_live(timeout=args.langfuse_timeout)
+        except RuntimeError as exc:
+            parser.exit(1, f"{exc}\n")
         source, sync = "Live Langfuse · " + os.environ.get("LANGFUSE_HOST", ""), None
     server = ReviewServer(("127.0.0.1", args.port), records, args.state_dir or state_root(), source, sync=sync)
     print(f"Review {len(records)} traces in {len(server.sessions)} conversations at http://127.0.0.1:{args.port}", flush=True)

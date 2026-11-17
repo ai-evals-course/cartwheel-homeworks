@@ -2,7 +2,7 @@
 const $ = (id) => document.getElementById(id);
 const state = {catalog: null, review: null, session: null, view: 'read', busy: false, loading: false, request: 0, editor: null, disclosures: new Map(), noteTarget: null, taxonomyMode: null, taxonomyTab: 'summary', selectedSuggestions: new Set(), suggestionBatchBusy: false, suggestionFeedback: ''};
 const allTraces = () => state.catalog.sessions.flatMap(s => s.traces);
-const finalModes = () => state.review.modes.filter(m => m.final);
+const finalModes = () => state.review.modes.filter(m => m.final && (!m.review_status || m.review_status === 'approved'));
 const reviewed = id => ['reviewed', 'first_failure', 'no_failure'].includes(state.review.reviews[id]?.status);
 const notesFor = id => state.review.annotations.filter(n => n.trace_id === id);
 const conversationReviewed = ids => ids.some(id => notesFor(id).length > 0) || (ids.length > 0 && ids.every(reviewed));
@@ -53,6 +53,12 @@ async function act(event) {
       throw new Error(data.error || 'Save failed');
     }
     state.review = data;
+    if (event.action === 'mode' && Object.hasOwn(event, 'evaluator_type')) {
+      const savedMode = data.modes.find(mode => mode.id === event.id);
+      if (savedMode?.evaluator_type !== event.evaluator_type) {
+        throw new Error('The server did not retain the evaluator type. Restart the review server, refresh this page, and save the mode again.');
+      }
+    }
     render();
     return true;
   } catch (error) {
@@ -441,27 +447,51 @@ function layoutNotes() {
 }
 function renderLabels() {
   const root = $('labels-view'); root.replaceChildren();
-  root.append(el('h2', '', 'Structured labeling'), el('p', 'quiet', 'Label each individual trace against every final mode. Unreviewed is distinct from Absent. Each choice is an explicit human judgment saved locally and synchronized to Langfuse.'));
-  if (!finalModes().length) return root.append(el('p', 'empty', 'No modes are final yet. Complete open coding, then define and confirm your modes in Taxonomy.'));
-  if (!state.session) return;
-  for (const turn of state.session.turns) {
-    const panel = el('div', 'panel'); panel.append(el('h3', '', `Trace ${turn.id}`), button('Read evidence', () => jumpTrace(turn.id)));
-    const table = el('table'); const header = el('tr'); ['Mode', 'Definition', 'Human decision', 'Save status'].forEach(s => header.append(el('th', '', s))); table.append(header);
-    for (const mode of finalModes()) {
-      const row = el('tr'), label = state.review.labels[turn.id + ':' + mode.id], choice = el('td'), actions = el('div', 'actions');
-      for (const [name,value] of [['Present',1], ['Absent',0]]) {
-        const b = button(name, () => act({action:'label', trace_id:turn.id, mode:mode.id, value,
-          comment: notesFor(turn.id).map(n => n.note).join('\n')}));
-        b.setAttribute('aria-pressed', String(label?.value === value)); actions.append(b);
-      }
-      choice.append(actions, el('p', 'quiet', label ? 'Current: ' + (label.value ? 'Present' : 'Absent') : 'Unreviewed'));
-      row.append(el('td', '', mode.id), el('td', '', mode.definition), choice,
-        el('td', '', label ? label.sync === 'synced' ? 'Langfuse verified' : 'Saved locally · sync pending' : 'No judgment'));
-      table.append(row);
-    }
-    const wrap = el('div', 'table-wrap'); wrap.append(table); panel.append(wrap); root.append(panel);
+  const modes = finalModes(), traces = allTraces();
+  const linkedTraces = new Map(modes.map(mode => {
+    const annotationIds = new Set(mode.annotation_ids || []);
+    return [mode.id, new Set(state.review.annotations.filter(note => annotationIds.has(note.id)).map(note => note.trace_id))];
+  }));
+  root.append(el('h2', '', 'Structured labeling'), el('p', 'quiet', 'Values come from the accepted taxonomy: Fail = a linked comment for this run and mode; Pass = no linked comment. Select a run to read its evidence.'));
+  if (!modes.length) return root.append(el('p', 'empty', 'No accepted final modes yet. Approve your modes in Taxonomy before labeling.'));
+  const table = el('table', 'label-matrix');
+  const head = el('thead'), header = el('tr'), runHeading = el('th', '', 'Run ID');
+  runHeading.scope = 'col'; header.append(runHeading);
+  for (const mode of modes) {
+    const name = (mode.name || mode.id).replaceAll('_', ' ');
+    const failedCount = traces.filter(trace => linkedTraces.get(mode.id).has(trace.id)).length;
+    const cell = el('th', '', `${name.charAt(0).toUpperCase() + name.slice(1)} — ${failedCount}/${traces.length}`);
+    const evaluator = mode.evaluator_type === 'code_check' ? 'Code evaluator'
+      : mode.evaluator_type === 'llm_judge' ? 'LLM judge evaluator'
+      : /llm judge/i.test(mode.evaluator || '') ? 'LLM judge evaluator'
+      : /code check/i.test(mode.evaluator || '') ? 'Code evaluator' : 'Evaluator not set';
+    cell.append(el('span', 'label-evaluator', `(${evaluator})`));
+    cell.scope = 'col'; cell.title = mode.definition;
+    header.append(cell);
   }
+  head.append(header); table.append(head);
+  const body = el('tbody');
+  for (const trace of traces) {
+    const row = el('tr'), run = el('th'); run.scope = 'row';
+    run.append(button(trace.scenario || trace.id, () => jumpTrace(trace.id), 'label-run'));
+    if (trace.scenario) run.append(el('span', 'label-trace-id', trace.id));
+    row.append(run);
+    for (const mode of modes) {
+      const failed = linkedTraces.get(mode.id).has(trace.id);
+      const cell = el('td');
+      cell.dataset.judgment = failed ? 'fail' : 'pass';
+      cell.append(el('span', 'label-result', failed ? 'Fail' : 'Pass'));
+      cell.title = failed ? 'This run has a comment linked to this accepted mode.' : 'No comment is linked to this accepted mode for this run.';
+      row.append(cell);
+    }
+    body.append(row);
+  }
+  table.append(body);
+  const wrap = el('div', 'label-matrix-scroll');
+  wrap.tabIndex = 0; wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', 'Run judgments across accepted failure modes');
+  wrap.append(table); root.append(wrap);
 }
+
 function field(form, label, name, value = '', multiline = false) {
   const outer = el('label', '', label), input = el(multiline ? 'textarea' : 'input');
   input.name = name; input.value = value; if (multiline) input.rows = 3;
@@ -506,13 +536,6 @@ function renderTaxonomy() {
   function buildTiles(items, depth = 0) {
     if (items.length === 1) {
       const {mode, index, notes} = items[0];
-      const seenComments = new Set();
-      const uniqueNotes = notes.filter(note => {
-        const key = note.note.trim().replace(/\s+/g, ' ').replace(/[.,!;:]+$/g, '').toLowerCase();
-        if (seenComments.has(key)) return false;
-        seenComments.add(key);
-        return true;
-      });
       const tile = el('section', 'taxonomy-tile');
       tile.dataset.color = index % 6;
       tile.dataset.unassigned = String(mode.id === '__unassigned');
@@ -521,12 +544,12 @@ function renderTaxonomy() {
       choose.setAttribute('aria-pressed', String(state.taxonomyMode === mode.id));
       choose.setAttribute('aria-controls', 'taxonomy-summary');
       const heading = el('h3'); heading.append(choose);
-      tile.append(heading, el('p', 'taxonomy-count', `${uniqueNotes.length} ${uniqueNotes.length === 1 ? 'comment' : 'comments'}`));
+      tile.append(heading, el('p', 'taxonomy-count', `${notes.length} ${notes.length === 1 ? 'comment' : 'comments'}`));
       const previews = el('div', 'taxonomy-previews');
       previews.tabIndex = 0;
       previews.setAttribute('role', 'region');
       previews.setAttribute('aria-label', `${mode.name || mode.id.replaceAll('_', ' ')} comments`);
-      uniqueNotes.forEach(note => {
+      notes.forEach(note => {
         const preview = el('div', 'taxonomy-comment');
         const excerpt = el('span', 'taxonomy-excerpt');
         const quote = note.anchor?.quote;
@@ -807,7 +830,9 @@ function editMode(mode = {}) {
   };
   check.addEventListener('change', updateFinalRequirements);
   updateFinalRequirements();
-  const save = el('button', 'primary', 'Approve'); save.type = 'submit';
+  const saveError = el('p', 'warning'); saveError.hidden = true; saveError.setAttribute('role', 'alert');
+  form.append(saveError);
+  const save = el('button', 'primary', 'Save and approve'); save.type = 'submit';
   const reject = button('Reject', async () => {
     if (!mode.id) {slot.close(); return;}
     save.disabled = reject.disabled = true;
@@ -818,10 +843,16 @@ function editMode(mode = {}) {
   const actions = el('div', 'actions'); actions.append(save, reject); form.append(actions);
   form.onsubmit = async e => {e.preventDefault(); updateFinalRequirements(); if (!form.reportValidity()) return;
     const data = new FormData(form);
+    saveError.hidden = true;
     save.disabled = reject.disabled = true;
-    const saved = await act({action:'mode', ...Object.fromEntries(data), review_status:'approved', final:data.has('final'), annotation_ids:data.getAll('annotation_ids')});
+    const saved = await act({action:'mode', ...Object.fromEntries(data), evaluator_type:evaluator.value, review_status:'approved', final:data.has('final'), annotation_ids:data.getAll('annotation_ids')});
     save.disabled = reject.disabled = false;
     if (saved) slot.close();
+    else {
+      saveError.textContent = $('notice').firstChild?.textContent || 'Could not save this mode. Your selections are retained; try again.';
+      saveError.hidden = false;
+      saveError.scrollIntoView({block:'nearest'});
+    }
   };
   slot.append(form);
   if (!slot.open) slot.showModal();
@@ -881,6 +912,7 @@ function renderProgress() {
 }
 function render() {
   document.querySelector('main').classList.toggle('taxonomy-layout', state.view === 'taxonomy');
+  document.querySelector('main').classList.toggle('labels-layout', state.view === 'labels');
   $('sampling-controls').hidden = state.view !== 'read';
   if (!state.review || !state.catalog) return;
   renderQueue(); saveStatus();

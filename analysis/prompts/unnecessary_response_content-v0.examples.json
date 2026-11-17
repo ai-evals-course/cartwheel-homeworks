@@ -1,0 +1,46 @@
+{
+  "mode": "unnecessary_response_content",
+  "version": 0,
+  "status": "development_attempt_failed_connection",
+  "prompt_path": "analysis/prompts/unnecessary_response_content-v0.txt",
+  "prompt_sha256": "c3597f6dbbc61eec49c065c143737022e6a77c9d2625a587b57eecd1196bede1",
+  "input_sha256": "7d42beef28520a8f7ff5d25ab82b44faf7b27f045983aa054263812460a64e46",
+  "splits_sha256": "15702e40237381257fa7561b94c02198ca7f6ccd92fcf930229f2e3419d198c1",
+  "examples": [
+    {
+      "trace_id": "ffc646cec684a84abf45671c701292d2",
+      "split": "train",
+      "human_verdict": "Pass",
+      "purpose": "clear_pass",
+      "excerpt_rule": "All user turns and tool calls/results plus final assistant reply; call IDs omitted."
+    },
+    {
+      "trace_id": "016de42625b7b5fe3fea972b92701613",
+      "split": "train",
+      "human_verdict": "Fail",
+      "purpose": "clear_fail",
+      "excerpt_rule": "All user turns and tool calls/results plus final assistant reply; call IDs omitted."
+    },
+    {
+      "trace_id": "383ef4888c490343f389d023b46e5736",
+      "split": "train",
+      "human_verdict": "Pass",
+      "purpose": "borderline_pass",
+      "excerpt_rule": "All user turns and tool calls/results plus final assistant reply; call IDs omitted."
+    }
+  ],
+  "pending_label_review": [
+    {
+      "trace_id": "5a3b52da903fbc5651703b933687e2c0",
+      "split": "train",
+      "saved_label": "Pass",
+      "issue": "The final reply ends with a generic further-questions invitation, which appears inconsistent with the agreed Fail rule. Student decision pending; no label changed and case not used as a prompt example."
+    }
+  ],
+  "judge_model_planned": "gpt-4o-mini",
+  "development_trace_count": 94,
+  "paid_batch_approved": true,
+  "judge_registered": true,
+  "predictions_generated": false,
+  "judge_id": "unnecessary_response_content-v0"
+}

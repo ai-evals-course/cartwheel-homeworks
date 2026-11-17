@@ -1,0 +1,18 @@
+{
+  "judge_id": "unnecessary_response_content-v0",
+  "model": "gpt-4o-mini",
+  "split": "dev",
+  "trace_count": 94,
+  "class_counts": {
+    "Pass": 26,
+    "Fail": 68
+  },
+  "approved_by_student": true,
+  "attempted_at": "2026-11-17T05:03:42.500206+00:00",
+  "status": "failed_connection",
+  "error": "API connection error; log contains Temporary failure in name resolution.",
+  "saved_predictions": 0,
+  "metrics_available": false,
+  "test_run": false,
+  "resume_command": "uv run python -m analysis.run_judges dev --mode unnecessary_response_content --prompt-path analysis/prompts/unnecessary_response_content-v0.txt --approve-dev-batch"
+}

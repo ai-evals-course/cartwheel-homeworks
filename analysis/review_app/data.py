@@ -298,7 +298,9 @@ class ReviewStore:
                 mode["review_status"] = "rejected"
             elif action == "label":
                 mode = event.get("mode")
-                if not any(m["id"] == mode and m.get("final") for m in state["modes"]):
+                if not any(m["id"] == mode and m.get("final")
+                           and m.get("review_status") in (None, "approved")
+                           for m in state["modes"]):
                     raise ValueError("Confirm this mode as final in Taxonomy before labeling")
                 value = event.get("value")
                 if type(value) is not int or value not in {0, 1}:
