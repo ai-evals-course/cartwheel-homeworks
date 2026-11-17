@@ -61,6 +61,10 @@ const EvaluatorPanel = (() => {
     const title = el('h3', '', `${mode.name} (LLM judge)`); title.id = titleId;
     card.append(title, el('p', 'evaluator-description', mode.definition || 'No saved definition.'));
     const columns = el('div', 'evaluator-card-columns');
+    const prompt = el('section', 'evaluator-card-section evaluator-prompt-column');
+    prompt.append(el('h4', '', 'Judge prompt'));
+    const data = el('div', 'evaluator-data-column');
+    columns.append(prompt, data); card.append(columns);
     const sets = el('section', 'evaluator-card-section'); sets.append(el('h4', '', 'Train / development / test'));
     const assigned = Object.values(mode.splits).reduce((total, split) => total + split.total, 0);
     sets.append(el('p', 'quiet', `${assigned} assigned conversations · ${mode.label_count} saved labels · Seed ${mode.seed ?? 'not saved'}`));
@@ -80,14 +84,17 @@ const EvaluatorPanel = (() => {
       if (!split.ids.length) content.append(el('p', 'quiet', 'No split saved.')); else content.append(list);
       sets.append(details(`${name === 'train' ? 'Training' : name === 'dev' ? 'Development' : 'Test'} trace IDs (${split.total})`, content));
     }
-    columns.append(sets);
+    data.append(sets);
     const results = el('section', 'evaluator-card-section'); results.append(el('h4', '', 'Development / test results'));
     if (!mode.judges.length) {
+      prompt.append(el('p', 'quiet', 'No judge prompt saved yet.'));
       results.append(el('p', 'empty', 'No judge registered for this mode yet.'));
-      columns.append(results); card.append(columns); return card;
+      data.append(results); return card;
     }
     const judge = mode.judges.find(j => j.judge_id === selectedJudges.get(mode.id)) || mode.judges[0];
     selectedJudges.set(mode.id, judge.judge_id);
+    prompt.append(judge.prompt_text ? el('pre', 'evaluator-prompt', judge.prompt_text)
+      : el('p', 'quiet', 'No judge prompt saved yet.'));
     if (mode.judges.length > 1) results.append(selector('Judge version', 'evaluator-judge-' + encodeURIComponent(mode.id),
       mode.judges.map(j => [j.judge_id, j.judge_id]), judge.judge_id, value => selectedJudges.set(mode.id, value)));
     else results.append(el('p', 'quiet evaluator-version', judge.judge_id));
@@ -103,8 +110,7 @@ const EvaluatorPanel = (() => {
     results.append(table('Judge evaluation results', ['Measure', 'Development', 'Test'],
       rows.map(([title, format]) => [title, metric('dev', format), metric('test', format)])));
     results.append(el('p', 'quiet', 'TPR = TP / (TP + FN). TNR = TN / (TN + FP). Pass is the positive class.'));
-    if (judge.prompt_text) results.append(details('Judge prompt', el('pre', 'evaluator-prompt', judge.prompt_text)));
-    columns.append(results); card.append(columns);
+    data.append(results);
     if (mode.boundaries || mode.requirement) {
       const boundary = el('div');
       if (mode.boundaries) boundary.append(el('p', '', mode.boundaries));
