@@ -1250,6 +1250,7 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-description { max-width:90ch; margin-bottom:24px; }
 .evaluator-card-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:28px; }
 .evaluator-card-section { min-width:0; }
+.evaluator-prompt-column { display:flex; flex-direction:column; min-height:0; }
 .evaluator-data-column { display:grid; gap:28px; min-width:0; align-content:start; }
 .evaluator-card-section h4 { margin:0 0 12px; font-size:var(--text-body); }
 .evaluator-card-section > label { margin-top:0; }
@@ -1258,9 +1259,10 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-table th,.evaluator-table td { text-align:left; vertical-align:top; }
 .evaluator-table tbody th { font-weight:500; }
 .evaluator-table thead { background:#eeece9; }
-.evaluator-prompt { max-height:75vh; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
+.evaluator-prompt { flex:1; height:0; min-height:0; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
 @media(max-width:1050px) {
   .evaluator-card-columns { grid-template-columns:minmax(0,1fr); gap:24px; }
+  .evaluator-prompt { flex:none; height:auto; max-height:75vh; }
 }
 @media(max-width:650px) {
   #evaluator-view { padding:0; }
