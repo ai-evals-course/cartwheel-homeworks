@@ -1265,6 +1265,7 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-confusion-matrices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:24px; }
 .evaluator-confusion caption { text-align:left; font-weight:600; padding-bottom:12px; }
 .evaluator-confusion .evaluator-table { border:1px solid var(--line); }
+.evaluator-confusion thead th[colspan] { text-align:center; }
 .evaluator-confusion td { font-weight:600; white-space:nowrap; }
 .evaluator-confusion tbody tr:first-child td:nth-child(2),.evaluator-confusion tbody tr:last-child td:last-child { background:#edf3ed; }
 .evaluator-confusion tbody tr:first-child td:last-child,.evaluator-confusion tbody tr:last-child td:nth-child(2) { background:#faf0e9; }

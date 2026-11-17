@@ -84,10 +84,19 @@ const EvaluatorPanel = (() => {
     const metric = (split, format) => judge[split] ? format(judge[split]) : split === 'test' && judge.status !== 'frozen' ? 'Locked until frozen' : 'Pending';
     const matrices = el('div', 'evaluator-confusion-matrices');
     for (const [split, title] of [['dev', 'Development'], ['test', 'Test']]) {
-      const matrix = table(`${title} confusion matrix`, ['Judge verdict', 'Human: Pass', 'Human: Fail'], [
+      const matrix = table(`${title} confusion matrix`, ['Judge verdict', 'Pass', 'Fail'], [
         ['Pass (1)', metric(split, r => `TP: ${r.tp}`), metric(split, r => `FP: ${r.fp}`)],
         ['Fail (0)', metric(split, r => `FN: ${r.fn}`), metric(split, r => `TN: ${r.tn}`)],
       ]);
+      const head = matrix.querySelector('thead');
+      const judgeHeading = head.querySelector('th');
+      judgeHeading.rowSpan = 2;
+      const humanHeading = el('th', '', 'Human');
+      humanHeading.colSpan = 2;
+      humanHeading.scope = 'colgroup';
+      const group = el('tr');
+      group.append(judgeHeading, humanHeading);
+      head.prepend(group);
       matrix.classList.add('evaluator-confusion');
       matrix.querySelector('caption').className = '';
       matrices.append(matrix);
