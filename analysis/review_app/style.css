@@ -1259,6 +1259,13 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-table th,.evaluator-table td { text-align:left; vertical-align:top; }
 .evaluator-table tbody th { font-weight:500; }
 .evaluator-table thead { background:#eeece9; }
+.evaluator-confusion-matrices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:24px; }
+.evaluator-confusion caption { text-align:left; font-weight:600; padding-bottom:12px; }
+.evaluator-confusion .evaluator-table { border:1px solid var(--line); }
+.evaluator-confusion td { font-weight:600; white-space:nowrap; }
+.evaluator-confusion tbody tr:first-child td:nth-child(2),.evaluator-confusion tbody tr:last-child td:last-child { background:#edf3ed; }
+.evaluator-confusion tbody tr:first-child td:last-child,.evaluator-confusion tbody tr:last-child td:nth-child(2) { background:#faf0e9; }
+.evaluator-results-heading { font-size:var(--text-body); margin:0 0 12px; }
 .evaluator-prompt { flex:1; height:0; min-height:0; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
 @media(max-width:1050px) {
   .evaluator-card-columns { grid-template-columns:minmax(0,1fr); gap:24px; }
@@ -1269,4 +1276,5 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
   .evaluator-heading { align-items:flex-start; }
   .evaluator-table th,.evaluator-table td { padding:8px; }
   .evaluator-card { padding:16px; }
+  .evaluator-confusion-matrices { grid-template-columns:minmax(0,1fr); }
 }

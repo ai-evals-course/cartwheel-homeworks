@@ -82,10 +82,19 @@ const EvaluatorPanel = (() => {
     else results.append(el('p', 'quiet evaluator-version', judge.judge_id));
     results.append(el('p', 'quiet', `Model: ${judge.model || 'Not saved'} · Status: ${judge.status || 'Not saved'}`));
     const metric = (split, format) => judge[split] ? format(judge[split]) : split === 'test' && judge.status !== 'frozen' ? 'Locked until frozen' : 'Pending';
+    const matrices = el('div', 'evaluator-confusion-matrices');
+    for (const [split, title] of [['dev', 'Development'], ['test', 'Test']]) {
+      const matrix = table(`${title} confusion matrix`, ['Judge ↓ / Human →', 'Pass (1)', 'Fail (0)'], [
+        ['Pass (1)', metric(split, r => `TP: ${r.tp}`), metric(split, r => `FP: ${r.fp}`)],
+        ['Fail (0)', metric(split, r => `FN: ${r.fn}`), metric(split, r => `TN: ${r.tn}`)],
+      ]);
+      matrix.classList.add('evaluator-confusion');
+      matrix.querySelector('caption').className = '';
+      matrices.append(matrix);
+    }
+    results.append(matrices, el('h5', 'evaluator-results-heading', 'Results'));
     const rows = [
       ['Evaluated conversations', r => r.n],
-      ['TP · human Pass, judge Pass', r => r.tp], ['FN · human Pass, judge Fail', r => r.fn],
-      ['TN · human Fail, judge Fail', r => r.tn], ['FP · human Fail, judge Pass', r => r.fp],
       ['TPR · Pass agreement', r => percent(r.tpr)], ['TPR · 95% Wilson interval', r => interval(r.tpr_interval)],
       ['TNR · Fail detection', r => percent(r.tnr)], ['TNR · 95% Wilson interval', r => interval(r.tnr_interval)],
     ];
