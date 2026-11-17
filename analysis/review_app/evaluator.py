@@ -1,4 +1,5 @@
 """Read-only projections of saved HW5 evaluator artifacts for the review UI."""
+import hashlib
 from pathlib import Path
 
 from analysis.helpers._state import read_json, read_jsonl
@@ -38,6 +39,7 @@ def evaluator_summary(root: Path) -> dict:
                 continue
             # Derive report filenames from the existing file, never from a URL.
             row = {key: judge.get(key) for key in ('judge_id', 'version', 'model', 'status', 'prompt_text')}
+            row['prompt_sha256'] = hashlib.sha256((judge.get('prompt_text') or '').encode('utf-8')).hexdigest()
             for split in ('dev', 'test'):
                 metrics = None
                 if split != 'test' or judge.get('status') == 'frozen':

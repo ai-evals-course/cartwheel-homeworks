@@ -3,8 +3,6 @@ const EvaluatorPanel = (() => {
   let snapshot = null, loading = false, error = '';
   const selectedJudges = new Map();
   const percent = value => Number.isFinite(value) ? (value * 100).toFixed(1) + '%' : 'Not available';
-  const interval = values => Array.isArray(values) && values.every(Number.isFinite)
-    ? `${percent(values[0])}–${percent(values[1])}` : 'Not available';
   function table(caption, headings, rows) {
     const wrap = el('div', 'table-wrap'), grid = el('table', 'evaluator-table');
     grid.append(el('caption', 'sr-only', caption));
@@ -76,7 +74,8 @@ const EvaluatorPanel = (() => {
     }
     const judge = mode.judges.find(j => j.judge_id === selectedJudges.get(mode.id)) || mode.judges[0];
     selectedJudges.set(mode.id, judge.judge_id);
-    promptHeading.textContent = `Judge prompt (v${judge.version})`;
+    const sha = judge.prompt_sha256 ? ` - ${judge.prompt_sha256.slice(-7)}` : '';
+    promptHeading.textContent = `Judge prompt (v${judge.version}${sha})`;
     prompt.append(judge.prompt_text ? el('pre', 'evaluator-prompt', judge.prompt_text)
       : el('p', 'quiet', 'No judge prompt saved yet.'));
     if (mode.judges.length > 1) results.append(selector('Judge version', 'evaluator-judge-' + encodeURIComponent(mode.id),
@@ -104,8 +103,8 @@ const EvaluatorPanel = (() => {
     results.append(matrices, el('h5', 'evaluator-results-heading', 'Results'));
     const rows = [
       ['Evaluated conversations', r => r.n],
-      ['TPR · Pass agreement', r => percent(r.tpr)], ['TPR · 95% Wilson interval', r => interval(r.tpr_interval)],
-      ['TNR · Fail detection', r => percent(r.tnr)], ['TNR · 95% Wilson interval', r => interval(r.tnr_interval)],
+      ['TPR · Pass agreement', r => percent(r.tpr)],
+      ['TNR · Fail detection', r => percent(r.tnr)],
     ];
     results.append(table('Judge evaluation results', ['Measure', 'Development', 'Test'],
       rows.map(([title, format]) => [title, metric('dev', format), metric('test', format)])));

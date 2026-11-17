@@ -85,9 +85,9 @@ the full conversation available. Clear the field or press Escape to reset it.
    column. The columns stack on narrower screens. The split table shows
    Pass and Fail counts and planned shares.
    Select a judge version to see separate development and test confusion
-   matrices (judge verdicts on rows, human labels on columns), with TPR, TNR,
-   and 95% Wilson intervals in a results table below. The saved prompt stays
-   alongside these results. Results are
+   matrices (judge verdicts on rows, human labels on columns), with TPR and TNR
+   in a results table below. The saved prompt stays alongside these results,
+   with its version and last seven SHA-256 characters in the heading. Results are
    read from `analysis/state/judges/` and `analysis/report/`; labels and splits
    come from `hw5_labels/` and `splits.json`. The `--state-dir` override applies
    to these artifacts too, with reports read from its sibling `report/` folder.
