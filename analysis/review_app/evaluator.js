@@ -37,10 +37,9 @@ const EvaluatorPanel = (() => {
     root.setAttribute('aria-busy', String(loading));
     const heading = el('div', 'evaluator-heading');
     heading.append(el('h2', '', 'Evaluator'));
-    const reload = button(loading ? 'Refreshing…' : 'Refresh results', refresh); reload.disabled = loading;
-    heading.append(reload); root.append(heading);
+    root.append(heading);
     if (error) {const message = el('p', 'warning', 'Could not load evaluator data: ' + error); message.setAttribute('role', 'alert'); root.append(message);}
-    if (!snapshot) return root.append(el('p', 'empty', loading ? 'Loading evaluator data…' : 'Choose Refresh results to load saved evaluations.'));
+    if (!snapshot) return root.append(el('p', 'empty', loading ? 'Loading evaluator data…' : 'Open Evaluator to load saved evaluations.'));
     if (!snapshot.modes.length) return root.append(el('p', 'empty', 'No HW5 evaluator data yet. Export confirmed HW5 labels and save the split to see it here.'));
     const cards = el('div', 'evaluator-cards');
     for (const mode of snapshot.modes) cards.append(modeCard(mode));

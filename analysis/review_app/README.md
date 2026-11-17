@@ -91,7 +91,7 @@ the full conversation available. Clear the field or press Escape to reset it.
    read from `analysis/state/judges/` and `analysis/report/`; labels and splits
    come from `hw5_labels/` and `splits.json`. The `--state-dir` override applies
    to these artifacts too, with reports read from its sibling `report/` folder.
-   **Refresh results** rereads saved artifacts without running a judge or changing
+   Opening **Evaluator** rereads saved artifacts without running a judge or changing
    labels. Missing runs show Pending, and test results stay locked until their
    judge is frozen. The original HW4 labeling view remains separate from the
    confirmed HW5 export (HW5 uses 1 = Pass and 0 = Fail).
