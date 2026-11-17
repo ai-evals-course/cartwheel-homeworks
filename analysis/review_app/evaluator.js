@@ -87,7 +87,7 @@ const EvaluatorPanel = (() => {
     const metric = (split, format) => judge[split] ? format(judge[split]) : split === 'test' && judge.status !== 'frozen' ? 'Locked until frozen' : 'Pending';
     const matrices = el('div', 'evaluator-confusion-matrices');
     for (const [split, title] of [['dev', 'Development'], ['test', 'Test']]) {
-      const matrix = table(`${title} confusion matrix`, ['Judge ↓ / Human →', 'Pass (1)', 'Fail (0)'], [
+      const matrix = table(`${title} confusion matrix`, ['Judge verdict', 'Human: Pass', 'Human: Fail'], [
         ['Pass (1)', metric(split, r => `TP: ${r.tp}`), metric(split, r => `FP: ${r.fp}`)],
         ['Fail (0)', metric(split, r => `FN: ${r.fn}`), metric(split, r => `TN: ${r.tn}`)],
       ]);
