@@ -65,3 +65,21 @@ uv run python -m analysis.run_judges dev \
 Inspect every development disagreement with the student after the run succeeds.
 Leave labels and final prompt selection to the student. Make at most two prompt
 revisions. Do not freeze or test during Part C.
+
+## Resumed development completed
+
+The student ran the approved command and confirmed completion. Saved artifacts
+contain all 94 development predictions and 94 critiques for
+`unnecessary_response_content-v0`. The metrics file is now
+`dev-unnecessary_response_content-v0.json`.
+
+Observed confusion counts: TP=16, FN=10, TN=47, FP=21. TPR=0.6154 with a 95%
+Wilson interval [0.4253, 0.7757]; TNR=0.6912 with [0.5736, 0.7883]. There are
+31 disagreements (21 false Pass, 10 false Fail). Counts were independently
+recomputed offline from saved predictions and human labels. The full review
+packet is `dev-review-unnecessary_response_content-v0.md`.
+
+The earlier connection-failure record is retained as attempt history. Human
+review of every disagreement is pending. No labels or prompt text changed;
+the judge remains draft and contains no test predictions. Part C remains in
+progress until the student reviews disagreements and chooses whether to revise.

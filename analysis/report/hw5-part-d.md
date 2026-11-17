@@ -44,3 +44,37 @@ using `gpt-4o-mini` when connectivity is restored, review disagreements, and
 let the student choose a final version.
 Then obtain test-batch approval, run Part D, and leave the use decision and
 recording to the student.
+
+## Student selected initial prompt for test
+
+The student explicitly chose `unnecessary_response_content-v0` for final test.
+The saved prompt was verified against the registered prompt and frozen without
+revision. All 94 development predictions exist. The 31 disagreement decisions
+remain pending full student review; do not describe that review as completed.
+No test predictions exist. Before the paid test batch, request approval for
+`gpt-4o-mini` on 93 held-out conversations (25 Pass, 68 Fail). Development-batch
+approval does not constitute test-batch approval.
+
+## Approved test attempted
+
+The student approved the displayed gpt-4o-mini / 93-trace test batch with
+"run it". The first invocation exposed a runner bug: .env was not loaded
+before backend selection. The runner now loads .env, with a regression test
+that failed before the fix. All six offline preparation/lifecycle tests passed.
+
+A retry invoked the live DocETL path but failed with an API connection error;
+the log contains "Temporary failure in name resolution". Zero of 93 test
+predictions were saved, and `test-unnecessary_response_content-v0.json` does
+not exist. No test metrics are claimed. The attempt is recorded in
+`test-attempt-unnecessary_response_content-v0.json`.
+
+The same frozen judge and student approval remain valid. Resume from a terminal
+with working API connectivity:
+
+```bash
+uv run python -m analysis.run_judges test \
+  --judge-id unnecessary_response_content-v0 --approve-test-batch
+```
+
+Do not re-register the judge, regenerate splits, freeze again, or alter the
+prompt. The runner will reuse any cached predictions on interruption.

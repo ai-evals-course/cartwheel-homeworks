@@ -16,6 +16,7 @@ from analysis.helpers._state import read_json, state_root
 from analysis.helpers.langfuse_io import _client
 from analysis.helpers.normalization import _metadata
 from analysis.review_app.data import ReviewStore, build_turn, group_sessions
+from analysis.review_app.evaluator import evaluator_summary
 from observability.instrument import load_env
 from scenarios.export_langfuse import _jsonable
 
@@ -117,6 +118,7 @@ class ReviewHandler(BaseHTTPRequestHandler):
                   "/app.js": ("app.js", "text/javascript; charset=utf-8"),
                   "/sampling.js": ("sampling.js", "text/javascript; charset=utf-8"),
                   "/review-controls.js": ("review-controls.js", "text/javascript; charset=utf-8"),
+                  "/evaluator.js": ("evaluator.js", "text/javascript; charset=utf-8"),
                   "/style.css": ("style.css", "text/css; charset=utf-8")}
         if url.path in static:
             filename, mime = static[url.path]
@@ -129,6 +131,8 @@ class ReviewHandler(BaseHTTPRequestHandler):
                           "sample_manifest": read_json(self.server.store.root / "sample_manifest.json", {})})
         elif url.path == "/api/state":
             self.respond(self.server.store.read())
+        elif url.path == "/api/evaluator":
+            self.respond(evaluator_summary(self.server.store.root))
         elif url.path == "/api/session":
             sid = parse_qs(url.query).get("id", [""])[0]
             session = next((s for s in self.server.sessions if s["id"] == sid), None)
