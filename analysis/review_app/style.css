@@ -1247,7 +1247,7 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-card { margin:0; padding:24px; min-width:0; }
 .evaluator-card > h3 { font-size:var(--text-heading); margin-bottom:8px; }
 .evaluator-card > h3::first-letter { text-transform:uppercase; }
-.evaluator-description { max-width:90ch; margin-bottom:24px; }
+.evaluator-description { margin-bottom:24px; }
 .evaluator-card-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); column-gap:28px; row-gap:12px; }
 .evaluator-card-section { min-width:0; }
 .evaluator-prompt-column { display:grid; grid-template-rows:subgrid; grid-column:1; grid-row:1 / span 2; min-height:0; }
