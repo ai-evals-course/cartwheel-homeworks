@@ -64,8 +64,6 @@ const EvaluatorPanel = (() => {
     setsHeading.append(el('h4', '', 'Train / development / test'));
     columns.insertBefore(setsHeading, data);
     const sets = el('section', 'evaluator-card-section');
-    const assigned = Object.values(mode.splits).reduce((total, split) => total + split.total, 0);
-    setsHeading.append(el('p', 'quiet', `${assigned} assigned conversations · ${mode.label_count} saved labels · Seed ${mode.seed ?? 'not saved'}`));
     sets.append(table('Dataset split counts', ['Set', 'Planned share', 'Pass', 'Fail', 'Total'],
       Object.entries(mode.splits).map(([name, split]) => [name === 'dev' ? 'Development' : name === 'train' ? 'Training' : 'Test',
         percent(split.fraction), split.pass, split.fail, split.total])));

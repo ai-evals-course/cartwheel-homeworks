@@ -83,7 +83,7 @@ the full conversation available. Clear the field or press Escape to reset it.
    split table, and development/test results table. The judge prompt is visible
    in the left column; the split table sits above the results in the right
    column. The columns stack on narrower screens. The split table shows
-   Pass and Fail counts, planned shares, and seed.
+   Pass and Fail counts and planned shares.
    Select a judge version to see separate development and test confusion
    matrices (judge verdicts on rows, human labels on columns), with TPR, TNR,
    and 95% Wilson intervals in a results table below. The saved prompt stays
