@@ -65,6 +65,10 @@ def test_evaluator_http_endpoint_uses_server_state_directory(tmp_path):
             assert json.load(response)['modes'][0]['id'] == 'content'
         with urllib.request.urlopen(f'http://127.0.0.1:{server.server_port}/evaluator.js') as response:
             assert 'javascript' in response.headers['Content-Type']
+        with urllib.request.urlopen(f'http://127.0.0.1:{server.server_port}/api/evaluator/traces?judge_id=content-v0&split=test') as response:
+            data = json.load(response)
+            assert data['split'] == 'dev'
+            assert [row['trace_id'] for row in data['traces']] == ['b']
     finally:
         server.shutdown(); server.server_close(); worker.join()
 
@@ -82,3 +86,45 @@ def test_evaluator_get_handler_returns_saved_artifacts_without_a_socket(tmp_path
     handler.do_GET()
     assert replies[0]['modes'][0]['judges'][0]['dev']['tnr'] == 1
     assert replies[0]['modes'][0]['judges'][0]['test'] is None
+
+
+def test_validation_trace_browser_pairs_verdicts_and_only_returns_validation_inputs(tmp_path):
+    from analysis.review_app.evaluator import validation_traces
+    root = artifacts(tmp_path)
+    path = root / 'judges/content-v0.json'
+    judge = json.loads(path.read_text())
+    judge.update(prompt_hash='hash', label_convention='pass_positive',
+                 predictions={'hash': {'b': 1, 'c': 0}},
+                 critiques={'hash': {'b': 'Specific validation evidence', 'c': 'TEST SECRET'}})
+    put(path, judge)
+    put(root / 'hw5_trace_inputs.json', [
+        {'trace_id': 'b', 'trace': [{'role': 'user', 'text': '<script>untrusted</script>'},
+                                  {'role': 'tool_result', 'content': 'Policy evidence'},
+                                  {'role': 'assistant', 'text': 'Final answer'}]},
+        {'trace_id': 'c', 'trace': [{'role': 'assistant', 'text': 'TEST SECRET'}]},
+    ])
+    before = {p: p.read_bytes() for p in tmp_path.rglob('*') if p.is_file()}
+    data = validation_traces(root, 'content-v0')
+    assert data['judge_id'] == 'content-v0'
+    assert data['split'] == 'dev'
+    assert len(data['traces']) == 1
+    case = data['traces'][0]
+    assert case['trace_id'] == 'b'
+    assert case['judge_verdict'] == 'Pass' and case['human_verdict'] == 'Fail'
+    assert case['disagreement'] is True
+    assert case['critique'] == 'Specific validation evidence'
+    assert case['trace'][1]['role'] == 'tool_result'
+    assert 'TEST SECRET' not in json.dumps(data)
+    assert all(p.read_bytes() == contents for p, contents in before.items())
+
+
+def test_validation_trace_browser_handles_pending_and_rejects_paths(tmp_path):
+    import pytest
+    from analysis.review_app.evaluator import validation_traces
+    root = artifacts(tmp_path)
+    data = validation_traces(root, 'content-v0')
+    assert data['traces'][0]['judge_verdict'] is None
+    assert data['traces'][0]['trace'] == []
+    for judge_id in ('../content-v0', 'missing', '/tmp/secret', ''):
+        with pytest.raises(ValueError):
+            validation_traces(root, judge_id)

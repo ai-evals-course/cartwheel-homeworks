@@ -16,7 +16,7 @@ from analysis.helpers._state import read_json, state_root
 from analysis.helpers.langfuse_io import _client
 from analysis.helpers.normalization import _metadata
 from analysis.review_app.data import ReviewStore, build_turn, group_sessions
-from analysis.review_app.evaluator import evaluator_summary
+from analysis.review_app.evaluator import evaluator_summary, validation_traces
 from observability.instrument import load_env
 from scenarios.export_langfuse import _jsonable
 
@@ -133,6 +133,12 @@ class ReviewHandler(BaseHTTPRequestHandler):
             self.respond(self.server.store.read())
         elif url.path == "/api/evaluator":
             self.respond(evaluator_summary(self.server.store.root))
+        elif url.path == "/api/evaluator/traces":
+            judge_id = parse_qs(url.query).get('judge_id', [''])[0]
+            try:
+                self.respond(validation_traces(self.server.store.root, judge_id))
+            except ValueError as exc:
+                self.respond({'error': str(exc)}, 400)
         elif url.path == "/api/session":
             sid = parse_qs(url.query).get("id", [""])[0]
             session = next((s for s in self.server.sessions if s["id"] == sid), None)

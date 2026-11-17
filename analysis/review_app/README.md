@@ -79,12 +79,12 @@ the full conversation available. Clear the field or press Escape to reset it.
    saved locally before a synchronous Langfuse score write and readback.
 6. Open **Evaluator** between Label and Progress to inspect saved HW5 artifacts.
    This full-width view hides the conversation sidebar and header. Each failure
-   mode has its own card with a brief definition, training/development/test
-   split table, and development/test results table. The judge prompt is visible
+   mode has its own card with a brief definition, training/validation/test
+   split table, and validation/test results table. The judge prompt is visible
    in the left column; the split table sits above the results in the right
    column. The columns stack on narrower screens. The split table shows
    Pass and Fail counts and planned shares.
-   Select a judge version to see separate development and test confusion
+   Select a judge version to see separate validation and test confusion
    matrices (judge verdicts on rows, human labels on columns), with TPR and TNR
    in a results table below. The saved prompt stays alongside these results,
    with its version and last seven SHA-256 characters in the heading. Results are
@@ -95,6 +95,14 @@ the full conversation available. Clear the field or press Escape to reset it.
    labels. Missing runs show Pending, and test results stay locked until their
    judge is frozen. The original HW4 labeling view remains separate from the
    confirmed HW5 export (HW5 uses 1 = Pass and 0 = Fail).
+   **Show traces** beside the Validation confusion matrix opens a modal trace
+   browser. It starts with validation disagreements and can switch to all
+   validation traces. Browse one run at a time with **Previous / Next** or
+   Left/Right arrow keys. The run ID has Judge and Human verdict badges beside
+   it; the saved critique, conversation history, tool evidence, and highlighted
+   final reply appear below. **Close** or Escape returns focus to the button.
+   This view reads the fixed HW5 inputs and cached predictions; it never changes
+   labels, calls a model, or serves test traces through its data endpoint.
 7. Use **Progress** to see distinct traces reviewed, missing judgments, pending
    synchronization, and AI suggestions. Accepting a suggestion creates a
    human-confirmed note with AI provenance; it never silently creates a label.

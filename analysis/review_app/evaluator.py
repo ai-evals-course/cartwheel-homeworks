@@ -1,11 +1,49 @@
 """Read-only projections of saved HW5 evaluator artifacts for the review UI."""
 import hashlib
+import re
 from pathlib import Path
 
 from analysis.helpers._state import read_json, read_jsonl
 
 METRIC_FIELDS = ('judge_id', 'split', 'n', 'tp', 'fn', 'tn', 'fp', 'tpr', 'tnr',
                  'tpr_interval', 'tnr_interval', 'class_counts')
+
+
+def validation_traces(root: Path, judge_id: str) -> dict:
+    """Pair saved validation inputs and labels with cached verdicts, read-only.
+
+    There is deliberately no split parameter: this endpoint never serves test
+    inputs or predictions, even when callers supply a different query string.
+    """
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', judge_id):
+        raise ValueError('Invalid judge ID')
+    judge = read_json(root / 'judges' / f'{judge_id}.json', {})
+    if judge.get('judge_id') != judge_id or not judge.get('mode'):
+        raise ValueError('Unknown judge')
+    mode = judge['mode']
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', mode):
+        raise ValueError('Invalid failure mode')
+    ids = read_json(root / 'splits.json', {}).get(mode, {}).get('dev', [])
+    labels = {r['trace_id']: r['label'] for r in read_jsonl(root / 'hw5_labels' / f'{mode}.jsonl')
+              if not r.get('superseded_by') and r.get('label') in (0, 1)}
+    inputs = {r['trace_id']: r['trace'] for r in read_json(root / 'hw5_trace_inputs.json', [])}
+    prompt_hash = judge.get('prompt_hash')
+    predictions = judge.get('predictions', {}).get(prompt_hash, {})
+    critiques = judge.get('critiques', {}).get(prompt_hash, {})
+    traces = []
+    for tid in ids:
+        prediction = predictions.get(tid)
+        if prediction in (0, 1) and judge.get('label_convention') != 'pass_positive':
+            prediction = 1 - prediction
+        label = labels.get(tid)
+        traces.append({
+            'trace_id': tid, 'trace': inputs.get(tid, []),
+            'judge_verdict': ('Pass' if prediction else 'Fail') if prediction in (0, 1) else None,
+            'human_verdict': ('Pass' if label else 'Fail') if label in (0, 1) else None,
+            'disagreement': prediction in (0, 1) and label in (0, 1) and prediction != label,
+            'critique': critiques.get(tid, ''),
+        })
+    return {'judge_id': judge_id, 'mode': mode, 'split': 'dev', 'traces': traces}
 
 
 def evaluator_summary(root: Path) -> dict:
