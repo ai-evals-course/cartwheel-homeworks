@@ -284,6 +284,8 @@ def run_test(judge_id: str, *, approved: bool = False) -> dict:
     labels = _labels(mode)
     if any(tid not in labels for tid in test_ids):
         raise ValueError('A test record has no human label')
+    from dotenv import load_dotenv
+    load_dotenv(override=False)
     os.environ['CARTWHEEL_JUDGE_TRACE_SOURCE'] = str(source.resolve())
     # DocETL's default user cache is outside the workspace in this environment.
     os.environ.setdefault('DOCETL_HOME_DIR', str(state_path('..', '..').resolve()))

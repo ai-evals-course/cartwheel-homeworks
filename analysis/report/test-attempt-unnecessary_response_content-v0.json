@@ -1,0 +1,19 @@
+{
+  "judge_id": "unnecessary_response_content-v0",
+  "model": "gpt-4o-mini",
+  "split": "test",
+  "trace_count": 93,
+  "class_counts": {
+    "Pass": 25,
+    "Fail": 68
+  },
+  "approved_by_student": true,
+  "attempted_at": "2026-11-17T11:51:23.141317+00:00",
+  "status": "failed_connection",
+  "error": "API connection error; Temporary failure in name resolution observed.",
+  "saved_test_predictions": 0,
+  "metrics_available": false,
+  "runner_fix": "Load .env before selecting the DocETL backend; covered by an offline regression test.",
+  "offline_checks": "6 passed",
+  "resume_command": "uv run python -m analysis.run_judges test --judge-id unnecessary_response_content-v0 --approve-test-batch"
+}

@@ -117,3 +117,23 @@ def test_development_reuses_registered_judge_and_never_calls_test(tmp_path, monk
     prompt.with_suffix('.examples.json').write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match='training'):
         run_development('unnecessary_response_content', prompt, approved=True)
+
+
+def test_test_runner_loads_local_env_before_backend_selection(tmp_path, monkeypatch):
+    """Regression: a key stored only in .env must enable the DocETL backend."""
+    import os
+    state, judge_id = setup_judge(tmp_path, monkeypatch)
+    save_dev_result(state, judge_id)
+    monkeypatch.delenv('OPENAI_API_KEY', raising=False)
+    env_path = tmp_path / '.env'
+    env_path.write_text('OPENAI_API_KEY=offline-env-key\n')
+    monkeypatch.setattr('dotenv.main.find_dotenv', lambda: str(env_path))
+    def classify(prompt, model, ids):
+        assert os.environ.get('OPENAI_API_KEY') == 'offline-env-key'
+        result = JudgeBatch()
+        for tid in ids:
+            result[tid] = int(tid == 't1')
+            result.critiques[tid] = 'Synthetic offline evidence.'
+        return result
+    monkeypatch.setattr('analysis.helpers.scale.classify_store', classify)
+    run_test(judge_id, approved=True)

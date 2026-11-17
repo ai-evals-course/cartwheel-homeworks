@@ -1,0 +1,17 @@
+{
+  "judge_id": "unnecessary_response_content-v0",
+  "selected_by": "student",
+  "selection_instruction": "use initial prompt for test",
+  "selected_at": "2026-11-17T11:44:04.260256+00:00",
+  "status": "frozen_test_attempt_failed_connection",
+  "model": "gpt-4o-mini",
+  "test_trace_count": 93,
+  "test_class_counts": {
+    "Pass": 25,
+    "Fail": 68
+  },
+  "test_paid_batch_approved": true,
+  "disagreement_review_status": "31 development disagreements recorded; full student review not completed",
+  "revision_decision": "Use initial v0 without prompt revisions.",
+  "test_approval_instruction": "run it"
+}
