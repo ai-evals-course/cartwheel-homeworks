@@ -1248,11 +1248,14 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-card > h3 { font-size:var(--text-heading); margin-bottom:8px; }
 .evaluator-card > h3::first-letter { text-transform:uppercase; }
 .evaluator-description { max-width:90ch; margin-bottom:24px; }
-.evaluator-card-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:28px; }
+.evaluator-card-columns { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); column-gap:28px; row-gap:12px; }
 .evaluator-card-section { min-width:0; }
-.evaluator-prompt-column { display:flex; flex-direction:column; min-height:0; }
-.evaluator-data-column { display:grid; gap:28px; min-width:0; align-content:start; }
-.evaluator-card-section h4 { margin:0 0 12px; font-size:var(--text-body); }
+.evaluator-prompt-column { display:grid; grid-template-rows:subgrid; grid-column:1; grid-row:1 / span 2; min-height:0; }
+.evaluator-data-column { display:grid; grid-column:2; grid-row:2; gap:28px; min-width:0; align-content:start; }
+.evaluator-set-heading { grid-column:2; grid-row:1; }
+.evaluator-set-heading p { margin-bottom:0; }
+.evaluator-footnote { grid-column:2; grid-row:3; margin:0; }
+.evaluator-card-section h4,.evaluator-set-heading h4 { margin:0 0 12px; font-size:var(--text-body); }
 .evaluator-card-section > label { margin-top:0; }
 .evaluator-version { overflow-wrap:anywhere; }
 .evaluator-table { width:100%; }
@@ -1266,10 +1269,12 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-confusion tbody tr:first-child td:nth-child(2),.evaluator-confusion tbody tr:last-child td:last-child { background:#edf3ed; }
 .evaluator-confusion tbody tr:first-child td:last-child,.evaluator-confusion tbody tr:last-child td:nth-child(2) { background:#faf0e9; }
 .evaluator-results-heading { font-size:var(--text-body); margin:0 0 12px; }
-.evaluator-prompt { flex:1; height:0; min-height:0; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
+.evaluator-prompt { contain:size; min-height:0; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
 @media(max-width:1050px) {
   .evaluator-card-columns { grid-template-columns:minmax(0,1fr); gap:24px; }
-  .evaluator-prompt { flex:none; height:auto; max-height:75vh; }
+  .evaluator-prompt-column { display:flex; flex-direction:column; grid-column:auto; grid-row:auto; }
+  .evaluator-data-column,.evaluator-set-heading,.evaluator-footnote { grid-column:auto; grid-row:auto; }
+  .evaluator-prompt { contain:none; max-height:75vh; }
 }
 @media(max-width:650px) {
   #evaluator-view { padding:0; }

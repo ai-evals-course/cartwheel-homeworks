@@ -60,9 +60,12 @@ const EvaluatorPanel = (() => {
     prompt.append(el('h4', '', 'Judge prompt'));
     const data = el('div', 'evaluator-data-column');
     columns.append(prompt, data); card.append(columns);
-    const sets = el('section', 'evaluator-card-section'); sets.append(el('h4', '', 'Train / development / test'));
+    const setsHeading = el('header', 'evaluator-set-heading');
+    setsHeading.append(el('h4', '', 'Train / development / test'));
+    columns.insertBefore(setsHeading, data);
+    const sets = el('section', 'evaluator-card-section');
     const assigned = Object.values(mode.splits).reduce((total, split) => total + split.total, 0);
-    sets.append(el('p', 'quiet', `${assigned} assigned conversations · ${mode.label_count} saved labels · Seed ${mode.seed ?? 'not saved'}`));
+    setsHeading.append(el('p', 'quiet', `${assigned} assigned conversations · ${mode.label_count} saved labels · Seed ${mode.seed ?? 'not saved'}`));
     sets.append(table('Dataset split counts', ['Set', 'Planned share', 'Pass', 'Fail', 'Total'],
       Object.entries(mode.splits).map(([name, split]) => [name === 'dev' ? 'Development' : name === 'train' ? 'Training' : 'Test',
         percent(split.fraction), split.pass, split.fail, split.total])));
@@ -100,7 +103,7 @@ const EvaluatorPanel = (() => {
     ];
     results.append(table('Judge evaluation results', ['Measure', 'Development', 'Test'],
       rows.map(([title, format]) => [title, metric('dev', format), metric('test', format)])));
-    results.append(el('p', 'quiet', 'TPR = TP / (TP + FN). TNR = TN / (TN + FP). Pass is the positive class.'));
+    columns.append(el('p', 'quiet evaluator-footnote', 'TPR = TP / (TP + FN). TNR = TN / (TN + FP). Pass is the positive class.'));
     data.append(results);
     return card;
   }
