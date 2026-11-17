@@ -5,11 +5,6 @@ const EvaluatorPanel = (() => {
   const percent = value => Number.isFinite(value) ? (value * 100).toFixed(1) + '%' : 'Not available';
   const interval = values => Array.isArray(values) && values.every(Number.isFinite)
     ? `${percent(values[0])}–${percent(values[1])}` : 'Not available';
-  const purposes = {
-    train: 'Training supplies examples for the judge prompt.',
-    dev: 'Development compares predictions with your labels to refine the prompt.',
-    test: 'Test measures the final judge after its prompt is frozen.',
-  };
   function table(caption, headings, rows) {
     const wrap = el('div', 'table-wrap'), grid = el('table', 'evaluator-table');
     grid.append(el('caption', 'sr-only', caption));
@@ -71,19 +66,6 @@ const EvaluatorPanel = (() => {
     sets.append(table('Dataset split counts', ['Set', 'Planned share', 'Pass', 'Fail', 'Total'],
       Object.entries(mode.splits).map(([name, split]) => [name === 'dev' ? 'Development' : name === 'train' ? 'Training' : 'Test',
         percent(split.fraction), split.pass, split.fail, split.total])));
-    const available = new Set(allTraces().map(t => t.id));
-    for (const [name, split] of Object.entries(mode.splits)) {
-      const content = el('div'); content.append(el('p', 'quiet', purposes[name]));
-      if (split.unlabeled) content.append(el('p', 'warning', `${split.unlabeled} assigned trace(s) have no saved HW5 label.`));
-      const list = el('ul', 'evaluator-traces');
-      for (const id of split.ids) {
-        const row = el('li');
-        row.append(available.has(id) ? button(id, () => jumpTrace(id), 'evaluator-trace-link') : el('code', '', id));
-        list.append(row);
-      }
-      if (!split.ids.length) content.append(el('p', 'quiet', 'No split saved.')); else content.append(list);
-      sets.append(details(`${name === 'train' ? 'Training' : name === 'dev' ? 'Development' : 'Test'} trace IDs (${split.total})`, content));
-    }
     data.append(sets);
     const results = el('section', 'evaluator-card-section'); results.append(el('h4', '', 'Development / test results'));
     if (!mode.judges.length) {
@@ -111,12 +93,6 @@ const EvaluatorPanel = (() => {
       rows.map(([title, format]) => [title, metric('dev', format), metric('test', format)])));
     results.append(el('p', 'quiet', 'TPR = TP / (TP + FN). TNR = TN / (TN + FP). Pass is the positive class.'));
     data.append(results);
-    if (mode.boundaries || mode.requirement) {
-      const boundary = el('div');
-      if (mode.boundaries) boundary.append(el('p', '', mode.boundaries));
-      if (mode.requirement) boundary.append(el('p', 'quiet', 'Requirement: ' + mode.requirement));
-      card.append(details('Boundary and requirement', boundary));
-    }
     return card;
   }
   return {render, refresh};

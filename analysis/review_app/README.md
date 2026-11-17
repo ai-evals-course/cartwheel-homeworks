@@ -82,10 +82,8 @@ the full conversation available. Clear the field or press Escape to reset it.
    mode has its own card with a brief definition, training/development/test
    split table, and development/test results table. The judge prompt is visible
    in the left column; the split table sits above the results in the right
-   column. The columns stack on narrower screens. Boundary and
-   requirement details stay collapsed below the card. The split table shows
-   Pass and Fail counts, planned shares, seed, and expandable trace IDs. IDs
-   available in the current trace source open their original conversations.
+   column. The columns stack on narrower screens. The split table shows
+   Pass and Fail counts, planned shares, and seed.
    Select a judge version to compare development and test confusion counts,
    TPR, TNR, and 95% Wilson intervals alongside its saved prompt. Results are
    read from `analysis/state/judges/` and `analysis/report/`; labels and splits

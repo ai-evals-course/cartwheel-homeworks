@@ -1254,14 +1254,10 @@ main.evaluator-layout { grid-template-columns:minmax(0,1fr); }
 .evaluator-card-section h4 { margin:0 0 12px; font-size:var(--text-body); }
 .evaluator-card-section > label { margin-top:0; }
 .evaluator-version { overflow-wrap:anywhere; }
-.evaluator-card > details { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
 .evaluator-table { width:100%; }
 .evaluator-table th,.evaluator-table td { text-align:left; vertical-align:top; }
 .evaluator-table tbody th { font-weight:500; }
 .evaluator-table thead { background:#eeece9; }
-.evaluator-traces { max-height:260px; overflow-y:auto; margin:0; padding:8px 0; list-style:none; }
-.evaluator-traces li { padding:3px 0; overflow-wrap:anywhere; }
-.evaluator-trace-link { border:0; background:transparent; color:var(--accent); text-decoration:underline; text-underline-offset:3px; padding:4px; font:var(--text-small) ui-monospace,monospace; overflow-wrap:anywhere; text-align:left; }
 .evaluator-prompt { max-height:75vh; overflow:auto; padding:16px; margin:0; border:1px solid var(--line); border-radius:4px; background:#f7f6f4; }
 @media(max-width:1050px) {
   .evaluator-card-columns { grid-template-columns:minmax(0,1fr); gap:24px; }
