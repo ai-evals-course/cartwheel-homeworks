@@ -78,8 +78,11 @@ the full conversation available. Clear the field or press Escape to reset it.
    Unreviewed cells are not interpreted as Absent. Each explicit decision is
    saved locally before a synchronous Langfuse score write and readback.
 6. Open **Evaluator** between Label and Progress to inspect saved HW5 artifacts.
-   This full-width view hides the conversation sidebar and header. Select the
-   failure mode to see its definition and boundary, training/development/test
+   This full-width view hides the conversation sidebar and header. Each failure
+   mode has its own card with a brief definition, training/development/test
+   split table, and development/test results table. The two tables appear
+   side by side on wide screens and stack on narrower screens. Boundary and
+   requirement details stay collapsed below the card. The split table shows
    Pass and Fail counts, planned shares, seed, and expandable trace IDs. IDs
    available in the current trace source open their original conversations.
    Select a judge version to compare development and test confusion counts,

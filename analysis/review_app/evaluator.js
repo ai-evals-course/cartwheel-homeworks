@@ -1,6 +1,7 @@
 /* Saved evaluator artifacts are read-only. Content is always rendered as text. */
 const EvaluatorPanel = (() => {
-  let snapshot = null, selectedMode = '', selectedJudge = '', loading = false, error = '';
+  let snapshot = null, loading = false, error = '';
+  const selectedJudges = new Map();
   const percent = value => Number.isFinite(value) ? (value * 100).toFixed(1) + '%' : 'Not available';
   const interval = values => Array.isArray(values) && values.every(Number.isFinite)
     ? `${percent(values[0])}–${percent(values[1])}` : 'Not available';
@@ -49,15 +50,18 @@ const EvaluatorPanel = (() => {
     if (error) {const message = el('p', 'warning', 'Could not load evaluator data: ' + error); message.setAttribute('role', 'alert'); root.append(message);}
     if (!snapshot) return root.append(el('p', 'empty', loading ? 'Loading evaluator data…' : 'Choose Refresh results to load saved evaluations.'));
     if (!snapshot.modes.length) return root.append(el('p', 'empty', 'No HW5 evaluator data yet. Export confirmed HW5 labels and save the split to see it here.'));
-    const mode = snapshot.modes.find(m => m.id === selectedMode) || snapshot.modes[0]; selectedMode = mode.id;
-    root.append(selector('Failure mode', 'evaluator-mode', snapshot.modes.map(m => [m.id, m.name]), mode.id,
-      value => {selectedMode = value; selectedJudge = '';}));
-    const definition = el('section', 'panel evaluator-definition');
-    definition.append(el('h3', '', mode.name), el('p', '', mode.definition || 'No saved definition.'));
-    if (mode.boundaries) definition.append(el('p', '', 'Boundary: ' + mode.boundaries));
-    if (mode.requirement) definition.append(el('p', 'quiet', 'Requirement: ' + mode.requirement));
-    root.append(definition);
-    const sets = el('section', 'panel'); sets.append(el('h3', '', 'Train / development / test'));
+    const cards = el('div', 'evaluator-cards');
+    for (const mode of snapshot.modes) cards.append(modeCard(mode));
+    root.append(cards);
+  }
+  function modeCard(mode) {
+    const card = el('article', 'panel evaluator-card');
+    const titleId = 'evaluator-title-' + encodeURIComponent(mode.id);
+    card.setAttribute('aria-labelledby', titleId);
+    const title = el('h3', '', mode.name); title.id = titleId;
+    card.append(title, el('p', 'evaluator-description', mode.definition || 'No saved definition.'));
+    const columns = el('div', 'evaluator-card-columns');
+    const sets = el('section', 'evaluator-card-section'); sets.append(el('h4', '', 'Train / development / test'));
     const assigned = Object.values(mode.splits).reduce((total, split) => total + split.total, 0);
     sets.append(el('p', 'quiet', `${assigned} assigned conversations · ${mode.label_count} saved labels · Seed ${mode.seed ?? 'not saved'}`));
     sets.append(table('Dataset split counts', ['Set', 'Planned share', 'Pass', 'Fail', 'Total'],
@@ -76,12 +80,17 @@ const EvaluatorPanel = (() => {
       if (!split.ids.length) content.append(el('p', 'quiet', 'No split saved.')); else content.append(list);
       sets.append(details(`${name === 'train' ? 'Training' : name === 'dev' ? 'Development' : 'Test'} trace IDs (${split.total})`, content));
     }
-    root.append(sets);
-    const results = el('section', 'panel'); results.append(el('h3', '', 'Development and test results'));
-    if (!mode.judges.length) {results.append(el('p', 'empty', 'No judge registered for this mode yet.')); root.append(results); return;}
-    const judge = mode.judges.find(j => j.judge_id === selectedJudge) || mode.judges[0]; selectedJudge = judge.judge_id;
-    results.append(selector('Judge version', 'evaluator-judge', mode.judges.map(j => [j.judge_id, j.judge_id]), judge.judge_id,
-      value => {selectedJudge = value;}));
+    columns.append(sets);
+    const results = el('section', 'evaluator-card-section'); results.append(el('h4', '', 'Development / test results'));
+    if (!mode.judges.length) {
+      results.append(el('p', 'empty', 'No judge registered for this mode yet.'));
+      columns.append(results); card.append(columns); return card;
+    }
+    const judge = mode.judges.find(j => j.judge_id === selectedJudges.get(mode.id)) || mode.judges[0];
+    selectedJudges.set(mode.id, judge.judge_id);
+    if (mode.judges.length > 1) results.append(selector('Judge version', 'evaluator-judge-' + encodeURIComponent(mode.id),
+      mode.judges.map(j => [j.judge_id, j.judge_id]), judge.judge_id, value => selectedJudges.set(mode.id, value)));
+    else results.append(el('p', 'quiet evaluator-version', judge.judge_id));
     results.append(el('p', 'quiet', `Model: ${judge.model || 'Not saved'} · Status: ${judge.status || 'Not saved'}`));
     const metric = (split, format) => judge[split] ? format(judge[split]) : split === 'test' && judge.status !== 'frozen' ? 'Locked until frozen' : 'Pending';
     const rows = [
@@ -95,7 +104,14 @@ const EvaluatorPanel = (() => {
       rows.map(([title, format]) => [title, metric('dev', format), metric('test', format)])));
     results.append(el('p', 'quiet', 'TPR = TP / (TP + FN). TNR = TN / (TN + FP). Pass is the positive class.'));
     if (judge.prompt_text) results.append(details('Judge prompt', el('pre', 'evaluator-prompt', judge.prompt_text)));
-    root.append(results);
+    columns.append(results); card.append(columns);
+    if (mode.boundaries || mode.requirement) {
+      const boundary = el('div');
+      if (mode.boundaries) boundary.append(el('p', '', mode.boundaries));
+      if (mode.requirement) boundary.append(el('p', 'quiet', 'Requirement: ' + mode.requirement));
+      card.append(details('Boundary and requirement', boundary));
+    }
+    return card;
   }
   return {render, refresh};
 })();
